@@ -32,3 +32,9 @@ triangles. `tests/audio.cjs` holds every one-shot to peak ≤ −20 dBFS, < 1 % 
 - Rejected: dropping the tick entirely (a small deposit loses its feedback); a fixed cap of N ticks at full level (ends abruptly
   mid-stream); low-pass filters on every tone (more nodes per sound; a triangle already removes the buzz); one tick per resource
   kind (the bank's count-up already shows that, D-021).
+
+### D-040 — The ping's cache tone is timed by game time, not scheduled audio (2026-11-23, build 25, S-12)
+`updateScan` plays `audio.scanCache()` (784 Hz sine, 0.16 s, gain 0.07: peak −32.4 dBFS, 15 % of the ping's energy, 0 % > 2 kHz)
+on the frame the ring's age passes a cache mark, only if that cache is still unopened. Reduced motion (no ring) plays it at once.
+- Rejected: scheduling the tone with an audio delay at ping time (it would still play while paused or after the cache was mined
+  before the ring arrived); replaying the full cache chord (it is the kit's loudest sound and means "opened", not "found").

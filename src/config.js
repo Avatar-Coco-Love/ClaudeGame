@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.26';
+export const VERSION = '0.1.27';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -109,7 +109,7 @@ export const NEXUS_UPGRADES = [
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen. The Scanner ping shows CRYSTAL/PRISM/LUMEN cells within
 // SCAN_RADIUS cells for SCAN_SHOW_S as a ring sweeps out at SCAN_SPEED; nothing is marked explored or saved.
 export const RESEARCH = [
-  { id: 'scanner', name: 'Scanner', desc: 'Ping: shows ore within 12 cells for a few seconds', cost: 10 },
+  { id: 'scanner', name: 'Scanner', desc: 'Ping: shows ore and vault caches within 12 cells for a few seconds', cost: 10 },
 ];
 export const RESEARCH_HINT = 'Gold Lumen ● hides past 55 cells, in the Deep';
 export const SCAN_RADIUS = 12;     // cells

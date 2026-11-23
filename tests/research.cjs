@@ -6,7 +6,7 @@ async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const { T, CELL, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S } = await import('../src/config.js');
-  const { buyResearch } = await import('../src/research.js');
+  const { buyResearch, markAlpha } = await import('../src/research.js');
   const g = new Game({ seed: 77, mode: 'drift', audio }), w = g.world, p = g.player;
   // Park the core in an open spot ~30 cells out that has ore within 12 cells.
   for (let i = 0; i < w.cells.length; i++) {
@@ -53,6 +53,25 @@ async function nodeChecks(check) {
   rm.update(1 / 60, idle(true));
   check('reduced motion: no ring, every glyph at once; same ping in Surge (S-11)', !rm.scan.ring && rm.scan.marks.length === expect && rm.scan.marks.every(m => m.at === 0),
     `${rm.scan.marks.length} marks, ring ${rm.scan.ring}`);
+
+  // S-12 (D-035): the ping also marks an unopened vault cache inside 12 cells, once, with one soft tone when the ring gets there.
+  let tones = 0;
+  const vg = new Game({ seed: 77, mode: 'drift', audio: new Proxy({}, { get: (_, k) => k === 'scanCache' ? () => tones++ : () => {} }) });
+  vg.research.scanner = true; vg.spawnTimer = 99;
+  const v = vg.world.vaults[0], vw = vg.world, toN = Math.atan2(vw.cy - v.y, vw.cx - v.x);
+  const pingAt = cells => {
+    Object.assign(vg.player, { x: (v.x + 0.5 + Math.cos(toN) * cells) * CELL, y: (v.y + 0.5 + Math.sin(toN) * cells) * CELL, vx: 0, vy: 0 });
+    vg.scan.cooldown = 0; vg.update(1 / 60, idle(true));
+    return vg.scan.marks.filter(m => m.type === T.CACHE && m.x === v.x && m.y === v.y);
+  };
+  const near = pingAt(10);
+  for (let i = 0; i < 60; i++) vg.update(1 / 60, idle());
+  const nearTones = tones, shown = near.length === 1 && markAlpha(vg, near[0]) > 0;
+  const far = pingAt(14).length;
+  vg.world.cells[v.y * vw.w + v.x] = T.EMPTY; vg.onCellBroken(v.x, v.y, T.CACHE);
+  const broken = pingAt(10).length;
+  check('ping 10 cells from a vault marks its cache once (one soft tone); 14 cells away or broken, no mark (S-12)',
+    near.length === 1 && shown && nearTones === 1 && far === 0 && broken === 0, JSON.stringify({ near: near.length, shown, nearTones, far, broken }));
 }
 
 async function browserChecks(browser, url, check, errors, plantSaveAndReload) {

@@ -24,7 +24,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 ## M3 — Research (new *kinds* of things)
 - ✅ (#23) **S-11 Research v1:** a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal, 20 s cooldown) (D-034).
 - ✅ (#24) Design session 22: Lumen → Scanner play-tested, Q-010 measured and settled (D-035), beam modes specced (D-036).
-- **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells glows like ore, in both modes.
+- ✅ (#27) **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells shows as a white glyph + blip, one soft tone (D-040).
 - **S-13 Beam modes v1 — Wide** (25●): a 3-cell swath, slower per cell; Q or a touch button switches. `SAVE_FORMAT` 7.
 - **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells. Then measure Q-011.
 

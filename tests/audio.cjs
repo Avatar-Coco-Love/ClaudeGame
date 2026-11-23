@@ -69,7 +69,7 @@ async function renderSfx([script, secs]) {
   return { peakDb: r1(20 * Math.log10(peak || 1e-50)), loudS: loud / 20, above4k: r1(100 * hi / (tot || 1)) };
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
-  'cache()', 'scan()', 'hurt()', 'enemyDie()', 'full()'];
+  'cache()', 'scan()', 'scanCache()', 'hurt()', 'enemyDie()', 'full()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
