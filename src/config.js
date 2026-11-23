@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.27';
+export const VERSION = '0.1.28';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -110,12 +110,21 @@ export const NEXUS_UPGRADES = [
 // SCAN_RADIUS cells for SCAN_SHOW_S as a ring sweeps out at SCAN_SPEED; nothing is marked explored or saved.
 export const RESEARCH = [
   { id: 'scanner', name: 'Scanner', desc: 'Ping: shows ore and vault caches within 12 cells for a few seconds', cost: 10 },
+  { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
 ];
 export const RESEARCH_HINT = 'Gold Lumen ● hides past 55 cells, in the Deep';
 export const SCAN_RADIUS = 12;     // cells
 export const SCAN_COOLDOWN_S = 20;
 export const SCAN_SHOW_S = 6;
 export const SCAN_SPEED = 600;     // px/s, the ring's growth
+
+// Beam modes (S-13, D-036), in Q / ⟂ cycle order. Rays are parallel, `offsets` px sideways; range and damage are multipliers
+// on the Core Matrix stats (per ray, per cell: a cell or Glitch under two rays takes damage once). Wide: ~1.35× cells/s, 2.2× slower each.
+export const WIDE_OFFSET = 32, WIDE_RANGE = 0.75, WIDE_DMG = 0.45;
+export const BEAM_MODES = {
+  focus: { name: 'Focus', research: null, offsets: [0], range: 1, dmg: 1 },
+  wide: { name: 'Wide', research: 'wide', offsets: [-WIDE_OFFSET, 0, WIDE_OFFSET], range: WIDE_RANGE, dmg: WIDE_DMG },
+};
 
 export const MODES = {
   drift: { name: 'Drift', blurb: 'Calm. No hostiles. Mine, explore, build at your own pace.' },

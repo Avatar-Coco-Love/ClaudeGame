@@ -4,6 +4,7 @@ import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
+import { castBeam, cycleBeamMode, validMode } from './beam.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
@@ -82,7 +83,8 @@ export class Game {
       realizedVx: 0, realizedVy: 0, // what actually happened after collision
       angle: -Math.PI / 2, integrity: 100, invuln: 0, hurtFlash: 0,
     };
-    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null };
+    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [] };
+    this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
     this.particles = [];
@@ -208,6 +210,7 @@ export class Game {
 
     updateScan(this, dt);
     if (intent.scan) tryScan(this);
+    if (intent.beamMode && cycleBeamMode(this)) this.notify('beam-mode');
     this.updateBeam(dt, intent);
     this.updatePickups(dt);
     this.updateDeposit(dt);
@@ -229,50 +232,12 @@ export class Game {
     const p = this.player, b = this.beam;
     const was = b.on;
     b.on = !!(intent.fire && intent.aim);
-    b.target = null; b.enemy = null;
+    b.target = null; b.enemy = null; b.rays = [];
     if (b.on && !was) this.audio.beamStart();
     this.audio.beam(b.on);
     if (!b.on) return;
-    this.updateBeamHit(dt);
+    castBeam(this, dt);
     this.audio.beamContact(!!(b.target || b.enemy));
-  }
-
-  updateBeamHit(dt) {
-    const p = this.player, b = this.beam;
-    const range = this.stat('range');
-    const dx = Math.cos(p.angle), dy = Math.sin(p.angle);
-    // Cast from the core's centre so the wall touching the nose is always the first thing hit.
-    const hit0 = this.world.raycast(p.x, p.y, dx, dy, range + 12);
-    const hit = hit0 && { ...hit0, dist: Math.max(0, hit0.dist - 12) };
-    const ox = p.x + dx * 12, oy = p.y + dy * 12;
-    let dist = hit ? hit.dist : range;
-    // Enemies along the ray, if closer than the wall.
-    let best = null;
-    for (const e of this.enemies) {
-      if (e.fade !== undefined) continue; // a Glitch that gave up can't be targeted (S-6)
-      const ex = e.x - ox, ey = e.y - oy;
-      const t = ex * dx + ey * dy;
-      if (t < 0 || t > dist) continue;
-      const perp = Math.abs(ex * dy - ey * dx);
-      if (perp < e.r + 4 && (!best || t < best.t)) best = { e, t };
-    }
-    const dps = this.stat('beam');
-    if (best) {
-      dist = best.t;
-      b.enemy = best.e;
-      best.e.hp -= dps * dt * 1.6;
-      best.e.flash = 0.08;
-      if (Math.random() < dt * 40) this.particle(ox + dx * dist, oy + dy * dist, (Math.random() - 0.5) * 160, (Math.random() - 0.5) * 160, 0.3, '#ff7a3d', 2);
-    } else if (hit) {
-      const res = this.world.hit(hit.x, hit.y, dps * dt);
-      b.target = { x: hit.x, y: hit.y, frac: res && !res.broken ? res.frac : 0 };
-      if (Math.random() < dt * 45) {
-        const col = this.world.look(hit.x, hit.y, res ? res.type : T.ROCK).edge;
-        this.particle(ox + dx * dist, oy + dy * dist, (-dx + (Math.random() - 0.5) * 1.6) * 110, (-dy + (Math.random() - 0.5) * 1.6) * 110, 0.35, col, 2);
-      }
-      if (res && res.broken) this.onCellBroken(hit.x, hit.y, res.type);
-    }
-    b.ex = ox + dx * dist; b.ey = oy + dy * dist;
   }
 
   // Reduced motion (S-3) also turns off hitstop and the upgrade ring (S-4); null settings = all effects on.
@@ -490,7 +455,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
@@ -507,6 +472,7 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     Object.assign(this.research, s.research || {});
+    this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4 });
   }

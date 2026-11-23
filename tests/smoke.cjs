@@ -27,6 +27,7 @@ async function plantSaveAndReload(page, edit) {
 }
 
 const research = require('./research.cjs');
+const beam = require('./beam.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -191,6 +192,7 @@ async function rngChecks() {
   await lumenChecks().catch(e => check('S-10 Lumen checks ran', false, e.message));
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await research.nodeChecks(check).catch(e => check('S-11 research checks ran', false, e.message));
+  await beam.nodeChecks(check).catch(e => check('S-13 beam checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -433,6 +435,7 @@ async function rngChecks() {
     await ctx.close();
 
     await research.browserChecks(browser, url, check, errors, plantSaveAndReload);
+    await beam.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----
@@ -492,8 +495,8 @@ async function rngChecks() {
       return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #matrix-close')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); });
     await np.click('#matrix .tabs button[data-tab="research"]'); // S-11: the third tab and its Lumen hint fit too
     clip.push(...await np.evaluate(() => { const sh = document.querySelector('#matrix .sheet').getBoundingClientRect();
-      return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, .research-hint')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); }));
-    check('Matrix tabs + buy fit at 320 px (Nexus + Research)', clip.length === 0, clip.join(', '));
+      return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #upgrade-list .upgrade, .research-hint')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); }));
+    check('Matrix tabs + buy fit at 320 px (Nexus + Research with 2 nodes, S-13)', clip.length === 0, clip.join(', '));
     const ov = [...ovTitle, ...await overflow()];
     check('nothing overflows at 320 px: title, Settings, HUD, Matrix (B-001)', ov.length === 0, ov.join(', '));
     await np.close();

@@ -46,7 +46,7 @@ async function nodeChecks(check) {
   const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
   old.v = 5; delete old.research;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
-  check('a format-5 save loads with research: {} (S-11)', SAVE_FORMAT === 6 && up.v === 6 && JSON.stringify(up.research) === '{}' && !o.research.scanner,
+  check('a format-5 save loads with research: {} (S-11)', up.v === SAVE_FORMAT && JSON.stringify(up.research) === '{}' && !o.research.scanner,
     JSON.stringify({ v: up.v, research: up.research }));
   const rm = new Game({ seed: 77, mode: 'surge', audio, settings: { reducedMotion: true } });
   Object.assign(rm.player, { x: p.x, y: p.y }); rm.research.scanner = true; rm.spawnTimer = 99;

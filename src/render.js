@@ -267,9 +267,13 @@ export class Renderer {
   }
 
   drawCrack(ctx) {
-    const b = this.game.beam;
-    if (!b.target || b.target.frac <= 0) return;
-    const { x, y, frac } = b.target;
+    const b = this.game.beam, seen = new Set();
+    for (const r of b.rays.length ? b.rays : [b]) { // S-13: one crack per cell the beam is cutting
+      if (!r.target || r.target.frac <= 0 || seen.has(r.target)) continue;
+      seen.add(r.target); this.drawCrackAt(ctx, r.target);
+    }
+  }
+  drawCrackAt(ctx, { x, y, frac }) {
     ctx.save();
     ctx.strokeStyle = `rgba(255,255,255,${0.25 + frac * 0.6})`;
     ctx.lineWidth = 1.5;
@@ -346,21 +350,26 @@ export class Renderer {
   drawBeam(ctx) {
     const b = this.game.beam, p = this.game.player;
     if (!b.on) return;
-    const ox = p.x + Math.cos(p.angle) * 12, oy = p.y + Math.sin(p.angle) * 12;
+    // S-13: Wide draws each of its parallel rays at 0.6× width, joined by a thin emitter bar across the nose.
+    const rays = b.rays.length ? b.rays : [{ ox: p.x + Math.cos(p.angle) * 12, oy: p.y + Math.sin(p.angle) * 12, ex: b.ex, ey: b.ey, enemy: b.enemy }];
+    const w = rays.length > 1 ? 0.6 : 1, flick = 0.75 + Math.random() * 0.25;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';
-    const flick = 0.75 + Math.random() * 0.25;
-    const col = b.enemy ? '255,122,61' : '46,242,255';
-    ctx.strokeStyle = `rgba(${col},${0.25 * flick})`; ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(b.ex, b.ey); ctx.stroke();
-    ctx.strokeStyle = `rgba(${col},${0.7 * flick})`; ctx.lineWidth = 3.5;
-    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(b.ex, b.ey); ctx.stroke();
-    ctx.strokeStyle = `rgba(255,255,255,${0.9 * flick})`; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(b.ex, b.ey); ctx.stroke();
-    const g = ctx.createRadialGradient(b.ex, b.ey, 0, b.ex, b.ey, 14);
-    g.addColorStop(0, 'rgba(255,255,255,0.9)'); g.addColorStop(1, `rgba(${col},0)`);
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.ex, b.ey, 14, 0, Math.PI * 2); ctx.fill();
+    if (rays.length > 1) {
+      ctx.strokeStyle = `rgba(46,242,255,${0.5 * flick})`; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(rays[0].ox, rays[0].oy); ctx.lineTo(rays[rays.length - 1].ox, rays[rays.length - 1].oy); ctx.stroke();
+    }
+    for (const r of rays) {
+      const col = r.enemy ? '255,122,61' : '46,242,255';
+      for (const [a, lw] of [[0.25, 9], [0.7, 3.5], [0, 1.2]]) {
+        ctx.strokeStyle = a ? `rgba(${col},${a * flick})` : `rgba(255,255,255,${0.9 * flick})`; ctx.lineWidth = lw * w;
+        ctx.beginPath(); ctx.moveTo(r.ox, r.oy); ctx.lineTo(r.ex, r.ey); ctx.stroke();
+      }
+      const R = 14 * w, g = ctx.createRadialGradient(r.ex, r.ey, 0, r.ex, r.ey, R);
+      g.addColorStop(0, 'rgba(255,255,255,0.9)'); g.addColorStop(1, `rgba(${col},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(r.ex, r.ey, R, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.restore();
   }
 
@@ -431,7 +440,10 @@ export class Renderer {
     };
     hole(g.player.x, g.player.y, LIGHT_RADIUS);
     hole(g.nexus.x, g.nexus.y, g.nexusLight());
-    if (g.beam.on) hole(g.beam.ex, g.beam.ey, 80, 0.7);
+    if (g.beam.on) {
+      const rs = g.beam.rays.length > 1 ? g.beam.rays : [g.beam]; // S-13: each Wide ray end lights its own, smaller hole
+      for (const r of rs) hole(r.ex, r.ey, rs.length > 1 ? 48 : 80, 0.7);
+    }
     ctx.drawImage(this.light, 0, 0, this.w, this.h);
   }
 

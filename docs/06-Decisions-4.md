@@ -38,3 +38,12 @@ triangles. `tests/audio.cjs` holds every one-shot to peak ≤ −20 dBFS, < 1 % 
 on the frame the ring's age passes a cache mark, only if that cache is still unopened. Reduced motion (no ring) plays it at once.
 - Rejected: scheduling the tone with an audio delay at ping time (it would still play while paused or after the cache was mined
   before the ring arrived); replaying the full cache chord (it is the kit's loudest sound and means "opened", not "found").
+
+### D-041 — Beam modes live in `src/beam.js`; rays dedupe per cell and per Glitch (2026-11-23, build 26, S-13)
+`BEAM_MODES` in config holds each mode's ray offsets, range and damage multipliers; `castBeam` casts every ray from the core's
+centre shifted sideways (so a Wide side ray beside a wall cuts that wall: the hall really is 3 cells wide) and applies damage once
+per cell and once per Glitch per frame. `beam.ex/ey/target/enemy` stay the centre ray's. Q / ⟂ cycles unlocked modes only, with a
+1-word toast and a 520 Hz 0.06 s click (peak −33.7 dBFS, the kit's quietest). A saved mode that isn't unlocked loads as Focus.
+- Rejected: side rays starting at the nose (they skip the cells beside the core, leaving a ragged 1–3 cell hall); summing damage
+  when two rays hit one cell (diagonal aim would beat Focus on single cells, against D-036); a mode label on the ⟂ button (the toast
+  and the 3 beams already say it; the button stays narrow at 320 px).
