@@ -2,6 +2,8 @@
 
 _Last updated: 2026-11-23_
 
+**Session counter: 1** (next session = 2 → **Design** session per CLAUDE.md rotation)
+
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
 - 160×160-cell procedurally generated world (seeded). Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, found farther out), and a bedrock border.
@@ -20,7 +22,11 @@ _Last updated: 2026-11-23_
 - Reloading restores the mode, upgrades, bank, and mined terrain.
 - Touch sticks move the core and mine. No page errors.
 
+## Health
+- `node tests/smoke.cjs`: 16/16 passing.
+
 ## Next step (one thing)
-**Nexus Development v1:** spend Prisms to raise the Nexus light radius. Prisms currently have only light use
+Next session is a **Design** session: play-test, then spec M1's remaining items in `04` in enough detail to build directly.
+After that, build **Nexus Development v1:** spend Prisms to raise the Nexus light radius. Prisms currently have only light use
 (upgrade costs at level 2 and up), so they need a reason to exist.
 Done = a "Nexus" tab in the Core Matrix with a single *Radiance* upgrade, and a visibly bigger lit area around the hub.
