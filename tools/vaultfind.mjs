@@ -8,6 +8,7 @@
 import { Game } from '../src/game.js';
 import { CELL, T, SCAN_RADIUS } from '../src/config.js';
 
+const BEAM_MODE = process.env.MODE || 'focus';
 const audio = new Proxy({}, { get: () => () => {} });
 const [SEEDS = 20, GOAL = 10, LVL = 2] = process.argv.slice(2, 5).map(Number);
 const dt = 1 / 60, CAP = 1800, clamp = v => Math.max(-1, Math.min(1, v));
@@ -15,6 +16,7 @@ const dt = 1 / 60, CAP = 1800, clamp = v => Math.max(-1, Math.min(1, v));
 function run(seed) {
   const g = new Game({ seed, mode: 'drift', audio });
   for (const k in g.upgrades) g.upgrades[k] = LVL;
+  if (BEAM_MODE !== 'focus') g.research[BEAM_MODE] = true; g.beamMode = BEAM_MODE; // Q-011 (design 27): MODE=wide env picks the beam mode
   const w = g.world, spots = [];
   let t = 0, got = 0;
   while (got < GOAL && t < CAP) {
@@ -46,6 +48,6 @@ const rows = [];
 for (let s = 1; s <= SEEDS; s++) rows.push(run(s * 7919));
 const sum = k => rows.reduce((a, r) => a + r[k], 0);
 const share = k => rows.filter(r => r[k] > 0).length;
-console.log(`lvl=${LVL} goal=${GOAL}● ${SEEDS} seeds: mean ${(sum('t') / SEEDS).toFixed(0)} s, reached goal ${rows.filter(r => r.got >= GOAL).length}/${SEEDS}`);
+console.log(`mode=${BEAM_MODE} lvl=${LVL} goal=${GOAL}● ${SEEDS} seeds: mean ${(sum('t') / SEEDS).toFixed(0)} s, reached goal ${rows.filter(r => r.got >= GOAL).length}/${SEEDS}`);
 console.log(`vaults seen ${sum('seen')}/${sum('vaults')} (runs with >=1: ${share('seen')}/${SEEDS}), ` +
   `within a ping of a break ${sum('ping')}/${sum('vaults')} (runs with >=1: ${share('ping')}/${SEEDS}), caches opened ${sum('opened')}`);

@@ -7,6 +7,7 @@ import { Game } from '../src/game.js';
 import { CELL, T, RINGS } from '../src/config.js';
 import { mulberry32 } from '../src/world.js';
 
+const BEAM_MODE = process.env.MODE || 'focus';
 const audio = new Proxy({}, { get: () => () => {} });
 const [BEAM = 0, SEEDS = 20, MUL = NaN, REST = 0] = process.argv.slice(2, 6).map(Number);
 if (!Number.isNaN(MUL)) RINGS[RINGS.length - 1].hpMul = MUL;
@@ -28,11 +29,12 @@ function run(seed) {
   const g = new Game({ seed, mode: 'drift', audio });
   for (const k in g.upgrades) g.upgrades[k] = REST;
   g.upgrades.beam = BEAM;
+  if (BEAM_MODE !== 'focus') g.research[BEAM_MODE] = true; g.beamMode = BEAM_MODE; // Q-011 (design 27): MODE=wide env picks the beam mode
   const w = g.world, n = makeNoise(seed ^ 0x27d4eb2f);
   let target = null, best = Infinity;
   for (let y = 0; y < w.h; y++) for (let x = 0; x < w.w; x++) {
     const c = w.get(x, y), d = Math.hypot(x + 0.5 - w.cx, y + 0.5 - w.cy);
-    if ((c === T.ROCK || c === T.DENSE) && d >= 55 && n(x / 5, y / 5) > 0.8 && d < best) { best = d; target = { x, y }; }
+    if ((c === T.LUMEN || ((c === T.ROCK || c === T.DENSE) && n(x / 5, y / 5) > 0.8)) && d >= 55 && d < best) { best = d; target = { x, y }; }
   }
   const goal = { x: (target.x + 0.5) * CELL, y: (target.y + 0.5) * CELL };
   let t = 0, deep = 0;
@@ -48,5 +50,5 @@ const rows = [];
 for (let s = 1; s <= SEEDS; s++) rows.push(run(s * 7919));
 const ts = rows.map(r => r.t).sort((a, b) => a - b), q = f => ts[Math.min(ts.length - 1, Math.floor(f * ts.length))].toFixed(0);
 const avg = k => (rows.reduce((a, r) => a + r[k], 0) / rows.length).toFixed(0);
-console.log(`beam=${BEAM} rest=${REST} deep hpMul=${RINGS[RINGS.length - 1].hpMul} ${SEEDS} seeds: first-Lumen s median ${q(0.5)}, p90 ${q(0.9)}, ` +
+console.log(`mode=${BEAM_MODE} beam=${BEAM} rest=${REST} deep hpMul=${RINGS[RINGS.length - 1].hpMul} ${SEEDS} seeds: first-Lumen s median ${q(0.5)}, p90 ${q(0.9)}, ` +
   `max ${q(1)}, mean ${avg('t')} (in Deep ${avg('deep')}), target d mean ${avg('d')}, capped ${rows.filter(r => r.t >= CAP).length}`);

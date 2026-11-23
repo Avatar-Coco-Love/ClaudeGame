@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 26** · **Version: v0.1.28** (session 26 was a Build; 27 % 5 == 2, so next is a Design)
+**Session counter: 27** · **Version: v0.1.29** (session 27 was a Design; 28 % 5 == 3, so next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -26,7 +26,7 @@ _Last updated: 2026-11-23_
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs live in `07`: S-14 Pulse beam (D-036), S-15 perf check.
+- Build specs live in `07`: S-14 Pulse beam (retuned, D-042), S-15 perf check, S-16 Beacons (first Crafting item, D-043). Q-011 probes take `MODE=focus|wide`.
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -56,4 +56,4 @@ _Last updated: 2026-11-23_
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Next session (27) is a **Design**: play-test Wide (Q-011 first look, hall feel, Surge crowds), then refine S-14 / S-15 in `07`.
+Next session (28) is a **Build**: S-14 Pulse beam from `07` (retuned per D-042), then re-run the Q-011 probes with `MODE=pulse`.

@@ -47,3 +47,20 @@ per cell and once per Glitch per frame. `beam.ex/ey/target/enemy` stay the centr
 - Rejected: side rays starting at the nose (they skip the cells beside the core, leaving a ragged 1–3 cell hall); summing damage
   when two rays hit one cell (diagonal aim would beat Focus on single cells, against D-036); a mode label on the ⟂ button (the toast
   and the 3 beams already say it; the button stays narrow at 320 px).
+
+### D-042 — Wide stays as tuned; Pulse trades throughput for reach (2026-11-23, design 27, Q-011 first look; retunes D-036's S-14)
+Measured per mode (`MODE=` on the probes, `09` session 27): Focus reaches Lumen ~1.9× faster and hunts Prisms 1.6× faster; Wide
+harvests crystal ground +12 % ◆/min and picks up more side ore; Surge kills are about equal (Wide slightly worse). Neither wins
+everywhere, so Wide is not retuned. S-14 as written (burst ×1.3, no recovery) would tunnel at 1.3× Focus with 1.5× reach and pierce,
+winning everywhere, so `PULSE_MUL` is 1.0 and a 0.3 s `PULSE_RECOVER_S` follows each release (~0.8× Focus sustained). Q-011 stays
+open until Pulse is measured.
+- Rejected: buffing Wide (it already wins its niche; more would push Focus out of ore fields); keeping ×1.3 and shortening Pulse's reach
+  instead (reach is Pulse's identity: Surge players hit from farther away); a heat/overcharge meter (a second system for one mode).
+
+### D-043 — Beacons are the first Crafting item: Prisms, placed light, same in both modes (2026-11-23, design 27, S-16)
+A Beacon costs 5▲ (spare Prisms after Core Matrix + Radiance are ~1100▲; 20 beacons = 100▲), is crafted into a stock of 3 and
+placed on the core's open cell, ≥ 4 cells apart, outside the Nexus ring, at most 20. It lights 140 px for good and shows on the
+minimap. Glitches ignore it. It follows the throttled perf check (S-15), which prices 20 extra light holes first.
+- Rejected: Shards as the cost (the Core Matrix already takes ~90 % of a world's ◆); beacons that repel Glitches (a Surge-only perk,
+  D-002); a Nexus Development upgrade instead (Nexus upgrades grow the hub; placed items are Crafting, `01`); pick-up/move in v1 (needs
+  a hold gesture on touch; cheap to add later if play-tests miss it).

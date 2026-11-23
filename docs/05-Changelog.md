@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.29 — 2026-11-23 (#29)
+- Design pass, no gameplay change: Wide Beam play-tested and measured against Focus (Focus travels faster, Wide harvests
+  more Shards). Next up: the **Pulse** beam (charge and release, longer reach) and the first craftable item, **Beacons**.
+
 ## v0.1.28 — 2026-11-23 (#28)
 - New Research for 25●: **Wide Beam**. Press **Q** (or tap the new **⟂** button) to switch between Focus and Wide. Wide fires
   three parallel beams that carve a hall three cells wide; each cell takes longer, and the reach is shorter. Your choice is saved.

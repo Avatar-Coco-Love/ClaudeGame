@@ -11,7 +11,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#17) **S-7 Dev panel** (`?dev` or backtick, `__lumen.dev.*`, D-027). Save/load test spots were left out (not in the spec); add when a bot needs them.
 - **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
-- **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining. Budget p95 16.7 ms.
+- **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining, plus 20 beacon holes. Budget p95 16.7 ms.
+- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`deeprun`, `vaultfind`, `surgefarm`, `parity`); `deeprun` fixed for Lumen cells (B-019).
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
 ## M2 — A world worth exploring
@@ -26,10 +27,11 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#24) Design session 22: Lumen → Scanner play-tested, Q-010 measured and settled (D-035), beam modes specced (D-036).
 - ✅ (#27) **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells shows as a white glyph + blip, one soft tone (D-040).
 - ✅ (#28) **S-13 Beam modes v1 — Wide** (25●): 3 parallel rays, 0.45× each, 0.75× reach; Q / ⟂ switches; `SAVE_FORMAT` 7 (D-041).
-- **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells. Then measure Q-011.
+- ✅ (#29) Design session 27: Wide play-tested, Q-011 measured for Focus vs Wide (D-042), S-14 retuned, Beacons specced (S-16, D-043).
+- **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells; ~0.8× Focus sustained (D-042). Then re-run Q-011 probes.
 
 ## M4 — Crafting & building
-- **Beacons:** placeable light sources that permanently light an area and show on the minimap.
+- **S-16 Beacons v1** (5▲, Craft tab, D-043): placeable light that permanently lights 140 px and shows on the minimap. After S-15.
 - **Relays:** a remote deposit point linked to the Nexus. Expensive, and they change how routes work.
 - Build mode UX on both desktop and touch.
 
