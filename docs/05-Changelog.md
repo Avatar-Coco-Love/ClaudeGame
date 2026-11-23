@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.19 — 2026-11-23 (#19)
+- No change in play. The Deep's tougher rock was timed and stays as it is: the trip out is the long part, not the digging.
+- Planned next for Research: spend gold Lumen on a **Scanner** that pings nearby ore through the dark, in Drift and Surge alike.
+
 ## v0.1.18 — 2026-11-23 (#18)
 - The world now gets deeper as you dig out: the **Hearth** (blue) around the Nexus, then the **Veil** (teal and violet), then the
   **Deep** (indigo and magenta). Rock is tougher in each ring (×1.4, then ×2); crystals and prisms break as fast as before.

@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 16** · **Version: v0.1.18** (session 16 was a Build; next is a Design)
+**Session counter: 17** · **Version: v0.1.19** (session 17 was a Design; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -22,8 +22,8 @@ _Last updated: 2026-11-23_
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build-ready specs live in `07`, in build order: S-9 (vaults), S-10 (Lumen, right before Research v1).
-- M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build-ready specs live in `07`, in build order: S-9 (vaults), S-10 (Lumen), S-11 (Research v1: Scanner), S-10 and S-11 back to back.
+- M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -44,9 +44,10 @@ _Last updated: 2026-11-23_
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
 - `dev.teleport(60)` lands 1936 px out in an open room; no panel without `?dev`; god mode is never saved (session 15).
 - Deep rock takes 2× Hearth's beam time; seed 77's layout + types are unchanged by rings; Veil–Deep border reads at DSF 1 (session 16).
+- A Deep Prism field reads at DSF 1; the Deep's ×2 rock adds only ~2 s to the first-Lumen trip, kept (D-029, session 17).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (17) is a **Design**: play-test rings, settle Q-008, spec Research v1 in `07`.
+Next session (18) is a **Build**: S-9 vaults (spec in `07`).

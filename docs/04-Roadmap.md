@@ -28,14 +28,14 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 
 ## M2 — A world worth exploring
 - ✅ (#14) Design session 12: S-4 feel play-tested, M2 measured, specs S-8…S-10, Q-002 decided (D-022…D-024).
+- ✅ (#19) Design session 17: rings play-tested, Q-008 measured and settled (D-029), Research v1 specced as S-11 (D-030).
 - ✅ (#18) **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap (D-028).
 - **S-9 Vaults:** 6 geometric rooms in the Deep, each with a cache (20◆ + 6▲); old saves skip vaults over ground they already saw.
 - **S-10 Lumen ore** (gold, rare, d ≥ 55): the Research currency. Ship directly before Research v1 (D-024).
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
-- **Research v1** (spec in the next Design, build right after S-10): a Research tab at the Nexus, paid in Lumen; first node = Scanner ping.
+- **S-11 Research v1** (build right after S-10, D-030): a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal).
 - Beam modes: **Wide** (3-cell swath, slower), **Pulse** (charge, then burst). Switch modes with Q or a touch button.
-- Scanner ping: briefly reveals ore within a radius.
 
 ## M4 — Crafting & building
 - **Beacons:** placeable light sources that permanently light an area and show on the minimap.
@@ -63,6 +63,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- **Bedrock edge (watch, session 17):** a core pushed into the world border in the Deep sits on a near-black band and its beam shows no
+  hit. Reads like a dead end, which it is, but silently. If it confuses play-tests, give bedrock hits a dull spark.
 - ✅ **B-012** (#17): smoke's "beam mines terrain" was seed-dependent; the seed is now pinned.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. A player (or bot) who leaves mid-stream gets no chime. Keep unless a play-test log says it feels broken.
 - ✅ **B-005, B-010, B-011** (#16): cargo kept past the pickup cap; "Upgrade ready" hint; floor pickups saved (D-026).

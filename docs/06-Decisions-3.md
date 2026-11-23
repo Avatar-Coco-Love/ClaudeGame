@@ -15,3 +15,16 @@ only place hp is read, so toughness and crack fraction agree. The start ring cou
 once each (not stored in the save). The hum drops `RING_PITCH_STEP` = 2 semitones per ring and follows the ring both ways.
 - Rejected: persisting seen rings (a save shape change for a one-line toast); toasting every crossing (spam when mining along a
   border); a smooth colour gradient by distance (no named place to arrive in; harder to read on the minimap).
+
+### D-029 — The Deep keeps ×2 rock toughness (2026-11-23, Design 17, answers Q-008)
+`tools/deeprun.mjs` (20 seeds, Drift, straight-line bot from the Nexus to the nearest S-10 Lumen cell, d ≈ 55): Beam 2 takes
+median 29 s / p90 74 s, of which only ~9 s is spent in the Deep; Beam 0 takes 53 / 94 s. Lowering `hpMul` to 1.4 saves 1–2 s.
+The time goes into the trip, not the Deep's rock, so it is not a wall; Q-008's 60 s bar is met at the median.
+- Rejected: `hpMul` 1.4–1.6 (no measurable gain; the Deep would stop feeling different); a Beam minimum for the Deep (D-008).
+
+### D-030 — Research v1 shape (2026-11-23, Design 17, S-11)
+Research nodes are one-time unlocks paid only in Lumen; the first is the Scanner ping, a temporary ore reveal with no save state.
+- Why: Research unlocks *kinds* of things (pillar 4, layers distinct): the Core Matrix sells stats, Radiance a permanent light
+  disc; a timed, local ore ping is neither. Lumen is scattered (median blob 2 cells), so a finder makes the currency findable.
+- Rejected: levelled nodes (that is the Core Matrix's job); ping marks cells explored (overlaps Radiance and lets the minimap
+  be painted by spam); ping shows Glitches (a Surge-only edge, Q-009); a research tree UI now (one node needs no tree).
