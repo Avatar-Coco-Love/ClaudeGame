@@ -53,3 +53,13 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Screenshot** (1280×800, DSF 1, `teleport(46)`): the Veil–Deep border reads clearly (teal edges vs indigo/violet), toast centred,
   the minimap shows the two bands. Watch: Veil teal rock sits closer to crystal cyan; gems still stand out by glyph and glow.
 - Not measured yet: Q-008 (Deep rock vs low Beam Power). Left for the Design session.
+
+## 2026-11-23 — Session 17 (v0.1.19): Design — rings play-test, Q-008, S-11
+- **Play-test (1280×800, DSF 1, `?dev`, Beam 2, `teleport(50)`, 20 s held S + beam):** mined 7 cells and drifted 28 cells out
+  through Deep caves to the world border; a Prism field in Deep palette reads well. At the border the core sits on a near-black
+  bedrock band and the beam shows no hit (logged in `04` Debt as a watch item, not a bug). No page errors.
+- **Q-008 → D-029:** new `tools/deeprun.mjs` (straight-line bot from the Nexus to the nearest would-be Lumen cell, 20 seeds).
+  First Lumen median/p90: Beam 0 53/94 s, Beam 2 29/74 s, Beam 4 22/48 s; ~9 s of Beam 2's trip is in the Deep.
+  Deep `hpMul` 2 → 1.4 saves 1–2 s at every Beam level, so ×2 stays.
+- **Lumen layout (40 seeds, S-10 rule):** 143● per world in ~36 blobs (median 2 cells, p90 9, largest ~18); ~46 Crystal/Prism
+  cells within 12 cells of a Lumen cell. Basis for S-11's Scanner (10●) and the ~70● Research budget (D-030). Q-009 opened.
