@@ -1,25 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`.
-
-## 2026-11-23 — Session 12 (v0.1.14): Design — S-4 play-test, M2 specs
-- **Play-test (1280×800, DSF 1, in-page greedy crystal bot, 60 s real time, Drift):** 32 crystal breaks → 32 hitstops (~1.1 s frozen
-  in total, never on the 21 rock breaks), 1 beam sweep (beam held), bank 46◆, no page errors. Reads as a light tick, not a stutter.
-  The arpeggio never fired: the bot left the ring as soon as cargo had room. Logged as "Missed chime (watch)". B-010 found: the
-  "Bring shards home" hint stays up with 46◆ banked (`main.js` hint checks bank + cargo, not cargo alone).
-- **Screenshot:** a room carved 62 cells out looks exactly like the start (same blue rock): distance means nothing on screen yet.
-- **Measured (40 seeds, scratch scripts, not committed):** cells per distance band (header of `07`); a new Lumen noise at cut 0.80 on
-  ROCK/DENSE at d ≥ 55 gives ~141 cells/world (0.74 → 381, 0.78 → 203); 6 vaults (7×7, d 50–72, ≥ 20 apart) place on 40/40 seeds.
-- **Decided:** D-022 (rings in the fixed world, settles Q-002), D-023 (generation changes keep a save's seen layout; `vaultSkip`),
-  D-024 (Lumen ships next to Research v1). Specs S-8 rings, S-9 vaults, S-10 Lumen in `07`. New Q-008 (Deep toughness).
-
-## 2026-11-23 — Session 13 (v0.1.15): Build — S-5 deterministic gameplay RNG
-- **Built:** `seededStream(seed, salt)` in `world.js`; `game.rand` (seeded `seed ^ Date.now()`, one shared stream) replaced by
-  `game.rng.{yield, pickup, glitch-spawn, glitch-wander, glitch-loot}` (D-025). Particles/shake still on `Math.random`.
-- **Tests:** 2 node-side smoke checks (51 total): seed 4242, Surge, 40 s scripted mining twice → identical 13 spawns / 12 pickups;
-  7 extra `yield` rolls leave the spawn list unchanged. Games are built ≥ 3 ms apart; both checks fail on the old code (stash run, 49/51).
-  An exception in these checks now reports as a FAIL instead of killing the run silently.
-- **Observed:** `tools/parity.mjs` still runs (1 seed × 30 s, both modes 40◆/min). No visual change, so no screenshot.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`.
 
 ## 2026-11-23 — Session 14 (v0.1.16): Audit
 - **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
@@ -63,3 +44,14 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   Deep `hpMul` 2 → 1.4 saves 1–2 s at every Beam level, so ×2 stays.
 - **Lumen layout (40 seeds, S-10 rule):** 143● per world in ~36 blobs (median 2 cells, p90 9, largest ~18); ~46 Crystal/Prism
   cells within 12 cells of a Lumen cell. Basis for S-11's Scanner (10●) and the ~70● Research budget (D-030). Q-009 opened.
+
+## 2026-11-23 — Session 18 (v0.1.20): Build — S-9 vaults
+- **Built:** `T.VAULT` (hp 6) + `T.CACHE` (hp 3), three 7×7 templates and `vaultSites(seed)` in `world.js` (seed-only, stream
+  `'vault'`); 6/6 placed on all 40 seeds, template mix 86/85/69. Cache bursts 20◆ + 6▲ (forced past the cap), chord, double hitstop,
+  toast. `SAVE_FORMAT` 4: the 3→4 step stores `vaultSkip` from the explored/broken bits (D-031). Minimap: shells white.
+- **Tests:** 4 new smoke checks (6 vaults on 40 seeds and nothing changed outside footprints; cache loot + reload; a format-3 save
+  with one explored cell on vault 2 and a tunnel through vault 4 → skip `2,4`, tunnels kept; new world `vaultSkip: []`). With
+  `src/` stashed they fail. The S-8 layout hash now hashes the base generator (all vaults skipped), unchanged values.
+- **Screenshot** (1280×800, DSF 1, `?dev`, teleport beside vault 0): white-edged diamond reads clearly against Veil rock, the cache
+  glyph is distinct from ore; opening it bursts pickups and toasts. Watch: Glitches may spawn in a hollow (Debt). Q-010 opened.
+- **Docs:** sessions 12–13 of this log archived word for word to `archive/2026-11-23-09-sessions-12-13.md` (cap).

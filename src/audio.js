@@ -82,6 +82,11 @@ export class Audio {
   upgrade() {
     [523, 784, 1047, 1568].forEach((f, i) => this.tone(f, 0.25, { type: 'triangle', vol: 0.14, delay: i * 0.07 }));
   }
+  // S-9: a vault cache opens with a bright major chord (all three notes together), then a high sparkle.
+  cache() {
+    [523, 659, 784].forEach(f => this.tone(f, 0.5, { type: 'triangle', vol: 0.1 }));
+    this.tone(2093, 0.25, { type: 'sine', vol: 0.08, delay: 0.12 });
+  }
   hurt() { this.tone(160, 0.25, { type: 'square', vol: 0.15, slide: -90 }); }
   enemyDie() { this.tone(420, 0.2, { type: 'square', vol: 0.1, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }

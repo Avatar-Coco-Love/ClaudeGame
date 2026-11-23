@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.19';
+export const VERSION = '0.1.20';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -25,7 +25,7 @@ export const HITSTOP_S = 0.035;     // sim freeze on a crystal/prism break
 export const HITSTOP_GAP_S = 0.15;  // at most one hitstop per this much game time
 export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core Matrix purchase
 
-export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5 };
+export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7 };
 
 export const MATERIAL = {
   [T.ROCK]:    { hp: 0.55, fill: '#17215a', edge: '#3d6bff', yield: null },
@@ -33,7 +33,16 @@ export const MATERIAL = {
   [T.CRYSTAL]: { hp: 0.9,  fill: '#0c3446', edge: '#2ef2ff', yield: { kind: 'shard', min: 1, max: 3 } },
   [T.PRISM]:   { hp: 2.4,  fill: '#3a1046', edge: '#ff4fd8', yield: { kind: 'prism', min: 1, max: 2 } },
   [T.BEDROCK]: { hp: Infinity, fill: '#05060f', edge: '#1b2140', yield: null },
+  [T.VAULT]:   { hp: 6,    fill: '#142a3a', edge: '#d8fbff', yield: null }, // S-9 vault shell: tough, no yield
+  [T.CACHE]:   { hp: 3,    fill: '#1d1440', edge: '#ffffff', yield: null }, // S-9 vault centre: bursts VAULT_LOOT
 };
+
+// S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
+export const VAULT_COUNT = 6;
+export const VAULT_D = [50, 72];     // centre distance from the Nexus, in cells
+export const VAULT_GAP = 20;         // min cells between vault centres
+export const VAULT_TRIES = 200;
+export const VAULT_LOOT = { shard: 20, prism: 6 };
 
 // S-8 depth rings (D-022). d = cells from the Nexus centre; a cell belongs to the last ring whose r0 ≤ d (the corners are Deep).
 // Each ring recolours ROCK/DENSE and multiplies only their hp; ore, bedrock and the cell layout are the same everywhere.

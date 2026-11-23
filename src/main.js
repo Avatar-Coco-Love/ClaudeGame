@@ -122,6 +122,7 @@ function updateHud() {
     if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
     if (ev === 'deposited') { toast('Deposited'); persist(); }
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
+    if (ev === 'cache') toast('Vault cache opened');
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
   }
   g.events.length = 0;

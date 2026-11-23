@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS } from './config.js';
+import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS, VAULT_COUNT, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -37,8 +37,32 @@ function makeNoise(seed) {
   return (x, y) => value(x, y) * 0.65 + value(x * 2.1 + 17.3, y * 2.1 + 5.9) * 0.35;
 }
 
+// S-9 vault templates (7×7): '#' shell (T.VAULT), '.' hollow, 'C' cache (T.CACHE), ' ' leave the generated cell alone.
+export const VAULT_TEMPLATES = [
+  ['   #   ', '  #.#  ', ' #...# ', '#..C..#', ' #...# ', '  #.#  ', '   #   '], // diamond
+  ['  ###  ', ' #...# ', '#.....#', '#..C..#', '#.....#', ' #...# ', '  ###  '], // hexagon
+  ['  ###  ', '  #.#  ', '###.###', '#..C..#', '###.###', '  #.#  ', '  ###  '], // cross
+];
+
+/** S-9: where a seed's vaults go. Depends on the seed alone (not on terrain), so the save upgrade can find them too.
+ *  Returns [{ x, y, kind, cells: [cell index, ...] }] where cells are the indices the template writes. */
+export function vaultSites(seed, w = WORLD_W, h = WORLD_H) {
+  const rand = seededStream(seed, 'vault'), sites = [];
+  for (let t = 0; t < VAULT_TRIES && sites.length < VAULT_COUNT; t++) {
+    const a = rand() * Math.PI * 2, d = VAULT_D[0] + rand() * (VAULT_D[1] - VAULT_D[0]), kind = Math.floor(rand() * VAULT_TEMPLATES.length);
+    const x = Math.floor(w / 2 + Math.cos(a) * d), y = Math.floor(h / 2 + Math.sin(a) * d);
+    if (x - 3 < 2 || y - 3 < 2 || x + 3 > w - 3 || y + 3 > h - 3) continue; // footprint stays inside the bedrock border
+    if (sites.some(v => Math.hypot(v.x - x, v.y - y) < VAULT_GAP)) continue;
+    const cells = [];
+    VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - 3 + j) * w + (x - 3 + i)); }));
+    sites.push({ x, y, kind, cells });
+  }
+  return sites;
+}
+
 export class World {
-  constructor(seed) {
+  /** `vaultSkip`: indices into vaultSites(seed) never stamped (D-023: an old save had already seen that ground). */
+  constructor(seed, vaultSkip = []) {
     this.seed = seed;
     this.w = WORLD_W;
     this.h = WORLD_H;
@@ -58,6 +82,16 @@ export class World {
       this.rings[y * this.w + x] = r;
     }
     this.generate();
+    this.vaults = vaultSites(seed, this.w, this.h).filter((_, i) => !vaultSkip.includes(i));
+    for (const v of this.vaults) this.stampVault(v);
+  }
+
+  stampVault(v) {
+    const rows = VAULT_TEMPLATES[v.kind];
+    for (let j = 0; j < 7; j++) for (let i = 0; i < 7; i++) {
+      const ch = rows[j][i];
+      if (ch !== ' ') this.cells[(v.y - 3 + j) * this.w + (v.x - 3 + i)] = ch === '#' ? T.VAULT : ch === 'C' ? T.CACHE : T.EMPTY;
+    }
   }
 
   /** S-8: depth ring index (0 Hearth, 1 Veil, 2 Deep) of a cell; out-of-bounds counts as the outermost ring. */

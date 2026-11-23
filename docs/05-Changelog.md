@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.20 — 2026-11-23 (#20)
+- Six sealed **vaults** now sit 50–72 cells out: white-edged diamond, hexagon and cross rooms with tough walls. Cut in and break
+  the cache at the centre for a burst of 20◆ and 6▲, with a chord. Opened caches stay open.
+- Worlds you have already explored keep every tunnel: a vault only appears where your save has never looked.
+
 ## v0.1.19 — 2026-11-23 (#19)
 - No change in play. The Deep's tougher rock was timed and stays as it is: the trip out is the long part, not the digging.
 - Planned next for Research: spend gold Lumen on a **Scanner** that pings nearby ore through the dark, in Drift and Surge alike.
