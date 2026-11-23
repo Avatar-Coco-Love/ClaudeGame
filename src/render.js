@@ -348,6 +348,12 @@ export class Renderer {
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(0, 0, 17, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac); ctx.stroke();
     }
+    if (g.coreRing > 0) { // S-4: Core Matrix purchase, a white ring expands off the core
+      const k = 1 - g.coreRing;
+      ctx.globalAlpha = g.coreRing; ctx.strokeStyle = '#ffffff'; ctx.shadowColor = '#2ef2ff'; ctx.shadowBlur = 14; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(0, 0, 20 + k * 70, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
     ctx.rotate(p.angle);
     const col = p.hurtFlash > 0 ? '#ff5a2e' : '#d8fbff';
     ctx.shadowColor = p.hurtFlash > 0 ? '#ff5a2e' : '#2ef2ff'; ctx.shadowBlur = 18;

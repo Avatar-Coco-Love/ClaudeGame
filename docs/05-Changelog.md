@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.13 — 2026-11-23 (#13)
+- Emptying your hold at the Nexus now ends with a rising chime: one note per resource kind you brought home, plus a top note.
+- Buying a Core Matrix upgrade sends a ring off the core and makes that upgrade's level bar flash.
+- Breaking a crystal or prism vein lands with a tiny freeze-frame; the beam starts with a short rising sweep.
+- Reduced motion turns off the freeze-frame and the ring (sounds stay). The "Press E" tip no longer shows under the open Core Matrix.
+
 ## v0.1.12 — 2026-11-23 (#12)
 - New **Settings** button on the title screen: a volume slider, mute (M still works), screen shake on/off, and reduced motion.
 - Reduced motion turns off screen shake and the glowing pulse animations. On first launch it follows your device's reduced-motion setting.

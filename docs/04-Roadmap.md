@@ -14,7 +14,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#10) **S-6 Glitches give up when they make no progress:** they fade and free their slot so Surge keeps its pressure (D-017); Glitch Prism drop at 50 % (D-018).
 - ✅ (#11) Audit session 9: B-006 fixed, touch sticks released on blur, Drift/Surge income parity measured (D-019).
 - ✅ (#12) **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion, opened from the title (D-016, D-020).
-- **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
+- ✅ (#13) **S-4 Feel pass:** deposit arpeggio, upgrade ring + pip flash, crystal/prism hitstop, beam sweep; fixed B-008 (D-021).
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
 - ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
 
@@ -62,8 +62,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
-- **B-008:** the "Press E for the Core Matrix" hint stays visible under the open Matrix (desktop). Folded into S-4.
-- **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into S-4 or the dev panel.
+- **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into the dev panel (S-7).
 - **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
 - ✅ **B-006** (#11): "beam mines terrain" now waits for 5 s of game time (loop clamps dt to 0.05 s, so wall time under load was ~1.3 s of play).
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.

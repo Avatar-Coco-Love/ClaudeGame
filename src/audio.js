@@ -67,6 +67,13 @@ export class Audio {
     const notes = [523, 659, 784, 1047];
     this.tone(notes[i % 4], 0.14, { type: 'sine', vol: 0.12, throttle: 0.045, key: 'dep' });
   }
+  // S-4: a rising 3-note arpeggio when the hold is empty: one note per resource kind deposited, then a top note (max 3).
+  depositDone(kinds) {
+    const notes = [784, 988, 1319], n = Math.min(3, Math.max(1, kinds) + 1);
+    for (let i = 0; i < n; i++) this.tone(notes[i], 0.18, { type: 'triangle', vol: 0.13, delay: 0.06 + i * 0.09 });
+  }
+  // S-4: a short rising sine sweep when the beam switches on (not repeated while it stays on).
+  beamStart() { this.tone(330, 0.12, { type: 'sine', vol: 0.1, slide: 330 }); }
   upgrade() {
     [523, 784, 1047, 1568].forEach((f, i) => this.tone(f, 0.25, { type: 'triangle', vol: 0.14, delay: i * 0.07 }));
   }
