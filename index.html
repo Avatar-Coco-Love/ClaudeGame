@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#03040c">
+  <meta name="description" content="Lumen Core — a neon geometry mining game. Carve glowing caves, haul crystal home to the Nexus, upgrade your core.">
+  <title>Lumen Core</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div class="panel top-left">
+      <div class="bank"><span class="shard">◆ <b id="bank-shard">0</b></span><span class="prism">▲ <b id="bank-prism">0</b></span></div>
+      <div class="bar-row"><label>Cargo</label><div class="bar"><div id="cargo-fill"></div></div><span id="cargo-text">0/20</span></div>
+      <div class="bar-row hidden" id="integrity-row"><label>Integrity</label><div class="bar"><div id="integrity-fill"></div></div><span id="integrity-text">100</span></div>
+    </div>
+    <div class="top-right">
+      <canvas id="minimap" width="140" height="140"></canvas>
+      <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
+    </div>
+    <div id="hint" class="hidden"></div>
+    <button id="matrix-btn" class="hidden">Core Matrix <kbd>E</kbd></button>
+    <div id="toast"></div>
+  </div>
+
+  <div id="matrix" class="hidden">
+    <div class="sheet">
+      <header><h2>Core Matrix</h2><div id="matrix-bank"></div><button id="matrix-close" aria-label="Close">✕</button></header>
+      <div id="upgrade-list"></div>
+      <div class="mode-row">
+        <span>Mode</span>
+        <div class="mode-toggle"><button data-mode="drift">Drift · calm</button><button data-mode="surge">Surge · hostile</button></div>
+      </div>
+      <div id="stats"></div>
+    </div>
+  </div>
+
+  <div id="title">
+    <div class="title-inner">
+      <h1>LUMEN<span>CORE</span></h1>
+      <p class="tag">Carve neon caves. Haul light home. Grow the Nexus.</p>
+      <button id="continue" class="big hidden">Continue<small></small></button>
+      <div class="modes">
+        <div class="mode-card" data-mode="drift"><h3>Drift</h3><p>Calm. No hostiles. Mine, explore, and build at your own pace.</p></div>
+        <div class="mode-card" data-mode="surge"><h3>Surge</h3><p>Glitches hunt in the dark. Same rewards, more heartbeat.</p></div>
+      </div>
+      <button id="new-world" class="big">New World</button>
+      <p class="controls">Desktop: WASD move · mouse aim · click/Space mine · E Core Matrix<br>Touch: left thumb move · right thumb aim + mine</p>
+      <p class="foot">Designed &amp; built by Claude. You can switch modes any time at the Nexus.</p>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
