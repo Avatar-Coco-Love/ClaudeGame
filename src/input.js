@@ -7,7 +7,8 @@ export class Input {
     this.mouse = { x: 0, y: 0, down: false, active: false };
     this.sticks = { move: null, aim: null }; // touch sticks: {id, ox, oy, x, y}
     this.pressed = new Set(); // one-shot actions consumed by game
-    this.usingTouch = false;
+    // A phone gets touch hints before its first touch (B-002); a mouse move or touch flips it later.
+    this.usingTouch = !!globalThis.matchMedia?.('(pointer: coarse)').matches;
 
     addEventListener('keydown', e => {
       if (e.target instanceof HTMLInputElement) return;

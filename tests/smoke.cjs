@@ -128,6 +128,11 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await ph.reload(); await ph.waitForTimeout(300); // a fresh visitor leaving + returning must not get a phantom save
     check('title demo world is never saved', !(await ph.isVisible('#continue')));
     await ph.tap('#new-world'); await ph.waitForTimeout(300);
+    // Before any touch: a phone must already get touch hints and no keyboard badge (B-002, S-2).
+    const pre = await ph.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; return document.getElementById('hint').textContent; });
+    await ph.waitForTimeout(150);
+    const kbd = await ph.evaluate(() => { const k = document.querySelector('#matrix-btn kbd'); return !!k && k.getClientRects().length > 0; });
+    check('phone shows touch hint + no E badge before first touch (B-002)', /thumb/i.test(pre) && !kbd, `hint "${pre}", E badge ${kbd ? 'shown' : 'hidden'}`);
     const cdp = await ctx.newCDPSession(ph);
     const vp = ph.viewportSize();
     const pts = dy => [{ x: 80, y: vp.height - 150 + dy, id: 1 }, { x: vp.width - 80, y: vp.height - 150 + dy, id: 2 }];
@@ -141,13 +146,21 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
 
     // Narrowest phone: Matrix tabs and buy buttons fit at 320 px (S-1).
     const np = await browser.newPage({ viewport: { width: 320, height: 568 } });
-    await np.goto(url); await np.waitForTimeout(200); await np.click('#new-world'); await np.waitForTimeout(200);
+    await np.goto(url); await np.waitForTimeout(200);
+    // Nothing on the title, HUD or Matrix may overflow its box at 320 px (B-001, S-2). The hint's ellipsis is deliberate.
+    const overflow = () => np.evaluate(() => [...document.querySelectorAll('#hud *, #title *, #matrix *')]
+      .filter(e => e.id !== 'hint' && e.getClientRects().length && e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).display !== 'inline')
+      .map(e => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''} ${e.scrollWidth}>${e.clientWidth}`));
+    const ovTitle = await overflow();
+    await np.click('#new-world'); await np.waitForTimeout(200);
     await np.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.demo = true; });
     await np.keyboard.press('e'); await np.waitForTimeout(100);
     await np.click('#matrix .tabs button[data-tab="nexus"]');
     const clip = await np.evaluate(() => { const sh = document.querySelector('#matrix .sheet').getBoundingClientRect();
       return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #matrix-close')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); });
     check('Matrix tabs + buy fit at 320 px', clip.length === 0, clip.join(', '));
+    const ov = [...ovTitle, ...await overflow()];
+    check('nothing overflows at 320 px: title, HUD, Matrix (B-001)', ov.length === 0, ov.join(', '));
     await np.close();
   } catch (e) {
     check('smoke run completed', false, e.message);
