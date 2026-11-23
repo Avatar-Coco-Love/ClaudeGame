@@ -43,6 +43,11 @@ Over the cap: split word for word into a `-2` file, or move old entries into `do
 Dense rock keeps high HP only; no minimum Beam Power. The Core Matrix stays pure stats, and anything that unlocks access belongs to Research (pillar: layers never unlock the same thing twice).
 - Rejected: a Beam Power threshold (turns a stat upgrade into an unlock, and blocks early tunnels for no new decision).
 
+### D-012 — A coarse pointer means touch until proven otherwise (2026-11-23, S-2)
+`input.usingTouch` starts as `matchMedia('(pointer: coarse)').matches`; a mouse move switches to desktop, a touch switches back. Keyboard badges hide via `body.touch`.
+- Why: phones showed the desktop hint and an `E` badge until the first touch (B-002).
+- Rejected: user-agent sniffing (brittle); `'ontouchstart' in window` (true on touchscreen laptops that use a mouse); showing both hints (too long for the pill at 320 px).
+
 ### D-010 — The title screen takes no gameplay hotkeys (2026-11-23, audit)
 While the title is up (`paused`), the Core Matrix can't open; only mute works. Enter on a focused button is that button's click, never a Matrix toggle.
 - Why: the demo world and a paused real world both sit inside the Nexus, so E opened the Matrix over the title (B-003), with live mode/buy buttons.

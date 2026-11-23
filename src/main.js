@@ -113,6 +113,7 @@ function updateHud() {
     $('integrity-fill').style.width = `${Math.max(0, g.player.integrity / hull * 100)}%`;
     $('integrity-text').textContent = `${Math.max(0, Math.ceil(g.player.integrity))}/${hull}`;
     $('matrix-btn').classList.toggle('hidden', !g.inNexus());
+    document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
     $('hint').classList.toggle('hidden', !h);

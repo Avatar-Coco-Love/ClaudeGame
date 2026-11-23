@@ -18,7 +18,7 @@ Prisms in a world ≈ 1470▲, the Core Matrix only takes 246▲. The first Pris
   Reload keeps the level.
 - **Done =** before/after screenshots at the Nexus (deviceScaleFactor 1) show a visibly larger lit area and a larger explored disc on the minimap.
 
-## S-2 — Touch-first hints + narrow screens (B-001, B-002)
+## S-2 — Touch-first hints + narrow screens (B-001, B-002) (✅ built in #8)
 - `input.usingTouch` starts as `matchMedia('(pointer: coarse)').matches`, so a phone shows touch hints before the first touch.
 - Hide the `E` key badge on the Core Matrix button while `usingTouch` is true.
 - Title wordmark: shrink the clamp minimum / letter-spacing so "LUMEN CORE" fits at 320 px.

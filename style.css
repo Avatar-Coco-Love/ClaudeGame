@@ -33,6 +33,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #matrix-btn { position: absolute; bottom: max(70px, calc(env(safe-area-inset-bottom) + 48px)); left: 50%; transform: translateX(-50%);
   padding: 12px 22px; border-radius: 12px; border: 1px solid var(--cyan); background: rgba(10, 40, 60, .85); color: var(--cyan);
   font-weight: 600; letter-spacing: .04em; box-shadow: 0 0 18px rgba(46,242,255,.35); animation: glow 1.6s ease-in-out infinite; }
+.touch kbd { display: none; }
 kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border-radius: 4px; padding: 1px 5px; margin-left: 6px; opacity: .7; }
 @keyframes glow { 50% { box-shadow: 0 0 28px rgba(46,242,255,.6); } }
 #toast { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -10px); opacity: 0; transition: opacity .25s, transform .25s;
@@ -69,7 +70,7 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 #title { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;
   background: radial-gradient(ellipse at center, rgba(3,4,12,.55), rgba(3,4,12,.92)); }
 .title-inner { width: min(560px, 100%); text-align: center; }
-#title h1 { font-size: clamp(40px, 11vw, 76px); margin: 0; letter-spacing: .14em; font-weight: 800; color: #fff;
+#title h1 { font-size: clamp(28px, 10.5vw, 76px); margin: 0; letter-spacing: .14em; font-weight: 800; color: #fff;
   text-shadow: 0 0 18px var(--cyan), 0 0 40px rgba(46,242,255,.5); }
 #title h1 span { color: var(--magenta); text-shadow: 0 0 18px var(--magenta), 0 0 40px rgba(255,79,216,.5); margin-left: .2em; }
 .tag { color: var(--dim); margin: 6px 0 22px; }

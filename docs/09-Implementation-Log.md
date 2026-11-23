@@ -1,32 +1,6 @@
 # 09 — Implementation Log
 
-## 2026-11-23 — v0.1 first playable
-- **Changed:** built the whole first loop (see 02). Files: `index.html`, `style.css`, `src/{config,world,game,render,input,audio,main}.js`.
-- **Bug found → fixed:** the beam started 12 px in front of the core. When that point was inside a wall, the DDA skipped
-  the origin cell, so the beam mined the cell *behind* the wall. Fix: check the origin cell, and cast from the core's centre.
-- **Bug found → fixed:** a 20 px core standing on a cell boundary couldn't enter a 1-cell tunnel it had just dug.
-  Fix: corner assist in `moveBody` nudges sideways (up to ~half a cell) when blocked head-on.
-- **Visual:** rock fill was too close to empty space, so walls looked like floor. Fills brightened.
-- **Observed:** chunk cache (16×16 cells, max 48 canvases) keeps redraws to mined chunks only. Light overlay at half resolution.
-
-## 2026-11-23 — Session 1b: autonomy + health tooling
-- **Added:** `CLAUDE.md` (operating manual for autonomous sessions), `docs/04-Roadmap.md`, `docs/inbox/`, `tests/smoke.cjs` (16 checks, desktop + Pixel 7).
-- **Bug found → fixed:** the title screen's demo world (seed 1337) was saved on `pagehide`. A first-time visitor came back to a phantom
-  "Continue", and "New World" then raised a confirm() prompt. Fix: `game.demo` flag, never persisted. Smoke check added.
-- **Process:** a scheduled task now starts a fresh session periodically. Each session does one PR, so context stays small.
-
-## 2026-11-23 — Session 2 (v0.1.4): inbox, Gloamdeep insights → version tracking
-- **Inbox:** an insights file from the sister project Gloamdeep (~735 PRs in). Archived as `docs/archive/2026-11-23-Gloamdeep-insights.md`.
-- **Adopted as checks/code:** `VERSION` shown on the title + `05-Changelog.md` (D-003); numbered IDs and `06-Decisions.md` with rejected
-  alternatives (D-004); `src/save.js` format upgrades and an "unversioned save loads" smoke check (D-005); `tests/docs.cjs` doc cap,
-  run inside smoke (D-006). `03` converted to Q-xxx IDs.
-- **Adopted as rules (CLAUDE.md):** record everything in the same PR, rule broken twice → check, measure before deciding, new tests must fail
-  on old code, salt per random draw, state-change edge cases, audits archive `09` and check D-xxx against code.
-- **Adopted as roadmap (04 → Tooling):** dev panel, Surge bot runner with degenerate-loop probes, throttled perf check, narrow-screen text check, deterministic RNG.
-- **Not adopted (D-007):** owner-playtest-driven planning (owner doesn't decide here), recorded audio (opened as Q-006), canvas text-fit test (our text is DOM).
-- **Observed:** saves already wrote `v: 1` but nothing read it; now it does. `game.rand` is seeded from `Date.now()`, so gameplay isn't reproducible yet (roadmap).
-- **Bug found (not fixed, logged in 04 Debt):** B-001, title wordmark clipped at 320 px wide. Seen in the narrow-screen screenshot taken for this PR.
-- **Rotation note:** this session's Design slot went to the inbox, so session 3 runs the displaced Design session.
+Older entries (v0.1 to session 2): `archive/2026-11-23-09-sessions-0-2.md`.
 
 ## 2026-11-23 — Session 3 (v0.1.5): Design — play-test + economy measurement
 - **Play-test:** Playwright, desktop 1280×800 and Pixel 7, deviceScaleFactor 1. A straight-line bot (6 legs × 14 s, deposit each) banked
@@ -53,3 +27,10 @@
 - **Tests:** 5 new/extended smoke checks (32 total): Prism-only spend, light +96 and explored grows (454 → 611 cells), tab remembered, Radiance survives reload, format-1 save loads with Radiance 0, tabs/buy fit at 320 px. On the old code the run aborts at `nexusLight is not a function`.
 - **Observed:** the first format-1 check passed wrongly in reverse (got Radiance 1): reload's `pagehide` re-saved the live game over the planted save, the same trap as session 4. Setup now sets `demo` first. Second time this trap bit, so per the manual it became a tool: `plantSaveAndReload()` in smoke, used by both planted-save checks.
 - **Screenshots (1280×800 and 320×568, DSF 1):** Radiance 5 lights roughly twice the area around the Nexus; the minimap disc grows from hidden-under-the-marker to clearly visible. At 320 px the tabs, the ▲6 button and ✕ fit.
+
+## 2026-11-23 — Session 6 (v0.1.8): Build — S-2 touch-first hints + narrow screens
+- **Built:** `input.usingTouch` starts from `matchMedia('(pointer: coarse)')`; the HUD sets `body.touch`, which hides `kbd` badges; title wordmark `clamp(28px, 10.5vw, 76px)`.
+- **B-001, B-002 → fixed.** Tests: 2 new smoke checks (34 total). Both failed on the old code: hint "WASD…" + E badge shown; `h1 314>288` and `.title-inner` overflowing at 320 px.
+- **Overflow check scope:** every rendered non-inline element in `#hud`, `#title`, `#matrix` (title before start, HUD + Matrix Nexus tab after), `#hint` excluded (deliberate ellipsis).
+- **Screenshots (DSF 1):** 320×568 title shows the whole wordmark with margin; Pixel 7 in the Nexus shows "Left thumb…" and a badge-free Core Matrix button.
+- **Housekeeping:** `09` was at 7.2 KB of 8 KB, so v0.1…session 2 moved word for word to `docs/archive/`.
