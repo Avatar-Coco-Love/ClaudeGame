@@ -28,7 +28,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 
 ## M2 — A world worth exploring
 - ✅ (#14) Design session 12: S-4 feel play-tested, M2 measured, specs S-8…S-10, Q-002 decided (D-022…D-024).
-- **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap.
+- ✅ (#18) **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap (D-028).
 - **S-9 Vaults:** 6 geometric rooms in the Deep, each with a cache (20◆ + 6▲); old saves skip vaults over ground they already saw.
 - **S-10 Lumen ore** (gold, rare, d ≥ 55): the Research currency. Ship directly before Research v1 (D-024).
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).

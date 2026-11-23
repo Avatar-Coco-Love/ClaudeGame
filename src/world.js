@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL } from './config.js';
+import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -50,7 +50,28 @@ export class World {
     this.chunksH = Math.ceil(this.h / CHUNK);
     this.dirtyChunks = new Set();
     this.listeners = [];
+    this.rings = new Uint8Array(this.w * this.h); // S-8: ring index per cell, fixed by distance alone
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+      const d = Math.hypot(x + 0.5 - this.cx, y + 0.5 - this.cy);
+      let r = 0;
+      while (r + 1 < RINGS.length && d >= RINGS[r + 1].r0) r++;
+      this.rings[y * this.w + x] = r;
+    }
     this.generate();
+  }
+
+  /** S-8: depth ring index (0 Hearth, 1 Veil, 2 Deep) of a cell; out-of-bounds counts as the outermost ring. */
+  ring(x, y) { return this.inBounds(x, y) ? this.rings[y * this.w + x] : RINGS.length - 1; }
+  /** Hit points of a cell type at (x, y): rings toughen only ROCK and DENSE (D-022). */
+  hpAt(x, y, type) {
+    const hp = MATERIAL[type].hp;
+    return type === T.ROCK || type === T.DENSE ? hp * RINGS[this.ring(x, y)].hpMul : hp;
+  }
+  /** Fill + edge colour of a cell: ROCK/DENSE take their ring's palette; ore and bedrock look the same everywhere. */
+  look(x, y, type) {
+    if (type !== T.ROCK && type !== T.DENSE) return MATERIAL[type];
+    const r = RINGS[this.ring(x, y)];
+    return type === T.ROCK ? { fill: r.rockFill, edge: r.rockEdge } : { fill: r.denseFill, edge: r.denseEdge };
   }
 
   get cx() { return this.w / 2; }
@@ -106,11 +127,12 @@ export class World {
     if (type === T.EMPTY || type === T.BEDROCK) return null;
     const i = this.idx(x, y);
     this.damage[i] += amount;
-    if (this.damage[i] >= MATERIAL[type].hp) {
+    const hp = this.hpAt(x, y, type);
+    if (this.damage[i] >= hp) {
       this.destroy(x, y);
       return { broken: true, type };
     }
-    return { broken: false, type, frac: this.damage[i] / MATERIAL[type].hp };
+    return { broken: false, type, frac: this.damage[i] / hp };
   }
 
   destroy(x, y) {
@@ -125,7 +147,7 @@ export class World {
   damageFrac(x, y) {
     const type = this.get(x, y);
     if (type === T.EMPTY || type === T.BEDROCK) return 0;
-    return this.damage[this.idx(x, y)] / MATERIAL[type].hp;
+    return this.damage[this.idx(x, y)] / this.hpAt(x, y, type);
   }
 
   /** Grid DDA raycast. Returns the first solid cell and the distance to it, or null within maxDist. */

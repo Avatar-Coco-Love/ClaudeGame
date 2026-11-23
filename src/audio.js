@@ -1,5 +1,5 @@
 // Tiny synthesized sound kit. No asset files; everything is oscillators.
-import { DEFAULT_VOLUME, MASTER_GAIN_MAX } from './config.js';
+import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP } from './config.js';
 
 export class Audio {
   constructor() {
@@ -7,6 +7,7 @@ export class Audio {
     this.muted = false;
     this.volume = DEFAULT_VOLUME / 100; // 0-1 (settings volume / 100)
     this.beamOsc = null;
+    this.beamHz = 92; // S-8: drops RING_PITCH_STEP semitones per depth ring
     this.last = {};
   }
   unlock() {
@@ -38,11 +39,15 @@ export class Audio {
     o.connect(g); g.connect(this.master);
     o.start(now + delay); o.stop(now + delay + dur + 0.02);
   }
+  setRing(r) {
+    this.beamHz = 92 * Math.pow(2, -RING_PITCH_STEP * r / 12);
+    if (this.beamOsc && this.ctx) this.beamOsc.o.frequency.setTargetAtTime(this.beamHz, this.ctx.currentTime, 0.08);
+  }
   beam(on) {
     if (!this.ctx) return;
     if (on && !this.beamOsc && !this.muted) {
       const o = this.ctx.createOscillator(), g = this.ctx.createGain(), lfo = this.ctx.createOscillator(), lg = this.ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.value = 92;
+      o.type = 'sawtooth'; o.frequency.value = this.beamHz;
       lfo.frequency.value = 13; lg.gain.value = 14;
       lfo.connect(lg); lg.connect(o.frequency);
       g.gain.value = 0.045;

@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -100,9 +100,16 @@ export class Game {
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, 230);
+    // S-8: the depth ring the core is in. A session toasts each ring once on first entry; the start ring counts as seen.
+    this.ringNow = this.coreRingIndex();
+    this.ringsSeen = new Set([this.ringNow]);
+    this.audio.setRing(this.ringNow);
     this.nexusPulse = 0; // 1 -> 0 after a Nexus Development purchase (ring burst in render.js)
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
   }
+
+  coreRingIndex() { return this.world.ring(Math.floor(this.player.x / CELL), Math.floor(this.player.y / CELL)); }
+  ringName() { return RINGS[this.ringNow].name; }
 
   nexusLight() { return NEXUS_UPGRADES[0].value(this.nexusLevels.radiance); }
   canAffordNexus(id) {
@@ -186,6 +193,12 @@ export class Game {
       let d = Math.atan2(Math.sin(target - p.angle), Math.cos(target - p.angle));
       p.angle += d * Math.min(1, dt * 8);
     }
+    const ring = this.coreRingIndex();
+    if (ring !== this.ringNow) {
+      this.ringNow = ring;
+      this.audio.setRing(ring);
+      if (!this.ringsSeen.has(ring)) { this.ringsSeen.add(ring); this.notify('ring'); }
+    }
     p.invuln = Math.max(0, p.invuln - dt);
     p.hurtFlash = Math.max(0, p.hurtFlash - dt);
 
@@ -242,7 +255,7 @@ export class Game {
       const res = this.world.hit(hit.x, hit.y, dps * dt);
       b.target = { x: hit.x, y: hit.y, frac: res && !res.broken ? res.frac : 0 };
       if (Math.random() < dt * 45) {
-        const col = MATERIAL[res ? res.type : T.ROCK].edge;
+        const col = this.world.look(hit.x, hit.y, res ? res.type : T.ROCK).edge;
         this.particle(ox + dx * dist, oy + dy * dist, (-dx + (Math.random() - 0.5) * 1.6) * 110, (-dy + (Math.random() - 0.5) * 1.6) * 110, 0.35, col, 2);
       }
       if (res && res.broken) this.onCellBroken(hit.x, hit.y, res.type);
@@ -263,7 +276,7 @@ export class Game {
     this.stats.mined++;
     const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
     const mat = MATERIAL[type];
-    this.burst(cx, cy, type === T.ROCK ? 8 : 16, mat.edge, 150);
+    this.burst(cx, cy, type === T.ROCK ? 8 : 16, this.world.look(x, y, type).edge, 150);
     this.addShake(type === T.ROCK ? 1.5 : 3);
     if (mat.yield) {
       const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
