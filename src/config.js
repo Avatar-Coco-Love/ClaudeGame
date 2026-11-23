@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.12';
+export const VERSION = '0.1.13';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -19,6 +19,11 @@ export const GLITCH_GIVE_UP_S = 6;
 export const GLITCH_FADE_S = 0.6;
 // D-018 (Q-007 fallback): once Glitches stop sticking, a kill drops a Prism only this often (Shards unchanged).
 export const GLITCH_PRISM_CHANCE = 0.5;
+
+// S-4 Feel pass (D-021). Reduced motion turns off hitstop and the upgrade ring (shake already off); sounds stay.
+export const HITSTOP_S = 0.035;     // sim freeze on a crystal/prism break
+export const HITSTOP_GAP_S = 0.15;  // at most one hitstop per this much game time
+export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core Matrix purchase
 
 export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5 };
 

@@ -23,3 +23,12 @@ leave the other half-working. Reduced motion also adds `body.reduce-motion` (no 
 Volume 0–100 maps linearly to master gain 0–0.5 (`config.js`); 70 is the old fixed level, so nobody hears a change.
 - Rejected: shake switch and reduced motion independent (reduced motion with shake on would still shake the screen); keeping the
   legacy key in sync (two writers); a log/curved volume taper (synth levels are already tuned at 0.35; revisit with S-4 sounds).
+
+### D-021 — S-4 feel: the deposit is the count-up; hitstop lives in the main loop (2026-11-23, S-4)
+The bank already counts up one unit per 35 ms while cargo streams into the Nexus, so no second 0.4 s tween was added. The arpeggio
+plays once when the hold empties: kinds deposited + 1 notes (max 3), so it rises a step further when Prisms came home too.
+Hitstop is a real-time timer that `main.js` honours by skipping `game.update()`; tools that step the game directly never pause.
+Reduced motion turns off hitstop and the core ring (shake was already off); sounds stay, and the pip flash (a CSS animation) goes
+with `body.reduce-motion`'s blanket rule.
+- Rejected: a tweened bank number (fights the per-unit stream: the number would lag what is in the bank); one arpeggio note per
+  unit (that is the existing tick); hitstop inside `game.update()` (would freeze bots and the parity tool's clock).

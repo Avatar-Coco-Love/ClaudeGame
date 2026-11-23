@@ -24,3 +24,9 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Tests:** 5 new smoke checks (43 total): legacy mute → muted; shake off → `game.shake` max 0 over a stepped Glitch kill + a hit; volume 0 + shake off survive reload; settings never in the world save; sheet fits 320×568 with no scroll and every control ≥ 40 px. Overflow check now covers `#settings`. Shake check failed on the old behaviour (gate disabled: max shake 8).
 - **Screenshots (1280×800 and 320×568, DSF 1):** Settings button reads as secondary under New World; the sheet fits the narrow phone with room to spare; switch states clear (cyan = On).
 - **Watch:** the M badge hides on coarse pointers via a media query, since `body.touch` is only set once a game starts.
+
+## 2026-11-23 — Session 11 (v0.1.13): Build — S-4 Feel pass
+- **Built:** `audio.depositDone(kinds)` (kinds+1 rising notes, max 3) when the hold empties; `audio.beamStart()` on the beam's off→on edge; `game.coreRing` ring on the core after a Core Matrix buy + `.flash` pip row; `game.hitstop` (35 ms, crystal/prism only, ≥ 150 ms apart) honoured by `main.js`; `game.motionOn()` gate. B-008 fixed: hint hidden while the Matrix is open (D-021). Demo world uses a silent audio Proxy.
+- **Tests:** 6 new smoke checks (49 total): B-008 hint, ring + pip flash, hitstop rock/crystal/rate-limit, arpeggio `[2,1]` + beam sweep ×2, reduced motion → no hitstop/ring, loop holds `stats.time` during hitstop. Five failed on the old code (stash run, 44/49); the reduced-motion one is a guard.
+- **Screenshot (900×600, DSF 1):** ring reads clearly around the core inside the Nexus; Matrix open shows no hint behind it.
+- **Watch:** can't listen in-session; arpeggio levels (vol 0.13) were set by ear-free reasoning next to `upgrade()` (0.14). Revisit if a play-test log says the deposit is loud.

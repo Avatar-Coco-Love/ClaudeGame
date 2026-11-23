@@ -99,7 +99,7 @@ let lastHud = '';
 function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
-  const key = [g.bank.shard, g.bank.prism, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades].join('|');
+  const key = [g.bank.shard, g.bank.prism, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -114,7 +114,7 @@ function updateHud() {
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
-    $('hint').classList.toggle('hidden', !h);
+    $('hint').classList.toggle('hidden', !h || panelOpen); // never under the open Matrix (B-008)
   }
   for (const ev of g.events) {
     if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
@@ -149,7 +149,12 @@ function upgradeRow(u, lvl, cost, affordable, onBuy) {
     <div class="u-main"><div class="u-name">${u.name}</div><div class="u-desc">${u.desc}</div>
       <div class="u-val">${now}${next}</div><div class="pips">${pips}</div></div>
     <button class="buy" ${affordable ? '' : 'disabled'}>${maxed ? 'MAX' : costHtml(cost)}</button>`;
-  row.querySelector('.buy').addEventListener('click', () => { if (onBuy()) { renderPanel(); persist(); } });
+  row.dataset.id = u.id;
+  row.querySelector('.buy').addEventListener('click', () => {
+    if (!onBuy()) return;
+    renderPanel(); persist();
+    $('upgrade-list').querySelector(`[data-id="${u.id}"]`)?.classList.add('flash'); // S-4: the bought pip row brightens
+  });
   return row;
 }
 function renderPanel() {
@@ -229,8 +234,8 @@ function frame(now) {
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : input.read(sp);
     if (!paused) {
-      const revealed = game.update(dt, intent);
-      renderer.revealed(revealed);
+      if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames
+      else renderer.revealed(game.update(dt, intent));
       updateHud();
       saveTimer += dt;
       if (saveTimer > 10) { saveTimer = 0; persist(); }
@@ -247,7 +252,7 @@ addEventListener('visibilitychange', () => { if (document.hidden) { persist(); a
 addEventListener('pagehide', persist);
 
 // Render a live world behind the title screen so it isn't a blank page.
-game = new Game({ seed: 1337, mode: 'drift', save: null, settings, audio: { beam() {}, break() {}, pickup() {}, deposit() {}, upgrade() {}, hurt() {}, enemyDie() {}, full() {} } });
+game = new Game({ seed: 1337, mode: 'drift', save: null, settings, audio: new Proxy({}, { get: () => () => {} }) }); // silent
 game.demo = true; // background world for the title screen — never saved
 renderer.attach(game);
 showTitle();

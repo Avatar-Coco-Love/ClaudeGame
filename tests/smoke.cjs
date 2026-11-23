@@ -70,10 +70,13 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('deposit empties cargo into bank', bank.cargo === 0 && bank.shard >= 30, JSON.stringify(bank));
     await pg.keyboard.press('e'); await pg.waitForTimeout(200);
     check('core matrix opens', await pg.isVisible('#matrix'));
+    check('no "Press E" hint under the open Matrix (B-008)', !(await pg.isVisible('#hint')), await pg.textContent('#hint'));
     const before = await pg.evaluate(() => window.__lumen.game.bank.shard);
     await pg.click('#upgrade-list .upgrade:first-child .buy:not([disabled])');
     const after = await pg.evaluate(() => window.__lumen.game.bank.shard);
     check('upgrade purchase spends shards', after < before, `${before} -> ${after}`);
+    const ring = await pg.evaluate(() => ({ ring: window.__lumen.game.coreRing, flash: document.querySelectorAll('#upgrade-list .upgrade.flash').length }));
+    check('purchase rings the core and brightens its pip row (S-4)', ring.ring > 0 && ring.flash === 1, JSON.stringify(ring));
 
     // Nexus Development (S-1): Radiance costs Prisms only, widens the light, and reveals more of the map.
     const nx0 = await pg.evaluate(() => { const g = window.__lumen.game; g.bank.prism = 10; return { light: g.nexusLight(), shard: g.bank.shard, explored: g.world.explored.reduce((a, b) => a + b, 0) }; });
@@ -85,6 +88,36 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.keyboard.press('Escape'); await pg.keyboard.press('e'); await pg.waitForTimeout(100);
     check('Matrix remembers the last tab', await pg.evaluate(() => document.querySelector('#matrix .tabs .selected')?.dataset.tab === 'nexus'));
     await pg.keyboard.press('Escape');
+
+    // S-4 feel: hitstop on crystal/prism breaks only (rate-limited) and the loop really pauses the sim for it;
+    // deposit arpeggio once per emptied hold, sized by kinds; beam sweep only on the off -> on edge.
+    const fx = await pg.evaluate(() => {
+      const g = window.__lumen.game, calls = { beamStart: 0, depositDone: [] }, a = g.audio;
+      const orig = { beamStart: a.beamStart, depositDone: a.depositDone };
+      a.beamStart = () => calls.beamStart++; a.depositDone = n => calls.depositDone.push(n);
+      g.hitstop = 0; g.lastHitstop = -Infinity;
+      g.onCellBroken(1, 1, 1); const rock = g.hitstop;
+      g.onCellBroken(1, 1, 3); const crystal = g.hitstop; g.hitstop = 0;
+      g.onCellBroken(1, 1, 4); const tooSoon = g.hitstop;
+      const idle = { move: { x: 0, y: 0 }, fire: false, aim: null }, fire = { move: { x: 0, y: 0 }, fire: true, aim: { x: 0, y: -1 } };
+      g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.cargo.shard = 3; g.cargo.prism = 2;
+      for (let i = 0; i < 30; i++) g.update(1 / 60, idle);
+      g.cargo.shard = 2;
+      for (let i = 0; i < 30; i++) g.update(1 / 60, idle);
+      for (const inp of [fire, fire, fire, idle, fire, fire]) g.update(1 / 60, inp);
+      g.update(1 / 60, idle);
+      Object.assign(a, orig);
+      return { rock, crystal, tooSoon, ...calls };
+    });
+    check('hitstop on crystal/prism breaks only, at most once per 150 ms (S-4)', fx.rock === 0 && fx.crystal > 0 && fx.tooSoon === 0, JSON.stringify(fx));
+    check('deposit arpeggio sized by kinds; beam sweep once per switch-on (S-4)', JSON.stringify(fx.depositDone) === '[2,1]' && fx.beamStart === 2, JSON.stringify(fx));
+    const rm = await pg.evaluate(() => { const g = window.__lumen.game, st = window.__lumen.settings; st.reducedMotion = true;
+      g.hitstop = 0; g.lastHitstop = -Infinity; g.coreRing = 0; g.bank.shard += 999; g.onCellBroken(1, 1, 3); g.buy('magnet');
+      const r = { hitstop: g.hitstop, ring: g.coreRing, bought: g.upgrades.magnet }; st.reducedMotion = false; g.hitstop = 0; return r; });
+    check('reduced motion: no hitstop, no upgrade ring (S-4)', rm.hitstop === 0 && rm.ring === 0 && rm.bought >= 1, JSON.stringify(rm));
+    const hs = await pg.evaluate(async () => { const g = window.__lumen.game, t0 = g.stats.time; g.hitstop = 0.4;
+      await new Promise(r => setTimeout(r, 250)); return { frozen: g.stats.time - t0, left: g.hitstop }; });
+    check('main loop holds the sim during hitstop (S-4)', hs.frozen === 0 && hs.left > 0 && hs.left < 0.4, JSON.stringify(hs));
 
     // Surge mode: glitches spawn and die to the beam.
     await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.player.x = g.nexus.x + 1200; g.player.y = g.nexus.y + 1200;

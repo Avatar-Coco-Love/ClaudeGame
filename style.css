@@ -58,6 +58,8 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 .pips { display: flex; gap: 3px; margin-top: 5px; }
 .pips i { width: 14px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.12); }
 .pips i.on { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+.upgrade.flash .pips { animation: pipflash .4s ease-out; } /* S-4: bought row brightens */
+@keyframes pipflash { 0% { filter: brightness(2.6) drop-shadow(0 0 6px #fff); } 100% { filter: none; } }
 .buy { min-width: 92px; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--cyan); background: rgba(46,242,255,.1); font-weight: 600; white-space: nowrap; }
 .buy:disabled { opacity: .4; cursor: default; border-color: var(--line); }
 .buy:not(:disabled):hover { background: rgba(46,242,255,.22); }

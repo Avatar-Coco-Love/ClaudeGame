@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
 import { World, packBits, unpackBits, mulberry32 } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -90,6 +90,10 @@ export class Game {
     this.depositTimer = 0;
     this.spawnTimer = 3;
     this.depositCount = 0;
+    this.depositKinds = new Set(); // kinds moved this Nexus visit -> arpeggio length (S-4)
+    this.hitstop = 0;    // real seconds the main loop skips update() for (S-4); tools never read it
+    this.lastHitstop = -Infinity;
+    this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     this.rand = mulberry32((seed ^ Date.now()) >>> 0);
     if (save) this.load(save);
     this.player.integrity = this.stat('hull');
@@ -139,6 +143,7 @@ export class Game {
     this.stats.upgrades++;
     if (id === 'hull') this.player.integrity = this.stat('hull');
     this.audio.upgrade();
+    if (this.motionOn()) this.coreRing = 1;
     this.burst(this.nexus.x, this.nexus.y, 40, '#ffffff', 260);
     return true;
   }
@@ -194,6 +199,7 @@ export class Game {
 
     this.shake = Math.max(0, this.shake - dt * 30);
     this.nexusPulse = Math.max(0, this.nexusPulse - dt * 1.4);
+    this.coreRing = Math.max(0, this.coreRing - dt / CORE_RING_S);
     const newly = this.world.reveal(p.x, p.y, 230);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
     return newly;
@@ -201,8 +207,10 @@ export class Game {
 
   updateBeam(dt, intent) {
     const p = this.player, b = this.beam;
+    const was = b.on;
     b.on = !!(intent.fire && intent.aim);
     b.target = null; b.enemy = null;
+    if (b.on && !was) this.audio.beamStart();
     this.audio.beam(b.on);
     if (!b.on) return;
     const range = this.stat('range');
@@ -241,6 +249,9 @@ export class Game {
     b.ex = ox + dx * dist; b.ey = oy + dy * dist;
   }
 
+  // Reduced motion (S-3) also turns off hitstop and the upgrade ring (S-4); null settings = all effects on.
+  motionOn() { return !this.settings || !this.settings.reducedMotion; }
+
   // Every shake goes through here so the Settings switches (S-3) can turn it off.
   addShake(n) {
     if (this.settings && (!this.settings.shake || this.settings.reducedMotion)) return;
@@ -257,6 +268,7 @@ export class Game {
       const n = mat.yield.min + Math.floor(this.rand() * (mat.yield.max - mat.yield.min + 1));
       for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
       this.audio.break(mat.yield.kind);
+      if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }
     } else {
       this.audio.break('rock');
     }
@@ -300,15 +312,16 @@ export class Game {
   }
 
   updateDeposit(dt) {
-    if (!this.inNexus() || this.cargoTotal() === 0) { this.depositTimer = 0; return; }
+    if (!this.inNexus() || this.cargoTotal() === 0) { this.depositTimer = 0; this.depositKinds.clear(); return; }
     this.depositTimer += dt;
     while (this.depositTimer > 0.035 && this.cargoTotal() > 0) {
       this.depositTimer -= 0.035;
       const kind = this.cargo.shard > 0 ? 'shard' : 'prism';
       this.cargo[kind]--; this.bank[kind]++;
       this.audio.deposit(this.depositCount++);
+      this.depositKinds.add(kind);
       this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx: this.nexus.x, ty: this.nexus.y, life: 0.4, max: 0.4, color: kind === 'shard' ? '#2ef2ff' : '#ff4fd8', size: 3 });
-      if (this.cargoTotal() === 0) this.notify('deposited');
+      if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); }
     }
   }
 
