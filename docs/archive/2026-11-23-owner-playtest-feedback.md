@@ -1,0 +1,6 @@
+# Owner play-test feedback (2026-11-23, after v0.1.24)
+Owner's words (paraphrased lightly): "I enjoyed the gameplay and it gave me a sense of both discovery and achievement. I greatly look forward to all future content. However, I did not like the sound of the beam. It was very annoying. Perhaps at some point I could provide a free sound asset pack to convert to .OGG and incorporate into the game." The owner stressed they don't want to steer design decisions; this is play-test input.
+Agreed approach from the conversation with the owner:
+- Treat the beam sound as a bug (log a B-xxx). Fix now within synthesized audio: the continuous beam hum is the problem.
+- Claude cannot listen to audio, only measure it (loudness/RMS, spectrum/harshness, attack/decay, loop seams). Plan: the owner downloads a CC0 pack (recommended: Kenney "Sci-Fi Sounds" and "Digital Audio" from kenney.nl, already .ogg, CC0) and drops it into the repo/inbox; a session measures and shortlists 2–3 candidates per sound, builds a small audition page, and the owner picks by ear (choosing among options, not designing).
+- This supersedes D-014 (keep synthesized audio because sessions can't listen). Recorded files would be the game's first binary assets: set a size budget and licence rule (CC0 only, record the source) in the new decision.

@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.25 — 2026-11-23 (#25)
+- The mining beam is much quieter and softer: a short soft swell when it switches on, then a low, gentle hum that lifts slightly
+  only while it is cutting rock or hitting a Glitch. No more buzzing drone or wobble. The volume setting still controls it.
+
 ## v0.1.24 — 2026-11-23 (#24)
 - No change in play. Planned next: the Scanner ping will also reveal a nearby **vault cache**, and Research gains two new beams
   for Lumen: **Wide** (a 3-cell swath) and **Pulse** (charge, then a burst that punches through rock). Switch with Q.

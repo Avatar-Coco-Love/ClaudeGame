@@ -27,6 +27,7 @@ async function plantSaveAndReload(page, edit) {
 }
 
 const research = require('./research.cjs');
+const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 
@@ -432,6 +433,7 @@ async function rngChecks() {
     await ctx.close();
 
     await research.browserChecks(browser, url, check, errors, plantSaveAndReload);
+    await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----
     const sp = await browser.newPage({ viewport: { width: 1280, height: 800 } });

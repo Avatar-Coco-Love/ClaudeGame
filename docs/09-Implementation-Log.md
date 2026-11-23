@@ -55,3 +55,17 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   S-13/S-14). New Q-011 (dominant mode check after S-14). S-15 throttled perf check specced in Tooling.
 - **Docs:** 09 sessions 16–17 and changelog v0.1.1–v0.1.9 archived word for word; M1's done list in `04` folded into one line.
 
+## 2026-11-23 — Session 23 (v0.1.25): Inbox — owner play-test feedback
+- **Inbox:** `2026-11-23-owner-playtest-feedback.md` (first owner play-test, after v0.1.24): enjoyed discovery and achievement;
+  the beam sound was "very annoying"; offered a free sound pack later. Adopted: the hum as a bug (B-016), a measure-then-owner-picks
+  plan for recorded audio (D-037, supersedes D-014), a CLAUDE.md rule (measure audio offline). Rejected: nothing. Archived.
+- **B-016 (new) → fixed:** the hum was a 92 Hz sawtooth at gain 0.045 with 13 Hz ±14 Hz vibrato that never faded. Now a 700 Hz
+  low-passed triangle at 2× pitch: 40 ms swell, settles to a quiet bed, slightly higher while cutting (D-038, `BEAM_HUM`).
+- **Measured** (4 s held on rock, volume 70, OfflineAudioContext 44.1 kHz, `node tests/audio.cjs`), before → after:
+  RMS −42.3 → −54.2 dBFS; peak −36.1 → −39.9 (onset only); sustained (last 1 s) −42.3 → −56.7 (−14.4 dB, ~5× less amplitude);
+  centroid 324 → 191 Hz; energy > 2 kHz 2.47 % → 0 %; above −50 dBFS for 4 s (never fades) → 0.3 s.
+- **Found while building:** `cancelScheduledValues(now)` on the first contact frame wiped the onset and jumped the gain to 1
+  (peak −9.4 dBFS); contact changes now retarget only after the attack.
+- **Tests:** 2 new checks in `tests/audio.cjs` (83 total): level/harshness ceiling, volume 100 > 70 and 0 = silence. With `src/`
+  stashed the ceiling check fails (tail −42.3). No visual change, so no screenshot.
+

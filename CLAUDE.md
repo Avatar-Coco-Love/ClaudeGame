@@ -44,6 +44,8 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - **Measure before deciding:** real viewport sizes, text width at the narrowest phone, odds over many seeds, frame time on a throttled CPU.
 - **A new test must fail on the old code.** Prove it once (stash the fix, run it) before trusting it; for random bugs, run many seeds.
 - **Seeded randomness with a separate salt per draw** for anything gameplay-relevant, so draws don't secretly depend on each other.
+- **You can't hear, so measure audio:** render it offline (`tests/audio.cjs`: RMS, peak, > 2 kHz share, how long it stays loud).
+  A sound that plays continuously needs a level ceiling check. The owner judges by ear only by picking among options (D-037).
 - **Edge cases to check on every state change:** mode switch, death, deposit and pickup on the same frame, page hidden, old save.
 
 ## Hard rules
