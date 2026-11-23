@@ -13,6 +13,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **S-3 Settings panel:** volume, screen shake on/off, reduced motion, and "reset world" with confirmation.
 - **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
+- ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
 - **Dev panel** (`?dev` or backtick): add resources, teleport to a ring, god mode, toggle mode, save/load test spots. Bots and playtests jump straight to the thing under test.
@@ -59,4 +60,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 
 ## Debt
 - **B-001:** at 320 px wide the title "LUMEN CORE" is clipped on the right (letter-spacing + clamp min). Fixed by S-2.
+- **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into S-4 or the dev panel.
+- **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
+- **B-006:** smoke "beam mines terrain" is timing-dependent (5 s wall clock; 3–8 cells mined across runs, needs ≥ 4). Failed once in 6 runs. Fix: drive it by game time (step `game.update`), not wall time. Don't lower the bar.
+- **To verify:** touch sticks aren't cleared on `blur`/page hide (keys are). If a phone drops `touchend` while hidden, the core may drift on return.
 - **B-002:** on a phone, the first hint is the desktop one ("WASD to move…", truncated) and the Matrix button shows an `E` key badge until the first touch. Fixed by S-2.

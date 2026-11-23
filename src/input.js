@@ -13,7 +13,8 @@ export class Input {
       if (e.target instanceof HTMLInputElement) return;
       const k = e.key.toLowerCase();
       if (!this.keys.has(k)) {
-        if (k === 'e' || k === 'enter') this.pressed.add('matrix');
+        // Enter on a focused button is that button's click, not a Core Matrix toggle (B-003).
+        if (k === 'e' || (k === 'enter' && !(e.target instanceof HTMLButtonElement))) this.pressed.add('matrix');
         if (k === 'escape') this.pressed.add('escape');
         if (k === 'm') this.pressed.add('mute');
       }

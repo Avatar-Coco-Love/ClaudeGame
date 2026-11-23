@@ -43,6 +43,11 @@ Over the cap: split word for word into a `-2` file, or move old entries into `do
 Dense rock keeps high HP only; no minimum Beam Power. The Core Matrix stays pure stats, and anything that unlocks access belongs to Research (pillar: layers never unlock the same thing twice).
 - Rejected: a Beam Power threshold (turns a stat upgrade into an unlock, and blocks early tunnels for no new decision).
 
+### D-010 — The title screen takes no gameplay hotkeys (2026-11-23, audit)
+While the title is up (`paused`), the Core Matrix can't open; only mute works. Enter on a focused button is that button's click, never a Matrix toggle.
+- Why: the demo world and a paused real world both sit inside the Nexus, so E opened the Matrix over the title (B-003), with live mode/buy buttons.
+- Rejected: dropping Enter as a Matrix key (keyboard users rely on it in play); clearing all input on the title (mute should still work there).
+
 ### D-009 — Nexus Development is paid in Prisms only (2026-11-23)
 Radiance and later Nexus upgrades cost Prisms, not Shards. Measured over 40 seeds: a world holds ~2750◆ and the Core Matrix takes 2482◆,
 while it holds ~1470▲ and the Matrix takes only 246▲. Prisms (first one 32 cells out) also pull players into the middle ring.

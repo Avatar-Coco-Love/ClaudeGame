@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.6 — 2026-11-23 (#6)
+- Pressing E (or Enter) on the title screen no longer opens the Core Matrix behind the title.
+- Starting a new world now asks first if a save exists that this version can't read, instead of silently erasing it.
+
 ## v0.1.5 — 2026-11-23 (#5)
 - No change on screen. A design pass: play-tested on desktop and phone, measured the economy, and planned the next five builds
   (Nexus Radiance, phone-first hints, settings, game feel, reproducible randomness).
