@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 8** · **Version: v0.1.10** (session 8 was a Build: S-6 Glitch give-up + 50 % Prism drop; next is an Audit)
+**Session counter: 9** · **Version: v0.1.11** (session 9 was an Audit: B-006, B-009, Drift/Surge parity; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -17,7 +17,7 @@ _Last updated: 2026-11-23_
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
-- Build-ready specs live in `07`, in build order: S-3, S-4, S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build-ready specs live in `07`, in build order: S-3, S-4, S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -30,9 +30,10 @@ _Last updated: 2026-11-23_
 - Phone shows the thumb hint before the first touch; nothing in title/HUD/Matrix overflows at 320 px (session 6).
 - Dying among several Glitches near the Nexus no longer freezes the game (B-007, session 7).
 - A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
+- The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (9) is an **Audit** (counter % 5 == 4): parallel subagent sweep per the manual, fix the top issues (B-006 flaky mining check is a strong candidate), archive old `09` entries.
+Next session (10) is a **Build**: S-3 Settings panel per `07` (volume, mute, screen shake, reduced motion; opened from the title, D-016).

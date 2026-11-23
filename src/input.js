@@ -23,7 +23,9 @@ export class Input {
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();
     });
     addEventListener('keyup', e => this.keys.delete(e.key.toLowerCase()));
-    addEventListener('blur', () => { this.keys.clear(); this.mouse.down = false; });
+    // Leaving the page drops every held input, touch sticks included: a phone may never send touchend while hidden.
+    addEventListener('blur', () => this.release());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.release(); });
 
     canvas.addEventListener('mousemove', e => {
       this.mouse.x = e.clientX; this.mouse.y = e.clientY; this.mouse.active = true; this.usingTouch = false;
@@ -64,6 +66,8 @@ export class Input {
       }
     }
   }
+
+  release() { this.keys.clear(); this.mouse.down = false; this.sticks.move = this.sticks.aim = null; }
 
   static STICK_RADIUS = 56;
 

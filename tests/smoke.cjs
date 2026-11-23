@@ -52,11 +52,15 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('game started', await pg.evaluate(() => !!window.__lumen?.game && document.getElementById('title').classList.contains('hidden')));
 
     // Mine straight down from the Nexus.
+    // Real input, but timed by GAME time (B-006): the loop clamps dt to 0.05 s, so under load 5 s of wall clock was
+    // as little as ~3 s of play and the cell count swung 3-8. Wait for 5 s of stats.time instead.
     await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s');
-    await pg.waitForTimeout(5000);
+    const mineT0 = await pg.evaluate(() => window.__lumen.game.stats.time);
+    const mineWall = Date.now();
+    await pg.waitForFunction(t => window.__lumen.game.stats.time >= t + 5, mineT0, { timeout: 60000, polling: 'raf' });
     await pg.keyboard.up('s'); await pg.mouse.up();
     const m = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, got: g.cargo.shard + g.cargo.prism + g.bank.shard + g.bank.prism, dy: g.player.y - g.nexus.y }; });
-    check('beam mines terrain', m.mined >= 4, `mined ${m.mined}`);
+    check('beam mines terrain', m.mined >= 4, `mined ${m.mined} in 5 s game time (${((Date.now() - mineWall) / 1000).toFixed(1)} s wall)`);
     check('core tunnels forward', m.dy > 150, `moved ${Math.round(m.dy)}px`);
 
     // Deposit + upgrade.
@@ -167,6 +171,16 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     const t = await ph.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, moved: Math.round(Math.hypot(g.player.x - g.nexus.x, g.player.y - g.nexus.y - 40)), beam: g.beam.on }; });
     check('touch stick moves the core', t.moved > 60, JSON.stringify(t));
     check('touch aim stick fires the beam', t.mined > 0 || t.beam, JSON.stringify(t));
+    // Leaving the page mid-drag (no touchend ever arrives) must drop both sticks, like held keys (audit 9).
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: pts(0) });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pts(50) }); await ph.waitForTimeout(100);
+    const held = await ph.evaluate(() => {
+      const i = window.__lumen.input, before = !!(i.sticks.move && i.sticks.aim);
+      dispatchEvent(new Event('blur'));
+      const m = i.read({ x: 0, y: 0 }).move;
+      return { before, after: !!(i.sticks.move || i.sticks.aim), move: Math.hypot(m.x, m.y) };
+    });
+    check('blur releases held touch sticks', held.before && !held.after && held.move === 0, JSON.stringify(held));
     await ctx.close();
 
     // Narrowest phone: Matrix tabs and buy buttons fit at 320 px (S-1).
