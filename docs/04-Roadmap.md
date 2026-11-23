@@ -16,6 +16,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#12) **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion, opened from the title (D-016, D-020).
 - ✅ (#13) **S-4 Feel pass:** deposit arpeggio, upgrade ring + pip flash, crystal/prism hitstop, beam sweep; fixed B-008 (D-021).
 - ✅ (#16) Audit session 14: fixed B-010, B-005, B-011 (floor pickups saved, D-026).
+- ✅ (#21) Audit session 19: fixed B-014 (off-screen pickups culled, D-032) and B-013 (dev teleport carved bedrock).
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
 - ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
 
@@ -63,6 +64,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
 - **Glitch inside a vault (watch, session 18):** spawning only checks for open cells, so a Glitch can appear in a sealed vault's
   hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.
 - **Bedrock edge (watch, session 17):** a core pushed into the world border in the Deep sits on a near-black band and its beam shows no
@@ -70,9 +72,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ **B-012** (#17): smoke's "beam mines terrain" was seed-dependent; the seed is now pinned.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. A player (or bot) who leaves mid-stream gets no chime. Keep unless a play-test log says it feels broken.
 - ✅ **B-005, B-010, B-011** (#16): cargo kept past the pickup cap; "Upgrade ready" hint; floor pickups saved (D-026).
-- **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
-- ✅ **B-006** (#11): "beam mines terrain" now waits for 5 s of game time (loop clamps dt to 0.05 s, so wall time under load was ~1.3 s of play).
+- **Render cost:** ✅ pickups are culled to the view (B-014, #21). Particles are still drawn uncull'd (short-lived, local). Each on-screen pickup keeps its `shadowBlur`; measure on the throttled perf check (Tooling) before changing that.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
-- ✅ **B-009** (#11): touch sticks weren't released on `blur`/page hide (keys were). `input.release()` now drops all held input.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
 - ✅ **Test trap** (sessions 4, 5): planting a save then reloading let `pagehide` overwrite it. Now a smoke helper, `plantSaveAndReload()`.

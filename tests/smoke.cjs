@@ -323,6 +323,21 @@ async function rngChecks() {
       return { d: Math.round(Math.hypot(g.player.x - g.nexus.x, g.player.y - g.nexus.y)), open, panel: getComputedStyle(document.getElementById('dev-panel')).display !== 'none' };
     });
     check('dev.teleport(60): core ≥ 1800 px out in an open room; panel shown with ?dev (S-7)', tp.d >= 1800 && tp.open && tp.panel, JSON.stringify(tp));
+    // Audit 19: teleport never carves the bedrock border (B-013); off-screen floor pickups aren't drawn (B-014).
+    const au = await dp.evaluate(() => {
+      const L = window.__lumen, g = L.game, w = g.world, isBed = () => [...w.cells].filter(c => c === 5).length;
+      const bed0 = isBed(); L.dev.teleport(90); const bedLost = bed0 - isBed();
+      const R = L.renderer, ctx = R.ctx, fill = ctx.fill; let fills = 0; ctx.fill = function (...a) { fills++; return fill.apply(this, a); };
+      const saved = g.pickups.splice(0);
+      for (let i = 0; i < 400; i++) g.pickups.push({ x: g.nexus.x + (i % 20) * 6, y: g.nexus.y + Math.floor(i / 20) * 6, vx: 0, vy: 0, kind: 'shard', age: 1, r: 4 });
+      R.draw(0.016, L.input); const off = fills; fills = 0;
+      g.pickups.length = 0; g.pickups.push({ x: R.cam.x + 20, y: R.cam.y, vx: 0, vy: 0, kind: 'prism', age: 1, r: 4 }); // the camera lags the teleport
+      R.draw(0.016, L.input); const on = fills;
+      ctx.fill = fill; g.pickups.splice(0, g.pickups.length, ...saved);
+      return { bedLost, offFills: off, onFills: on };
+    });
+    check('teleport(90) keeps the bedrock border (B-013); 400 off-screen pickups add no draws (B-014)',
+      au.bedLost === 0 && au.onFills - au.offFills >= 1 && au.offFills < 50, JSON.stringify(au));
     await dp.click('#dev-panel [data-dev="+100◆"]'); await dp.click('#dev-panel [data-dev="God"]');
     const dv = await dp.evaluate(() => {
       const L = window.__lumen, g = L.game, godOn = g.god, mode = L.dev.setMode('surge');

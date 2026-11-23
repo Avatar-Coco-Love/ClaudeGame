@@ -1,28 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`.
-
-## 2026-11-23 — Session 14 (v0.1.16): Audit
-- **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
-- **B-010 → fixed:** with ≥ 8◆ banked and no upgrade, the hint now reads "Upgrade ready — press E at the Nexus" (touch: "back to the
-  Nexus"); "Bring shards home" only shows while the Shards are still in the hold. Screenshot (800×500, DSF 1): pill reads cleanly.
-- **B-011 (new) → fixed:** floor pickups weren't in the save, so a reload after a Surge death lost the scattered cargo for good (and
-  would have lost S-9 vault caches). Saved as `[kind, x, y]`; `SAVE_FORMAT` 3, step 2→3 adds `pickups: []` (D-026).
-- **B-005 → fixed:** cargo scatter on a death now bypasses `PICKUP_CAP` (bounded by the hold), so nothing vanishes on a full floor.
-- **Tests:** 4 new smoke checks (55 total). Three failed on the old code (stash run, 52/55); the format-2 load check is a guard.
-- **Perf / mobile / code health:** nothing new; new hint strings are shorter than the old one (320 px overflow check passes).
-  Largest files: `game.js` 478, `render.js` 463 lines. **D-check:** D-001…D-025 match the code (spot-read). `09` session 8 archived.
-
-## 2026-11-23 — Session 15 (v0.1.17): Build — S-7 dev panel
-- **Built:** `src/dev.js`. `window.__lumen.dev` = `addShards`, `addPrisms`, `teleport(cells, angle)`, `god`, `setMode`, `maxAll`,
-  `showPanel`. The panel (8 buttons, bottom left) is only built with `?dev` or the backtick key and only calls those functions (D-027).
-- **Teleport** carves a 3×3 room with no yield (cells count as broken, so the room survives reload) and clears floor pickups.
-- **B-012 (new) → fixed:** "beam mines terrain" used a random world seed and fell to 3 cells on some seeds (2 fails in 7 runs here;
-  `main` gave 5–8 in 3 runs; the dev code never runs on that page, so it's seed luck). Smoke now pins the seed (901943132: 8 cells, 3/3 runs).
-- **Tests:** 3 new smoke checks (58 total): no panel without `?dev`; `teleport(60)` lands 1936 px out in an open room with the panel
-  shown; panel +100◆ / God, no damage in Surge, max all, `god` never in the save. **Screenshot** (1280×800, DSF 1): panel reads cleanly
-  bottom left, carved room visible; it would cover the hint pill on a phone, accepted for a dev tool.
-- Not built: "save/load test spots" from the old `04` line (not in the spec). Add if a bot needs it.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`.
 
 ## 2026-11-23 — Session 16 (v0.1.18): Build — S-8 depth rings
 - **Built:** `RINGS` in `config.js` (Hearth < 24, Veil 24–48, Deep ≥ 48 cells; ×1 / ×1.4 / ×2 hp on ROCK + DENSE only).
@@ -55,3 +33,16 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Screenshot** (1280×800, DSF 1, `?dev`, teleport beside vault 0): white-edged diamond reads clearly against Veil rock, the cache
   glyph is distinct from ore; opening it bursts pickups and toasts. Watch: Glitches may spawn in a hollow (Debt). Q-010 opened.
 - **Docs:** sessions 12–13 of this log archived word for word to `archive/2026-11-23-09-sessions-12-13.md` (cap).
+
+## 2026-11-23 — Session 19 (v0.1.21): Audit
+- **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
+- **B-014 (new) → fixed (perf):** every floor pickup was drawn with `shadowBlur` wherever it lay, and the floor is saved (B-011), so
+  loot left across the map taxed every frame. Headless 1280×800, DSF 1: 400 pickups 3000 px off screen took a frame from 17 ms to
+  1093 ms (SwiftShader, software GL; same cost as on screen). Now culled to the view + 16 px: 19 ms. On-screen loot still glows (D-032).
+- **B-013 (new) → fixed (dev only):** `dev.teleport` clamped the 3×3 room to x ≥ 2, so `teleport(90)` carved 3 cells of the inner
+  bedrock ring (seed 77). Clamp is now 2 + room. Not fixed: a teleport whose room hits a vault cache removes it with no loot (Debt).
+- **Tests:** 1 new smoke check (67 total): `teleport(90)` loses no bedrock and 400 off-screen pickups add no `fill` calls. With
+  `src/` stashed it fails (`bedLost 3, offFills 403`). **Screenshot** (800×500, DSF 1): 30 burst pickups by the core still draw and glow.
+- **Mobile / code health:** nothing new; 320 px overflow checks pass. Largest files `game.js` 500, `render.js` 480 lines (under 600).
+- **D-check:** D-026…D-031 match the code (spot-read); `dev.js` cited D-026 for itself, now D-027. Glitch-in-vault stays a watch item.
+- **Docs:** sessions 14–15 of this log archived word for word to `archive/2026-11-23-09-sessions-14-15.md`.

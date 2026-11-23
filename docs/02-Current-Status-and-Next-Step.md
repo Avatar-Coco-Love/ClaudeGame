@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 18** · **Version: v0.1.20** (session 18 was a Build; next is an Audit)
+**Session counter: 19** · **Version: v0.1.21** (session 19 was an Audit; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -47,9 +47,10 @@ _Last updated: 2026-11-23_
 - Deep rock takes 2× Hearth's beam time; seed 77's layout + types are unchanged by rings; Veil–Deep border reads at DSF 1 (session 16).
 - A Deep Prism field reads at DSF 1; the Deep's ×2 rock adds only ~2 s to the first-Lumen trip, kept (D-029, session 17).
 - 6 vaults on 40/40 seeds; a cache gives 20◆ + 6▲ and stays open; a format-3 save keeps its tunnels and skips seen vaults (session 18).
+- 400 off-screen pickups cost no draws (frame 1093 → 19 ms headless); dev teleport keeps the bedrock border (audit, session 19).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (19) is an **Audit** (counter 19 % 5 == 4): run the audit checklist, then S-10 Lumen next Build.
+Next session (20) is a **Build**: implement S-10 Lumen ore from `07` (then S-11 Research v1, D-024).

@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.21 — 2026-11-23 (#21)
+- Smoother frames when lots of loot lies around the map: Shards and Prisms far off screen no longer cost drawing time.
+- Dev tools only: teleporting to the world's edge no longer cuts into the bedrock border.
+
 ## v0.1.20 — 2026-11-23 (#20)
 - Six sealed **vaults** now sit 50–72 cells out: white-edged diamond, hexagon and cross rooms with tough walls. Cut in and break
   the cache at the centre for a burst of 20◆ and 6▲, with a chord. Opened caches stay open.
