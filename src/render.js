@@ -1,5 +1,5 @@
 // All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, NEXUS_RADIUS, LIGHT_RADIUS } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -283,13 +283,14 @@ export class Renderer {
   drawEnemies(ctx, eyesOnly) {
     const p = this.game.player;
     for (const e of this.game.enemies) {
+      const fade = e.fade !== undefined ? Math.max(0, e.fade / GLITCH_FADE_S) : 1; // S-6 give-up: fade and shrink
       ctx.save();
       ctx.translate(e.x, e.y);
       if (eyesOnly) {
         const d = Math.hypot(e.x - p.x, e.y - p.y);
         const a = Math.max(0, Math.min(0.9, (d - LIGHT_RADIUS * 0.6) / 200));
         if (a <= 0) { ctx.restore(); continue; }
-        ctx.globalAlpha = a * (0.6 + Math.sin(this.time * 6 + e.wander) * 0.3);
+        ctx.globalAlpha = fade * a * (0.6 + Math.sin(this.time * 6 + e.wander) * 0.3);
         ctx.fillStyle = '#ff5a2e'; ctx.shadowColor = '#ff5a2e'; ctx.shadowBlur = 12;
         ctx.beginPath(); ctx.arc(0, 0, 2.5 + e.tier * 0.6, 0, Math.PI * 2); ctx.fill();
         ctx.restore(); continue;
@@ -297,6 +298,7 @@ export class Renderer {
       const col = e.flash > 0 ? '#ffffff' : ['#ff7a3d', '#ff4a4a', '#ff2e7a', '#ffd23d'][e.tier];
       ctx.strokeStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.lineWidth = 2;
       ctx.rotate(e.spin);
+      if (fade < 1) { ctx.globalAlpha = fade; ctx.scale(0.4 + 0.6 * fade, 0.4 + 0.6 * fade); }
       const spikes = 3 + e.tier;
       ctx.beginPath();
       for (let i = 0; i <= spikes * 2; i++) {
@@ -304,9 +306,9 @@ export class Renderer {
         i ? ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r) : ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
       }
       ctx.stroke();
-      ctx.fillStyle = col; ctx.globalAlpha = 0.25; ctx.fill();
+      ctx.fillStyle = col; ctx.globalAlpha = 0.25 * fade; ctx.fill();
       ctx.restore();
-      if (e.hp < e.maxHp) {
+      if (e.hp < e.maxHp && fade === 1) {
         ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(e.x - 12, e.y - 20, 24, 3);
         ctx.fillStyle = '#ff7a3d'; ctx.fillRect(e.x - 12, e.y - 20, 24 * Math.max(0, e.hp / e.maxHp), 3);
       }

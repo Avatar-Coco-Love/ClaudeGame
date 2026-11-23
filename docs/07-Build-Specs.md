@@ -3,19 +3,7 @@
 Specs ready to build, in roadmap order. Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
-Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2 built in #7, #8.)
-
-## S-6 — Glitches give up when rock blocks them (D-015)
-- **Why:** Glitches steer in a straight line and can't path. Session 7 found 37 of 38 live Glitches (20 seeds, 120 s idle in a room 1200 px out) stuck on
-  rock, holding every spawn slot, so a Surge player in a tunnel gets ~0.5 encounters/min and Surge goes quiet (pillar 2).
-- **Rule:** each alert Glitch keeps `best` (closest distance to the core so far) and `stall` (s). Closing ≥ `GLITCH_PROGRESS_PX` (24) on `best`
-  resets `stall`; otherwise it grows. At `GLITCH_GIVE_UP_S` (6 s) the Glitch fades out over 0.6 s (no contact damage, no loot, not
-  beam-targetable) and frees its slot. Unalerted (wandering) Glitches are untouched. Constants in `config.js`.
-- **Render:** the fade scales alpha down and shrinks the shape; no new effect.
-- **Smoke:** a Glitch boxed behind dense rock 300 px away is gone within 8 s and `stats.glitches` is unchanged; a Glitch in open air
-  with a clear line keeps chasing (still present and closer after 8 s). Prove the first fails on the old code.
-- **Measure (log in `09`):** `node tools/surgefarm.mjs 1000 0 300` before/after. If kills/min at base stats goes above 3, apply the Q-007
-  fallback in the same PR: Glitch Prism drop becomes a 50 % chance (Shards unchanged) and record it as a decision.
+Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2, S-6 built in #7, #8, #10.)
 
 ## S-3 — Settings panel (D-016)
 - A **Settings** button on the title screen (≡ in game already returns to the title) opens a sheet styled like the Core Matrix.

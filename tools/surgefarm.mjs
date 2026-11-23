@@ -1,6 +1,6 @@
 // Q-007 probe (design session 7): a Surge bot parked in a cleared room, beaming the nearest Glitch. Headless, Node only.
 // Usage: node tools/surgefarm.mjs <distance px from Nexus> <upgrade level 0-6> <seconds> [room radius cells = 6]
-// Reports kills/min (each kill drops 1▲ + 2-5◆), deaths/min, and how many Glitches alive at the end are stuck on rock.
+// Reports kills/min (each kill drops 2-5◆, plus 1▲ half the time: D-018), deaths/min, and how many Glitches alive at the end are stuck on rock.
 import { Game } from '../src/game.js';
 import { CELL, T } from '../src/config.js';
 

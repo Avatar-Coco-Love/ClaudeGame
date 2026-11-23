@@ -2,13 +2,20 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.9';
+export const VERSION = '0.1.10';
 export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;
 export const CHUNK = 16; // cells per render chunk edge
 export const NEXUS_RADIUS = 5.5 * CELL; // px; deposit + safe zone
 export const LIGHT_RADIUS = 260; // px around the core
+// S-6 (D-017): an alert Glitch that hasn't closed GLITCH_PROGRESS_PX on its best distance for GLITCH_GIVE_UP_S gives up
+// and fades out over GLITCH_FADE_S (harmless, no loot, not beam-targetable), freeing its spawn slot.
+export const GLITCH_PROGRESS_PX = 24;
+export const GLITCH_GIVE_UP_S = 6;
+export const GLITCH_FADE_S = 0.6;
+// D-018 (Q-007 fallback): once Glitches stop sticking, a kill drops a Prism only this often (Shards unchanged).
+export const GLITCH_PRISM_CHANCE = 0.5;
 
 export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5 };
 
