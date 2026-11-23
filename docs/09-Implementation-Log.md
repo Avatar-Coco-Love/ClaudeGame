@@ -46,3 +46,10 @@
 - **Logged in 04 Debt:** B-005 (cargo lost past the pickup cap on death), unculled pickup/particle drawing, touch sticks not cleared on blur (unverified).
 - **B-006 (logged):** "beam mines terrain" failed once (mined 3, needs 4), then passed 4×. Pre-existing timing variance under load.
 - **D-check:** D-001…D-009 match the code, except D-005, which B-004 broke and is now fixed. D-009 isn't built yet (S-1). `09` archive: nothing older than this first audit.
+
+## 2026-11-23 — Session 5 (v0.1.7): Build — S-1 Nexus Radiance
+- **Built:** `NEXUS_UPGRADES` (config), `game.nexusLevels`, `nexusLight()`, `buyNexus()`; render light hole uses it; Core/Nexus tabs in the Matrix sheet; `SAVE_FORMAT` 1 → 2 (step adds `nexus: { radiance: 0 }`).
+- **Minimap:** Nexus reveals outside `update()` (purchase, boot) go through `game.revealQueue`, drained into `update()`'s return so the renderer paints them. Boot now reveals the Nexus disc at `nexusLight()` (was a fixed 260 px), so old saves get the 320 px disc.
+- **Tests:** 5 new/extended smoke checks (32 total): Prism-only spend, light +96 and explored grows (454 → 611 cells), tab remembered, Radiance survives reload, format-1 save loads with Radiance 0, tabs/buy fit at 320 px. On the old code the run aborts at `nexusLight is not a function`.
+- **Observed:** the first format-1 check passed wrongly in reverse (got Radiance 1): reload's `pagehide` re-saved the live game over the planted save, the same trap as session 4. Setup now sets `demo` first. Second time this trap bit, so per the manual it became a tool: `plantSaveAndReload()` in smoke, used by both planted-save checks.
+- **Screenshots (1280×800 and 320×568, DSF 1):** Radiance 5 lights roughly twice the area around the Nexus; the minimap disc grows from hidden-under-the-marker to clearly visible. At 320 px the tabs, the ▲6 button and ✕ fit.

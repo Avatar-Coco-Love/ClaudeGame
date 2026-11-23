@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -137,32 +137,49 @@ function closePanel() {
   $('matrix').classList.add('hidden');
   persist();
 }
+let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1)
+const costHtml = c => [c.shard ? `<span class="shard">${RESOURCE.shard.glyph}${c.shard}</span>` : '',
+  c.prism ? `<span class="prism">${RESOURCE.prism.glyph}${c.prism}</span>` : ''].filter(Boolean).join(' ');
+function upgradeRow(u, lvl, cost, affordable, onBuy) {
+  const maxed = lvl >= u.max;
+  const row = document.createElement('div');
+  row.className = 'upgrade';
+  const pips = Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
+  const now = u.fmt(u.value(lvl)), next = maxed ? '' : ` → <b>${u.fmt(u.value(lvl + 1))}</b>`;
+  row.innerHTML = `
+    <div class="u-main"><div class="u-name">${u.name}</div><div class="u-desc">${u.desc}</div>
+      <div class="u-val">${now}${next}</div><div class="pips">${pips}</div></div>
+    <button class="buy" ${affordable ? '' : 'disabled'}>${maxed ? 'MAX' : costHtml(cost)}</button>`;
+  row.querySelector('.buy').addEventListener('click', () => { if (onBuy()) { renderPanel(); persist(); } });
+  return row;
+}
 function renderPanel() {
   const g = game;
+  $('matrix-title').textContent = panelTab === 'nexus' ? 'Nexus' : 'Core Matrix';
+  document.querySelectorAll('#matrix .tabs button').forEach(b => {
+    const on = b.dataset.tab === panelTab;
+    b.classList.toggle('selected', on); b.setAttribute('aria-selected', on);
+  });
   $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>`;
   const list = $('upgrade-list');
   list.innerHTML = '';
-  for (const u of UPGRADES) {
-    if (u.id === 'hull' && g.mode !== 'surge' && g.upgrades.hull === 0) continue;
-    const lvl = g.upgrades[u.id], maxed = lvl >= u.max;
-    const cost = upgradeCost(lvl);
-    const row = document.createElement('div');
-    row.className = 'upgrade';
-    const pips = Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
-    const now = u.fmt(u.value(lvl)), next = maxed ? '' : ` → <b>${u.fmt(u.value(lvl + 1))}</b>`;
-    const costHtml = maxed ? 'MAX' :
-      `<span class="shard">${RESOURCE.shard.glyph}${cost.shard}</span>${cost.prism ? ` <span class="prism">${RESOURCE.prism.glyph}${cost.prism}</span>` : ''}`;
-    row.innerHTML = `
-      <div class="u-main"><div class="u-name">${u.name}</div><div class="u-desc">${u.desc}</div>
-        <div class="u-val">${now}${next}</div><div class="pips">${pips}</div></div>
-      <button class="buy" ${g.canAfford(u.id) ? '' : 'disabled'}>${costHtml}</button>`;
-    row.querySelector('.buy').addEventListener('click', () => { if (g.buy(u.id)) { renderPanel(); persist(); } });
-    list.appendChild(row);
+  if (panelTab === 'nexus') {
+    for (const u of NEXUS_UPGRADES) {
+      const lvl = g.nexusLevels[u.id];
+      list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => g.buyNexus(u.id)));
+    }
+  } else {
+    for (const u of UPGRADES) {
+      if (u.id === 'hull' && g.mode !== 'surge' && g.upgrades.hull === 0) continue;
+      const lvl = g.upgrades[u.id];
+      list.appendChild(upgradeRow(u, lvl, upgradeCost(lvl), g.canAfford(u.id), () => g.buy(u.id)));
+    }
   }
   document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));
   $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m`;
 }
 $('matrix-btn').addEventListener('click', openPanel);
+document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
   game.setMode(b.dataset.mode);

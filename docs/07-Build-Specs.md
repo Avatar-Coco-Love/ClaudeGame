@@ -5,7 +5,7 @@ and marks the item ✅ in `04`. Numbers here are starting values; they go in `sr
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
 Prisms in a world ≈ 1470▲, the Core Matrix only takes 246▲. The first Prism is 32 cells out (it never spawns closer).
 
-## S-1 — Nexus Development v1: Radiance (next Build)
+## S-1 — Nexus Development v1: Radiance (✅ built in #7)
 - **Data:** `NEXUS_UPGRADES` in `config.js`, the same shape as `UPGRADES`. One entry: `radiance`, max 5,
   `value: l => 320 + 96 * l` (px of Nexus light; 320 today, 800 at max), cost **Prisms only** (D-009): `[6, 12, 20, 30, 45]` (113▲ total).
 - **State:** `game.nexusLevels = { radiance: 0 }`, a `game.nexusLight()` getter. `render.js` light hole uses it instead of the hard-coded 320.

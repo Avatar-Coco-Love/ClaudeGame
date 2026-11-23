@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, MATERIAL, UPGRADES, upgradeCost, T } from './config.js';
+import { CELL, NEXUS_RADIUS, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
 import { World, packBits, unpackBits, mulberry32 } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -69,6 +69,7 @@ export class Game {
     this.nexus = { x: c.x, y: c.y };
     this.bank = { shard: 0, prism: 0 };
     this.upgrades = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
+    this.nexusLevels = Object.fromEntries(NEXUS_UPGRADES.map(u => [u.id, 0]));
     this.cargo = { shard: 0, prism: 0 };
     this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0 };
     this.player = {
@@ -93,7 +94,28 @@ export class Game {
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, 230);
-    this.world.reveal(this.nexus.x, this.nexus.y, 260);
+    this.nexusPulse = 0; // 1 -> 0 after a Nexus Development purchase (ring burst in render.js)
+    this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
+  }
+
+  nexusLight() { return NEXUS_UPGRADES[0].value(this.nexusLevels.radiance); }
+  canAffordNexus(id) {
+    const u = NEXUS_UPGRADES.find(u => u.id === id), lvl = this.nexusLevels[id];
+    if (lvl >= u.max) return false;
+    const c = u.cost(lvl);
+    return this.bank.shard >= c.shard && this.bank.prism >= c.prism;
+  }
+  buyNexus(id) {
+    if (!this.canAffordNexus(id)) return false;
+    const u = NEXUS_UPGRADES.find(u => u.id === id), c = u.cost(this.nexusLevels[id]);
+    this.bank.shard -= c.shard; this.bank.prism -= c.prism;
+    this.nexusLevels[id]++;
+    this.stats.upgrades++;
+    this.revealQueue.push(...this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()));
+    this.audio.upgrade();
+    this.burst(this.nexus.x, this.nexus.y, 70, '#ffffff', 420);
+    this.nexusPulse = 1;
+    return true;
   }
 
   stat(id) { const u = UPGRADES.find(u => u.id === id); return u.value(this.upgrades[id]); }
@@ -170,7 +192,10 @@ export class Game {
     else if (this.mode === 'drift') p.integrity = this.stat('hull');
 
     this.shake = Math.max(0, this.shake - dt * 30);
-    return this.world.reveal(p.x, p.y, 230);
+    this.nexusPulse = Math.max(0, this.nexusPulse - dt * 1.4);
+    const newly = this.world.reveal(p.x, p.y, 230);
+    if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
+    return newly;
   }
 
   updateBeam(dt, intent) {
@@ -394,7 +419,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored),
     };
@@ -407,6 +432,7 @@ export class Game {
     Object.assign(this.bank, s.bank);
     Object.assign(this.cargo, s.cargo);
     for (const k of Object.keys(this.upgrades)) if (s.upgrades && s.upgrades[k] != null) this.upgrades[k] = s.upgrades[k];
+    for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
   }

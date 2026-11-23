@@ -52,3 +52,8 @@ While the title is up (`paused`), the Core Matrix can't open; only mute works. E
 Radiance and later Nexus upgrades cost Prisms, not Shards. Measured over 40 seeds: a world holds ~2750◆ and the Core Matrix takes 2482◆,
 while it holds ~1470▲ and the Matrix takes only 246▲. Prisms (first one 32 cells out) also pull players into the middle ring.
 - Rejected: Shards + Prisms (Shards already nearly run out at a full Matrix); a new currency now (Lumen ore is M2's; one new thing at a time).
+
+### D-011 — Matrix tab memory lives in the page session only (2026-11-23, S-1)
+The last-opened Core/Nexus tab is a module variable in `main.js`: kept while the page is open, back to Core after a reload.
+Boot also reveals the Nexus disc at the current Radiance, so a format-1 save gains the 320 px disc on first load (cosmetic, no economy effect).
+- Rejected: storing the tab in the world save (UI state in the save shape, and a format bump for nothing); a localStorage key now (S-3 owns the settings key; fold it in there if wanted).

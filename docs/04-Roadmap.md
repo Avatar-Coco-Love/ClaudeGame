@@ -8,7 +8,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#2) Pages deploy workflow.
 - ✅ (#3) Health tooling: `tests/smoke.cjs`, operating manual, roadmap. Fixed the demo world being saved over a real save.
 - ✅ (#4) Version tracking: VERSION + changelog, decisions log, doc cap test, save format upgrades (Gloamdeep inbox).
-- **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
+- ✅ (#7) **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
 - **S-2 Touch-first hints + narrow screens:** fixes B-001 and B-002 and adds the 320×568 overflow smoke check (pulled forward from Tooling).
 - **S-3 Settings panel:** volume, screen shake on/off, reduced motion, and "reset world" with confirmation.
 - **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
@@ -65,3 +65,4 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **B-006:** smoke "beam mines terrain" is timing-dependent (5 s wall clock; 3–8 cells mined across runs, needs ≥ 4). Failed once in 6 runs. Fix: drive it by game time (step `game.update`), not wall time. Don't lower the bar.
 - **To verify:** touch sticks aren't cleared on `blur`/page hide (keys are). If a phone drops `touchend` while hidden, the core may drift on return.
 - **B-002:** on a phone, the first hint is the desktop one ("WASD to move…", truncated) and the Matrix button shows an `E` key badge until the first touch. Fixed by S-2.
+- ✅ **Test trap** (sessions 4, 5): planting a save then reloading let `pagehide` overwrite it. Now a smoke helper, `plantSaveAndReload()`.

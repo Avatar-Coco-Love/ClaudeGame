@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 4** · **Version: v0.1.6** (session 4 was the first Audit; next is a Build)
+**Session counter: 5** · **Version: v0.1.7** (session 5 built S-1 Radiance; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -10,10 +10,11 @@ _Last updated: 2026-11-23_
 - Core movement: analog intent → target velocity → acceleration → axis-separated collision → realized velocity, plus corner assist so the core slides into 1-cell tunnels.
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
+- Nexus Development v1: a **Nexus** tab in the Matrix sheet sells Radiance (5 levels, Prisms only, D-009): +96 px Nexus light per level and a wider explored disc.
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
 - Darkness/light overlay, explored-only minimap, an off-screen Nexus pointer, contextual hints, synthesized audio, and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks).
-- Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number; old formats are upgraded on load (`src/save.js`).
+- Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Build-ready specs live in `07` (S-1…S-5). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
@@ -24,9 +25,10 @@ _Last updated: 2026-11-23_
 - Reloading restores the mode, upgrades, bank, and mined terrain.
 - Touch sticks move the core and mine. No page errors.
 - Title-screen hotkeys can't open the Core Matrix; New World asks before replacing an unreadable save (audit, session 4).
+- Radiance spends only Prisms, grows the light and minimap, survives reload; Matrix tabs fit at 320 px (session 5).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (5) is a **Build**: implement **S-1 (Nexus Radiance)** from `07` (Prism-only sink, D-009). Smoke must cover buying a level and the save round-trip.
+Next session (6) is a **Build**: implement **S-2 (touch-first hints + narrow screens)** from `07`, fixing B-001 and B-002. Prove both new smoke checks fail on the old code.

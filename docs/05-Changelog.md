@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.7 — 2026-11-23 (#7)
+- New: the Core Matrix has two tabs, **Core** and **Nexus**. The Nexus tab sells **Radiance** (5 levels, paid in Prisms ▲ only):
+  each level widens the Nexus light by 96 px and reveals more of the map around it, with a white ring sweeping out from the Nexus.
+- The panel remembers which tab you last opened.
+
 ## v0.1.6 — 2026-11-23 (#6)
 - Pressing E (or Enter) on the title screen no longer opens the Core Matrix behind the title.
 - Starting a new world now asks first if a save exists that this version can't read, instead of silently erasing it.

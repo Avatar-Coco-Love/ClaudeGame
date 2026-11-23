@@ -45,6 +45,10 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 .sheet header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .sheet h2 { margin: 0; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); flex: 1; }
 #matrix-bank { display: flex; gap: 12px; font-weight: 700; }
+.tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+.tabs button { flex: 1; min-height: 40px; border-radius: 9px; border: 1px solid var(--line); background: transparent; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; font-size: 13px; }
+.tabs button.selected { border-color: var(--cyan); background: rgba(46,242,255,.14); color: #fff; box-shadow: 0 0 10px rgba(46,242,255,.2); }
 #matrix-close { background: none; border: 1px solid var(--line); border-radius: 8px; width: 32px; height: 32px; }
 .upgrade { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid rgba(90,120,255,.15); }
 .u-main { flex: 1; min-width: 0; }

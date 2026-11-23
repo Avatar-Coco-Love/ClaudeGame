@@ -14,6 +14,18 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(p).pipe(res);
 });
 
+// Plant a save, then reload. Always use this: a plain reload fires `pagehide`, which saves the running game over the
+// planted one (bit sessions 4 and 5). `edit(save)` runs in the page and returns the save to store (null = current save).
+async function plantSaveAndReload(page, edit) {
+  await page.evaluate(src => {
+    dispatchEvent(new Event('pagehide')); // flush the live game first so edit() sees current state
+    window.__lumen.game.demo = true;      // ...then stop it from saving again during the reload
+    const k = 'lumencore.save.v1', cur = JSON.parse(localStorage.getItem(k));
+    localStorage.setItem(k, JSON.stringify((0, eval)(src)(cur)));
+  }, edit.toString());
+  await page.reload(); await page.waitForTimeout(400);
+}
+
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 
@@ -58,6 +70,16 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.click('#upgrade-list .upgrade:first-child .buy:not([disabled])');
     const after = await pg.evaluate(() => window.__lumen.game.bank.shard);
     check('upgrade purchase spends shards', after < before, `${before} -> ${after}`);
+
+    // Nexus Development (S-1): Radiance costs Prisms only, widens the light, and reveals more of the map.
+    const nx0 = await pg.evaluate(() => { const g = window.__lumen.game; g.bank.prism = 10; return { light: g.nexusLight(), shard: g.bank.shard, explored: g.world.explored.reduce((a, b) => a + b, 0) }; });
+    await pg.click('#matrix .tabs button[data-tab="nexus"]');
+    await pg.click('#upgrade-list .upgrade:first-child .buy:not([disabled])');
+    const nx1 = await pg.evaluate(() => { const g = window.__lumen.game; return { light: g.nexusLight(), shard: g.bank.shard, prism: g.bank.prism, lvl: g.nexusLevels.radiance, explored: g.world.explored.reduce((a, b) => a + b, 0) }; });
+    check('Radiance spends Prisms, not Shards', nx1.lvl === 1 && nx1.prism === 4 && nx1.shard === nx0.shard, JSON.stringify(nx1));
+    check('Radiance widens Nexus light by 96 and reveals map', nx1.light === nx0.light + 96 && nx1.explored > nx0.explored, `${nx0.light}->${nx1.light}, explored ${nx0.explored}->${nx1.explored}`);
+    await pg.keyboard.press('Escape'); await pg.keyboard.press('e'); await pg.waitForTimeout(100);
+    check('Matrix remembers the last tab', await pg.evaluate(() => document.querySelector('#matrix .tabs .selected')?.dataset.tab === 'nexus'));
     await pg.keyboard.press('Escape');
 
     // Surge mode: glitches spawn and die to the beam.
@@ -70,25 +92,22 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('beam kills glitches', await pg.evaluate(() => window.__lumen.game.stats.glitches >= 1));
 
     // Save / reload.
-    const snap = await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades) }; });
+    const snap = await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), nexus: g.nexusLevels.radiance }; });
     await pg.reload(); await pg.waitForTimeout(400);
     check('continue offered after reload', await pg.isVisible('#continue'));
     await pg.click('#continue'); await pg.waitForTimeout(200);
-    const re = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), mode: g.mode }; });
-    check('save restores progress', re.mined === snap.mined && re.up === snap.up && re.mode === 'surge', JSON.stringify(re));
+    const re = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), mode: g.mode, nexus: g.nexusLevels.radiance }; });
+    check('save restores progress (incl. Radiance)', re.mined === snap.mined && re.up === snap.up && re.mode === 'surge' && re.nexus === 1 && snap.nexus === 1, JSON.stringify(re));
 
     // Old saves must load: a save written before format tracking has no `v`.
-    await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const k = 'lumencore.save.v1', s = JSON.parse(localStorage.getItem(k)); delete s.v; localStorage.setItem(k, JSON.stringify(s)); });
-    await pg.reload(); await pg.waitForTimeout(400);
+    // A format-1 save has no `nexus` either.
+    await plantSaveAndReload(pg, s => { delete s.v; delete s.nexus; return s; });
     await pg.click('#continue'); await pg.waitForTimeout(200);
-    const old = await pg.evaluate(() => window.__lumen.game.stats.mined);
-    check('unversioned (format 1) save still loads', old === snap.mined, `mined ${old}`);
+    const old = await pg.evaluate(() => ({ mined: window.__lumen.game.stats.mined, radiance: window.__lumen.game.nexusLevels.radiance }));
+    check('unversioned (format 1) save still loads, Radiance 0', old.mined === snap.mined && old.radiance === 0, JSON.stringify(old));
 
     // A save this build can't read (newer format) must not be wiped without asking (D-005, B-004).
-    // demo = true stops the running game's pagehide save from overwriting the planted one during reload.
-    await pg.evaluate(() => window.__lumen.game.demo = true);
-    await pg.evaluate(() => localStorage.setItem('lumencore.save.v1', JSON.stringify({ v: 99, seed: 5, mode: 'drift', bank: { shard: 1, prism: 1 } })));
-    await pg.reload(); await pg.waitForTimeout(300);
+    await plantSaveAndReload(pg, () => ({ v: 99, seed: 5, mode: 'drift', bank: { shard: 1, prism: 1 } }));
     let asked = false; pg.once('dialog', d => { asked = true; d.dismiss(); });
     await pg.click('#new-world'); await pg.waitForTimeout(200);
     const kept = await pg.evaluate(() => JSON.parse(localStorage.getItem('lumencore.save.v1'))?.v);
@@ -119,6 +138,17 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('touch stick moves the core', t.moved > 60, JSON.stringify(t));
     check('touch aim stick fires the beam', t.mined > 0 || t.beam, JSON.stringify(t));
     await ctx.close();
+
+    // Narrowest phone: Matrix tabs and buy buttons fit at 320 px (S-1).
+    const np = await browser.newPage({ viewport: { width: 320, height: 568 } });
+    await np.goto(url); await np.waitForTimeout(200); await np.click('#new-world'); await np.waitForTimeout(200);
+    await np.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.demo = true; });
+    await np.keyboard.press('e'); await np.waitForTimeout(100);
+    await np.click('#matrix .tabs button[data-tab="nexus"]');
+    const clip = await np.evaluate(() => { const sh = document.querySelector('#matrix .sheet').getBoundingClientRect();
+      return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #matrix-close')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); });
+    check('Matrix tabs + buy fit at 320 px', clip.length === 0, clip.join(', '));
+    await np.close();
   } catch (e) {
     check('smoke run completed', false, e.message);
   } finally {
