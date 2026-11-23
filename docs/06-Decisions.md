@@ -68,7 +68,7 @@ Boot also reveals the Nexus disc at the current Radiance, so a format-1 save gai
 Session 7 (Design, normally no gameplay code) found B-007: dying to one of several Glitches near the Nexus froze the game. The fix (a few lines plus a smoke check that fails on the old code) shipped in that docs PR.
 - Rejected: waiting for the next Build session (the live game keeps freezing for a whole session); a broader refactor of the Glitch loop (out of a design session's scope).
 
-### D-014 — Keep synthesized audio (2026-11-23, answers Q-006)
+### D-014 — Keep synthesized audio (2026-11-23, answers Q-006) — Superseded by D-037
 No recorded sound pack. Sessions can't listen, so a listen-test can't decide it; synthesized sound stays tunable in code and keeps the game binary-free. S-4 improves the sounds we have.
 - Rejected: a free recorded pack (first binary assets, licence tracking, size budget, and still no way to judge it); asking the owner (not expected to respond).
 

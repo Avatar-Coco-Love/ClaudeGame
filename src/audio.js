@@ -1,5 +1,5 @@
 // Tiny synthesized sound kit. No asset files; everything is oscillators.
-import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP } from './config.js';
+import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP, BEAM_HUM } from './config.js';
 
 export class Audio {
   constructor() {
@@ -41,25 +41,40 @@ export class Audio {
   }
   setRing(r) {
     this.beamHz = 92 * Math.pow(2, -RING_PITCH_STEP * r / 12);
-    if (this.beamOsc && this.ctx) this.beamOsc.o.frequency.setTargetAtTime(this.beamHz, this.ctx.currentTime, 0.08);
+    if (this.beamOsc && this.ctx) this.beamOsc.o.frequency.setTargetAtTime(this.beamHz * 2, this.ctx.currentTime, 0.08);
   }
+  // B-016: the hum was a constant sawtooth drone with a 13 Hz wobble (play-test: "very annoying"). Now a low-passed
+  // triangle with a short soft onset that settles to a quiet bed; it lifts a little only while the beam touches something.
   beam(on) {
     if (!this.ctx) return;
     if (on && !this.beamOsc && !this.muted) {
-      const o = this.ctx.createOscillator(), g = this.ctx.createGain(), lfo = this.ctx.createOscillator(), lg = this.ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.value = this.beamHz;
-      lfo.frequency.value = 13; lg.gain.value = 14;
-      lfo.connect(lg); lg.connect(o.frequency);
-      g.gain.value = 0.045;
-      o.connect(g); g.connect(this.master);
-      o.start(); lfo.start();
-      this.beamOsc = { o, lfo, g };
+      const H = BEAM_HUM, t = this.ctx.currentTime;
+      const o = this.ctx.createOscillator(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
+      o.type = 'triangle'; o.frequency.value = this.beamHz * 2;
+      f.type = 'lowpass'; f.frequency.value = H.lowpassHz; f.Q.value = 0.5;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(H.onsetGain, t + H.attackS);
+      g.gain.setTargetAtTime(H.bedGain, t + H.attackS, H.settleS);
+      o.connect(f); f.connect(g); g.connect(this.master);
+      o.start(t);
+      this.beamOsc = { o, g, contact: false, t0: t };
     } else if ((!on || this.muted) && this.beamOsc) {
-      const { o, lfo, g } = this.beamOsc;
-      g.gain.setTargetAtTime(0, this.ctx.currentTime, 0.03);
-      o.stop(this.ctx.currentTime + 0.15); lfo.stop(this.ctx.currentTime + 0.15);
+      const { o, g } = this.beamOsc, t = this.ctx.currentTime;
+      g.gain.cancelScheduledValues(t);
+      g.gain.setTargetAtTime(0, t, 0.03);
+      o.stop(t + 0.2);
       this.beamOsc = null;
     }
+  }
+  // Called every beam frame: true while the beam is cutting a cell or hitting a Glitch.
+  beamContact(c) {
+    const b = this.beamOsc;
+    if (!b || !this.ctx || b.contact === !!c) return;
+    b.contact = !!c;
+    // Never cancel the onset: retarget only from the end of the attack (cancelling everything would jump to gain 1).
+    const at = Math.max(this.ctx.currentTime, b.t0 + BEAM_HUM.attackS + 0.001);
+    b.g.gain.cancelScheduledValues(at);
+    b.g.gain.setTargetAtTime(c ? BEAM_HUM.contactGain : BEAM_HUM.bedGain, at, BEAM_HUM.settleS);
   }
   break(kind) {
     const base = kind === 'lumen' ? 1047 : kind === 'prism' ? 880 : kind === 'shard' ? 660 : 220;

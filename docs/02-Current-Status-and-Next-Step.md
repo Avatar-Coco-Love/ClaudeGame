@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 22** · **Version: v0.1.24** (session 22 was a Design; next is a Build)
+**Session counter: 23** · **Version: v0.1.25** (session 23 was an Inbox; 24 % 5 == 4, so next is an Audit)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -18,7 +18,8 @@ _Last updated: 2026-11-23_
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore within 12 cells for 6 s, 20 s cooldown.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
-- Darkness/light overlay, explored-only minimap, an off-screen Nexus pointer, contextual hints, synthesized audio, and a mute toggle.
+- Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
+  −42 → −57 dBFS by `tests/audio.cjs`; recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups) every 10 s, on deposit, and on page hide. Saves carry a format number (now 6); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
@@ -50,10 +51,9 @@ _Last updated: 2026-11-23_
 - 400 off-screen pickups cost no draws (frame 1093 → 19 ms headless); dev teleport keeps the bedrock border (audit, session 19).
 - Lumen only at d ≥ 55 on 40 seeds; one cell banks 1●; a format-4 save loads with 0●; beads read at DSF 1 (session 20).
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21).
-- By the 10● Scanner, a Lumen-hunting bot has seen 8 % of vaults; at 60● 35 % (`tools/vaultfind.mjs`, session 22).
 
 ## Health
-- `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
+- `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Next session (23) is a **Build**: S-12, the Scanner ping shows vault caches (spec in `07`).
+Next session (24) is an **Audit** (counter % 5 == 4; archive `09` entries before session 19's audit). S-12 (vault caches on ping) follows in 25.

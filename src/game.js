@@ -233,6 +233,12 @@ export class Game {
     if (b.on && !was) this.audio.beamStart();
     this.audio.beam(b.on);
     if (!b.on) return;
+    this.updateBeamHit(dt);
+    this.audio.beamContact(!!(b.target || b.enemy));
+  }
+
+  updateBeamHit(dt) {
+    const p = this.player, b = this.beam;
     const range = this.stat('range');
     const dx = Math.cos(p.angle), dy = Math.sin(p.angle);
     // Cast from the core's centre so the wall touching the nose is always the first thing hit.

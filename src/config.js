@@ -2,10 +2,14 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.24';
+export const VERSION = '0.1.25';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
+// B-016 beam hum (before master gain): soft onset to onsetGain in attackS, settles (time constant settleS) to bedGain,
+// or to contactGain while the beam touches a cell/Glitch. Triangle at 2x the ring pitch through a low-pass (no vibrato).
+// The old hum was a sawtooth at gain 0.045 that never faded. tests/audio.cjs measures it (ceiling -55 dBFS sustained).
+export const BEAM_HUM = { onsetGain: 0.03, attackS: 0.04, settleS: 0.25, bedGain: 0.004, contactGain: 0.007, lowpassHz: 700 };
 export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;

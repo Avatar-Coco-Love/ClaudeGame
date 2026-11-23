@@ -45,6 +45,10 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Anomalies found in the world that give a buff until you next deposit (e.g. double magnet, beam overclock).
 
 ## M8 — Polish & platform
+- **Recorded audio v1a: audition** (D-037, *waiting on the owner's CC0 pack in `docs/inbox/`*): measure every file, shortlist 2–3
+  per game sound (beam, break, pickup, deposit, upgrade, cache, scan, hurt, Glitch death), `audition.html` for the owner to pick by ear.
+- **Recorded audio v1b: wire-in** (after the picks): `assets/audio/*.ogg` + `CREDITS.md`, fetch + decode per sound with the synth
+  tone as fallback (old Safari), size budget check (≤ 1.5 MB, ≤ 200 KB per file), loudness matched to `tests/audio.cjs` ceilings.
 - Generative ambient music layer that reacts to depth and mode.
 - PWA: installable and works offline.
 - Accessibility: remappable keys, colour-blind-safe ore shapes (they're already shape-coded; audit this), and readable text sizes.
@@ -54,6 +58,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- ✅ **B-016** (#25): the beam hum was a loud sawtooth drone with a 13 Hz wobble (owner play-test); now a soft bed (D-038).
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
