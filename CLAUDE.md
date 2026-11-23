@@ -12,8 +12,9 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 3. **Do exactly one PR-sized unit** of the session type that's due (below). If the task turns out bigger, split it. Ship the first slice and put the rest in the roadmap.
 4. **Verify:** `node tests/smoke.cjs` must pass (16+ checks, headless Chromium, no install needed). Add or extend checks for what you built.
    Look at the result: take a screenshot with Playwright and actually view it at least once for any visual change.
-5. **Record:** update `docs/02` (increment the session counter, set the next task), add an entry to `docs/09` (what changed, what you observed, and any bugs found).
-   Move roadmap items in `docs/04`. Add new open questions to `docs/03`.
+5. **Record (every PR, no exceptions; see "Tracking across versions"):** bump `VERSION`, add a `docs/05` changelog entry,
+   update `docs/02` (increment the session counter, set exactly one next task), add an entry to `docs/09` (what changed, what you observed, bugs as B-xxx).
+   Log any decision in `docs/06` (D-xxx, with rejected alternatives). Move roadmap items in `docs/04`. Add open questions to `docs/03` (Q-xxx).
 6. **Ship:** commit, push to the session's designated branch, open a PR against `main` (body: what/why/verification), merge it yourself
    (the owner explicitly authorized self-merge), then confirm the Pages deploy run succeeded with the GitHub Actions tools.
    If the branch is behind `main`, merge `main` into it. **Never force-push.** Never rewrite `main` history.
@@ -24,6 +25,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
   write detailed specs for the next 3–5 build items, and cut anything that doesn't serve the pillars. Ship it as a docs PR.
 - **Audit / health check** (counter % 5 == 4): use subagents in parallel (correctness bug hunt, performance, mobile/touch UX, code health/dead code,
   docs drift vs code). Verify each finding yourself before acting on it. Fix the top issues in one PR and log the rest in `docs/04` under "Debt".
+  Also: archive `09` entries older than the last audit into `docs/archive/` (word for word), and check every D-xxx in `06` still matches the code.
 
 ## Context discipline
 - Don't read whole files you don't need. Use Grep, or read line ranges. `docs/09` grows forever, so only read its tail.
@@ -32,12 +34,24 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - Keep `docs/02` short (under ~60 lines). It is the handoff note, not a history. History goes in `09`.
 - If a file passes ~600 lines, split it as part of that session's work.
 
+## Tracking across versions
+- `src/config.js` `VERSION` = `0.<milestone>.<PR count>`, shown on the title screen. `docs/05-Changelog.md` gets one player-facing entry per PR.
+- `docs/06-Decisions.md` is the only place a decision is settled. Supersede, never silently edit. Bugs get B-xxx IDs in `09`.
+- `tests/docs.cjs` (run inside smoke) enforces: docs ≤ 8 KB, `02` ≤ 60 lines with one Next step, VERSION = top changelog entry, inbox empty.
+- A rule asked for or learned goes into the docs **in the same PR**. A rule broken twice gets a check (test or tool), not more words.
+
+## Verification habits (from Gloamdeep, `docs/archive/2026-11-23-Gloamdeep-insights.md`)
+- **Measure before deciding:** real viewport sizes, text width at the narrowest phone, odds over many seeds, frame time on a throttled CPU.
+- **A new test must fail on the old code.** Prove it once (stash the fix, run it) before trusting it; for random bugs, run many seeds.
+- **Seeded randomness with a separate salt per draw** for anything gameplay-relevant, so draws don't secretly depend on each other.
+- **Edge cases to check on every state change:** mode switch, death, deposit and pickup on the same frame, page hidden, old save.
+
 ## Hard rules
 - `main` must always be playable and deployable. Never merge with a failing smoke test. Never skip or weaken a check to get green.
 - Pillars in `docs/01` are constraints: top-down neon geometry, no humanoids/literal objects, **Drift and Surge are equals**,
   small complete systems over long lists of shallow features, intent vs realized state.
 - Progression layers (Core Matrix / Nexus Development / Research / Crafting / Temporary) must never unlock the same thing twice.
-- Saves: bump `SAVE_KEY` or migrate when the save shape changes. Never strand an existing player's save silently.
+- Saves: when the save shape changes, bump `SAVE_FORMAT` and add an upgrade step in `src/save.js` plus a smoke check (D-005). Never strand an existing player's save.
 - No new runtime dependencies or build steps without a design-session decision recorded in `docs/03`. The game is static files.
 - Vanilla JS ES modules, no frameworks. Keep tuning numbers in `src/config.js`.
 - Debug handle: `window.__lumen` (`game`, `renderer`, `input`). Tests rely on it.

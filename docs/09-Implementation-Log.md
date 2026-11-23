@@ -14,3 +14,16 @@
 - **Bug found → fixed:** the title screen's demo world (seed 1337) was saved on `pagehide`. A first-time visitor came back to a phantom
   "Continue", and "New World" then raised a confirm() prompt. Fix: `game.demo` flag, never persisted. Smoke check added.
 - **Process:** a scheduled task now starts a fresh session periodically. Each session does one PR, so context stays small.
+
+## 2026-11-23 — Session 2 (v0.1.4): inbox, Gloamdeep insights → version tracking
+- **Inbox:** an insights file from the sister project Gloamdeep (~735 PRs in). Archived as `docs/archive/2026-11-23-Gloamdeep-insights.md`.
+- **Adopted as checks/code:** `VERSION` shown on the title + `05-Changelog.md` (D-003); numbered IDs and `06-Decisions.md` with rejected
+  alternatives (D-004); `src/save.js` format upgrades and an "unversioned save loads" smoke check (D-005); `tests/docs.cjs` doc cap,
+  run inside smoke (D-006). `03` converted to Q-xxx IDs.
+- **Adopted as rules (CLAUDE.md):** record everything in the same PR, rule broken twice → check, measure before deciding, new tests must fail
+  on old code, salt per random draw, state-change edge cases, audits archive `09` and check D-xxx against code.
+- **Adopted as roadmap (04 → Tooling):** dev panel, Surge bot runner with degenerate-loop probes, throttled perf check, narrow-screen text check, deterministic RNG.
+- **Not adopted (D-007):** owner-playtest-driven planning (owner doesn't decide here), recorded audio (opened as Q-006), canvas text-fit test (our text is DOM).
+- **Observed:** saves already wrote `v: 1` but nothing read it; now it does. `game.rand` is seeded from `Date.now()`, so gameplay isn't reproducible yet (roadmap).
+- **Bug found (not fixed, logged in 04 Debt):** B-001, title wordmark clipped at 320 px wide. Seen in the narrow-screen screenshot taken for this PR.
+- **Rotation note:** this session's Design slot went to the inbox, so session 3 runs the displaced Design session.

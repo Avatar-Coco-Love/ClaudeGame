@@ -1,4 +1,8 @@
 // Tunable constants. Everything gameplay-numeric lives here so balance passes touch one file.
+
+// Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
+// (tests/docs.cjs fails if the two disagree).
+export const VERSION = '0.1.4';
 export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;

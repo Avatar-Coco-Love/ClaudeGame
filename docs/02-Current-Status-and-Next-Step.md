@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 1** (next session = 2 → **Design** session per CLAUDE.md rotation)
+**Session counter: 2** · **Version: v0.1.4** (session 2's Design slot went to the inbox, so **session 3 runs that Design session**; rotation resumes after)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -13,7 +13,8 @@ _Last updated: 2026-11-23_
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
 - Darkness/light overlay, explored-only minimap, an off-screen Nexus pointer, contextual hints, synthesized audio, and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks).
-- Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide.
+- Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number; old formats are upgraded on load (`src/save.js`).
+- History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -23,10 +24,10 @@ _Last updated: 2026-11-23_
 - Touch sticks move the core and mine. No page errors.
 
 ## Health
-- `node tests/smoke.cjs`: 16/16 passing.
+- `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session is a **Design** session: play-test, then spec M1's remaining items in `04` in enough detail to build directly.
+Next session (3) is a **Design** session: play-test, then spec M1's remaining items in `04` in enough detail to build directly.
 After that, build **Nexus Development v1:** spend Prisms to raise the Nexus light radius. Prisms currently have only light use
 (upgrade costs at level 2 and up), so they need a reason to exist.
 Done = a "Nexus" tab in the Core Matrix with a single *Radiance* upgrade, and a visibly bigger lit area around the hub.
