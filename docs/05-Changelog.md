@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.5 — 2026-11-23 (#5)
+- No change on screen. A design pass: play-tested on desktop and phone, measured the economy, and planned the next five builds
+  (Nexus Radiance, phone-first hints, settings, game feel, reproducible randomness).
+
 ## v0.1.4 — 2026-11-23 (#4)
 - The version number now shows on the title screen.
 - Old saves are upgraded on load instead of being dropped (no shape change yet; groundwork).

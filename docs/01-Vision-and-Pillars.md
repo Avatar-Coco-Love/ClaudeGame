@@ -17,7 +17,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 
 ## Progression layers (keep them distinct — never unlock the same thing twice)
 - **Core Matrix** *(built)*: permanent stat upgrades to the core.
-- **Nexus Development** *(planned)*: the hub itself grows (light radius, structures, beacons).
+- **Nexus Development** *(planned)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
 - **Research** *(planned)*: unlocks new *kinds* of things (new beam modes, new materials).
-- **Crafting** *(planned)*: turns resources into placeable items (light beacons, relays).
+- **Crafting** *(planned)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
 - **Temporary Upgrades** *(planned)*: run-scoped buffs found in the world.

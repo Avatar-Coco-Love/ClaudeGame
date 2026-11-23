@@ -7,7 +7,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 
 ## Session loop (every session)
 1. **Orient (cheap):** read `docs/02-Current-Status-and-Next-Step.md` only. It holds the session counter, the session type due, and the next task.
-   Open other docs only when the task needs them: `01` for pillars, `04` for the roadmap, `03` for open decisions, `09` for history (read the tail only).
+   Open other docs only when the task needs them: `01` for pillars, `04` for the roadmap, `03` for open decisions, `07` for build-ready specs, `09` for history (read the tail only).
 2. **Check inbox:** if `docs/inbox/` contains anything besides `README.md`, processing it *is* this session's task (see the inbox README).
 3. **Do exactly one PR-sized unit** of the session type that's due (below). If the task turns out bigger, split it. Ship the first slice and put the rest in the roadmap.
 4. **Verify:** `node tests/smoke.cjs` must pass (16+ checks, headless Chromium, no install needed). Add or extend checks for what you built.
@@ -22,7 +22,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 ## Session types (rotate by the counter in docs/02)
 - **Build** (default): implement the next roadmap item from `docs/04`.
 - **Design** (counter % 5 == 2): no gameplay code. Play-test with Playwright and screenshots, then refine `01`/`04`: rebalance, resolve items in `03`,
-  write detailed specs for the next 3–5 build items, and cut anything that doesn't serve the pillars. Ship it as a docs PR.
+  write detailed specs for the next 3–5 build items in `docs/07` (S-n IDs), and cut anything that doesn't serve the pillars. Ship it as a docs PR.
 - **Audit / health check** (counter % 5 == 4): use subagents in parallel (correctness bug hunt, performance, mobile/touch UX, code health/dead code,
   docs drift vs code). Verify each finding yourself before acting on it. Fix the top issues in one PR and log the rest in `docs/04` under "Debt".
   Also: archive `09` entries older than the last audit into `docs/archive/` (word for word), and check every D-xxx in `06` still matches the code.

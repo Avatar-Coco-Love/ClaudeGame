@@ -38,3 +38,12 @@ Over the cap: split word for word into a `-2` file, or move old entries into `do
 - Owner playtests set the plan: not available here, since the owner does not decide. Design sessions with Playwright playtests and bots stand in.
 - Recorded sound files over synthesized audio: not adopted yet. Our audio is synthesized, so this is opened as Q-006 instead of decided.
 - Canvas text-fit tests: our HUD text is DOM, not canvas, so a narrow-viewport overflow smoke check covers it (roadmap).
+
+### D-008 — Dense rock is slower, never gated (2026-11-23, answers Q-005)
+Dense rock keeps high HP only; no minimum Beam Power. The Core Matrix stays pure stats, and anything that unlocks access belongs to Research (pillar: layers never unlock the same thing twice).
+- Rejected: a Beam Power threshold (turns a stat upgrade into an unlock, and blocks early tunnels for no new decision).
+
+### D-009 — Nexus Development is paid in Prisms only (2026-11-23)
+Radiance and later Nexus upgrades cost Prisms, not Shards. Measured over 40 seeds: a world holds ~2750◆ and the Core Matrix takes 2482◆,
+while it holds ~1470▲ and the Matrix takes only 246▲. Prisms (first one 32 cells out) also pull players into the middle ring.
+- Rejected: Shards + Prisms (Shards already nearly run out at a full Matrix); a new currency now (Lumen ore is M2's; one new thing at a time).
