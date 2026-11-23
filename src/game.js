@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -64,7 +64,7 @@ export class Game {
   constructor({ seed, mode, save, audio, settings = null }) {
     this.audio = audio;
     this.mode = mode;
-    this.world = new World(seed);
+    this.world = new World(seed, (save && save.vaultSkip) || []);
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
     this.bank = { shard: 0, prism: 0 };
@@ -96,6 +96,7 @@ export class Game {
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
+    this.vaultSkip = (save && save.vaultSkip) || []; // S-9: fixed for this world's life (D-023)
     if (save) this.load(save);
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
@@ -278,7 +279,14 @@ export class Game {
     const mat = MATERIAL[type];
     this.burst(cx, cy, type === T.ROCK ? 8 : 16, this.world.look(x, y, type).edge, 150);
     this.addShake(type === T.ROCK ? 1.5 : 3);
-    if (mat.yield) {
+    if (type === T.CACHE) {
+      // S-9: a vault cache bursts its loot. Forced past the pickup cap (bounded, once per vault); the broken bit remembers it.
+      for (const [kind, n] of Object.entries(VAULT_LOOT)) for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, kind, true);
+      this.burst(cx, cy, 40, '#ffffff', 260);
+      this.audio.cache();
+      if (this.motionOn()) { this.hitstop = HITSTOP_S * 2; this.lastHitstop = this.stats.time; }
+      this.notify('cache');
+    } else if (mat.yield) {
       const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
       for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
       this.audio.break(mat.yield.kind);
@@ -472,7 +480,7 @@ export class Game {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
-      broken: packBits(this.world.broken), explored: packBits(this.world.explored),
+      broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       pickups: this.pickups.map(q => [q.kind === 'prism' ? 1 : 0, Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
     };
   }

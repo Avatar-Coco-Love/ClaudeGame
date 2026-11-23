@@ -3,19 +3,8 @@
 Specs ready to build, in roadmap order. Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
-Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1…S-8 built in #7–#18.)
+Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1…S-9 built in #7–#20.)
 M2 basis (session 12, 40 seeds): cells by distance, rock/dense/crystal/prism: d 50–65 1410/666/263/210, d 65–80 1686/997/332/360.
-
-## S-9 — Vaults (M2, D-023)
-- 6 per world, stamped after generation: centres at d 50–72 from `mulberry32(hash(seed, 'vault'))`, ≥ 20 cells apart, footprint
-  inside the border, 200 tries (6/6 placed on all 40 measured seeds). Three 7×7 templates as string grids in `world.js`:
-  diamond, hexagon, cross. Shell = new `T.VAULT` (hp 6, white-cyan edge, no yield); interior empty; centre = `T.CACHE` (hp 3).
-- Breaking a CACHE bursts 20◆ + 6▲ as pickups plus a chord; the broken bit in the save already remembers it. No new save state for loot.
-- Old saves (D-023): the save upgrade (`SAVE_FORMAT` 3) records `vaultSkip`, the vaults whose footprint touches a cell that save has
-  already explored or broken; they are never stamped. New worlds store `vaultSkip: []`.
-- Minimap draws an explored vault shell in white. Supply check: 120◆ + 36▲ per world, about 4 % / 2.5 % of the world's ore.
-- **Smoke:** 6 vaults on a fresh seed; breaking a cache gives 20◆ + 6▲; a format-2 save with explored cells over a vault loads with
-  that vault skipped and keeps its tunnels; reload keeps an opened cache open.
 
 ## S-10 — Lumen ore (M2; build directly before Research v1, D-024)
 - New `T.LUMEN` (gold `#ffc94f`, glyph ●, hp 3.5, yield 1) re-types ROCK/DENSE cells at d ≥ 55 where a new noise

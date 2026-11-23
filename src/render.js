@@ -6,6 +6,7 @@ const MAX_CACHED_CHUNKS = 48;
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44], [T.ROCK]: [34, 51, 122], [T.DENSE]: [74, 47, 138],
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
+  [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
 };
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
@@ -116,8 +117,13 @@ export class Renderer {
     g.shadowBlur = 10;
     for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
       const t = w.get(x0 + x, y0 + y);
-      if (t !== T.CRYSTAL && t !== T.PRISM) continue;
+      if (t !== T.CRYSTAL && t !== T.PRISM && t !== T.CACHE) continue;
       const m = MATERIAL[t], px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
+      if (t === T.CACHE) { // S-9: a square-in-square glyph, upright, so it never reads as ore
+        g.shadowColor = m.edge; g.strokeStyle = m.edge; g.lineWidth = 2;
+        g.strokeRect(px - 9, py - 9, 18, 18); g.fillStyle = m.edge; g.fillRect(px - 4, py - 4, 8, 8);
+        continue;
+      }
       const h = (((x0 + x) * 73856093) ^ ((y0 + y) * 19349663)) >>> 0;
       const rot = (h % 628) / 100, sz = 5 + (h % 4);
       g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge;

@@ -64,8 +64,8 @@ async function ringChecks() {
   const [hx, hy] = rockAt(10, 20), [dx, dy] = rockAt(55, 70);
   const th = beamTime(hx, hy), td = beamTime(dx, dy);
   check('Deep ROCK takes 2× the beam time of Hearth ROCK (S-8)', Math.abs(td / th - 2) < 0.03, `${th} vs ${td} ticks`);
-  // Hashes of seed 77 as generated before S-8 (empty/solid bitset, then full cell types): rings must only recolour (D-023).
-  const g0 = new World(77); let lay = 0x811c9dc5, typ = 0x811c9dc5;
+  // Base generator with every vault skipped (S-9 stamps on top; vaultChecks covers that). Hashes of seed 77 as generated before S-8 (empty/solid bitset, then full cell types): rings must only recolour (D-023).
+  const g0 = new World(77, [0, 1, 2, 3, 4, 5]); let lay = 0x811c9dc5, typ = 0x811c9dc5;
   for (let i = 0; i < g0.cells.length; i++) { lay = Math.imul(lay ^ (g0.cells[i] ? 1 : 0), 0x01000193) >>> 0; typ = Math.imul(typ ^ g0.cells[i], 0x01000193) >>> 0; }
   check('seed 77 layout + cell types identical to pre-ring generation (S-8, D-023)', lay === 2394919557 && typ === 3824047980, `${lay} / ${typ}`);
   const pitches = [];
@@ -76,6 +76,42 @@ async function ringChecks() {
   for (const d of [30, 10, 30, 60, 30, 60]) go(d);
   check('each ring toasts once per session, hum pitch follows the ring (S-8)', toasts.join() === 'Veil,Deep' && pitches.join() === '0,1,0,1,2,1,2',
     `toasts ${toasts.join()} · pitch ${pitches.join()}`);
+}
+
+// S-9 vaults: 6 per fresh world, only the vault footprint differs from the base generator, a cache bursts 20◆ + 6▲,
+// an opened cache stays open after reload, and an old (format 3) save that has looked at a vault never gets it stamped.
+async function vaultChecks() {
+  const { World, vaultSites, packBits } = await import('../src/world.js');
+  const { Game } = await import('../src/game.js');
+  const { upgradeSave } = await import('../src/save.js');
+  const { T } = await import('../src/config.js');
+  const audio = new Proxy({}, { get: () => () => {} });
+  const seeds = Array.from({ length: 40 }, (_, i) => (i + 1) * 7919);
+  const counts = seeds.map(s => new World(s).vaults.length);
+  const w = new World(77), base = new World(77, [0, 1, 2, 3, 4, 5]), foot = new Set(w.vaults.flatMap(v => v.cells));
+  let outside = 0; for (let i = 0; i < w.cells.length; i++) if (!foot.has(i) && w.cells[i] !== base.cells[i]) outside++;
+  check('6 vaults on every one of 40 seeds; only their footprints differ from the base world (S-9)', counts.every(n => n === 6) && outside === 0
+    && w.vaults.every(v => w.cells[v.y * w.w + v.x] === T.CACHE), `min ${Math.min(...counts)}, ${outside} cells changed outside`);
+  const g = new Game({ seed: 77, mode: 'drift', audio }), v = g.world.vaults[0];
+  const before = g.pickups.length;
+  while (!(g.world.hit(v.x, v.y, 0.5) || {}).broken);
+  g.onCellBroken(v.x, v.y, T.CACHE);
+  const got = g.pickups.slice(before), n = k => got.filter(q => q.kind === k).length;
+  const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
+  check('breaking a cache bursts 20◆ + 6▲; it stays open after reload (S-9)', n('shard') === 20 && n('prism') === 6
+    && h.world.get(v.x, v.y) === T.EMPTY && h.world.vaults.length === 6, `${n('shard')}◆ ${n('prism')}▲, after reload ${h.world.get(v.x, v.y)}`);
+  // A format-3 save (no vaultSkip) that explored one cell of vault 2 and tunnelled through the base world where vault 4 sits.
+  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave(), sites = vaultSites(77), N = w.w * w.h;
+  const ex = new Uint8Array(N), br = new Uint8Array(N);
+  ex[sites[2].cells[0]] = 1;
+  const tunnel = sites[4].cells.filter(c => base.cells[c] !== T.EMPTY).slice(0, 3); for (const c of tunnel) br[c] = ex[c] = 1;
+  Object.assign(old, { v: 3, explored: packBits(ex), broken: packBits(br) }); delete old.vaultSkip;
+  const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
+  const vs = sites[4];
+  check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === 4 && up.vaultSkip.join() === '2,4'
+    && o.world.vaults.length === 4 && tunnel.every(c => o.world.cells[c] === T.EMPTY) && o.world.get(vs.x, vs.y) !== T.CACHE
+    && JSON.stringify(o.toSave().vaultSkip) === '[2,4]', `skip ${up.vaultSkip}, ${o.world.vaults.length} vaults`);
+  check('a new world saves vaultSkip: [] (S-9)', JSON.stringify(new Game({ seed: 5, mode: 'drift', audio }).toSave().vaultSkip) === '[]');
 }
 
 async function rngChecks() {
@@ -107,6 +143,7 @@ async function rngChecks() {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
   await ringChecks().catch(e => check('S-8 ring checks ran', false, e.message));
+  await vaultChecks().catch(e => check('S-9 vault checks ran', false, e.message));
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
