@@ -3,15 +3,7 @@
 Specs ready to build, in roadmap order. Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
-Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2, S-6 built in #7, #8, #10.)
-
-## S-3 — Settings panel (D-016)
-- A **Settings** button on the title screen (≡ in game already returns to the title) opens a sheet styled like the Core Matrix.
-- Controls: volume slider (0–100, default 70, maps to `master.gain` 0–0.5), mute toggle (M still works), screen shake on/off,
-  reduced motion (default follows `prefers-reduced-motion` on first run). No "reset world": New World already does that with a confirm.
-- Stored as one object under `lumencore.settings.v1`, never in the world save. First run reads the legacy `lumencore.muted` pref into it.
-- Every control ≥ 40 px tall; the sheet fits at 320×568 (the existing overflow check must cover `#settings`).
-- **Smoke:** shake off → `game.shake` stays 0 after a Glitch kill; volume 0 survives reload; a legacy `lumencore.muted = '1'` loads as muted.
+Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2, S-6, S-3 built in #7, #8, #10, #12.)
 
 ## S-4 — Feel pass (after S-3, so every effect ships with its off switch)
 - Deposit: a rising 3-note arpeggio (one note per resource kind deposited, max 3) and the bank number counts up over 0.4 s.

@@ -183,14 +183,55 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('blur releases held touch sticks', held.before && !held.after && held.move === 0, JSON.stringify(held));
     await ctx.close();
 
+    // ---- Settings (S-3, D-016) ----
+    const sp = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    sp.on('pageerror', e => errors.push('settings: ' + e.message));
+    await sp.goto(url); await sp.waitForTimeout(200);
+    await sp.evaluate(() => { try { localStorage.clear(); localStorage.setItem('lumencore.muted', '1'); } catch {} });
+    await sp.reload(); await sp.waitForTimeout(300);
+    const legacy = await sp.evaluate(() => ({ s: window.__lumen.settings.muted, a: window.__lumen.audio.muted,
+      stored: JSON.parse(localStorage.getItem('lumencore.settings.v1'))?.muted, old: localStorage.getItem('lumencore.muted') }));
+    check('legacy lumencore.muted = 1 loads as muted (S-3)', legacy.s && legacy.a && legacy.stored === true && legacy.old === null, JSON.stringify(legacy));
+    await sp.click('#settings-btn'); await sp.waitForTimeout(100);
+    await sp.click('#settings [data-setting="shake"]');
+    await sp.$eval('#set-volume', el => { el.value = 0; el.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sp.keyboard.press('Escape'); await sp.waitForTimeout(100);
+    const closed = !(await sp.isVisible('#settings'));
+    await sp.click('#new-world'); await sp.waitForTimeout(200);
+    // Kill a Glitch and take a hit with shake off, stepped in-page; both used to set game.shake to 4 / 8.
+    const sk = await sp.evaluate(() => {
+      const g = window.__lumen.game, p = g.player, C = 32;
+      g.setMode('surge'); p.x = g.nexus.x + 1200.5; p.y = g.nexus.y + 1216;
+      for (let y = -3; y <= 3; y++) for (let x = -3; x <= 3; x++) g.world.destroy(Math.floor(p.x / C) + x, Math.floor(p.y / C) + y);
+      g.enemies = [{ x: p.x + 60, y: p.y, r: 11, vx: 0, vy: 0, tier: 0, hp: 0.05, maxHp: 1, speed: 0, dmg: 1, spin: 0, flash: 0, hitCd: 9, wander: 0, alert: true }];
+      const kills = g.stats.glitches; let maxShake = 0;
+      for (let i = 0; i < 60; i++) { g.spawnTimer = 99; g.update(1 / 60, { move: { x: 0, y: 0 }, fire: true, aim: { x: 1, y: 0 } }); maxShake = Math.max(maxShake, g.shake); }
+      g.hurtPlayer(1, 0, 0); maxShake = Math.max(maxShake, g.shake);
+      return { killed: g.stats.glitches - kills, maxShake };
+    });
+    check('shake off: no screen shake after a Glitch kill or a hit (S-3)', closed && sk.killed >= 1 && sk.maxShake === 0, JSON.stringify({ closed, ...sk }));
+    await sp.reload(); await sp.waitForTimeout(300);
+    const persisted = await sp.evaluate(() => ({ vol: window.__lumen.settings.volume, gain: window.__lumen.audio.volume, shake: window.__lumen.settings.shake, ui: document.getElementById('set-volume').value }));
+    check('volume 0 and shake off survive reload (S-3)', persisted.vol === 0 && persisted.gain === 0 && persisted.shake === false && persisted.ui === "0", JSON.stringify(persisted));
+    check('settings never enter the world save', await sp.evaluate(() => !/volume|shake/.test(localStorage.getItem('lumencore.save.v1') || '')));
+    await sp.close();
+
     // Narrowest phone: Matrix tabs and buy buttons fit at 320 px (S-1).
     const np = await browser.newPage({ viewport: { width: 320, height: 568 } });
     await np.goto(url); await np.waitForTimeout(200);
     // Nothing on the title, HUD or Matrix may overflow its box at 320 px (B-001, S-2). The hint's ellipsis is deliberate.
-    const overflow = () => np.evaluate(() => [...document.querySelectorAll('#hud *, #title *, #matrix *')]
+    const overflow = () => np.evaluate(() => [...document.querySelectorAll('#hud *, #title *, #matrix *, #settings *')]
       .filter(e => e.id !== 'hint' && e.getClientRects().length && e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).display !== 'inline')
       .map(e => `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''} ${e.scrollWidth}>${e.clientWidth}`));
     const ovTitle = await overflow();
+    // Settings sheet at 320×568: fits without scrolling, nothing overflows, every control ≥ 40 px tall (S-3).
+    await np.click('#settings-btn'); await np.waitForTimeout(100);
+    const st = await np.evaluate(() => { const sh = document.querySelector('#settings .sheet'), r = sh.getBoundingClientRect();
+      return { top: Math.round(r.top), bottom: Math.round(r.bottom), scroll: sh.scrollHeight > sh.clientHeight,
+        short: [...document.querySelectorAll('#settings button, #settings input')].filter(e => e.getBoundingClientRect().height < 40).map(e => e.id || e.dataset.setting) }; });
+    ovTitle.push(...await overflow());
+    check('Settings fits at 320×568, controls ≥ 40 px (S-3)', st.top >= 0 && st.bottom <= 568 && !st.scroll && st.short.length === 0, JSON.stringify(st));
+    await np.click('#settings-close'); await np.waitForTimeout(100);
     await np.click('#new-world'); await np.waitForTimeout(200);
     await np.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.demo = true; });
     await np.keyboard.press('e'); await np.waitForTimeout(100);
@@ -199,7 +240,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
       return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #matrix-close')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); });
     check('Matrix tabs + buy fit at 320 px', clip.length === 0, clip.join(', '));
     const ov = [...ovTitle, ...await overflow()];
-    check('nothing overflows at 320 px: title, HUD, Matrix (B-001)', ov.length === 0, ov.join(', '));
+    check('nothing overflows at 320 px: title, Settings, HUD, Matrix (B-001)', ov.length === 0, ov.join(', '));
     await np.close();
   } catch (e) {
     check('smoke run completed', false, e.message);

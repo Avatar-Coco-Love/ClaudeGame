@@ -1,8 +1,11 @@
 // Tiny synthesized sound kit. No asset files; everything is oscillators.
+import { DEFAULT_VOLUME, MASTER_GAIN_MAX } from './config.js';
+
 export class Audio {
   constructor() {
     this.ctx = null;
     this.muted = false;
+    this.volume = DEFAULT_VOLUME / 100; // 0-1 (settings volume / 100)
     this.beamOsc = null;
     this.last = {};
   }
@@ -11,14 +14,13 @@ export class Audio {
     try {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.35;
+      this.applyGain();
       this.master.connect(this.ctx.destination);
     } catch { this.ctx = null; }
   }
-  setMuted(m) {
-    this.muted = m;
-    if (this.master) this.master.gain.value = m ? 0 : 0.35;
-  }
+  applyGain() { if (this.master) this.master.gain.value = this.muted ? 0 : this.volume * MASTER_GAIN_MAX; }
+  setMuted(m) { this.muted = m; this.applyGain(); }
+  setVolume(v) { this.volume = Math.max(0, Math.min(1, v)); this.applyGain(); }
   tone(freq, dur, { type = 'sine', vol = 0.3, slide = 0, delay = 0, throttle = 0, key = null } = {}) {
     if (!this.ctx || this.muted) return;
     const now = this.ctx.currentTime;

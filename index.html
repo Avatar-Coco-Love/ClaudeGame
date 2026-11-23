@@ -49,8 +49,19 @@
         <div class="mode-card" data-mode="surge"><h3>Surge</h3><p>Glitches hunt in the dark. Same rewards, more heartbeat.</p></div>
       </div>
       <button id="new-world" class="big">New World</button>
+      <button id="settings-btn" class="big secondary">Settings</button>
       <p class="controls">Desktop: WASD move · mouse aim · click/Space mine · E Core Matrix<br>Touch: left thumb move · right thumb aim + mine</p>
       <p class="foot">Designed &amp; built by Claude. You can switch modes any time at the Nexus. <span id="version"></span></p>
+    </div>
+  </div>
+
+  <div id="settings" class="hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="sheet">
+      <header><h2 id="settings-title">Settings</h2><button id="settings-close" aria-label="Close">✕</button></header>
+      <label class="set-row"><span>Volume</span><input id="set-volume" type="range" min="0" max="100" step="5"><output id="set-volume-val"></output></label>
+      <div class="set-row"><span>Mute <kbd>M</kbd></span><button data-setting="muted" role="switch"></button></div>
+      <div class="set-row"><span>Screen shake</span><button data-setting="shake" role="switch"></button></div>
+      <div class="set-row"><span>Reduced motion<small>No shake, no glow pulses</small></span><button data-setting="reducedMotion" role="switch"></button></div>
     </div>
   </div>
 

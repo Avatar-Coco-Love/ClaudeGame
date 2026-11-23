@@ -13,7 +13,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#9) Design session 7: play-test, Q-006/Q-007 measured and decided, B-007 crash fixed, specs S-6 and S-7.
 - ✅ (#10) **S-6 Glitches give up when they make no progress:** they fade and free their slot so Surge keeps its pressure (D-017); Glitch Prism drop at 50 % (D-018).
 - ✅ (#11) Audit session 9: B-006 fixed, touch sticks released on blur, Drift/Surge income parity measured (D-019).
-- **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion (no reset button: New World covers it, D-016).
+- ✅ (#12) **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion, opened from the title (D-016, D-020).
 - **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
 - ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
