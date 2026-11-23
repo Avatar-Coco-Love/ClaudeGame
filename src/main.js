@@ -1,5 +1,6 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, upgradeCost, MODES, RESOURCE } from './config.js';
+import { UPGRADES, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
+import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
@@ -9,7 +10,7 @@ const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
 
 const store = {
-  read() { try { const s = localStorage.getItem(SAVE_KEY); return s ? JSON.parse(s) : null; } catch { return null; } },
+  read() { try { const s = localStorage.getItem(SAVE_KEY); return s ? upgradeSave(JSON.parse(s)) : null; } catch { return null; } },
   write(data) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage unavailable */ } },
   clear() { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } },
   pref(k, v) {
@@ -29,6 +30,7 @@ let toastTimer = 0;
 let selectedMode = 'drift';
 
 audio.setMuted(store.pref('muted') === '1');
+$('version').textContent = 'v' + VERSION;
 updateMuteButton();
 
 // ---------- title screen ----------

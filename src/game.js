@@ -2,6 +2,7 @@
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
 import { CELL, NEXUS_RADIUS, MATERIAL, UPGRADES, upgradeCost, T } from './config.js';
 import { World, packBits, unpackBits, mulberry32 } from './world.js';
+import { SAVE_FORMAT } from './save.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
@@ -392,7 +393,7 @@ export class Game {
   // ---------- persistence ----------
   toSave() {
     return {
-      v: 1, seed: this.world.seed, mode: this.mode,
+      v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored),

@@ -18,6 +18,7 @@ const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 
 (async () => {
+  for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -30,6 +31,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.goto(url);
     await pg.waitForTimeout(400);
     check('title screen visible', await pg.isVisible('#title'));
+    check('version shown on title', /^v\d+\.\d+\.\d+$/.test(await pg.textContent('#version')));
     await pg.click('#new-world');
     await pg.waitForTimeout(300);
     check('game started', await pg.evaluate(() => !!window.__lumen?.game && document.getElementById('title').classList.contains('hidden')));
@@ -71,6 +73,13 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.click('#continue'); await pg.waitForTimeout(200);
     const re = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), mode: g.mode }; });
     check('save restores progress', re.mined === snap.mined && re.up === snap.up && re.mode === 'surge', JSON.stringify(re));
+
+    // Old saves must load: a save written before format tracking has no `v`.
+    await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const k = 'lumencore.save.v1', s = JSON.parse(localStorage.getItem(k)); delete s.v; localStorage.setItem(k, JSON.stringify(s)); });
+    await pg.reload(); await pg.waitForTimeout(400);
+    await pg.click('#continue'); await pg.waitForTimeout(200);
+    const old = await pg.evaluate(() => window.__lumen.game.stats.mined);
+    check('unversioned (format 1) save still loads', old === snap.mined, `mined ${old}`);
 
     // Frame budget: average frame time while mining.
     const fps = await pg.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { if (++n < 120) requestAnimationFrame(f); else r(1000 * n / (performance.now() - t0)); }; requestAnimationFrame(f); }));
