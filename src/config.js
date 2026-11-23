@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.6';
+export const VERSION = '0.1.7';
 export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;
@@ -47,6 +47,14 @@ export function upgradeCost(level) {
     prism: level >= 2 ? (level - 1) * 3 : 0,
   };
 }
+
+// Nexus Development (S-1, D-009): upgrades to the base itself, paid in Prisms only. cost(level) is the NEXT level's price.
+// Radiance only widens the Nexus light + explored disc; deposit and Glitch-repel radii stay fixed (D-002: no Surge-only safety buff).
+export const NEXUS_UPGRADES = [
+  { id: 'radiance', name: 'Radiance', desc: 'How far the Nexus lights the caves', max: 5,
+    value: l => 320 + 96 * l, fmt: v => Math.round(v) + ' px',
+    cost: l => ({ shard: 0, prism: [6, 12, 20, 30, 45][l] }) },
+];
 
 export const MODES = {
   drift: { name: 'Drift', blurb: 'Calm. No hostiles. Mine, explore, build at your own pace.' },

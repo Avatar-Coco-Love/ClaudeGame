@@ -235,6 +235,11 @@ export class Renderer {
     const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
     grd.addColorStop(0, 'rgba(255,255,255,0.95)'); grd.addColorStop(0.4, 'rgba(46,242,255,0.6)'); grd.addColorStop(1, 'rgba(46,242,255,0)');
     ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.fill();
+    if (this.game.nexusPulse > 0) { // Radiance bought: a white ring sweeps out to the new light edge
+      const k = 1 - this.game.nexusPulse;
+      ctx.globalAlpha = this.game.nexusPulse; ctx.strokeStyle = '#ffffff'; ctx.shadowColor = '#ffffff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, 30 + k * (this.game.nexusLight() - 30), 0, Math.PI * 2); ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -389,7 +394,7 @@ export class Renderer {
       l.fillStyle = grd; l.beginPath(); l.arc(x, y, rr, 0, Math.PI * 2); l.fill();
     };
     hole(g.player.x, g.player.y, LIGHT_RADIUS);
-    hole(g.nexus.x, g.nexus.y, 320);
+    hole(g.nexus.x, g.nexus.y, g.nexusLight());
     if (g.beam.on) hole(g.beam.ex, g.beam.ey, 80, 0.7);
     ctx.drawImage(this.light, 0, 0, this.w, this.h);
   }
