@@ -3,6 +3,7 @@
 import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
+import { tryScan, updateScan, emptyScan } from './research.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
@@ -72,6 +73,8 @@ export class Game {
     this.nexusLevels = Object.fromEntries(NEXUS_UPGRADES.map(u => [u.id, 0]));
     this.cargo = { shard: 0, prism: 0, lumen: 0 };
     this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0 }; // lumen: ever picked up (S-10 shows ● after the first)
+    this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
+    this.scan = emptyScan(); // S-11: the live ping (never saved)
     this.player = {
       x: c.x, y: c.y + 40, r: PLAYER_R,
       vx: 0, vy: 0,
@@ -203,6 +206,8 @@ export class Game {
     p.invuln = Math.max(0, p.invuln - dt);
     p.hurtFlash = Math.max(0, p.hurtFlash - dt);
 
+    updateScan(this, dt);
+    if (intent.scan) tryScan(this);
     this.updateBeam(dt, intent);
     this.updatePickups(dt);
     this.updateDeposit(dt);
@@ -479,7 +484,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
@@ -495,6 +500,7 @@ export class Game {
     for (const k of Object.keys(this.upgrades)) if (s.upgrades && s.upgrades[k] != null) this.upgrades[k] = s.upgrades[k];
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
+    Object.assign(this.research, s.research || {});
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4 });
   }

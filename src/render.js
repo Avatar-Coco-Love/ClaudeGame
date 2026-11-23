@@ -1,5 +1,6 @@
 // All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED } from './config.js';
+import { markAlpha } from './research.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -12,6 +13,7 @@ const MINI_COLORS = {
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
 const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const SCAN_KIND = { [T.CRYSTAL]: RESOURCE.shard, [T.PRISM]: RESOURCE.prism, [T.LUMEN]: RESOURCE.lumen }; // S-11 ping glyphs
 const MINI_RING = RINGS.map(r => ({
   [T.ROCK]: mix(rgb(r.rockFill), rgb(r.rockEdge), 0.22), [T.DENSE]: mix(rgb(r.denseFill), rgb(r.denseEdge), 0.3),
 }));
@@ -208,6 +210,7 @@ export class Renderer {
     ctx.save();
     ctx.translate(this.w / 2 + shx, this.h / 2 + shy); ctx.scale(s, s); ctx.translate(-this.cam.x, -this.cam.y);
     this.drawEnemies(ctx, true);
+    this.drawScan(ctx);
     ctx.restore();
 
     this.drawNexusPointer(ctx);
@@ -432,6 +435,29 @@ export class Renderer {
     ctx.drawImage(this.light, 0, 0, this.w, this.h);
   }
 
+  // S-11: the Scanner ring and the ore glyphs it reveals, drawn above the darkness (world transform).
+  drawScan(ctx) {
+    const sc = this.game.scan;
+    if (!sc.marks.length) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const r = sc.age * SCAN_SPEED, R = SCAN_RADIUS * CELL;
+    if (sc.ring && r < R + 40) {
+      ctx.strokeStyle = '#ffc94f'; ctx.lineWidth = 3; ctx.shadowColor = '#ffc94f'; ctx.shadowBlur = 14;
+      ctx.globalAlpha = Math.max(0, 1 - r / (R + 40)) * 0.8;
+      ctx.beginPath(); ctx.arc(sc.x, sc.y, Math.min(r, R + 40), 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.font = '600 18px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 10;
+    for (const m of sc.marks) {
+      const a = markAlpha(this.game, m);
+      if (a <= 0) continue;
+      const k = SCAN_KIND[m.type];
+      ctx.globalAlpha = a; ctx.fillStyle = k.color; ctx.shadowColor = k.color;
+      ctx.fillText(k.glyph, (m.x + 0.5) * CELL, (m.y + 0.5) * CELL);
+    }
+    ctx.restore();
+  }
+
   drawNexusPointer(ctx) {
     const g = this.game, n = this.worldToScreen(g.nexus.x, g.nexus.y);
     const m = 40;
@@ -482,6 +508,13 @@ export class Renderer {
     const sc = size / (w.w * CELL);
     m.fillStyle = '#ffffff';
     m.beginPath(); m.arc(g.nexus.x * sc, g.nexus.y * sc, 3, 0, Math.PI * 2); m.fill();
+    for (const q of g.scan.marks) { // S-11 ping blips, same lifetime as the glyphs
+      const a = markAlpha(g, q);
+      if (a <= 0) continue;
+      m.globalAlpha = a; m.fillStyle = SCAN_KIND[q.type].color;
+      m.fillRect((q.x + 0.5) * CELL * sc - 1.5, (q.y + 0.5) * CELL * sc - 1.5, 3, 3);
+    }
+    m.globalAlpha = 1;
     m.fillStyle = '#ffd23d';
     m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
   }

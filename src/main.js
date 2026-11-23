@@ -1,5 +1,6 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
+import { canResearch, buyResearch } from './research.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -102,7 +103,8 @@ function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen].join('|');
+  const scanReady = g.scan.cooldown <= 0;
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -116,6 +118,8 @@ function updateHud() {
     $('integrity-fill').style.width = `${Math.max(0, g.player.integrity / hull * 100)}%`;
     $('integrity-text').textContent = `${Math.max(0, Math.ceil(g.player.integrity))}/${hull}`;
     $('matrix-btn').classList.toggle('hidden', !g.inNexus());
+    $('scan-btn').classList.toggle('hidden', !g.research.scanner); // S-11: shown once unlocked, dim while cooling down
+    $('scan-btn').classList.toggle('cooling', !scanReady);
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -144,8 +148,24 @@ function closePanel() {
   persist();
 }
 let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1)
-const costHtml = c => [c.shard ? `<span class="shard">${RESOURCE.shard.glyph}${c.shard}</span>` : '',
-  c.prism ? `<span class="prism">${RESOURCE.prism.glyph}${c.prism}</span>` : ''].filter(Boolean).join(' ');
+const costHtml = c => ['shard', 'prism', 'lumen'].filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
+// S-11: a Research node is a one-time unlock, so its row has no levels or pips.
+function researchRow(r) {
+  const g = game, owned = !!g.research[r.id];
+  const row = document.createElement('div');
+  row.className = 'upgrade'; row.dataset.id = r.id;
+  row.innerHTML = `
+    <div class="u-main"><div class="u-name">${r.name}</div><div class="u-desc">${r.desc}</div>
+      <div class="u-val">${owned ? 'Unlocked' : 'One-time unlock'}</div></div>
+    <button class="buy" ${canResearch(g, r.id) ? '' : 'disabled'}>${owned ? 'OWNED' : costHtml({ lumen: r.cost })}</button>`;
+  row.querySelector('.buy').addEventListener('click', () => {
+    if (!buyResearch(g, r.id)) return;
+    renderPanel(); persist();
+    $('upgrade-list').querySelector(`[data-id="${r.id}"]`)?.classList.add('flash');
+    if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : 'Scanner online — press F to ping', 3200);
+  });
+  return row;
+}
 function upgradeRow(u, lvl, cost, affordable, onBuy) {
   const maxed = lvl >= u.max;
   const row = document.createElement('div');
@@ -166,7 +186,7 @@ function upgradeRow(u, lvl, cost, affordable, onBuy) {
 }
 function renderPanel() {
   const g = game;
-  $('matrix-title').textContent = panelTab === 'nexus' ? 'Nexus' : 'Core Matrix';
+  $('matrix-title').textContent = { nexus: 'Nexus', research: 'Research' }[panelTab] || 'Core Matrix';
   document.querySelectorAll('#matrix .tabs button').forEach(b => {
     const on = b.dataset.tab === panelTab;
     b.classList.toggle('selected', on); b.setAttribute('aria-selected', on);
@@ -175,7 +195,14 @@ function renderPanel() {
     (g.stats.lumen > 0 || g.bank.lumen > 0 ? `<span class="lumen">${RESOURCE.lumen.glyph} ${g.bank.lumen}</span>` : '');
   const list = $('upgrade-list');
   list.innerHTML = '';
-  if (panelTab === 'nexus') {
+  if (panelTab === 'research') {
+    for (const r of RESEARCH) list.appendChild(researchRow(r));
+    if (RESEARCH.every(r => g.research[r.id] || !canResearch(g, r.id)) && !RESEARCH.every(r => g.research[r.id])) {
+      const tip = document.createElement('div');
+      tip.className = 'research-hint'; tip.textContent = RESEARCH_HINT;
+      list.appendChild(tip);
+    }
+  } else if (panelTab === 'nexus') {
     for (const u of NEXUS_UPGRADES) {
       const lvl = g.nexusLevels[u.id];
       list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => g.buyNexus(u.id)));
@@ -191,6 +218,7 @@ function renderPanel() {
   $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m`;
 }
 $('matrix-btn').addEventListener('click', openPanel);
+$('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -240,7 +268,8 @@ function frame(now) {
     if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (panelOpen) closePanel(); }
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : input.read(sp);
+    const scan = input.consume('scan'); // S-11: a press made while paused or under the Matrix is dropped, never queued
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : { ...input.read(sp), scan };
     if (!paused) {
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));

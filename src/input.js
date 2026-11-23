@@ -18,6 +18,7 @@ export class Input {
         if (k === 'e' || (k === 'enter' && !(e.target instanceof HTMLButtonElement))) this.pressed.add('matrix');
         if (k === 'escape') this.pressed.add('escape');
         if (k === 'm') this.pressed.add('mute');
+        if (k === 'f') this.pressed.add('scan'); // S-11 Scanner ping (the game ignores it until unlocked)
       }
       this.keys.add(k);
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();

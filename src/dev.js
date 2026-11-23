@@ -1,7 +1,7 @@
 // Dev tools (S-7, D-027). Every action is a plain function on `window.__lumen.dev`; the panel only calls them, so bots,
 // smoke checks and the panel share one entry point. The panel exists only with `?dev` in the URL or after the backtick key.
 // Nothing here enters the save except what the actions themselves change (bank, upgrades, mode, carved cells).
-import { UPGRADES, NEXUS_UPGRADES, CELL } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH } from './config.js';
 
 const ROOM = 1; // carve (2*ROOM+1)² cells: a 3×3 room around the teleport target
 
@@ -32,6 +32,7 @@ export function createDev(ui) {
       const game = g();
       for (const u of UPGRADES) game.upgrades[u.id] = u.max;
       for (const u of NEXUS_UPGRADES) game.nexusLevels[u.id] = u.max;
+      for (const r of RESEARCH) game.research[r.id] = true; // S-11
       game.player.integrity = game.stat('hull');
       game.revealQueue.push(...game.world.reveal(game.nexus.x, game.nexus.y, game.nexusLight()));
       ui.persist();

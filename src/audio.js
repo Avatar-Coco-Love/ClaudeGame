@@ -87,6 +87,7 @@ export class Audio {
     [523, 659, 784].forEach(f => this.tone(f, 0.5, { type: 'triangle', vol: 0.1 }));
     this.tone(2093, 0.25, { type: 'sine', vol: 0.08, delay: 0.12 });
   }
+  scan() { this.tone(1200, 0.3, { type: 'sine', vol: 0.14, slide: -600 }); } // S-11 Scanner sweep 1200 -> 600 Hz
   hurt() { this.tone(160, 0.25, { type: 'square', vol: 0.15, slide: -90 }); }
   enemyDie() { this.tone(420, 0.2, { type: 'square', vol: 0.1, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }

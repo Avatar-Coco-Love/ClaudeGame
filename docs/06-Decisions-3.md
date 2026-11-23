@@ -49,3 +49,12 @@ prism cells are unchanged (smoke hashes this). hp 3.5 is fixed: rings scale only
 and cargo; floor pickups store a kind index (`KINDS`), so 0/1 from older saves still mean ◆/▲. "Held one" = `stats.lumen` > 0.
 - Rejected: Lumen also replacing crystal/prism cells (would shrink M1's economy basis); ring-scaled Lumen hp (7 in the Deep made a
   bead cost more beam time than a vault wall); a separate `seenLumen` save flag (stats already persists; one less shape change).
+
+### D-034 — Research v1 as built (2026-11-23, Build 21, S-11; D-030)
+Research lives in `src/research.js` (`game.js` was at 500 lines). Nodes in `RESEARCH` (config) cost Lumen only, set
+`research[id] = true` once, and save as `research: {}` (format 6). The ping snapshots ore cells within 12 cells at press time,
+each shown when the ring reaches it (`d / SCAN_SPEED`); a mark hides once its cell is mined. F / ◎ is consumed every frame and
+dropped while paused or under the Matrix. The ◎ button sits under the minimap, not bottom-right (the right half is the aim stick).
+- Rejected: scan code in `game.js` (pushes it toward the 600-line split); a ring that follows the core (the snapshot would drift
+  off its cells); queuing a press made under the Matrix (it would fire on close, unasked); re-scanning cells live each frame
+  (cost per frame for no visible gain over 6 s); saving the live ping (D-030: no save state).
