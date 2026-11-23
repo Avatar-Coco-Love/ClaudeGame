@@ -314,8 +314,9 @@ export class Game {
       this.spawnTimer = 2.2 + this.rand() * 1.8;
       if (this.enemies.length < maxCount) this.trySpawnEnemy(distFromNexus);
     }
-    for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const e = this.enemies[i];
+    const list = this.enemies;
+    for (let i = list.length - 1; i >= 0; i--) {
+      const e = list[i];
       e.spin += dt * (2 + e.tier);
       e.flash = Math.max(0, e.flash - dt);
       e.hitCd = Math.max(0, e.hitCd - dt);
@@ -335,6 +336,7 @@ export class Game {
         e.hitCd = 0.9;
         e.vx = -dx / d * 260; e.vy = -dy / d * 260;
         if (p.invuln <= 0) this.hurtPlayer(e.dmg, dx / d, dy / d);
+        if (this.enemies !== list) return; // destabilize() replaced the list mid-loop (B-007: indexing on froze the game)
       }
       if (e.hp <= 0) {
         this.stats.glitches++;

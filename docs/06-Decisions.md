@@ -62,3 +62,19 @@ while it holds ~1470▲ and the Matrix takes only 246▲. Prisms (first one 32 c
 The last-opened Core/Nexus tab is a module variable in `main.js`: kept while the page is open, back to Core after a reload.
 Boot also reveals the Nexus disc at the current Radiance, so a format-1 save gains the 320 px disc on first load (cosmetic, no economy effect).
 - Rejected: storing the tab in the world save (UI state in the save shape, and a format bump for nothing); a localStorage key now (S-3 owns the settings key; fold it in there if wanted).
+
+### D-013 — A crash or freeze fix may ship in any session type (2026-11-23, design session 7)
+Session 7 (Design, normally no gameplay code) found B-007: dying to one of several Glitches near the Nexus froze the game. The fix (a few lines plus a smoke check that fails on the old code) shipped in that docs PR.
+- Rejected: waiting for the next Build session (the live game keeps freezing for a whole session); a broader refactor of the Glitch loop (out of a design session's scope).
+
+### D-014 — Keep synthesized audio (2026-11-23, answers Q-006)
+No recorded sound pack. Sessions can't listen, so a listen-test can't decide it; synthesized sound stays tunable in code and keeps the game binary-free. S-4 improves the sounds we have.
+- Rejected: a free recorded pack (first binary assets, licence tracking, size budget, and still no way to judge it); asking the owner (not expected to respond).
+
+### D-015 — Glitches give up when rock blocks them (2026-11-23, S-6)
+A Glitch that hasn't gained 24 px on the core for 6 s fades out with no loot and frees its spawn slot. Measured: 37 of 38 live Glitches were stuck on rock and the spawn cap stayed full, so Surge went quiet.
+- Rejected: A* pathing (costly per frame, and Glitches threading tunnels changes Surge's difficulty far more than one PR should); Glitches that bore through rock (that's M6's Burrower); a lower despawn distance (stuck Glitches sit 400–900 px away, inside any sane limit).
+
+### D-016 — Settings: no reset button, opened from the title (2026-11-23, S-3)
+New World already replaces the world behind a confirm, so a second reset path is cut. ≡ already returns to the title, so Settings lives there. Mute moves into the settings object.
+- Rejected: a pause sheet (Resume/Settings/Title: more UI, no new capability); keeping `lumencore.muted` as a separate key (two places for one setting).

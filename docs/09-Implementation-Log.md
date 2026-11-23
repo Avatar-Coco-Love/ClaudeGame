@@ -34,3 +34,10 @@ Older entries (v0.1 to session 2): `archive/2026-11-23-09-sessions-0-2.md`.
 - **Overflow check scope:** every rendered non-inline element in `#hud`, `#title`, `#matrix` (title before start, HUD + Matrix Nexus tab after), `#hint` excluded (deliberate ellipsis).
 - **Screenshots (DSF 1):** 320×568 title shows the whole wordmark with margin; Pixel 7 in the Nexus shows "Left thumb…" and a badge-free Core Matrix button.
 - **Housekeeping:** `09` was at 7.2 KB of 8 KB, so v0.1…session 2 moved word for word to `docs/archive/`.
+
+## 2026-11-23 — Session 7 (v0.1.9): Design — play-test, Q-006/Q-007, B-007
+- **Play-test (DSF 1):** desktop 1280×800 mined 19 cells / 16◆ in 16 s of 4 straight legs; Matrix Core tab clean; Pixel 7 shows the thumb hint and a badge-free Matrix button. S-1/S-2 hold up.
+- **B-007 → fixed (crash):** dying to one of several Glitches within 900 px of the Nexus: `destabilize()` replaced `enemies` mid-loop, the next index was undefined, `update()` threw and the rAF loop stopped (game frozen). Found by a Node probe. The loop now stops if the list was replaced. New smoke check (35 total) failed on the old code (game ran 0.017 s, plus the page error).
+- **Q-007 measured** with the new `tools/surgefarm.mjs` (10 seeds × 300 s): a parked Surge bot makes 0.2–0.6 kills/min at 1000–1700 px, any upgrade level. Not a money printer today. Why: 37 of 38 live Glitches (20 seeds, 120 s idle) were pressed against rock, holding every spawn slot. Surge goes quiet in tunnels → D-015, spec S-6 (next build).
+- **Decided:** D-013 (crash fixes in any session), D-014 (keep synthesized audio, answers Q-006), D-015, D-016 (S-3 trimmed: no reset button, opened from the title, mute folded in).
+- **Specs:** S-6 (Glitch give-up) and S-7 (dev panel) written; S-3 refined; built S-1/S-2 removed from `07`. **B-008** (logged): the "Press E" hint shows under the open Matrix.

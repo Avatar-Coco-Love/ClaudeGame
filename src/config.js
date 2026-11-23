@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.8';
+export const VERSION = '0.1.9';
 export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;
