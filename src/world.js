@@ -12,6 +12,15 @@ export function mulberry32(seed) {
   };
 }
 
+// S-5 / D-025: one independent stream per gameplay draw, keyed by world seed + a salt name, so draws never shift each
+// other (an extra pickup roll can't change where the next Glitch spawns). FNV-1a over the salt, mixed with the seed.
+export function seededStream(seed, salt) {
+  let h = 0x811c9dc5 ^ (seed >>> 0);
+  for (let i = 0; i < salt.length; i++) h = Math.imul(h ^ salt.charCodeAt(i), 0x01000193);
+  h = Math.imul(h ^ (h >>> 16), 0x85ebca6b); h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  return mulberry32((h ^ (h >>> 16)) >>> 0);
+}
+
 function makeNoise(seed) {
   const rand = mulberry32(seed);
   const SIZE = 256;

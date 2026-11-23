@@ -29,8 +29,36 @@ async function plantSaveAndReload(page, edit) {
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 
+// S-5: the same seed + the same scripted input -> the same pickups and Glitch spawns (node-side, no browser needed).
+// Each game is built ≥ 3 ms apart so a clock-salted RNG (the old `seed ^ Date.now()`) can't pass by luck.
+async function rngChecks() {
+  const { Game } = await import('../src/game.js');
+  const audio = new Proxy({}, { get: () => () => {} });
+  const play = async (extraYieldDraws = 0) => {
+    await new Promise(r => setTimeout(r, 3));
+    const g = new Game({ seed: 4242, mode: 'surge', audio });
+    for (let i = 0; i < extraYieldDraws; i++) g.rng.yield();
+    g.player.integrity = 1e9;
+    const spawns = [], pickups = [], push = g.enemies.push;
+    const inp = { move: { x: 0.15, y: 1 }, fire: true, aim: { x: 0, y: 1 } };
+    for (let f = 0; f < 60 * 40; f++) {
+      const n = g.enemies.length, k = g.pickups.length;
+      g.player.invuln = 9;
+      g.update(1 / 60, inp);
+      for (const e of g.enemies.slice(n)) spawns.push(`${Math.round(e.x)},${Math.round(e.y)}`);
+      for (const q of g.pickups.slice(k)) pickups.push(`${q.kind}${Math.round(q.vx)}`);
+    }
+    return { spawns: spawns.join(' '), pickups: pickups.join(' '), n: spawns.length, m: pickups.length, mined: g.stats.mined };
+  };
+  const a = await play(), b = await play(), c = await play(7);
+  check('same seed + same input -> same pickups and Glitch spawns (S-5)', a.n > 0 && a.m > 0 && a.spawns === b.spawns && a.pickups === b.pickups,
+    `${a.n} spawns, ${a.m} pickups, ${a.mined} cells mined`);
+  check('extra yield rolls leave Glitch spawns unchanged (S-5 per-draw salts)', c.spawns === a.spawns && c.n > 0, `${c.n} spawns`);
+}
+
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
+  await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

@@ -23,7 +23,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy mining. Budget 16.7 ms. Recheck the scene if numbers jump.
-- **S-5 Deterministic gameplay RNG:** `game.rand` is seeded with `Date.now()`, and gameplay draws share it. Before the bot runner: seed from the world seed + a salt per system.
+- ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
 ## M2 — A world worth exploring
 - ✅ (#14) Design session 12: S-4 feel play-tested, M2 measured, specs S-8…S-10, Q-002 decided (D-022…D-024).

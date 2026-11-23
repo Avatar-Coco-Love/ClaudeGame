@@ -42,3 +42,11 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Decided:** D-022 (rings in the fixed world, settles Q-002), D-023 (generation changes keep a save's seen layout; `vaultSkip`),
   D-024 (Lumen ships next to Research v1). Specs S-8 rings, S-9 vaults, S-10 Lumen in `07`. New Q-008 (Deep toughness).
 
+## 2026-11-23 — Session 13 (v0.1.15): Build — S-5 deterministic gameplay RNG
+- **Built:** `seededStream(seed, salt)` in `world.js`; `game.rand` (seeded `seed ^ Date.now()`, one shared stream) replaced by
+  `game.rng.{yield, pickup, glitch-spawn, glitch-wander, glitch-loot}` (D-025). Particles/shake still on `Math.random`.
+- **Tests:** 2 node-side smoke checks (51 total): seed 4242, Surge, 40 s scripted mining twice → identical 13 spawns / 12 pickups;
+  7 extra `yield` rolls leave the spawn list unchanged. Games are built ≥ 3 ms apart; both checks fail on the old code (stash run, 49/51).
+  An exception in these checks now reports as a FAIL instead of killing the run silently.
+- **Observed:** `tools/parity.mjs` still runs (1 seed × 30 s, both modes 40◆/min). No visual change, so no screenshot.
+
