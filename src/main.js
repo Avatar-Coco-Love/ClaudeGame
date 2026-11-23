@@ -90,6 +90,7 @@ function hint() {
   if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
   if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
+  if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : 'Upgrade ready — press E at the Nexus'; // B-010
   if (g.stats.upgrades === 0 && g.bank.shard + g.cargo.shard >= upgradeCost(0).shard) return 'Bring shards home to the Nexus to upgrade';
   if (g.stats.mined < 12) return 'Cyan crystal veins drop Shards ◆';
   return '';

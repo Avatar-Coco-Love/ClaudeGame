@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.16 — 2026-11-23 (#16)
+- Loot left on the ground (including the cargo you drop when your core destabilizes in Surge) is now kept when you close and reopen the game.
+- Your cargo can no longer vanish when you fall on a floor already littered with pickups.
+- Once your first upgrade is paid for, the hint says "Upgrade ready" instead of telling you to bring Shards home again.
+
 ## v0.1.15 — 2026-11-23 (#15)
 - No change you can feel. Under the hood, a world's luck (how many Shards a crystal drops, where Glitches appear, what they leave
   behind) now follows the world's seed, so play-test bots can replay a run exactly and balance work can be measured, not guessed.

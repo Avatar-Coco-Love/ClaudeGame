@@ -1,15 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`.
-
-## 2026-11-23 — Session 8 (v0.1.10): Build — S-6 Glitch give-up
-- **Built:** every Glitch keeps `best`/`stall`; no 24 px gain on its best distance to the core for 6 s → `fade` 0.6 s (drifts to a stop, no contact, no loot, skipped by the beam), then removed. A contact hit resets the stall. Render fades alpha and shrinks to 40 %. Constants in `config.js`.
-- **Spec was wrong, measured:** alert-only (as specced) left `surgefarm 1000 0 300` at 0.36 kills/min, 28/29 stuck. A probe showed the slot-holders were *unalerted* wanderers spawned 560–740 px out, drifting in rock. Applying the rule to all Glitches → D-017.
-- **surgefarm before → after (10 seeds × 300 s):** 1000 px lvl0 0.38 → 4.30 kills/min (deaths 0.02 → 0.80); lvl3 0.42 → 4.14; 1700 px lvl0 1.10 → 4.74; lvl6 0.78 → 4.10. Stuck at end 30–50 → 4–9. Over 3/min, so the Q-007 fallback shipped: Prism drop 50 % (D-018).
-- **Tests:** 2 smoke checks (37 total), stepped in-page by game time (480 × 1/60 s). Boxed one failed on the old code (still present). First run of it failed on the new code too: the open Glitch's hits knocked the core toward the box, which counted as progress; the core is now invulnerable for the check.
-- **Screenshot (800×500, DSF 1):** full, mid-fade and almost-gone Glitches side by side read as one shape shrinking and dimming; no new effect.
-- **Docs:** `09` session 3 archived word for word. `06` hit 8 KB: D-015 (superseded) archived word for word to `docs/archive/decisions-1.md`, new decisions go in `06-Decisions-2.md`; `tests/docs.cjs` checks ID uniqueness across both.
-- **Watch:** a core that outruns a Glitch also makes it give up (it lost the trail). Fine for now; Glitches still can't path (logged in `04` Debt).
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`.
 
 ## 2026-11-23 — Session 9 (v0.1.11): Audit
 - **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
@@ -50,3 +41,13 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   An exception in these checks now reports as a FAIL instead of killing the run silently.
 - **Observed:** `tools/parity.mjs` still runs (1 seed × 30 s, both modes 40◆/min). No visual change, so no screenshot.
 
+## 2026-11-23 — Session 14 (v0.1.16): Audit
+- **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
+- **B-010 → fixed:** with ≥ 8◆ banked and no upgrade, the hint now reads "Upgrade ready — press E at the Nexus" (touch: "back to the
+  Nexus"); "Bring shards home" only shows while the Shards are still in the hold. Screenshot (800×500, DSF 1): pill reads cleanly.
+- **B-011 (new) → fixed:** floor pickups weren't in the save, so a reload after a Surge death lost the scattered cargo for good (and
+  would have lost S-9 vault caches). Saved as `[kind, x, y]`; `SAVE_FORMAT` 3, step 2→3 adds `pickups: []` (D-026).
+- **B-005 → fixed:** cargo scatter on a death now bypasses `PICKUP_CAP` (bounded by the hold), so nothing vanishes on a full floor.
+- **Tests:** 4 new smoke checks (55 total). Three failed on the old code (stash run, 52/55); the format-2 load check is a guard.
+- **Perf / mobile / code health:** nothing new; new hint strings are shorter than the old one (320 px overflow check passes).
+  Largest files: `game.js` 478, `render.js` 463 lines. **D-check:** D-001…D-025 match the code (spot-read). `09` session 8 archived.

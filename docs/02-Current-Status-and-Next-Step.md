@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 13** · **Version: v0.1.15** (session 13 was a Build: S-5; next is an Audit)
+**Session counter: 14** · **Version: v0.1.16** (session 14 was an Audit; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -17,7 +17,7 @@ _Last updated: 2026-11-23_
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on crystal/prism breaks, beam start sweep (D-021).
 - Darkness/light overlay, explored-only minimap, an off-screen Nexus pointer, contextual hints, synthesized audio, and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
-- Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
+- Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups) every 10 s, on deposit, and on page hide. Saves carry a format number (now 3); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Build-ready specs live in `07`, in build order: S-7, S-8 (depth rings), S-9 (vaults), S-10 (Lumen, right before Research v1).
@@ -39,9 +39,10 @@ _Last updated: 2026-11-23_
 - Hitstop freezes the sim only on crystal/prism, rate-limited; reduced motion drops hitstop + ring; no hint under the Matrix (session 11).
 - Real-time play: 32 crystal breaks → 32 hitstops in 60 s, none on rock; a room 62 cells out looks like the start (session 12).
 - Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
+- Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (14) is an **Audit**: parallel health check; fix top issues (B-010 hint included), archive `09`.
+Next session (15) is a **Build**: S-7 dev panel (spec in `07`).
