@@ -1,23 +1,25 @@
 # 04 — Roadmap
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ (#1) First playable: mining, cargo, deposit, Core Matrix, Drift/Surge, touch, autosave.
 - ✅ (#2) Pages deploy workflow.
 - ✅ (#3) Health tooling: `tests/smoke.cjs`, operating manual, roadmap. Fixed the demo world being saved over a real save.
 - ✅ (#4) Version tracking: VERSION + changelog, decisions log, doc cap test, save format upgrades (Gloamdeep inbox).
-- **Nexus Development v1 — Radiance:** a Prism sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
-- Feel pass: deposit fanfare, an upgrade "level-up" pulse, cell-break hitstop, and a short beam charge-up sound.
-- Settings panel: volume, screen shake on/off, reduced motion, and a "reset world" option with confirmation.
+- **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
+- **S-2 Touch-first hints + narrow screens:** fixes B-001 and B-002 and adds the 320×568 overflow smoke check (pulled forward from Tooling).
+- **S-3 Settings panel:** volume, screen shake on/off, reduced motion, and "reset world" with confirmation.
+- **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
+- ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
 - **Dev panel** (`?dev` or backtick): add resources, teleport to a ring, god mode, toggle mode, save/load test spots. Bots and playtests jump straight to the thing under test.
 - **Surge bot runner** (`tools/surgebot.cjs`): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
-  and haul per minute. It also tries degenerate loops (e.g. hugging the Nexus edge). Needed before M6 balance work.
+  and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy mining. Budget 16.7 ms. Recheck the scene if numbers jump.
-- **Narrow-screen text check:** smoke at 320×568 and the real device sizes; HUD/panel text must not overflow or clip.
-- **Deterministic gameplay RNG:** `game.rand` is seeded with `Date.now()`, and gameplay draws share it. Before the bot runner: seed from the world seed + a salt per system.
+- **S-5 Deterministic gameplay RNG:** `game.rand` is seeded with `Date.now()`, and gameplay draws share it. Before the bot runner: seed from the world seed + a salt per system.
 
 ## M2 — A world worth exploring
 - Depth rings: the world gets visibly different with distance (palette shift, new rock types per ring), shown on the minimap.
@@ -56,4 +58,5 @@ Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessio
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
-- **B-001:** at 320 px wide the title "LUMEN CORE" is clipped on the right (letter-spacing + clamp min). Fix together with the narrow-screen text check.
+- **B-001:** at 320 px wide the title "LUMEN CORE" is clipped on the right (letter-spacing + clamp min). Fixed by S-2.
+- **B-002:** on a phone, the first hint is the desktop one ("WASD to move…", truncated) and the Matrix button shows an `E` key badge until the first touch. Fixed by S-2.

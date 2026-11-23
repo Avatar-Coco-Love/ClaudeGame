@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 2** · **Version: v0.1.4** (session 2's Design slot went to the inbox, so **session 3 runs that Design session**; rotation resumes after)
+**Session counter: 3** · **Version: v0.1.5** (session 3 was the Design session; rotation is back on track)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -15,6 +15,7 @@ _Last updated: 2026-11-23_
 - Desktop (WASD + mouse) and touch (twin dynamic sticks).
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number; old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
+- Build-ready specs live in `07` (S-1…S-5). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -27,7 +28,6 @@ _Last updated: 2026-11-23_
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (3) is a **Design** session: play-test, then spec M1's remaining items in `04` in enough detail to build directly.
-After that, build **Nexus Development v1:** spend Prisms to raise the Nexus light radius. Prisms currently have only light use
-(upgrade costs at level 2 and up), so they need a reason to exist.
-Done = a "Nexus" tab in the Core Matrix with a single *Radiance* upgrade, and a visibly bigger lit area around the hub.
+Next session (4) is an **Audit** (counter % 5 == 4): parallel subagents per CLAUDE.md, fix the top issues in one PR, log the rest under Debt in `04`,
+and check D-001…D-009 against the code. Archiving `09` is not needed yet: there's no earlier audit.
+The Build after that takes **S-1 (Nexus Radiance)** from `07`.
