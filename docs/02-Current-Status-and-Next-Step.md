@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 6** · **Version: v0.1.8** (session 6 built S-2 touch hints + 320 px fit; next is a Design)
+**Session counter: 7** · **Version: v0.1.9** (session 7 was a Design: B-007 crash fix, Q-006/Q-007, specs S-6/S-7; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -16,7 +16,7 @@ _Last updated: 2026-11-23_
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
-- Build-ready specs live in `07` (S-1…S-5). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build-ready specs live in `07`, in build order: S-6, S-3, S-4, S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -27,9 +27,10 @@ _Last updated: 2026-11-23_
 - Title-screen hotkeys can't open the Core Matrix; New World asks before replacing an unreadable save (audit, session 4).
 - Radiance spends only Prisms, grows the light and minimap, survives reload; Matrix tabs fit at 320 px (session 5).
 - Phone shows the thumb hint before the first touch; nothing in title/HUD/Matrix overflows at 320 px (session 6).
+- Dying among several Glitches near the Nexus no longer freezes the game (B-007, session 7).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (7) is a **Design** (7 % 5 == 2): play-test S-1/S-2 on phone + desktop, re-check `03` (Q-006, Q-007), and refresh specs S-3…S-5 plus the next 1–2 items.
+Next session (8) is a **Build**: build **S-6** from `07` (stuck Glitches give up and free their slot), and re-run `tools/surgefarm.mjs` before/after.

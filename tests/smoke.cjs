@@ -90,6 +90,13 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.evaluate(() => { const g = window.__lumen.game, p = g.player; g.enemies = [{ x: p.x + 60, y: p.y, r: 11, vx: 0, vy: 0, tier: 0, hp: 1, maxHp: 1, speed: 0, dmg: 1, spin: 0, flash: 0, hitCd: 9, wander: 0, alert: true }]; });
     await pg.mouse.move(900, 400); await pg.mouse.down(); await pg.waitForTimeout(1500); await pg.mouse.up();
     check('beam kills glitches', await pg.evaluate(() => window.__lumen.game.stats.glitches >= 1));
+    // B-007: dying to the last of several Glitches near the Nexus emptied the list mid-loop and froze the game.
+    const t0 = await pg.evaluate(() => { const g = window.__lumen.game, p = g.player; p.x = g.nexus.x + 600; p.y = g.nexus.y; p.integrity = 1; p.invuln = 0;
+      g.enemies = [0, 1, 2].map(() => ({ x: p.x, y: p.y, r: 11, vx: 0, vy: 0, tier: 0, hp: 9, maxHp: 9, speed: 0, dmg: 50, spin: 0, flash: 0, hitCd: 0, wander: 0, alert: true }));
+      return g.stats.time; });
+    await pg.waitForTimeout(500);
+    const d7 = await pg.evaluate(t => { const g = window.__lumen.game; return { ran: g.stats.time - t, home: Math.round(Math.hypot(g.player.x - g.nexus.x, g.player.y - g.nexus.y)) }; }, t0);
+    check('death among several Glitches keeps the game running (B-007)', d7.ran > 0.2 && d7.home < 200, JSON.stringify(d7));
 
     // Save / reload.
     const snap = await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), nexus: g.nexusLevels.radiance }; });

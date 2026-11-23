@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.9 — 2026-11-23 (#9)
+- Fixed: in Surge, being destabilized while several Glitches were close to the Nexus could freeze the game.
+- A design pass: next up, Glitches that are stuck behind rock give up so new ones can find you, then a settings panel.
+
 ## v0.1.8 — 2026-11-23 (#8)
 - Phones now show the thumb controls hint from the start, and the Core Matrix button no longer shows a keyboard `E` badge on touch screens.
 - The "LUMEN CORE" title fits on the narrowest phones (320 px) instead of being cut off.

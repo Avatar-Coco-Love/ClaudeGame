@@ -3,42 +3,42 @@
 Specs ready to build, in roadmap order. Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
-Prisms in a world ≈ 1470▲, the Core Matrix only takes 246▲. The first Prism is 32 cells out (it never spawns closer).
+Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2 built in #7, #8.)
 
-## S-1 — Nexus Development v1: Radiance (✅ built in #7)
-- **Data:** `NEXUS_UPGRADES` in `config.js`, the same shape as `UPGRADES`. One entry: `radiance`, max 5,
-  `value: l => 320 + 96 * l` (px of Nexus light; 320 today, 800 at max), cost **Prisms only** (D-009): `[6, 12, 20, 30, 45]` (113▲ total).
-- **State:** `game.nexusLevels = { radiance: 0 }`, a `game.nexusLight()` getter. `render.js` light hole uses it instead of the hard-coded 320.
-- **On purchase:** `world.reveal(nexus, nexusLight())` so the minimap visibly grows, a white ring burst from the Nexus, the upgrade sound.
-- **What it does *not* do:** no change to the deposit radius or the Glitch repel radius (that would make it a Surge-only safety buff, D-002).
-- **UI:** the Core Matrix sheet gets two tabs, **Core** and **Nexus**. Tabs are buttons (≥ 40 px tall, touch-safe), and the last tab is remembered per session.
-  Prism cost shows with the ▲ glyph only (no ◆0). At 320 px wide both tabs and the buy button must fit without clipping.
-- **Save:** `SAVE_FORMAT` 1 → 2. Step: `save.nexus = { radiance: 0 }`. Never strand a format-1 save (D-005).
-- **Smoke checks:** buying Radiance spends Prisms and not Shards. `nexusLight()` grows by 96. A format-1 save (no `nexus`) loads with radiance 0.
-  Reload keeps the level.
-- **Done =** before/after screenshots at the Nexus (deviceScaleFactor 1) show a visibly larger lit area and a larger explored disc on the minimap.
+## S-6 — Glitches give up when rock blocks them (D-015)
+- **Why:** Glitches steer in a straight line and can't path. Session 7 found 37 of 38 live Glitches (20 seeds, 120 s idle in a room 1200 px out) stuck on
+  rock, holding every spawn slot, so a Surge player in a tunnel gets ~0.5 encounters/min and Surge goes quiet (pillar 2).
+- **Rule:** each alert Glitch keeps `best` (closest distance to the core so far) and `stall` (s). Closing ≥ `GLITCH_PROGRESS_PX` (24) on `best`
+  resets `stall`; otherwise it grows. At `GLITCH_GIVE_UP_S` (6 s) the Glitch fades out over 0.6 s (no contact damage, no loot, not
+  beam-targetable) and frees its slot. Unalerted (wandering) Glitches are untouched. Constants in `config.js`.
+- **Render:** the fade scales alpha down and shrinks the shape; no new effect.
+- **Smoke:** a Glitch boxed behind dense rock 300 px away is gone within 8 s and `stats.glitches` is unchanged; a Glitch in open air
+  with a clear line keeps chasing (still present and closer after 8 s). Prove the first fails on the old code.
+- **Measure (log in `09`):** `node tools/surgefarm.mjs 1000 0 300` before/after. If kills/min at base stats goes above 3, apply the Q-007
+  fallback in the same PR: Glitch Prism drop becomes a 50 % chance (Shards unchanged) and record it as a decision.
 
-## S-2 — Touch-first hints + narrow screens (B-001, B-002) (✅ built in #8)
-- `input.usingTouch` starts as `matchMedia('(pointer: coarse)').matches`, so a phone shows touch hints before the first touch.
-- Hide the `E` key badge on the Core Matrix button while `usingTouch` is true.
-- Title wordmark: shrink the clamp minimum / letter-spacing so "LUMEN CORE" fits at 320 px.
-- **Smoke:** a 320×568 page where no element in `#hud`, `#title`, `#matrix` has `scrollWidth > clientWidth` (excluding the deliberate ellipsis hint),
-  and the Pixel 7 first hint mentions "thumb". Prove both fail on the old code first.
-
-## S-3 — Settings panel
-- Opened from the ≡ button. Toggles: volume slider (0–100, default 70), screen shake on/off, reduced motion (off by default, follows
-  `prefers-reduced-motion` on first run), and "Reset world" behind a confirm step that names what is lost.
-- Settings are stored under their own key (`lumencore.settings.v1`), not in the world save, so resetting a world keeps them.
-- **Smoke:** shake off → `game.shake` stays 0 after a Glitch kill. Reset world → new seed, bank 0, settings kept.
+## S-3 — Settings panel (D-016)
+- A **Settings** button on the title screen (≡ in game already returns to the title) opens a sheet styled like the Core Matrix.
+- Controls: volume slider (0–100, default 70, maps to `master.gain` 0–0.5), mute toggle (M still works), screen shake on/off,
+  reduced motion (default follows `prefers-reduced-motion` on first run). No "reset world": New World already does that with a confirm.
+- Stored as one object under `lumencore.settings.v1`, never in the world save. First run reads the legacy `lumencore.muted` pref into it.
+- Every control ≥ 40 px tall; the sheet fits at 320×568 (the existing overflow check must cover `#settings`).
+- **Smoke:** shake off → `game.shake` stays 0 after a Glitch kill; volume 0 survives reload; a legacy `lumencore.muted = '1'` loads as muted.
 
 ## S-4 — Feel pass (after S-3, so every effect ships with its off switch)
 - Deposit: a rising 3-note arpeggio (one note per resource kind deposited, max 3) and the bank number counts up over 0.4 s.
 - Upgrade bought: a 0.4 s expanding ring on the core plus a brief brightening of the matching pip row.
 - Cell break: 35 ms hitstop on crystal/prism breaks only, at most once per 150 ms (rock breaks are too frequent for it).
 - Beam start: a 0.12 s rising sine sweep, not repeated while the beam stays on.
-- Reduced motion turns off hitstop, rings and shake; sounds stay.
+- Reduced motion turns off hitstop, rings and shake; sounds stay. Also fix B-008 (stale "Press E" hint under the open Matrix).
 
 ## S-5 — Deterministic gameplay RNG (tooling, before the Surge bot runner)
 - Replace `mulberry32(seed ^ Date.now())` with per-system streams: `rng('pickup')`, `rng('glitch-spawn')`, `rng('glitch-wander')`,
   each `mulberry32(hash(worldSeed, salt))`. Visual-only randomness (particles) may stay on `Math.random`.
 - **Smoke:** two games on the same seed with the same scripted input produce the same pickups and Glitch spawns.
+
+## S-7 — Dev panel (tooling)
+- `?dev` in the URL or the backtick key shows a small fixed panel (hidden otherwise, never in the save): +100◆, +50▲, teleport to ring
+  (0/30/60 cells out, carving a 3-cell room), god mode (no damage), Drift/Surge toggle, max all upgrades.
+- All actions are `window.__lumen.dev.*` functions first; the panel only calls them, so bots and smoke use the same entry points.
+- **Smoke:** `__lumen.dev.teleport(60)` puts the core ≥ 1800 px from the Nexus in open space; the panel is absent without `?dev`.

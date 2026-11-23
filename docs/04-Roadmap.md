@@ -10,14 +10,16 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#4) Version tracking: VERSION + changelog, decisions log, doc cap test, save format upgrades (Gloamdeep inbox).
 - ✅ (#7) **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
 - ✅ (#8) **S-2 Touch-first hints + narrow screens:** fixes B-001 and B-002 and adds the 320×568 overflow smoke check (pulled forward from Tooling).
-- **S-3 Settings panel:** volume, screen shake on/off, reduced motion, and "reset world" with confirmation.
+- ✅ (#9) Design session 7: play-test, Q-006/Q-007 measured and decided, B-007 crash fixed, specs S-6 and S-7.
+- **S-6 Glitches give up when rock blocks them:** stuck Glitches fade and free their slot so Surge keeps its pressure (D-015).
+- **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion (no reset button: New World covers it, D-016).
 - **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
 - ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
-- **Dev panel** (`?dev` or backtick): add resources, teleport to a ring, god mode, toggle mode, save/load test spots. Bots and playtests jump straight to the thing under test.
-- **Surge bot runner** (`tools/surgebot.cjs`): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
+- **S-7 Dev panel** (`?dev` or backtick): add resources, teleport to a ring, god mode, toggle mode, save/load test spots. Bots and playtests jump straight to the thing under test.
+- **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is its first, parked-only probe): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy mining. Budget 16.7 ms. Recheck the scene if numbers jump.
 - **S-5 Deterministic gameplay RNG:** `game.rand` is seeded with `Date.now()`, and gameplay draws share it. Before the bot runner: seed from the world seed + a salt per system.
@@ -59,6 +61,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- **B-008:** the "Press E for the Core Matrix" hint stays visible under the open Matrix (desktop). Folded into S-4.
 - **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into S-4 or the dev panel.
 - **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
 - **B-006:** smoke "beam mines terrain" is timing-dependent (5 s wall clock; 3–8 cells mined across runs, needs ≥ 4). Failed once in 6 runs. Fix: drive it by game time (step `game.update`), not wall time. Don't lower the bar.
