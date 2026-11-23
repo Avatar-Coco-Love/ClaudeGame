@@ -6,6 +6,7 @@ import { Renderer } from './render.js';
 import { Input } from './input.js';
 import { Audio } from './audio.js';
 import { loadSettings, saveSettings } from './settings.js';
+import { createDev } from './dev.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -259,4 +260,8 @@ renderer.attach(game);
 showTitle();
 requestAnimationFrame(frame);
 
-window.__lumen = { get game() { return game; }, renderer, input, settings, audio }; // debug handle for tests
+const dev = createDev({ game: () => game, persist, modeChanged() {
+  $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
+  if (panelOpen) renderPanel();
+} });
+window.__lumen = { get game() { return game; }, renderer, input, settings, audio, dev }; // debug handle for tests + bots

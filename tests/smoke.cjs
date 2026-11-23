@@ -95,10 +95,14 @@ async function rngChecks() {
     check('version shown on title', /^v\d+\.\d+\.\d+$/.test(await pg.textContent('#version')));
     await pg.keyboard.press('e'); await pg.waitForTimeout(150);
     check('E on the title does not open the Core Matrix (B-003)', !(await pg.isVisible('#matrix')));
+    // B-012: pin the new world's seed. A random seed let "beam mines terrain" fall to 3 cells on a dense-rock column (~1 run in 4).
+    await pg.evaluate(() => { window.__rnd = Math.random; Math.random = () => 0.42; });
     await pg.focus('#new-world'); await pg.keyboard.press('Enter'); // keyboard start: Enter is the button's, not a Matrix toggle
+    await pg.evaluate(() => { Math.random = window.__rnd; });
     await pg.waitForTimeout(300);
     check('Enter on New World starts without opening the Matrix', !(await pg.isVisible('#matrix')));
     check('game started', await pg.evaluate(() => !!window.__lumen?.game && document.getElementById('title').classList.contains('hidden')));
+    check('dev panel absent without ?dev (S-7)', await pg.evaluate(() => !document.getElementById('dev-panel')));
 
     // Mine straight down from the Nexus.
     // Real input, but timed by GAME time (B-006): the loop clamps dt to 0.05 s, so under load 5 s of wall clock was
@@ -109,7 +113,7 @@ async function rngChecks() {
     await pg.waitForFunction(t => window.__lumen.game.stats.time >= t + 5, mineT0, { timeout: 60000, polling: 'raf' });
     await pg.keyboard.up('s'); await pg.mouse.up();
     const m = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, got: g.cargo.shard + g.cargo.prism + g.bank.shard + g.bank.prism, dy: g.player.y - g.nexus.y }; });
-    check('beam mines terrain', m.mined >= 4, `mined ${m.mined} in 5 s game time (${((Date.now() - mineWall) / 1000).toFixed(1)} s wall)`);
+    check('beam mines terrain', m.mined >= 4, `seed ${await pg.evaluate(() => window.__lumen.game.world.seed)}, mined ${m.mined} in 5 s game time (${((Date.now() - mineWall) / 1000).toFixed(1)} s wall)`);
     check('core tunnels forward', m.dy > 150, `moved ${Math.round(m.dy)}px`);
 
     // Deposit + upgrade.
@@ -240,6 +244,31 @@ async function rngChecks() {
     const fps = await pg.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { if (++n < 120) requestAnimationFrame(f); else r(1000 * n / (performance.now() - t0)); }; requestAnimationFrame(f); }));
     check('frame rate reasonable (headless)', fps > 20, `${fps.toFixed(1)} fps`);
     await pg.close();
+
+    // ---- Dev panel (S-7): every action is a __lumen.dev function; the panel only calls them ----
+    const dp = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    dp.on('pageerror', e => errors.push('dev: ' + e.message));
+    await dp.goto(url + '?dev'); await dp.waitForTimeout(200);
+    await dp.evaluate(() => { try { localStorage.clear(); } catch {} });
+    await dp.click('#new-world'); await dp.waitForTimeout(200);
+    const tp = await dp.evaluate(async () => {
+      const L = window.__lumen, g = L.game, { x, y } = L.dev.teleport(60), w = g.world;
+      let open = true; for (let yy = y - 1; yy <= y + 1; yy++) for (let xx = x - 1; xx <= x + 1; xx++) if (w.solid(xx, yy)) open = false;
+      const t0 = g.stats.time; await new Promise(r => { const f = () => g.stats.time > t0 + 0.5 ? r() : requestAnimationFrame(f); f(); });
+      return { d: Math.round(Math.hypot(g.player.x - g.nexus.x, g.player.y - g.nexus.y)), open, panel: getComputedStyle(document.getElementById('dev-panel')).display !== 'none' };
+    });
+    check('dev.teleport(60): core ≥ 1800 px out in an open room; panel shown with ?dev (S-7)', tp.d >= 1800 && tp.open && tp.panel, JSON.stringify(tp));
+    await dp.click('#dev-panel [data-dev="+100◆"]'); await dp.click('#dev-panel [data-dev="God"]');
+    const dv = await dp.evaluate(() => {
+      const L = window.__lumen, g = L.game, godOn = g.god, mode = L.dev.setMode('surge');
+      const hp = g.player.integrity; g.hurtPlayer(50, 1, 0); const after = g.player.integrity;
+      L.dev.maxAll();
+      return { shard: g.bank.shard, mode, godOn, hp, after, row: !document.getElementById('integrity-row').classList.contains('hidden'),
+        maxed: g.upgrades.beam === 8 && g.nexusLevels.radiance === 5, saved: /god/.test(JSON.stringify(g.toSave())) };
+    });
+    check('dev panel +100◆ and God; god mode takes no damage; max all; never saved (S-7)',
+      dv.shard === 100 && dv.mode === 'surge' && dv.godOn && dv.hp === dv.after && dv.row && dv.maxed && !dv.saved, JSON.stringify(dv));
+    await dp.close();
 
     // ---- Phone (touch) ----
     const ctx = await browser.newContext({ ...devices['Pixel 7'] });
