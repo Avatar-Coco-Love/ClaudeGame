@@ -35,7 +35,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#22) **S-10 Lumen ore:** gold ● cells at d ≥ 55 (~141 per world), banked like Shards; nothing spends it yet (D-033).
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
-- **S-11 Research v1** (build right after S-10, D-030): a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal).
+- ✅ (#23) **S-11 Research v1:** a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal, 20 s cooldown) (D-034).
 - Beam modes: **Wide** (3-cell swath, slower), **Pulse** (charge, then burst). Switch modes with Q or a touch button.
 
 ## M4 — Crafting & building
@@ -64,6 +64,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
+  If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
 - **Glitch inside a vault (watch, session 18):** spawning only checks for open cells, so a Glitch can appear in a sealed vault's
   hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.

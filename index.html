@@ -20,6 +20,7 @@
     <div class="top-right">
       <canvas id="minimap" width="140" height="140"></canvas>
       <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
+      <button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd>F</kbd></button>
     </div>
     <div id="hint" class="hidden"></div>
     <button id="matrix-btn" class="hidden">Core Matrix <kbd>E</kbd></button>
@@ -29,7 +30,7 @@
   <div id="matrix" class="hidden">
     <div class="sheet">
       <header><h2 id="matrix-title">Core Matrix</h2><div id="matrix-bank"></div><button id="matrix-close" aria-label="Close">✕</button></header>
-      <div class="tabs" role="tablist"><button data-tab="core" role="tab">Core</button><button data-tab="nexus" role="tab">Nexus</button></div>
+      <div class="tabs" role="tablist"><button data-tab="core" role="tab">Core</button><button data-tab="nexus" role="tab">Nexus</button><button data-tab="research" role="tab">Research</button></div>
       <div id="upgrade-list"></div>
       <div class="mode-row">
         <span>Mode</span>

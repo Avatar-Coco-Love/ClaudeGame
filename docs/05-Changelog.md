@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.23 — 2026-11-23 (#23)
+- A third Matrix tab, **Research**, spends gold Lumen ●. First node: the **Scanner** (10●, one-time unlock).
+- Once unlocked, press **F** (or tap the gold ◎ under the minimap): a gold ring sweeps out 12 cells and every Shard, Prism and
+  Lumen cell it passes glows through the dark for 6 s, with blips on the minimap. 20 s cooldown; the button dims meanwhile.
+- With reduced motion on, the ore shows at once without the ring. Old saves load with nothing researched.
+
 ## v0.1.22 — 2026-11-23 (#22)
 - Gold **Lumen ●** now glints in the Deep, 55+ cells from the Nexus: round beads with a halo, tougher than Prisms, one Lumen each.
   Carry it home like Shards. A gold ● joins your bank once you have held one. Nothing spends it yet: Research comes next.

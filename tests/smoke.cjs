@@ -26,6 +26,7 @@ async function plantSaveAndReload(page, edit) {
   await page.reload(); await page.waitForTimeout(400);
 }
 
+const research = require('./research.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
 
@@ -88,7 +89,7 @@ async function ringChecks() {
 async function vaultChecks() {
   const { World, vaultSites, packBits } = await import('../src/world.js');
   const { Game } = await import('../src/game.js');
-  const { upgradeSave } = await import('../src/save.js');
+  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const { T } = await import('../src/config.js');
   const audio = new Proxy({}, { get: () => () => {} });
   const seeds = Array.from({ length: 40 }, (_, i) => (i + 1) * 7919);
@@ -113,7 +114,7 @@ async function vaultChecks() {
   Object.assign(old, { v: 3, explored: packBits(ex), broken: packBits(br) }); delete old.vaultSkip;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   const vs = sites[4];
-  check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === 5 && up.vaultSkip.join() === '2,4'
+  check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === SAVE_FORMAT && up.vaultSkip.join() === '2,4'
     && o.world.vaults.length === 4 && tunnel.every(c => o.world.cells[c] === T.EMPTY) && o.world.get(vs.x, vs.y) !== T.CACHE
     && JSON.stringify(o.toSave().vaultSkip) === '[2,4]', `skip ${up.vaultSkip}, ${o.world.vaults.length} vaults`);
   check('a new world saves vaultSkip: [] (S-9)', JSON.stringify(new Game({ seed: 5, mode: 'drift', audio }).toSave().vaultSkip) === '[]');
@@ -152,7 +153,7 @@ async function lumenChecks() {
   Object.assign(old, { v: 4, bank: { shard: 5, prism: 2 }, cargo: { shard: 1, prism: 0 }, pickups: [[1, 3000, 3000], [0, 3010, 3000]] });
   delete old.stats.lumen;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
-  check('a format-4 save loads with bank.lumen = 0 and its pickups intact (S-10)', SAVE_FORMAT === 5 && up.v === 5 && o.bank.lumen === 0 && o.cargo.lumen === 0
+  check('a format-4 save loads with bank.lumen = 0 and its pickups intact (S-10)', up.v === SAVE_FORMAT && o.bank.lumen === 0 && o.cargo.lumen === 0
     && o.bank.shard === 5 && o.stats.lumen === 0 && o.pickups.map(q => q.kind).join() === 'prism,shard', JSON.stringify(o.bank));
 }
 
@@ -188,6 +189,7 @@ async function rngChecks() {
   await vaultChecks().catch(e => check('S-9 vault checks ran', false, e.message));
   await lumenChecks().catch(e => check('S-10 Lumen checks ran', false, e.message));
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
+  await research.nodeChecks(check).catch(e => check('S-11 research checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -429,6 +431,8 @@ async function rngChecks() {
     check('blur releases held touch sticks', held.before && !held.after && held.move === 0, JSON.stringify(held));
     await ctx.close();
 
+    await research.browserChecks(browser, url, check, errors, plantSaveAndReload);
+
     // ---- Settings (S-3, D-016) ----
     const sp = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     sp.on('pageerror', e => errors.push('settings: ' + e.message));
@@ -484,7 +488,10 @@ async function rngChecks() {
     await np.click('#matrix .tabs button[data-tab="nexus"]');
     const clip = await np.evaluate(() => { const sh = document.querySelector('#matrix .sheet').getBoundingClientRect();
       return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, #matrix-close')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); });
-    check('Matrix tabs + buy fit at 320 px', clip.length === 0, clip.join(', '));
+    await np.click('#matrix .tabs button[data-tab="research"]'); // S-11: the third tab and its Lumen hint fit too
+    clip.push(...await np.evaluate(() => { const sh = document.querySelector('#matrix .sheet').getBoundingClientRect();
+      return [...document.querySelectorAll('#matrix .tabs button, #matrix .buy, .research-hint')].filter(e => { const r = e.getBoundingClientRect(); return r.left < sh.left || r.right > sh.right || e.scrollWidth > e.clientWidth; }).map(e => e.textContent); }));
+    check('Matrix tabs + buy fit at 320 px (Nexus + Research)', clip.length === 0, clip.join(', '));
     const ov = [...ovTitle, ...await overflow()];
     check('nothing overflows at 320 px: title, Settings, HUD, Matrix (B-001)', ov.length === 0, ov.join(', '));
     await np.close();

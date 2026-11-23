@@ -55,3 +55,13 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   ring-scaled); bank + floor ● survive reload; a format-4 save loads with 0●. The S-8 hash now checks layout + types with DENSE/LUMEN
   folded into ROCK (same value as before S-10) and pins the full type hash. With `src/` stashed they fail.
 - **Screenshot** (960×600, DSF 1, a 19-cell blob at d ≈ 64): gold beads read clearly apart from ◆ / ▲ and from Deep rock.
+
+## 2026-11-23 — Session 21 (v0.1.23): Build
+- **S-11 Research v1** (D-034): `src/research.js` (buy, ping, fade), third Matrix tab with the Lumen hint at 0●, ◎ / F ping
+  (12 cells, 20 s cooldown, 6 s show, ring 600 px/s, 1200→600 Hz sweep), glyphs above the dark + minimap blips. `SAVE_FORMAT` 6
+  adds `research: {}`. Dev "Max all" unlocks research. Narrow Matrix header: three bank figures no longer wrap at 320 px.
+- **Tests:** 10 new smoke checks in `tests/research.cjs` (81 total): unlock rules, ping = node-side ore count (62 cells, seed 77,
+  d 30), cooldown, fade + re-ping, save/load, format-5 upgrade, reduced motion in Surge, UI tab + F + reload, 320 px Research tab.
+  They fail on the old code (no `research.js`, format 5).
+- **Screenshot** (1280×800, DSF 1, `?dev` teleport 60): the ring and gold ● / ◆ / ▲ glyphs read clearly through the dark, minimap
+  blips visible. At 320×568 the Research tab and hint fit. Watch: ◎ reach on big phones (Debt).
