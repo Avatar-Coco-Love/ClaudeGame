@@ -4,27 +4,14 @@ Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessio
 Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
-- ✅ (#1) First playable: mining, cargo, deposit, Core Matrix, Drift/Surge, touch, autosave.
-- ✅ (#2) Pages deploy workflow.
-- ✅ (#3) Health tooling: `tests/smoke.cjs`, operating manual, roadmap. Fixed the demo world being saved over a real save.
-- ✅ (#4) Version tracking: VERSION + changelog, decisions log, doc cap test, save format upgrades (Gloamdeep inbox).
-- ✅ (#7) **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
-- ✅ (#8) **S-2 Touch-first hints + narrow screens:** fixes B-001 and B-002 and adds the 320×568 overflow smoke check (pulled forward from Tooling).
-- ✅ (#9) Design session 7: play-test, Q-006/Q-007 measured and decided, B-007 crash fixed, specs S-6 and S-7.
-- ✅ (#10) **S-6 Glitches give up when they make no progress:** they fade and free their slot so Surge keeps its pressure (D-017); Glitch Prism drop at 50 % (D-018).
-- ✅ (#11) Audit session 9: B-006 fixed, touch sticks released on blur, Drift/Surge income parity measured (D-019).
-- ✅ (#12) **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion, opened from the title (D-016, D-020).
-- ✅ (#13) **S-4 Feel pass:** deposit arpeggio, upgrade ring + pip flash, crystal/prism hitstop, beam sweep; fixed B-008 (D-021).
-- ✅ (#16) Audit session 14: fixed B-010, B-005, B-011 (floor pickups saved, D-026).
-- ✅ (#21) Audit session 19: fixed B-014 (off-screen pickups culled, D-032) and B-013 (dev teleport carved bedrock).
-- ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
-- ✅ (#6) Audit session 4: fixed B-003, B-004; rest logged under Debt.
+- ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
+  feel pass (S-4), Glitch give-up (S-6), and Design/Audit sessions 3, 4, 7, 9, 14, 19. Detail per PR in `05` and `09`.
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
 - ✅ (#17) **S-7 Dev panel** (`?dev` or backtick, `__lumen.dev.*`, D-027). Save/load test spots were left out (not in the spec); add when a bot needs them.
 - **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
-- **Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy mining. Budget 16.7 ms. Recheck the scene if numbers jump.
+- **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining. Budget p95 16.7 ms.
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
 ## M2 — A world worth exploring
@@ -36,7 +23,10 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
 - ✅ (#23) **S-11 Research v1:** a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal, 20 s cooldown) (D-034).
-- Beam modes: **Wide** (3-cell swath, slower), **Pulse** (charge, then burst). Switch modes with Q or a touch button.
+- ✅ (#24) Design session 22: Lumen → Scanner play-tested, Q-010 measured and settled (D-035), beam modes specced (D-036).
+- **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells glows like ore, in both modes.
+- **S-13 Beam modes v1 — Wide** (25●): a 3-cell swath, slower per cell; Q or a touch button switches. `SAVE_FORMAT` 7.
+- **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells. Then measure Q-011.
 
 ## M4 — Crafting & building
 - **Beacons:** placeable light sources that permanently light an area and show on the minimap.

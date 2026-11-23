@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 21** · **Version: v0.1.23** (session 21 was a Build; next is a Design)
+**Session counter: 22** · **Version: v0.1.24** (session 22 was a Design; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -24,12 +24,11 @@ _Last updated: 2026-11-23_
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs live in `07`; the queue is empty until the next Design session.
-- M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build specs live in `07`: S-12 (ping shows vault caches, D-035), S-13 Wide beam, S-14 Pulse beam (D-036), S-15 perf check.
+- M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
-- Mining down from the Nexus tunnels continuously and collects Shards.
-- Deposit moves all cargo into the bank, and buying Beam Power deducts 8◆.
+- Mining down from the Nexus tunnels and collects Shards; deposit banks all cargo; Beam Power costs 8◆.
 - Surge spawns Glitches away from the Nexus, and the beam kills them.
 - Reloading restores the mode, upgrades, bank, and mined terrain.
 - Touch sticks move the core and mine. No page errors.
@@ -51,9 +50,10 @@ _Last updated: 2026-11-23_
 - 400 off-screen pickups cost no draws (frame 1093 → 19 ms headless); dev teleport keeps the bedrock border (audit, session 19).
 - Lumen only at d ≥ 55 on 40 seeds; one cell banks 1●; a format-4 save loads with 0●; beads read at DSF 1 (session 20).
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21).
+- By the 10● Scanner, a Lumen-hunting bot has seen 8 % of vaults; at 60● 35 % (`tools/vaultfind.mjs`, session 22).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (22) is a **Design**: play-test the Lumen → Scanner loop, settle Q-010, spec S-12… (beam modes) in `07`.
+Next session (23) is a **Build**: S-12, the Scanner ping shows vault caches (spec in `07`).

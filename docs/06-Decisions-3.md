@@ -58,3 +58,22 @@ dropped while paused or under the Matrix. The ◎ button sits under the minimap,
 - Rejected: scan code in `game.js` (pushes it toward the 600-line split); a ring that follows the core (the snapshot would drift
   off its cells); queuing a press made under the Matrix (it would fire on close, unasked); re-scanning cells live each frame
   (cost per frame for no visible gain over 6 s); saving the live ping (D-030: no save state).
+
+### D-035 — The Scanner ping shows vault caches; nothing else points to vaults (2026-11-23, Design 22, answers Q-010)
+Measured with `tools/vaultfind.mjs` (40 seeds, a bot fanning out Lumen to Lumen, upgrades at 2): by the 10● that buys the Scanner,
+20 of 240 vaults (8 %) had been seen and half the runs had seen none; at 30● 19 %, at 60● (level 3) 35 %. Most vaults stay unfound,
+so they need a pointer, but a pointer that needs you nearby keeps the find. The ping is already the "look around here" tool, so a
+cache inside its 12 cells shows like ore (S-12). Equal in both modes; no save state.
+- Rejected: a faint minimap glint at every site from the start (gives away all six, no finding left); nothing at all (two-thirds
+  of a world's caches would go unopened); a separate "Vault Sense" research node (a second tool for one job; Lumen is scarce);
+  showing the whole vault shell (a 7×7 outline of glyphs reads as ore; the cache glyph alone is distinct).
+
+### D-036 — Beam modes are Research nodes; each trades something, none is stronger everywhere (2026-11-23, Design 22)
+Wide (25●, S-13) and Pulse (40●, S-14) are new *kinds* of beam, so they live in Research (pillar layers), paid in Lumen. Scanner +
+Wide + Pulse = 75● of ~141 per world, leaving room for later nodes. All modes scale from the Core Matrix Beam Power and Range
+stats (no stat is unlocked twice). Wide: ~1.35× cells/s but 2.2× slower per cell and 0.75× reach (halls, Drift comfort, crowds in
+Surge). Pulse: front-loaded burst, 1.5× reach, pierces 3 cells (reach ore behind rock, burst a Glitch), but no damage while charging.
+Focus stays best for a single tough cell. Q / `⟂` cycles; the chosen mode is saved (format 7). Q-011 checks for a dominant mode.
+- Rejected: modes as Core Matrix upgrades (Matrix is stats only; it would unlock kinds twice); a mode wheel UI (two or three modes
+  need one button); Pulse that also moves the core (movement is the Thrusters' job, and it reads as a dash); Wide as a cone
+  (uneven damage per cell is hard to read on a grid); a Surge-only mode (D-002).

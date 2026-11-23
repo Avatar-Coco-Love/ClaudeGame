@@ -1,27 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`.
-
-## 2026-11-23 — Session 16 (v0.1.18): Build — S-8 depth rings
-- **Built:** `RINGS` in `config.js` (Hearth < 24, Veil 24–48, Deep ≥ 48 cells; ×1 / ×1.4 / ×2 hp on ROCK + DENSE only).
-  `world.rings` (Uint8Array, by cell-centre distance), `ring()`, `hpAt()`, `look()`; chunk render, minimap, beam sparks and
-  break bursts use the ring palette. Toast "Entering the Veil/Deep" once per session; the beam hum drops 2 semitones per ring (D-028).
-- **Layout unchanged:** seed 77's solid bitset and full cell-type hashes equal the pre-S-8 values (pinned in smoke).
-- **Tests:** 4 new smoke checks (62 total): ring at d 10/30/60; Deep ROCK 111 vs Hearth 56 beam ticks (2×); layout/type hash;
-  toasts `Veil,Deep` over a 30→10→30→60→30→60 walk with pitch calls `0,1,0,1,2,1,2`. With only `src/` stashed they fail (`ring` missing).
-- **Screenshot** (1280×800, DSF 1, `teleport(46)`): the Veil–Deep border reads clearly (teal edges vs indigo/violet), toast centred,
-  the minimap shows the two bands. Watch: Veil teal rock sits closer to crystal cyan; gems still stand out by glyph and glow.
-- Not measured yet: Q-008 (Deep rock vs low Beam Power). Left for the Design session.
-
-## 2026-11-23 — Session 17 (v0.1.19): Design — rings play-test, Q-008, S-11
-- **Play-test (1280×800, DSF 1, `?dev`, Beam 2, `teleport(50)`, 20 s held S + beam):** mined 7 cells and drifted 28 cells out
-  through Deep caves to the world border; a Prism field in Deep palette reads well. At the border the core sits on a near-black
-  bedrock band and the beam shows no hit (logged in `04` Debt as a watch item, not a bug). No page errors.
-- **Q-008 → D-029:** new `tools/deeprun.mjs` (straight-line bot from the Nexus to the nearest would-be Lumen cell, 20 seeds).
-  First Lumen median/p90: Beam 0 53/94 s, Beam 2 29/74 s, Beam 4 22/48 s; ~9 s of Beam 2's trip is in the Deep.
-  Deep `hpMul` 2 → 1.4 saves 1–2 s at every Beam level, so ×2 stays.
-- **Lumen layout (40 seeds, S-10 rule):** 143● per world in ~36 blobs (median 2 cells, p90 9, largest ~18); ~46 Crystal/Prism
-  cells within 12 cells of a Lumen cell. Basis for S-11's Scanner (10●) and the ~70● Research budget (D-030). Q-009 opened.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`.
 
 ## 2026-11-23 — Session 18 (v0.1.20): Build — S-9 vaults
 - **Built:** `T.VAULT` (hp 6) + `T.CACHE` (hp 3), three 7×7 templates and `vaultSites(seed)` in `world.js` (seed-only, stream
@@ -65,3 +44,14 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   They fail on the old code (no `research.js`, format 5).
 - **Screenshot** (1280×800, DSF 1, `?dev` teleport 60): the ring and gold ● / ◆ / ▲ glyphs read clearly through the dark, minimap
   blips visible. At 320×568 the Research tab and hint fit. Watch: ◎ reach on big phones (Debt).
+
+## 2026-11-23 — Session 22 (v0.1.24): Design — Lumen → Scanner, Q-010, beam modes
+- **Play-test** (1280×800, DSF 1, `?dev`, +12●): Research tab buys the Scanner cleanly (12● → 2●); teleported 10 cells from the
+  nearest vault (d 52) and pinged: 26 ore marks read well, but the vault 10 cells off stayed a dim grey outline and the ping
+  ignored its cache. That is Q-010's gap in one picture.
+- **Measured** with new `tools/vaultfind.mjs` (bot breaks Lumen cells nearest-first, upgrades 2, 40 seeds): 10● in 70 s mean;
+  vaults seen by then 20/240 (runs with any: 19/40); at 30● 46/240; at 60● (level 3) 83/240 (35 %). Caches opened by accident: 0–3.
+- **Decided:** D-035 (ping shows caches, S-12; Q-010 closed), D-036 (Wide 25● and Pulse 40● as Research, each with a trade-off,
+  S-13/S-14). New Q-011 (dominant mode check after S-14). S-15 throttled perf check specced in Tooling.
+- **Docs:** 09 sessions 16–17 and changelog v0.1.1–v0.1.9 archived word for word; M1's done list in `04` folded into one line.
+
