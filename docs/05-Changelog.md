@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.28 — 2026-11-23 (#28)
+- New Research for 25●: **Wide Beam**. Press **Q** (or tap the new **⟂** button) to switch between Focus and Wide. Wide fires
+  three parallel beams that carve a hall three cells wide; each cell takes longer, and the reach is shorter. Your choice is saved.
+
 ## v0.1.27 — 2026-11-23 (#27)
 - The **Scanner** ping now also finds sealed **vault caches**: if one lies within its 12 cells, a white square-in-square glyph
   lights up where it is (and a white blip on the minimap) as the ring reaches it, with one soft chime. Opened caches don't show.

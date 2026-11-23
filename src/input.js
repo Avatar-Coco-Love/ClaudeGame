@@ -19,6 +19,7 @@ export class Input {
         if (k === 'escape') this.pressed.add('escape');
         if (k === 'm') this.pressed.add('mute');
         if (k === 'f') this.pressed.add('scan'); // S-11 Scanner ping (the game ignores it until unlocked)
+        if (k === 'q') this.pressed.add('beamMode'); // S-13 next beam mode (ignored until a second mode is unlocked)
       }
       this.keys.add(k);
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();

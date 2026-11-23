@@ -1,6 +1,7 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, RESOURCE, VERSION } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION } from './config.js';
 import { canResearch, buyResearch } from './research.js';
+import { unlockedModes } from './beam.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -104,7 +105,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady].join('|');
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -120,6 +121,8 @@ function updateHud() {
     $('matrix-btn').classList.toggle('hidden', !g.inNexus());
     $('scan-btn').classList.toggle('hidden', !g.research.scanner); // S-11: shown once unlocked, dim while cooling down
     $('scan-btn').classList.toggle('cooling', !scanReady);
+    $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
+    $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -130,6 +133,7 @@ function updateHud() {
     if (ev === 'deposited') { toast('Deposited'); persist(); }
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
     if (ev === 'cache') toast('Vault cache opened');
+    if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200);
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
   }
   g.events.length = 0;
@@ -162,6 +166,7 @@ function researchRow(r) {
     if (!buyResearch(g, r.id)) return;
     renderPanel(); persist();
     $('upgrade-list').querySelector(`[data-id="${r.id}"]`)?.classList.add('flash');
+    if (r.id === 'wide') toast(input.usingTouch ? 'Wide Beam online — tap ⟂ to switch' : 'Wide Beam online — press Q to switch', 3200);
     if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : 'Scanner online — press F to ping', 3200);
   });
   return row;
@@ -219,6 +224,7 @@ function renderPanel() {
 }
 $('matrix-btn').addEventListener('click', openPanel);
 $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
+$('mode-btn').addEventListener('click', () => input.pressed.add('beamMode'));
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -269,7 +275,8 @@ function frame(now) {
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     const scan = input.consume('scan'); // S-11: a press made while paused or under the Matrix is dropped, never queued
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : { ...input.read(sp), scan };
+    const beamMode = input.consume('beamMode'); // S-13: same rule as F
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : { ...input.read(sp), scan, beamMode };
     if (!paused) {
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));

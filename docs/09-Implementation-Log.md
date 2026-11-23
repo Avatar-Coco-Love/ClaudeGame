@@ -1,16 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`, sessions 19–20 in `archive/2026-11-23-09-sessions-19-20.md`.
-
-## 2026-11-23 — Session 21 (v0.1.23): Build
-- **S-11 Research v1** (D-034): `src/research.js` (buy, ping, fade), third Matrix tab with the Lumen hint at 0●, ◎ / F ping
-  (12 cells, 20 s cooldown, 6 s show, ring 600 px/s, 1200→600 Hz sweep), glyphs above the dark + minimap blips. `SAVE_FORMAT` 6
-  adds `research: {}`. Dev "Max all" unlocks research. Narrow Matrix header: three bank figures no longer wrap at 320 px.
-- **Tests:** 10 new smoke checks in `tests/research.cjs` (81 total): unlock rules, ping = node-side ore count (62 cells, seed 77,
-  d 30), cooldown, fade + re-ping, save/load, format-5 upgrade, reduced motion in Surge, UI tab + F + reload, 320 px Research tab.
-  They fail on the old code (no `research.js`, format 5).
-- **Screenshot** (1280×800, DSF 1, `?dev` teleport 60): the ring and gold ● / ◆ / ▲ glyphs read clearly through the dark, minimap
-  blips visible. At 320×568 the Research tab and hint fit. Watch: ◎ reach on big phones (Debt).
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`, sessions 19–20 in `archive/2026-11-23-09-sessions-19-20.md`, session 21 in `archive/2026-11-23-09-session-21.md`.
 
 ## 2026-11-23 — Session 22 (v0.1.24): Design — Lumen → Scanner, Q-010, beam modes
 - **Play-test** (1280×800, DSF 1, `?dev`, +12●): Research tab buys the Scanner cleanly (12● → 2●); teleported 10 cells from the
@@ -61,3 +51,15 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Screenshot** (1280×800, DSF 1, 7 cells from a vault, 0.9 s after F): the white square-in-square reads clearly over the vault.
 - **Docs:** 09 sessions 19–20 archived word for word (09 was at 8150 B of the 8192 cap).
 
+
+## 2026-11-23 — Session 26 (v0.1.28): Build — S-13 Wide beam
+- **Built** (D-041): `src/beam.js` (`castBeam`, `unlockedModes`, `cycleBeamMode`, `validMode`) replaces `Game.updateBeamHit`;
+  `BEAM_MODES` + `WIDE_*` in config; Research node `wide` 25●; Q / ⟂ button (hidden until a 2nd mode), toast "Focus"/"Wide",
+  `modeSwitch()` click 520 Hz 0.06 s (offline, vol 70: peak −33.7 dBFS, 0 % > 4 kHz; quieter than scanCache −32.4). Render: 3 rays
+  at 0.6× width + an emitter bar, a crack per cell, a 48 px darkness hole per ray end. `SAVE_FORMAT` 7 (`beamMode`).
+- **Tests:** `tests/beam.cjs`, 6 checks (92 total): flat DENSE wall 1 s → Focus [0,0,1,0,0], Wide [0,.45,.45,.45,0]; two rays
+  on one cell at 45° → 0.45 not 0.9 (with the dedupe removed it reads 0.9: fails); Glitch 0.45×1.6; unlock at 25● + Q cycle;
+  reload / format-6 / un-unlocked mode → Focus; browser Q, ⟂, dropped under the Matrix. With `src/` stashed the module fails to load.
+- **Screenshot** (1280×800, DSF 1, Wide down from the Nexus): a clean 3-cell hall, three beams read as one tool, ⟂ under ◎.
+- Deploy note: PR #27's Pages deploy failed twice on GitHub's side ("Fetching artifact metadata failed"); a fresh manual run on
+  `main` succeeded, so v0.1.27 went live. On such a failure trigger a new run of `pages.yml` on `main`, not a re-run.

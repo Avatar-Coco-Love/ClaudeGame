@@ -114,6 +114,7 @@ export class Audio {
   scan() { this.tone(1200, 0.3, { type: 'sine', vol: 0.14, slide: -600 }); } // S-11 Scanner sweep 1200 -> 600 Hz
   scanCache() { this.tone(784, 0.16, { type: 'sine', vol: 0.07 }); } // S-12: the cache chord's top note, short, when the ping finds one
   // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.
+  modeSwitch() { this.tone(520, 0.06, { type: 'sine', vol: 0.06 }); } // S-13: a short soft click when Q / ⟂ changes the beam
   hurt() { this.tone(160, 0.25, { type: 'triangle', vol: 0.16, slide: -90 }); }
   enemyDie() { this.tone(420, 0.2, { type: 'triangle', vol: 0.11, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }

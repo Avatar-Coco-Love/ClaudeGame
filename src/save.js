@@ -6,7 +6,7 @@
 import { vaultSites, unpackBits } from './world.js';
 import { WORLD_W, WORLD_H } from './config.js';
 
-export const SAVE_FORMAT = 6;
+export const SAVE_FORMAT = 7;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 const STEPS = [
@@ -15,6 +15,7 @@ const STEPS = [
   s => ({ ...s, vaultSkip: seenVaults(s) }), // 3 -> 4: vaults (S-9) never appear where this save has already looked (D-023)
   s => ({ ...s, bank: { ...s.bank, lumen: 0 }, cargo: { ...s.cargo, lumen: 0 } }), // 4 -> 5: Lumen (S-10)
   s => ({ ...s, research: {} }),           // 5 -> 6: Research (S-11)
+  s => ({ ...s, beamMode: 'focus' }),      // 6 -> 7: beam modes (S-13)
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.
