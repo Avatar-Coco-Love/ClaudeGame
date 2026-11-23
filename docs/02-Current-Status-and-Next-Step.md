@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 23** · **Version: v0.1.25** (session 23 was an Inbox; 24 % 5 == 4, so next is an Audit)
+**Session counter: 24** · **Version: v0.1.26** (session 24 was an Audit; 25 % 5 == 0, so next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -19,7 +19,7 @@ _Last updated: 2026-11-23_
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore within 12 cells for 6 s, 20 s cooldown.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
-  −42 → −57 dBFS by `tests/audio.cjs`; recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
+  −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups) every 10 s, on deposit, and on page hide. Saves carry a format number (now 6); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
@@ -40,8 +40,7 @@ _Last updated: 2026-11-23_
 - A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
 - The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
 - Shake off stays 0 through a Glitch kill and a hit; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
-- Hitstop freezes the sim only on crystal/prism, rate-limited; reduced motion drops hitstop + ring; no hint under the Matrix (session 11).
-- Real-time play: 32 crystal breaks → 32 hitstops in 60 s, none on rock; a room 62 cells out looks like the start (session 12).
+- Hitstop only on crystal/prism, rate-limited (32 breaks → 32 in 60 s); reduced motion drops it + ring (sessions 11–12).
 - Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
 - `dev.teleport(60)` lands 1936 px out in an open room; no panel without `?dev`; god mode is never saved (session 15).
@@ -51,9 +50,10 @@ _Last updated: 2026-11-23_
 - 400 off-screen pickups cost no draws (frame 1093 → 19 ms headless); dev teleport keeps the bedrock border (audit, session 19).
 - Lumen only at d ≥ 55 on 40 seeds; one cell banks 1●; a format-4 save loads with 0●; beads read at DSF 1 (session 20).
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21).
+- Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Next session (24) is an **Audit** (counter % 5 == 4; archive `09` entries before session 19's audit). S-12 (vault caches on ping) follows in 25.
+Next session (25) is a **Build**: S-12 in `07`, the Scanner ping also marks vault caches (D-035).

@@ -24,3 +24,11 @@ The hum is a low-passed triangle (2× the ring pitch, 700 Hz cut, no vibrato) th
 gain 0.004, or 0.007 while the beam touches a cell or Glitch (`BEAM_HUM` in `config.js`). The S-4 switch-on sweep stays.
 - Rejected: no hum at all (the beam loses its "on" cue between break sounds); keeping the sawtooth and only turning it down
   (its buzz is what the 2 kHz measure flags); a noise-based crackle per hit (busier, and the break sounds already mark progress).
+
+### D-039 — Sounds that repeat fade; no square waves (2026-11-23, audit 24, B-017/B-018; refines D-021's tick)
+A deposit run's ticks each play at 0.8× the last and stop below gain 0.015 (~10 ticks, ~0.7 s), at most one per 70 ms; a gap of
+0.3 s starts a new run. The bank still counts up per unit and the closing arpeggio still plays. Hurt and Glitch death use
+triangles. `tests/audio.cjs` holds every one-shot to peak ≤ −20 dBFS, < 1 % energy above 4 kHz, ≤ 0.5 s above −45 dBFS.
+- Rejected: dropping the tick entirely (a small deposit loses its feedback); a fixed cap of N ticks at full level (ends abruptly
+  mid-stream); low-pass filters on every tone (more nodes per sound; a triangle already removes the buzz); one tick per resource
+  kind (the bank's count-up already shows that, D-021).

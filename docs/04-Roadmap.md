@@ -59,6 +59,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 
 ## Debt
 - ✅ **B-016** (#25): the beam hum was a loud sawtooth drone with a 13 Hz wobble (owner play-test); now a soft bed (D-038).
+- ✅ **B-017, B-018** (#26, audit 24): a full-hold deposit beeped for 4.4 s; hurt and Glitch death were buzzy square waves (D-039).
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
