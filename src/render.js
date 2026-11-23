@@ -451,9 +451,15 @@ export class Renderer {
     for (const m of sc.marks) {
       const a = markAlpha(this.game, m);
       if (a <= 0) continue;
+      const cx = (m.x + 0.5) * CELL, cy = (m.y + 0.5) * CELL;
+      if (m.type === T.CACHE) { // S-12: the cache glyph (square in square, upright), white, 1.3x the ore glyph
+        ctx.globalAlpha = a; ctx.strokeStyle = ctx.fillStyle = ctx.shadowColor = '#ffffff'; ctx.lineWidth = 2.5;
+        ctx.strokeRect(cx - 12, cy - 12, 24, 24); ctx.fillRect(cx - 5, cy - 5, 10, 10);
+        continue;
+      }
       const k = SCAN_KIND[m.type];
       ctx.globalAlpha = a; ctx.fillStyle = k.color; ctx.shadowColor = k.color;
-      ctx.fillText(k.glyph, (m.x + 0.5) * CELL, (m.y + 0.5) * CELL);
+      ctx.fillText(k.glyph, cx, cy);
     }
     ctx.restore();
   }
@@ -511,8 +517,9 @@ export class Renderer {
     for (const q of g.scan.marks) { // S-11 ping blips, same lifetime as the glyphs
       const a = markAlpha(g, q);
       if (a <= 0) continue;
-      m.globalAlpha = a; m.fillStyle = SCAN_KIND[q.type].color;
-      m.fillRect((q.x + 0.5) * CELL * sc - 1.5, (q.y + 0.5) * CELL * sc - 1.5, 3, 3);
+      const r = q.type === T.CACHE ? 2.25 : 1.5; // S-12: a cache blip is white and 1.5x an ore blip
+      m.globalAlpha = a; m.fillStyle = q.type === T.CACHE ? '#ffffff' : SCAN_KIND[q.type].color;
+      m.fillRect((q.x + 0.5) * CELL * sc - r, (q.y + 0.5) * CELL * sc - r, r * 2, r * 2);
     }
     m.globalAlpha = 1;
     m.fillStyle = '#ffd23d';

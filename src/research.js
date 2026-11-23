@@ -2,10 +2,10 @@
 // The ping is intent -> realized like movement: `intent.scan` asks, `tryScan` realizes it only if unlocked and off cooldown.
 import { CELL, T, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
 
-export const SCAN_TYPES = new Set([T.CRYSTAL, T.PRISM, T.LUMEN]);
+export const SCAN_TYPES = new Set([T.CRYSTAL, T.PRISM, T.LUMEN, T.CACHE]); // S-12 (D-035): vault caches show like ore
 
-/** Ore cells (CRYSTAL / PRISM / LUMEN) whose centre lies within SCAN_RADIUS cells of (px, py). Pure: tests reuse it. */
-export function oreWithin(world, px, py, radius = SCAN_RADIUS) {
+/** Ore + unopened vault-cache cells whose centre lies within SCAN_RADIUS cells of (px, py). Pure: tests reuse it. */
+export function scanWithin(world, px, py, radius = SCAN_RADIUS) {
   const out = [], R = radius * CELL;
   const x0 = Math.max(0, Math.floor((px - R) / CELL)), x1 = Math.min(world.w - 1, Math.floor((px + R) / CELL));
   const y0 = Math.max(0, Math.floor((py - R) / CELL)), y1 = Math.min(world.h - 1, Math.floor((py + R) / CELL));
@@ -17,6 +17,7 @@ export function oreWithin(world, px, py, radius = SCAN_RADIUS) {
   }
   return out;
 }
+export const oreWithin = scanWithin; // pre-S-12 name, kept for tests and tools
 
 export function researchNode(id) { return RESEARCH.find(r => r.id === id); }
 export function canResearch(game, id) {
@@ -37,7 +38,7 @@ export function buyResearch(game, id) {
 export function tryScan(game) {
   if (!game.research.scanner || game.scan.cooldown > 0) return false;
   const p = game.player, instant = !game.motionOn(); // reduced motion: no ring, every glyph at once
-  const marks = oreWithin(game.world, p.x, p.y).map(m => ({ ...m, at: instant ? 0 : m.d / SCAN_SPEED }));
+  const marks = scanWithin(game.world, p.x, p.y).map(m => ({ ...m, at: instant ? 0 : m.d / SCAN_SPEED }));
   game.scan = { cooldown: SCAN_COOLDOWN_S, age: 0, x: p.x, y: p.y, ring: !instant, marks,
     end: Math.max(0, ...marks.map(m => m.at)) + SCAN_SHOW_S };
   game.audio.scan();
@@ -48,7 +49,10 @@ export function updateScan(game, dt) {
   const s = game.scan;
   s.cooldown = Math.max(0, s.cooldown - dt);
   if (!s.marks.length) return;
+  const was = s.age;
   s.age += dt;
+  // S-12: one soft tone the moment the ring reaches an unopened cache (game time, so pause and hitstop hold it too).
+  for (const m of s.marks) if (m.type === T.CACHE && m.at >= was && m.at < s.age && markAlpha(game, m) > 0) game.audio.scanCache();
   if (s.age >= s.end) s.marks = [];
 }
 

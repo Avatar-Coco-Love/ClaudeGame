@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.27 — 2026-11-23 (#27)
+- The **Scanner** ping now also finds sealed **vault caches**: if one lies within its 12 cells, a white square-in-square glyph
+  lights up where it is (and a white blip on the minimap) as the ring reaches it, with one soft chime. Opened caches don't show.
+
 ## v0.1.26 — 2026-11-23 (#26)
 - Depositing a full hold no longer beeps for five seconds: the ticks fade out after the first few, then the closing chime plays.
 - Taking a hit and destroying a Glitch sound softer and rounder (no more buzz). Every sound was measured; the rest stay as they are.

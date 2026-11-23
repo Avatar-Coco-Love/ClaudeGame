@@ -1,28 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`.
-
-## 2026-11-23 — Session 19 (v0.1.21): Audit
-- **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
-- **B-014 (new) → fixed (perf):** every floor pickup was drawn with `shadowBlur` wherever it lay, and the floor is saved (B-011), so
-  loot left across the map taxed every frame. Headless 1280×800, DSF 1: 400 pickups 3000 px off screen took a frame from 17 ms to
-  1093 ms (SwiftShader, software GL; same cost as on screen). Now culled to the view + 16 px: 19 ms. On-screen loot still glows (D-032).
-- **B-013 (new) → fixed (dev only):** `dev.teleport` clamped the 3×3 room to x ≥ 2, so `teleport(90)` carved 3 cells of the inner
-  bedrock ring (seed 77). Clamp is now 2 + room. Not fixed: a teleport whose room hits a vault cache removes it with no loot (Debt).
-- **Tests:** 1 new smoke check (67 total): `teleport(90)` loses no bedrock and 400 off-screen pickups add no `fill` calls. With
-  `src/` stashed it fails (`bedLost 3, offFills 403`). **Screenshot** (800×500, DSF 1): 30 burst pickups by the core still draw and glow.
-- **Mobile / code health:** nothing new; 320 px overflow checks pass. Largest files `game.js` 500, `render.js` 480 lines (under 600).
-- **D-check:** D-026…D-031 match the code (spot-read); `dev.js` cited D-026 for itself, now D-027. Glitch-in-vault stays a watch item.
-- **Docs:** sessions 14–15 of this log archived word for word to `archive/2026-11-23-09-sessions-14-15.md`.
-
-## 2026-11-23 — Session 20 (v0.1.22): Build
-- **S-10 Lumen ore** (D-033): `T.LUMEN` re-types ROCK/DENSE at d ≥ 55 (noise salt `0x27d4eb2f`, cut 0.80). 40 seeds: mean 141.2
-  cells (85–225), nearest d 55.01. Gold bead + halo glyph, gold minimap dot, round pickup, higher break/pickup tones, ● in HUD
-  and Matrix bank after the first pickup. `SAVE_FORMAT` 5 (bank/cargo `lumen: 0`); pickups save a `KINDS` index. Dev `+20●`.
-- **Tests:** 4 new smoke checks (71 total): d ≥ 55 on 40 seeds; one cell → 1● banked via pickup + deposit, ~70 hits of 0.05 (not
-  ring-scaled); bank + floor ● survive reload; a format-4 save loads with 0●. The S-8 hash now checks layout + types with DENSE/LUMEN
-  folded into ROCK (same value as before S-10) and pins the full type hash. With `src/` stashed they fail.
-- **Screenshot** (960×600, DSF 1, a 19-cell blob at d ≈ 64): gold beads read clearly apart from ◆ / ▲ and from Deep rock.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`, sessions 19–20 in `archive/2026-11-23-09-sessions-19-20.md`.
 
 ## 2026-11-23 — Session 21 (v0.1.23): Build
 - **S-11 Research v1** (D-034): `src/research.js` (buy, ping, fade), third Matrix tab with the Lumen hint at 0●, ◎ / F ping
@@ -71,4 +49,15 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Other dimensions (no subagents available, done briefly):** docs vs code — `SAVE_FORMAT` 6, `BEAM_HUM` (D-038), hitstop (D-021),
   Glitch give-up (D-017) and Research (D-034) match; D-021's per-unit tick is now refined by D-039. Perf / 320 px / touch: smoke
   checks pass, no new findings; the open Debt watches stand. Session 18 of this log archived word for word.
+
+## 2026-11-23 — Session 25 (v0.1.27): Build — S-12 ping shows vault caches
+- **Built:** `scanWithin` (old name `oreWithin` kept as an alias) also returns `T.CACHE`; same ring timing, 6 s fade, hidden once
+  opened. Drawn as the cache glyph in white at 1.3× (24 px) above the dark, white minimap blip 1.5× (4.5 px). Research desc now
+  says "ore and vault caches". Nothing saved or explored; no cost change.
+- **Sound** (D-040): `scanCache()` 784 Hz sine 0.16 s, played by game time when the ring reaches an unopened cache. Measured
+  offline (vol 70): peak −32.4 dBFS, energy 0.16 vs the ping's 1.10 and the cache chord's 2.21, 0.02 % above 2 kHz.
+- **Tests:** 1 new node check (ping 10 cells from seed 77's first vault: 1 cache mark, visible, 1 tone; 14 cells: none; opened:
+  none) + `scanCache()` joins the one-shot ceilings (86 total). With `src/` stashed the new check fails (near 0).
+- **Screenshot** (1280×800, DSF 1, 7 cells from a vault, 0.9 s after F): the white square-in-square reads clearly over the vault.
+- **Docs:** 09 sessions 19–20 archived word for word (09 was at 8150 B of the 8192 cap).
 

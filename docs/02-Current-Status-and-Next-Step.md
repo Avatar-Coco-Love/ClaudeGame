@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 24** · **Version: v0.1.26** (session 24 was an Audit; 25 % 5 == 0, so next is a Build)
+**Session counter: 25** · **Version: v0.1.27** (session 25 was a Build; 26 % 5 == 1, so next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -16,7 +16,7 @@ _Last updated: 2026-11-23_
 - Settings on the title (S-3): volume, mute, screen shake, reduced motion; stored in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on crystal/prism breaks, beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
-- Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore within 12 cells for 6 s, 20 s cooldown.
+- Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -25,7 +25,7 @@ _Last updated: 2026-11-23_
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs live in `07`: S-12 (ping shows vault caches, D-035), S-13 Wide beam, S-14 Pulse beam (D-036), S-15 perf check.
+- Build specs live in `07`: S-13 Wide beam, S-14 Pulse beam (D-036), S-15 perf check.
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -47,13 +47,13 @@ _Last updated: 2026-11-23_
 - Deep rock takes 2× Hearth's beam time; seed 77's layout + types are unchanged by rings; Veil–Deep border reads at DSF 1 (session 16).
 - A Deep Prism field reads at DSF 1; the Deep's ×2 rock adds only ~2 s to the first-Lumen trip, kept (D-029, session 17).
 - 6 vaults on 40/40 seeds; a cache gives 20◆ + 6▲ and stays open; a format-3 save keeps its tunnels and skips seen vaults (session 18).
-- 400 off-screen pickups cost no draws (frame 1093 → 19 ms headless); dev teleport keeps the bedrock border (audit, session 19).
-- Lumen only at d ≥ 55 on 40 seeds; one cell banks 1●; a format-4 save loads with 0●; beads read at DSF 1 (session 20).
-- Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21).
+- 400 off-screen pickups cost no draws; teleport keeps the border (audit 19). Lumen only at d ≥ 55; format-4 saves load with 0● (20).
+- Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
+  also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Next session (25) is a **Build**: S-12 in `07`, the Scanner ping also marks vault caches (D-035).
+Next session (26) is a **Build**: S-13 in `07`, the Wide beam mode (25●, Q to switch, D-036).
