@@ -46,3 +46,12 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Mobile / code health:** nothing new; 320 px overflow checks pass. Largest files `game.js` 500, `render.js` 480 lines (under 600).
 - **D-check:** D-026…D-031 match the code (spot-read); `dev.js` cited D-026 for itself, now D-027. Glitch-in-vault stays a watch item.
 - **Docs:** sessions 14–15 of this log archived word for word to `archive/2026-11-23-09-sessions-14-15.md`.
+
+## 2026-11-23 — Session 20 (v0.1.22): Build
+- **S-10 Lumen ore** (D-033): `T.LUMEN` re-types ROCK/DENSE at d ≥ 55 (noise salt `0x27d4eb2f`, cut 0.80). 40 seeds: mean 141.2
+  cells (85–225), nearest d 55.01. Gold bead + halo glyph, gold minimap dot, round pickup, higher break/pickup tones, ● in HUD
+  and Matrix bank after the first pickup. `SAVE_FORMAT` 5 (bank/cargo `lumen: 0`); pickups save a `KINDS` index. Dev `+20●`.
+- **Tests:** 4 new smoke checks (71 total): d ≥ 55 on 40 seeds; one cell → 1● banked via pickup + deposit, ~70 hits of 0.05 (not
+  ring-scaled); bank + floor ● survive reload; a format-4 save loads with 0●. The S-8 hash now checks layout + types with DENSE/LUMEN
+  folded into ROCK (same value as before S-10) and pins the full type hash. With `src/` stashed they fail.
+- **Screenshot** (960×600, DSF 1, a 19-cell blob at d ≈ 64): gold beads read clearly apart from ◆ / ▲ and from Deep rock.

@@ -43,7 +43,7 @@ function showTitle() {
   $('continue').classList.toggle('hidden', !save);
   if (save) {
     $('continue').querySelector('small').textContent =
-      `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph} banked`;
+      `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph}${save.bank.lumen ? ` ${save.bank.lumen}${RESOURCE.lumen.glyph}` : ''} banked`;
   }
   selectMode(save?.mode || 'drift');
 }
@@ -101,11 +101,14 @@ let lastHud = '';
 function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
-  const key = [g.bank.shard, g.bank.prism, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen].join('|');
+  const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
     $('bank-prism').textContent = g.bank.prism;
+    $('bank-lumen').textContent = g.bank.lumen;
+    $('bank-lumen').parentElement.classList.toggle('hidden', !lumenSeen);
     $('cargo-text').textContent = `${total}/${cap}`;
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
     $('cargo-fill').classList.toggle('full', total >= cap);
@@ -168,7 +171,8 @@ function renderPanel() {
     const on = b.dataset.tab === panelTab;
     b.classList.toggle('selected', on); b.setAttribute('aria-selected', on);
   });
-  $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>`;
+  $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>` +
+    (g.stats.lumen > 0 || g.bank.lumen > 0 ? `<span class="lumen">${RESOURCE.lumen.glyph} ${g.bank.lumen}</span>` : '');
   const list = $('upgrade-list');
   list.innerHTML = '';
   if (panelTab === 'nexus') {

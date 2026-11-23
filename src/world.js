@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS, VAULT_COUNT, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
+import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_COUNT, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -117,6 +117,7 @@ export class World {
     const hard = makeNoise(this.seed ^ 0x9e3779b9);
     const ore = makeNoise(this.seed ^ 0x85ebca6b);
     const ore2 = makeNoise(this.seed ^ 0xc2b2ae35);
+    const lumen = makeNoise(this.seed ^ LUMEN_SALT); // S-10: its own noise, so Lumen never shifts crystal/prism placement
     for (let y = 0; y < this.h; y++) {
       for (let x = 0; x < this.w; x++) {
         const i = y * this.w + x;
@@ -134,6 +135,7 @@ export class World {
         const crystalCut = d < 22 ? 0.64 : 0.7;
         if (o > crystalCut) type = T.CRYSTAL;
         if (d > 32 && ore2(x / 5, y / 5) > 0.76 - Math.min(0.06, (d - 32) / 600)) type = T.PRISM;
+        if ((type === T.ROCK || type === T.DENSE) && d >= LUMEN_D && lumen(x / 5, y / 5) > LUMEN_CUT) type = T.LUMEN;
         this.cells[i] = type;
       }
     }

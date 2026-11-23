@@ -42,3 +42,10 @@ Anything drawn per object with `shadowBlur` (pickups now) is skipped outside the
 lie anywhere on the map, so its draw cost must follow what is on screen, not what exists. Smoke counts `fill` calls to keep it so.
 - Rejected: dropping pickup glow (pillar 1 look; on-screen cost is not the problem measured); a lower `PICKUP_CAP` (would eat saved
   loot, against B-005/B-011); a pre-rendered glow sprite (bigger change, unmeasured on a real device; Tooling perf check first).
+
+### D-033 — Lumen as built (2026-11-23, Build 20, S-10; D-023, D-024)
+Lumen is the last re-type in `generate()`, on ROCK/DENSE only, from its own noise (`seed ^ LUMEN_SALT`), so the layout, crystal and
+prism cells are unchanged (smoke hashes this). hp 3.5 is fixed: rings scale only ROCK/DENSE. Save format 5 adds `lumen: 0` to bank
+and cargo; floor pickups store a kind index (`KINDS`), so 0/1 from older saves still mean ◆/▲. "Held one" = `stats.lumen` > 0.
+- Rejected: Lumen also replacing crystal/prism cells (would shrink M1's economy basis); ring-scaled Lumen hp (7 in the Deep made a
+  bead cost more beam time than a vault wall); a separate `seenLumen` save flag (stats already persists; one less shape change).

@@ -11,6 +11,7 @@ export function createDev(ui) {
   const dev = {
     addShards(n = 100) { g().bank.shard += n; ui.persist(); },
     addPrisms(n = 50) { g().bank.prism += n; ui.persist(); },
+    addLumen(n = 20) { g().bank.lumen += n; ui.persist(); },
     /** Teleport `cells` out from the Nexus (straight down by default), carving a 3×3 room with no yield. */
     teleport(cells, angle = Math.PI / 2) {
       const game = g(), w = game.world;
@@ -39,7 +40,7 @@ export function createDev(ui) {
 
   let panel = null;
   const buttons = [
-    ['+100◆', () => dev.addShards()], ['+50▲', () => dev.addPrisms()],
+    ['+100◆', () => dev.addShards()], ['+50▲', () => dev.addPrisms()], ['+20●', () => dev.addLumen()],
     ['Ring 0', () => dev.teleport(0)], ['Ring 30', () => dev.teleport(30)], ['Ring 60', () => dev.teleport(60)],
     ['God', () => dev.god()], ['Drift/Surge', () => dev.setMode()], ['Max all', () => dev.maxAll()],
   ];

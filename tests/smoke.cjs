@@ -64,10 +64,15 @@ async function ringChecks() {
   const [hx, hy] = rockAt(10, 20), [dx, dy] = rockAt(55, 70);
   const th = beamTime(hx, hy), td = beamTime(dx, dy);
   check('Deep ROCK takes 2× the beam time of Hearth ROCK (S-8)', Math.abs(td / th - 2) < 0.03, `${th} vs ${td} ticks`);
-  // Base generator with every vault skipped (S-9 stamps on top; vaultChecks covers that). Hashes of seed 77 as generated before S-8 (empty/solid bitset, then full cell types): rings must only recolour (D-023).
-  const g0 = new World(77, [0, 1, 2, 3, 4, 5]); let lay = 0x811c9dc5, typ = 0x811c9dc5;
-  for (let i = 0; i < g0.cells.length; i++) { lay = Math.imul(lay ^ (g0.cells[i] ? 1 : 0), 0x01000193) >>> 0; typ = Math.imul(typ ^ g0.cells[i], 0x01000193) >>> 0; }
-  check('seed 77 layout + cell types identical to pre-ring generation (S-8, D-023)', lay === 2394919557 && typ === 3824047980, `${lay} / ${typ}`);
+  // Base generator with every vault skipped (S-9 stamps on top; vaultChecks covers that). Hashes of seed 77 (D-023):
+  // `lay` = empty/solid bitset as generated before S-8; `ore` = cell types with DENSE and LUMEN folded into ROCK, as generated
+  // before S-10 (so Lumen only re-typed plain rock); `typ` = full cell types, pinned at S-10 (3824047980 before it).
+  const g0 = new World(77, [0, 1, 2, 3, 4, 5]); let lay = 0x811c9dc5, typ = 0x811c9dc5, ore = 0x811c9dc5;
+  for (let i = 0; i < g0.cells.length; i++) { const c = g0.cells[i];
+    lay = Math.imul(lay ^ (c ? 1 : 0), 0x01000193) >>> 0; typ = Math.imul(typ ^ c, 0x01000193) >>> 0;
+    ore = Math.imul(ore ^ (c === 2 || c === 8 ? 1 : c), 0x01000193) >>> 0; }
+  check('seed 77 layout + ore unchanged by rings and Lumen; types pinned (S-8, S-10, D-023)', lay === 2394919557 && ore === 3976025408 && typ === 307018507,
+    `${lay} / ${ore} / ${typ}`);
   const pitches = [];
   const audio = new Proxy({}, { get: (_, k) => k === 'setRing' ? r => pitches.push(r) : () => {} });
   const g = new Game({ seed: 77, mode: 'drift', audio });
@@ -108,10 +113,47 @@ async function vaultChecks() {
   Object.assign(old, { v: 3, explored: packBits(ex), broken: packBits(br) }); delete old.vaultSkip;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   const vs = sites[4];
-  check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === 4 && up.vaultSkip.join() === '2,4'
+  check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === 5 && up.vaultSkip.join() === '2,4'
     && o.world.vaults.length === 4 && tunnel.every(c => o.world.cells[c] === T.EMPTY) && o.world.get(vs.x, vs.y) !== T.CACHE
     && JSON.stringify(o.toSave().vaultSkip) === '[2,4]', `skip ${up.vaultSkip}, ${o.world.vaults.length} vaults`);
   check('a new world saves vaultSkip: [] (S-9)', JSON.stringify(new Game({ seed: 5, mode: 'drift', audio }).toSave().vaultSkip) === '[]');
+}
+
+// S-10 Lumen: Deep only (d >= 55) on 40 seeds; one Lumen cell banks exactly 1● through pickup + deposit; a floor ● and the
+// bank survive save + load; a format-4 save (no lumen anywhere) loads with bank.lumen = 0 and its prism pickups intact.
+async function lumenChecks() {
+  const { World } = await import('../src/world.js');
+  const { Game } = await import('../src/game.js');
+  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { T, LUMEN_D } = await import('../src/config.js');
+  const audio = new Proxy({}, { get: () => () => {} });
+  let total = 0, minD = Infinity, empty = 0;
+  for (let k = 1; k <= 40; k++) {
+    const w = new World(k * 7919); let n = 0;
+    for (let y = 0; y < w.h; y++) for (let x = 0; x < w.w; x++) if (w.cells[y * w.w + x] === T.LUMEN) { n++; minD = Math.min(minD, Math.hypot(x + 0.5 - w.cx, y + 0.5 - w.cy)); }
+    total += n; if (!n) empty++;
+  }
+  check('Lumen only at d ≥ 55, ~141 cells per world on 40 seeds (S-10)', minD >= LUMEN_D && empty === 0 && total / 40 > 120 && total / 40 < 160,
+    `mean ${(total / 40).toFixed(1)}, nearest d ${minD.toFixed(2)}, ${empty} worlds without`);
+  const g = new Game({ seed: 77, mode: 'drift', audio }), w = g.world;
+  let cell = null; for (let i = 0; i < w.cells.length && !cell; i++) if (w.cells[i] === T.LUMEN) cell = [i % w.w, Math.floor(i / w.w)];
+  let ticks = 0; while (!(w.hit(cell[0], cell[1], 0.05) || {}).broken) ticks++;
+  g.onCellBroken(cell[0], cell[1], T.LUMEN);
+  const drops = g.pickups.filter(q => q.kind === 'lumen');
+  for (const q of g.pickups) { q.x = g.player.x; q.y = g.player.y; q.vx = q.vy = 0; }
+  for (let i = 0; i < 90; i++) g.update(1 / 60, { move: { x: 0, y: 0 } });
+  check('mining one Lumen cell banks exactly 1●; hp 3.5, not ring-scaled (S-10)', drops.length === 1 && g.bank.lumen === 1 && g.cargo.lumen === 0 && g.stats.lumen === 1
+    && ticks >= 68 && ticks <= 71, `${drops.length} dropped, bank ${g.bank.lumen}, ${ticks + 1} hits of 0.05`);
+  g.spawnPickup(g.nexus.x + 400, g.nexus.y, 'lumen', true);
+  const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
+  check('banked ● and a floor ● survive save + load (S-10)', h.bank.lumen === 1 && h.stats.lumen === 1 && h.pickups.filter(q => q.kind === 'lumen').length === 1,
+    `bank ${h.bank.lumen}, floor ${h.pickups.map(q => q.kind).join()}`);
+  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
+  Object.assign(old, { v: 4, bank: { shard: 5, prism: 2 }, cargo: { shard: 1, prism: 0 }, pickups: [[1, 3000, 3000], [0, 3010, 3000]] });
+  delete old.stats.lumen;
+  const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
+  check('a format-4 save loads with bank.lumen = 0 and its pickups intact (S-10)', SAVE_FORMAT === 5 && up.v === 5 && o.bank.lumen === 0 && o.cargo.lumen === 0
+    && o.bank.shard === 5 && o.stats.lumen === 0 && o.pickups.map(q => q.kind).join() === 'prism,shard', JSON.stringify(o.bank));
 }
 
 async function rngChecks() {
@@ -144,6 +186,7 @@ async function rngChecks() {
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
   await ringChecks().catch(e => check('S-8 ring checks ran', false, e.message));
   await vaultChecks().catch(e => check('S-9 vault checks ran', false, e.message));
+  await lumenChecks().catch(e => check('S-10 Lumen checks ran', false, e.message));
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;

@@ -62,11 +62,11 @@ export class Audio {
     }
   }
   break(kind) {
-    const base = kind === 'prism' ? 880 : kind === 'shard' ? 660 : 220;
+    const base = kind === 'lumen' ? 1047 : kind === 'prism' ? 880 : kind === 'shard' ? 660 : 220;
     this.tone(base, 0.12, { type: 'triangle', vol: 0.18, slide: -base * 0.4, throttle: 0.04, key: 'break' });
   }
   pickup(kind) {
-    this.tone(kind === 'prism' ? 1320 : 990, 0.07, { type: 'sine', vol: 0.12, throttle: 0.03, key: 'pickup' });
+    this.tone(kind === 'lumen' ? 1568 : kind === 'prism' ? 1320 : 990, 0.07, { type: 'sine', vol: 0.12, throttle: 0.03, key: 'pickup' });
   }
   deposit(i) {
     const notes = [523, 659, 784, 1047];

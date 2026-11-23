@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.22 — 2026-11-23 (#22)
+- Gold **Lumen ●** now glints in the Deep, 55+ cells from the Nexus: round beads with a halo, tougher than Prisms, one Lumen each.
+  Carry it home like Shards. A gold ● joins your bank once you have held one. Nothing spends it yet: Research comes next.
+- Old saves keep everything; ground you already explored out there may now show a few gold cells.
+
 ## v0.1.21 — 2026-11-23 (#21)
 - Smoother frames when lots of loot lies around the map: Shards and Prisms far off screen no longer cost drawing time.
 - Dev tools only: teleporting to the world's edge no longer cuts into the bedrock border.

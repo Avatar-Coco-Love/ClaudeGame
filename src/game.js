@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -67,11 +67,11 @@ export class Game {
     this.world = new World(seed, (save && save.vaultSkip) || []);
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
-    this.bank = { shard: 0, prism: 0 };
+    this.bank = { shard: 0, prism: 0, lumen: 0 };
     this.upgrades = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
     this.nexusLevels = Object.fromEntries(NEXUS_UPGRADES.map(u => [u.id, 0]));
-    this.cargo = { shard: 0, prism: 0 };
-    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0 };
+    this.cargo = { shard: 0, prism: 0, lumen: 0 };
+    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0 }; // lumen: ever picked up (S-10 shows ● after the first)
     this.player = {
       x: c.x, y: c.y + 40, r: PLAYER_R,
       vx: 0, vy: 0,
@@ -133,7 +133,7 @@ export class Game {
   }
 
   stat(id) { const u = UPGRADES.find(u => u.id === id); return u.value(this.upgrades[id]); }
-  cargoTotal() { return this.cargo.shard + this.cargo.prism; }
+  cargoTotal() { return this.cargo.shard + this.cargo.prism + this.cargo.lumen; }
   cargoRoom() { return this.stat('cargo') - this.cargoTotal(); }
   inNexus() { return Math.hypot(this.player.x - this.nexus.x, this.player.y - this.nexus.y) < NEXUS_RADIUS; }
 
@@ -324,6 +324,7 @@ export class Game {
       if (d < p.r + 6 && it.age > 0.25) {
         if (room) {
           this.cargo[it.kind]++;
+          if (it.kind === 'lumen') this.stats.lumen++;
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
         } else if (d < p.r + 6) {
@@ -339,11 +340,11 @@ export class Game {
     this.depositTimer += dt;
     while (this.depositTimer > 0.035 && this.cargoTotal() > 0) {
       this.depositTimer -= 0.035;
-      const kind = this.cargo.shard > 0 ? 'shard' : 'prism';
+      const kind = KINDS.find(k => this.cargo[k] > 0);
       this.cargo[kind]--; this.bank[kind]++;
       this.audio.deposit(this.depositCount++);
       this.depositKinds.add(kind);
-      this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx: this.nexus.x, ty: this.nexus.y, life: 0.4, max: 0.4, color: kind === 'shard' ? '#2ef2ff' : '#ff4fd8', size: 3 });
+      this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx: this.nexus.x, ty: this.nexus.y, life: 0.4, max: 0.4, color: RESOURCE[kind].color, size: 3 });
       if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); }
     }
   }
@@ -441,8 +442,8 @@ export class Game {
   destabilize() {
     const p = this.player;
     // Cargo isn't destroyed — it scatters where you fell, so a retrieval run is possible.
-    for (const kind of ['shard', 'prism']) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind, true);
-    this.cargo = { shard: 0, prism: 0 };
+    for (const kind of KINDS) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind, true);
+    this.cargo = { shard: 0, prism: 0, lumen: 0 };
     this.burst(p.x, p.y, 50, '#ffffff', 300);
     p.x = this.nexus.x; p.y = this.nexus.y + 40; p.vx = p.vy = 0;
     p.integrity = this.stat('hull'); p.invuln = 2;
@@ -481,7 +482,7 @@ export class Game {
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
-      pickups: this.pickups.map(q => [q.kind === 'prism' ? 1 : 0, Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
+      pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
     };
   }
   load(s) {
@@ -495,6 +496,6 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
-    for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: k ? 'prism' : 'shard', age: 1, r: 4 });
+    for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4 });
   }
 }

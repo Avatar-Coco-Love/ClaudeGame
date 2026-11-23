@@ -2,7 +2,7 @@
 
 // Game version: 0.<milestone>.<PR count>. Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.1.21';
+export const VERSION = '0.1.22';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -25,7 +25,7 @@ export const HITSTOP_S = 0.035;     // sim freeze on a crystal/prism break
 export const HITSTOP_GAP_S = 0.15;  // at most one hitstop per this much game time
 export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core Matrix purchase
 
-export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7 };
+export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8 };
 
 export const MATERIAL = {
   [T.ROCK]:    { hp: 0.55, fill: '#17215a', edge: '#3d6bff', yield: null },
@@ -35,7 +35,14 @@ export const MATERIAL = {
   [T.BEDROCK]: { hp: Infinity, fill: '#05060f', edge: '#1b2140', yield: null },
   [T.VAULT]:   { hp: 6,    fill: '#142a3a', edge: '#d8fbff', yield: null }, // S-9 vault shell: tough, no yield
   [T.CACHE]:   { hp: 3,    fill: '#1d1440', edge: '#ffffff', yield: null }, // S-9 vault centre: bursts VAULT_LOOT
+  [T.LUMEN]:   { hp: 3.5,  fill: '#3a2a0a', edge: '#ffc94f', yield: { kind: 'lumen', min: 1, max: 1 } }, // S-10, Deep only
 };
+
+// S-10 Lumen (D-033): re-types ROCK/DENSE at d >= LUMEN_D cells where its own noise (seed ^ LUMEN_SALT, at x/5, y/5) > LUMEN_CUT.
+// Never changes the layout (D-023). ~141 cells per world over 40 seeds; nothing spends it until Research v1 (S-11).
+export const LUMEN_D = 55;
+export const LUMEN_CUT = 0.8;
+export const LUMEN_SALT = 0x27d4eb2f;
 
 // S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
 export const VAULT_COUNT = 6;
@@ -56,7 +63,10 @@ export const RING_PITCH_STEP = 2; // semitones the beam hum drops per ring (S-8)
 export const RESOURCE = {
   shard: { color: '#2ef2ff', glyph: '◆', name: 'Shards' },
   prism: { color: '#ff4fd8', glyph: '▲', name: 'Prisms' },
+  lumen: { color: '#ffc94f', glyph: '●', name: 'Lumen' },
 };
+// Resource kinds in deposit / scatter / save order. A saved floor pickup stores its index here (0 shard, 1 prism, 2 lumen).
+export const KINDS = ['shard', 'prism', 'lumen'];
 
 // Core Matrix upgrades. value(level) gives the live stat; cost(level) the price of the NEXT level.
 export const UPGRADES = [
