@@ -26,13 +26,13 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **S-5 Deterministic gameplay RNG:** `game.rand` is seeded with `Date.now()`, and gameplay draws share it. Before the bot runner: seed from the world seed + a salt per system.
 
 ## M2 — A world worth exploring
-- Depth rings: the world gets visibly different with distance (palette shift, new rock types per ring), shown on the minimap.
-- New material: **Lumen ore** (gold, rare, far ring). It's the key resource for Research.
-- Points of interest: hand-placed geometric "vaults" (pre-carved rooms holding loot caches) stamped into generation.
-- Larger world (e.g. 256×256) with lazy chunk generation, if performance allows. Needs an audit first.
-
+- ✅ (#14) Design session 12: S-4 feel play-tested, M2 measured, specs S-8…S-10, Q-002 decided (D-022…D-024).
+- **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap.
+- **S-9 Vaults:** 6 geometric rooms in the Deep, each with a cache (20◆ + 6▲); old saves skip vaults over ground they already saw.
+- **S-10 Lumen ore** (gold, rare, d ≥ 55): the Research currency. Ship directly before Research v1 (D-024).
+- Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
-- Research tree UI at the Nexus, paid in Lumen.
+- **Research v1** (spec in the next Design, build right after S-10): a Research tab at the Nexus, paid in Lumen; first node = Scanner ping.
 - Beam modes: **Wide** (3-cell swath, slower), **Pulse** (charge, then burst). Switch modes with Q or a touch button.
 - Scanner ping: briefly reveals ore within a radius.
 
@@ -62,6 +62,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
 
 ## Debt
+- **B-010:** the "Bring shards home to the Nexus to upgrade" hint stays up after the Shards are banked (it checks bank + cargo ≥ 8 with no upgrade bought); with 46◆ banked it should say "Press E at the Nexus". Small; next Build or Audit.
+- **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. A player (or bot) who leaves mid-stream gets no chime. Keep unless a play-test log says it feels broken.
 - **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into the dev panel (S-7).
 - **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
 - ✅ **B-006** (#11): "beam mines terrain" now waits for 5 s of game time (loop clamps dt to 0.05 s, so wall time under load was ~1.3 s of play).

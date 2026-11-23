@@ -32,3 +32,24 @@ Reduced motion turns off hitstop and the core ring (shake was already off); soun
 with `body.reduce-motion`'s blanket rule.
 - Rejected: a tweened bank number (fights the per-unit stream: the number would lag what is in the bank); one arpeggio note per
   unit (that is the existing tick); hitstop inside `game.update()` (would freeze bots and the parity tool's clock).
+
+### D-022 — Depth comes from rings inside the 160-cell world (2026-11-23, Design 12; settles Q-002)
+The world keeps its bedrock border. It gets visibly deeper through three rings by distance (Hearth < 24, Veil 24–48, Deep ≥ 48 cells),
+each with its own rock palette and rock toughness (×1 / ×1.4 / ×2, ore unchanged), named on entry and on the minimap. Measured:
+a far room 62 cells out looked exactly like the start, so distance currently means nothing on screen.
+- Rejected: a 256×256 world now (no throttled perf numbers yet; Debt "Render cost"); endless chunked generation (a new tech risk with
+  nothing to fill it); rings as pure palette (no reason for Beam Power once the inner rock is gone).
+
+### D-023 — World generation changes keep what a save has seen (2026-11-23, Design 12)
+A new generator may **re-type** solid cells anywhere (rings, Lumen), because the empty/solid layout stays the same and tunnels still line up.
+It may **change the layout** (vaults) only where the save has neither explored nor broken a cell; the save upgrade records the skipped
+vaults once (`vaultSkip`) so a vault never appears or vanishes between loads.
+- Rejected: a frozen generator per save (old players would never see Lumen or vaults, so Research would be out of reach); regenerating
+  freely (the explored minimap would lie and caves would close around old tunnels); deciding skips at every load from the explored
+  bitset (exploring a vault would delete it on the next load).
+
+### D-024 — Lumen arrives next to its sink; vault loot uses today's currencies (2026-11-23, Design 12)
+Pillar 4 says a layer closes its loop before the next starts, so S-10 Lumen and Research v1 ship back to back with no build between them.
+Vaults (S-9) pay 20◆ + 6▲, equal in both modes (D-002), so they are useful the day they ship.
+- Rejected: Lumen first and Research "later" (a currency with nothing to buy); Lumen in vault caches (ties S-9 to S-10); a
+  Surge-only vault guard (Surge would get the harder path to the same loot; M6 owns Surge depth).

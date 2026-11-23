@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.14 — 2026-11-23 (#14)
+- No change in play. This update plans the next stretch: the world will get visibly deeper in three rings (Hearth, Veil, Deep),
+  sealed geometric vaults with loot caches out in the Deep, and a rare gold ore, Lumen, that will pay for Research.
+- Your current world stays safe: the tunnels you dug and the ground you've seen will keep their shape when these arrive.
+
 ## v0.1.13 — 2026-11-23 (#13)
 - Emptying your hold at the Nexus now ends with a rising chime: one note per resource kind you brought home, plus a top note.
 - Buying a Core Matrix upgrade sends a ring off the core and makes that upgrade's level bar flash.

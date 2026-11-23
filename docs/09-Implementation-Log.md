@@ -30,3 +30,15 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Tests:** 6 new smoke checks (49 total): B-008 hint, ring + pip flash, hitstop rock/crystal/rate-limit, arpeggio `[2,1]` + beam sweep ×2, reduced motion → no hitstop/ring, loop holds `stats.time` during hitstop. Five failed on the old code (stash run, 44/49); the reduced-motion one is a guard.
 - **Screenshot (900×600, DSF 1):** ring reads clearly around the core inside the Nexus; Matrix open shows no hint behind it.
 - **Watch:** can't listen in-session; arpeggio levels (vol 0.13) were set by ear-free reasoning next to `upgrade()` (0.14). Revisit if a play-test log says the deposit is loud.
+
+## 2026-11-23 — Session 12 (v0.1.14): Design — S-4 play-test, M2 specs
+- **Play-test (1280×800, DSF 1, in-page greedy crystal bot, 60 s real time, Drift):** 32 crystal breaks → 32 hitstops (~1.1 s frozen
+  in total, never on the 21 rock breaks), 1 beam sweep (beam held), bank 46◆, no page errors. Reads as a light tick, not a stutter.
+  The arpeggio never fired: the bot left the ring as soon as cargo had room. Logged as "Missed chime (watch)". B-010 found: the
+  "Bring shards home" hint stays up with 46◆ banked (`main.js` hint checks bank + cargo, not cargo alone).
+- **Screenshot:** a room carved 62 cells out looks exactly like the start (same blue rock): distance means nothing on screen yet.
+- **Measured (40 seeds, scratch scripts, not committed):** cells per distance band (header of `07`); a new Lumen noise at cut 0.80 on
+  ROCK/DENSE at d ≥ 55 gives ~141 cells/world (0.74 → 381, 0.78 → 203); 6 vaults (7×7, d 50–72, ≥ 20 apart) place on 40/40 seeds.
+- **Decided:** D-022 (rings in the fixed world, settles Q-002), D-023 (generation changes keep a save's seen layout; `vaultSkip`),
+  D-024 (Lumen ships next to Research v1). Specs S-8 rings, S-9 vaults, S-10 Lumen in `07`. New Q-008 (Deep toughness).
+

@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 11** · **Version: v0.1.13** (session 11 was a Build: S-4 Feel pass; next is a Design)
+**Session counter: 12** · **Version: v0.1.14** (session 12 was a Design: M2 specs; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -19,7 +19,8 @@ _Last updated: 2026-11-23_
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
-- Build-ready specs live in `07`, in build order: S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build-ready specs live in `07`, in build order: S-5, S-7, S-8 (depth rings), S-9 (vaults), S-10 (Lumen, right before Research v1).
+- M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -35,9 +36,10 @@ _Last updated: 2026-11-23_
 - The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
 - Shake off stays 0 through a Glitch kill and a hit; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
 - Hitstop freezes the sim only on crystal/prism, rate-limited; reduced motion drops hitstop + ring; no hint under the Matrix (session 11).
+- Real-time play: 32 crystal breaks → 32 hitstops in 60 s, none on rock; a room 62 cells out looks like the start (session 12).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (12) is a **Design**: play-test S-4 feel, then spec the M2 exploration builds after S-5/S-7 in `07`.
+Next session (13) is a **Build**: S-5 deterministic gameplay RNG (top spec in `07`).
