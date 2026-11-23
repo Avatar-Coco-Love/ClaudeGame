@@ -1,5 +1,5 @@
 :root {
-  --bg: #03040c; --ink: #d8e6ff; --dim: #7f8bb3; --cyan: #2ef2ff; --magenta: #ff4fd8;
+  --bg: #03040c; --ink: #d8e6ff; --dim: #7f8bb3; --cyan: #2ef2ff; --magenta: #ff4fd8; --gold: #ffc94f;
   --violet: #8a5cff; --amber: #ffd23d; --panel: rgba(8, 12, 32, 0.78); --line: rgba(90, 120, 255, 0.28);
 }
 * { box-sizing: border-box; }
@@ -9,7 +9,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 canvas#game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; cursor: crosshair; }
 .hidden { display: none !important; }
 button { font: inherit; color: inherit; cursor: pointer; }
-.shard { color: var(--cyan); } .prism { color: var(--magenta); }
+.shard { color: var(--cyan); } .prism { color: var(--magenta); } .lumen { color: var(--gold); }
 
 #hud { position: fixed; inset: 0; pointer-events: none; }
 #hud button { pointer-events: auto; }

@@ -32,7 +32,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#19) Design session 17: rings play-tested, Q-008 measured and settled (D-029), Research v1 specced as S-11 (D-030).
 - ✅ (#18) **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap (D-028).
 - ✅ (#20) **S-9 Vaults:** 6 sealed 7×7 rooms at d 50–72 with a cache (20◆ + 6▲); old saves skip vaults they already saw (D-031).
-- **S-10 Lumen ore** (gold, rare, d ≥ 55): the Research currency. Ship directly before Research v1 (D-024).
+- ✅ (#22) **S-10 Lumen ore:** gold ● cells at d ≥ 55 (~141 per world), banked like Shards; nothing spends it yet (D-033).
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
 - **S-11 Research v1** (build right after S-10, D-030): a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal).

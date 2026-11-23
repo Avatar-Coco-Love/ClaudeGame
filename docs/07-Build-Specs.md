@@ -3,15 +3,8 @@
 Specs ready to build, in roadmap order. Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
-Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1…S-9 built in #7–#20.)
+Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1…S-10 built in #7–#22.)
 M2 basis (session 12, 40 seeds): cells by distance, rock/dense/crystal/prism: d 50–65 1410/666/263/210, d 65–80 1686/997/332/360.
-
-## S-10 — Lumen ore (M2; build directly before Research v1, D-024)
-- New `T.LUMEN` (gold `#ffc94f`, glyph ●, hp 3.5, yield 1) re-types ROCK/DENSE cells at d ≥ 55 where a new noise
-  (salt `0x27d4eb2f`) at (x/5, y/5) > 0.80: ~141 cells per world (40 seeds), none closer than 55. Layout unchanged.
-- `lumen` joins cargo/bank (SAVE_FORMAT bump, upgrade step adds 0). The HUD shows ● only once you have held one.
-- Nothing spends Lumen yet: S-10 and Research v1 (spec in the next Design) ship back to back, no other build between them.
-- **Smoke:** Lumen exists only at d ≥ 55; mining one banks 1●; an old save loads with `bank.lumen = 0`.
 
 ## S-11 — Research v1: Scanner (M3; build right after S-10, D-024, D-030)
 - Lumen basis (session 17, 40 seeds, S-10 rule): 143● per world in ~36 blobs, median 2 cells, p90 9. Lumen is scattered, so a

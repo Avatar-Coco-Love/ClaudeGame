@@ -1,5 +1,5 @@
 // All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RINGS, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -7,6 +7,7 @@ const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44], [T.ROCK]: [34, 51, 122], [T.DENSE]: [74, 47, 138],
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
   [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
+  [T.LUMEN]: [255, 201, 79],
 };
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
@@ -117,11 +118,17 @@ export class Renderer {
     g.shadowBlur = 10;
     for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
       const t = w.get(x0 + x, y0 + y);
-      if (t !== T.CRYSTAL && t !== T.PRISM && t !== T.CACHE) continue;
+      if (t !== T.CRYSTAL && t !== T.PRISM && t !== T.CACHE && t !== T.LUMEN) continue;
       const m = MATERIAL[t], px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
       if (t === T.CACHE) { // S-9: a square-in-square glyph, upright, so it never reads as ore
         g.shadowColor = m.edge; g.strokeStyle = m.edge; g.lineWidth = 2;
         g.strokeRect(px - 9, py - 9, 18, 18); g.fillStyle = m.edge; g.fillRect(px - 4, py - 4, 8, 8);
+        continue;
+      }
+      if (t === T.LUMEN) { // S-10: a round gold bead with a halo ring; the only round ore, so it never reads as ◆ or ▲
+        g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge; g.lineWidth = 1.5;
+        g.globalAlpha = 0.9; g.beginPath(); g.arc(px, py, 5, 0, Math.PI * 2); g.fill();
+        g.globalAlpha = 0.6; g.beginPath(); g.arc(px, py, 9, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
         continue;
       }
       const h = (((x0 + x) * 73856093) ^ ((y0 + y) * 19349663)) >>> 0;
@@ -285,12 +292,13 @@ export class Renderer {
     const m = 16, x0 = left - m, y0 = top - m, x1 = left + vw + m, y1 = top + vh + m;
     for (const it of this.game.pickups) {
       if (it.x < x0 || it.x > x1 || it.y < y0 || it.y > y1) continue;
-      const col = it.kind === 'shard' ? '#2ef2ff' : '#ff4fd8';
+      const col = RESOURCE[it.kind].color;
       const bob = Math.sin(this.time * 5 + it.x) * 0.3 + 1;
       ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10;
       ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(this.time * 2 + it.y); ctx.scale(bob, bob);
       ctx.beginPath();
       if (it.kind === 'shard') { ctx.moveTo(0, -5); ctx.lineTo(3, 0); ctx.lineTo(0, 5); ctx.lineTo(-3, 0); }
+      else if (it.kind === 'lumen') ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
       else { ctx.moveTo(0, -5); ctx.lineTo(4.5, 3); ctx.lineTo(-4.5, 3); }
       ctx.fill(); ctx.restore();
     }
