@@ -4,6 +4,7 @@
 import { Game } from '../src/game.js';
 import { CELL, T } from '../src/config.js';
 
+const BEAM_MODE = process.env.MODE || 'focus';
 const audio = new Proxy({}, { get: () => () => {} });
 const [D = 1000, LVL = 0, SECS = 300, RAD = 6] = process.argv.slice(2).map(Number);
 const SEEDS = 10, dt = 1 / 60;
@@ -11,6 +12,7 @@ let kills = 0, deaths = 0, alive = 0, stuck = 0;
 for (let s = 1; s <= SEEDS; s++) {
   const g = new Game({ seed: s * 7919, mode: 'surge', audio });
   for (const k in g.upgrades) g.upgrades[k] = LVL;
+  if (BEAM_MODE !== 'focus') g.research[BEAM_MODE] = true; g.beamMode = BEAM_MODE; // Q-011 (design 27): MODE=wide env picks the beam mode
   g.player.integrity = g.stat('hull');
   const cx = Math.floor((g.nexus.x + D) / CELL), cy = Math.floor(g.nexus.y / CELL);
   for (let y = cy - RAD; y <= cy + RAD; y++) for (let x = cx - RAD; x <= cx + RAD; x++)
@@ -34,5 +36,5 @@ for (let s = 1; s <= SEEDS; s++) {
   for (const e of g.enemies) if (last.has(e)) { alive++; if (last.get(e) - Math.hypot(e.x - g.player.x, e.y - g.player.y) < 32) stuck++; }
 }
 const min = SECS / 60 * SEEDS;
-console.log(`D=${D}px lvl=${LVL} room=${RAD} cells, ${SEEDS} seeds x ${SECS}s: kills/min ${(kills / min).toFixed(2)}, deaths/min ${(deaths / min).toFixed(2)}, ` +
+console.log(`mode=${BEAM_MODE} D=${D}px lvl=${LVL} room=${RAD} cells, ${SEEDS} seeds x ${SECS}s: kills/min ${(kills / min).toFixed(2)}, deaths/min ${(deaths / min).toFixed(2)}, ` +
   `Glitches alive at end ${alive}, of which stuck (closed < 32 px in the last 4 s) ${stuck}`);

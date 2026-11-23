@@ -1,30 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`, sessions 19–20 in `archive/2026-11-23-09-sessions-19-20.md`, session 21 in `archive/2026-11-23-09-session-21.md`.
-
-## 2026-11-23 — Session 22 (v0.1.24): Design — Lumen → Scanner, Q-010, beam modes
-- **Play-test** (1280×800, DSF 1, `?dev`, +12●): Research tab buys the Scanner cleanly (12● → 2●); teleported 10 cells from the
-  nearest vault (d 52) and pinged: 26 ore marks read well, but the vault 10 cells off stayed a dim grey outline and the ping
-  ignored its cache. That is Q-010's gap in one picture.
-- **Measured** with new `tools/vaultfind.mjs` (bot breaks Lumen cells nearest-first, upgrades 2, 40 seeds): 10● in 70 s mean;
-  vaults seen by then 20/240 (runs with any: 19/40); at 30● 46/240; at 60● (level 3) 83/240 (35 %). Caches opened by accident: 0–3.
-- **Decided:** D-035 (ping shows caches, S-12; Q-010 closed), D-036 (Wide 25● and Pulse 40● as Research, each with a trade-off,
-  S-13/S-14). New Q-011 (dominant mode check after S-14). S-15 throttled perf check specced in Tooling.
-- **Docs:** 09 sessions 16–17 and changelog v0.1.1–v0.1.9 archived word for word; M1's done list in `04` folded into one line.
-
-## 2026-11-23 — Session 23 (v0.1.25): Inbox — owner play-test feedback
-- **Inbox:** `2026-11-23-owner-playtest-feedback.md` (first owner play-test, after v0.1.24): enjoyed discovery and achievement;
-  the beam sound was "very annoying"; offered a free sound pack later. Adopted: the hum as a bug (B-016), a measure-then-owner-picks
-  plan for recorded audio (D-037, supersedes D-014), a CLAUDE.md rule (measure audio offline). Rejected: nothing. Archived.
-- **B-016 (new) → fixed:** the hum was a 92 Hz sawtooth at gain 0.045 with 13 Hz ±14 Hz vibrato that never faded. Now a 700 Hz
-  low-passed triangle at 2× pitch: 40 ms swell, settles to a quiet bed, slightly higher while cutting (D-038, `BEAM_HUM`).
-- **Measured** (4 s held on rock, volume 70, OfflineAudioContext 44.1 kHz, `node tests/audio.cjs`), before → after:
-  RMS −42.3 → −54.2 dBFS; peak −36.1 → −39.9 (onset only); sustained (last 1 s) −42.3 → −56.7 (−14.4 dB, ~5× less amplitude);
-  centroid 324 → 191 Hz; energy > 2 kHz 2.47 % → 0 %; above −50 dBFS for 4 s (never fades) → 0.3 s.
-- **Found while building:** `cancelScheduledValues(now)` on the first contact frame wiped the onset and jumped the gain to 1
-  (peak −9.4 dBFS); contact changes now retarget only after the attack.
-- **Tests:** 2 new checks in `tests/audio.cjs` (83 total): level/harshness ceiling, volume 100 > 70 and 0 = silence. With `src/`
-  stashed the ceiling check fails (tail −42.3). No visual change, so no screenshot.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`, sessions 19–20 in `archive/2026-11-23-09-sessions-19-20.md`, session 21 in `archive/2026-11-23-09-session-21.md`, sessions 22–23 in `archive/2026-11-23-09-sessions-22-23.md`.
 
 ## 2026-11-23 — Session 24 (v0.1.26): Audit — every sound measured
 - **Audio check (owner ask after B-016):** all 12 one-shots plus 4 streams rendered offline (volume 70, 44.1 kHz). One-shots peak
@@ -63,3 +39,16 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Screenshot** (1280×800, DSF 1, Wide down from the Nexus): a clean 3-cell hall, three beams read as one tool, ⟂ under ◎.
 - Deploy note: PR #27's Pages deploy failed twice on GitHub's side ("Fetching artifact metadata failed"); a fresh manual run on
   `main` succeeded, so v0.1.27 went live. On such a failure trigger a new run of `pages.yml` on `main`, not a re-run.
+
+## 2026-11-23 — Session 27 (v0.1.29): Design — Wide play-tested, Q-011 first look, S-14 retuned, S-16 Beacons
+- **Probes per beam mode:** `MODE=wide` env added to `deeprun`, `vaultfind`, `surgefarm`, `parity` (Wide research set, mode forced).
+  **B-019 (new) → fixed:** `deeprun` crashed since S-10 (its target search wanted ROCK/DENSE, but Lumen cells are now `T.LUMEN`).
+- **Q-011, Focus vs Wide** (20 seeds unless noted): first Lumen at Beam 2 median 30 s vs 56 s (Beam 0: 55 vs 113); 10● run
+  69 vs 133 s (vaults seen 11 vs 12 of 120); parked Surge farm (Lvl 2, 10 seeds × 180 s) 3.90 vs 3.77 kills/min, deaths 0 vs 0.33;
+  greedy miner 10 × 300 s: crystal hunt Lvl 0 42.9 vs **48.3◆/min** (+12 %), Prism hunt Lvl 2 15.2 vs 9.7▲/min (◆ 15.0 vs 25.1).
+  Read: Wide is a harvesting tool for ore-rich ground, Focus the travel and Glitch tool. Neither wins everywhere: no retune (D-042).
+- **S-14 retuned** (D-042): with `PULSE_MUL` 1.3 and no recovery, Pulse would tunnel at 1.3× Focus with 1.5× reach and pierce,
+  beating Focus at everything. Now ×1.0 plus 0.3 s recovery: 0.8× Focus sustained; it trades throughput for reach and a burst.
+- **Play-test** (1280×800, DSF 1, seed 77, Beam 2, Veil): Wide's three beams read as one tool and carve a clean hall; in Surge (god)
+  the side rays help aim at a Glitch but each Glitch takes one ray (D-041), so kills are slower; switching to Focus is the answer.
+- **Specs:** S-14 refined, S-15 gets the pickup spawn call, new **S-16 Beacons v1** (first Crafting item, 5▲ each). No gameplay code.
