@@ -6,16 +6,7 @@ Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1
 Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1, S-2, S-6, S-3, S-4, S-5, S-7 built in #7, #8, #10, #12, #13, #15, #17.)
 M2 basis (session 12, 40 seeds): cells by distance, rock/dense/crystal/prism: d 50–65 1410/666/263/210, d 65–80 1686/997/332/360.
 
-## S-8 — Depth rings (M2, D-022)
-- `RINGS` in `config.js`: **Hearth** d < 24, **Veil** 24–48, **Deep** ≥ 48 (d = cells from the Nexus; the corners are Deep).
-  Each ring: `name`, `r0`, `rockFill`/`rockEdge`, `denseFill`/`denseEdge`, `hpMul`. Start: Hearth = today's blues, hpMul 1;
-  Veil = teal-violet, hpMul 1.4; Deep = magenta-indigo, hpMul 2. `world.ring(x, y)` returns the index (precompute a Uint8Array).
-- `hpMul` scales only ROCK and DENSE; ore hp stays, so ore still breaks fast and Beam Power gains a reason late on.
-- Chunk render and the minimap colour ROCK/DENSE by ring; ore and bedrock look the same everywhere. Layout and ore are unchanged (D-023).
-- The first time a session's core enters a ring: a toast with its name ("Entering the Veil"), and the beam hum's pitch drops one step
-  per ring. Same in Drift and Surge.
-- **Smoke:** `ring()` at d 10/30/60 = 0/1/2; one ROCK cell in the Deep takes 2× the beam time of a Hearth one; the cell layout of a
-  seed (empty/solid bitset) is identical before and after (hash it in the test). **Screenshot** a Veil–Deep border at DSF 1.
+## S-8 — Depth rings: built in #18 (D-028).
 
 ## S-9 — Vaults (M2, D-023)
 - 6 per world, stamped after generation: centres at d 50–72 from `mulberry32(hash(seed, 'vault'))`, ≥ 20 cells apart, footprint

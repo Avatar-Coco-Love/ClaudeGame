@@ -1,18 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`.
-
-## 2026-11-23 — Session 10 (v0.1.12): Build — S-3 Settings panel
-- **Built:** `src/settings.js` (load/clean/save `lumencore.settings.v1`, legacy `lumencore.muted` migrated then removed), a Settings sheet over the title (volume slider, mute, shake, reduced motion; ✕, Escape or backdrop closes), `audio.setVolume()`, `game.addShake()` gate (D-020). Mute button and M now write the settings object.
-- **Tests:** 5 new smoke checks (43 total): legacy mute → muted; shake off → `game.shake` max 0 over a stepped Glitch kill + a hit; volume 0 + shake off survive reload; settings never in the world save; sheet fits 320×568 with no scroll and every control ≥ 40 px. Overflow check now covers `#settings`. Shake check failed on the old behaviour (gate disabled: max shake 8).
-- **Screenshots (1280×800 and 320×568, DSF 1):** Settings button reads as secondary under New World; the sheet fits the narrow phone with room to spare; switch states clear (cyan = On).
-- **Watch:** the M badge hides on coarse pointers via a media query, since `body.touch` is only set once a game starts.
-
-## 2026-11-23 — Session 11 (v0.1.13): Build — S-4 Feel pass
-- **Built:** `audio.depositDone(kinds)` (kinds+1 rising notes, max 3) when the hold empties; `audio.beamStart()` on the beam's off→on edge; `game.coreRing` ring on the core after a Core Matrix buy + `.flash` pip row; `game.hitstop` (35 ms, crystal/prism only, ≥ 150 ms apart) honoured by `main.js`; `game.motionOn()` gate. B-008 fixed: hint hidden while the Matrix is open (D-021). Demo world uses a silent audio Proxy.
-- **Tests:** 6 new smoke checks (49 total): B-008 hint, ring + pip flash, hitstop rock/crystal/rate-limit, arpeggio `[2,1]` + beam sweep ×2, reduced motion → no hitstop/ring, loop holds `stats.time` during hitstop. Five failed on the old code (stash run, 44/49); the reduced-motion one is a guard.
-- **Screenshot (900×600, DSF 1):** ring reads clearly around the core inside the Nexus; Matrix open shows no hint behind it.
-- **Watch:** can't listen in-session; arpeggio levels (vol 0.13) were set by ear-free reasoning next to `upgrade()` (0.14). Revisit if a play-test log says the deposit is loud.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`.
 
 ## 2026-11-23 — Session 12 (v0.1.14): Design — S-4 play-test, M2 specs
 - **Play-test (1280×800, DSF 1, in-page greedy crystal bot, 60 s real time, Drift):** 32 crystal breaks → 32 hitstops (~1.1 s frozen
@@ -54,3 +42,14 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   shown; panel +100◆ / God, no damage in Surge, max all, `god` never in the save. **Screenshot** (1280×800, DSF 1): panel reads cleanly
   bottom left, carved room visible; it would cover the hint pill on a phone, accepted for a dev tool.
 - Not built: "save/load test spots" from the old `04` line (not in the spec). Add if a bot needs it.
+
+## 2026-11-23 — Session 16 (v0.1.18): Build — S-8 depth rings
+- **Built:** `RINGS` in `config.js` (Hearth < 24, Veil 24–48, Deep ≥ 48 cells; ×1 / ×1.4 / ×2 hp on ROCK + DENSE only).
+  `world.rings` (Uint8Array, by cell-centre distance), `ring()`, `hpAt()`, `look()`; chunk render, minimap, beam sparks and
+  break bursts use the ring palette. Toast "Entering the Veil/Deep" once per session; the beam hum drops 2 semitones per ring (D-028).
+- **Layout unchanged:** seed 77's solid bitset and full cell-type hashes equal the pre-S-8 values (pinned in smoke).
+- **Tests:** 4 new smoke checks (62 total): ring at d 10/30/60; Deep ROCK 111 vs Hearth 56 beam ticks (2×); layout/type hash;
+  toasts `Veil,Deep` over a 30→10→30→60→30→60 walk with pitch calls `0,1,0,1,2,1,2`. With only `src/` stashed they fail (`ring` missing).
+- **Screenshot** (1280×800, DSF 1, `teleport(46)`): the Veil–Deep border reads clearly (teal edges vs indigo/violet), toast centred,
+  the minimap shows the two bands. Watch: Veil teal rock sits closer to crystal cyan; gems still stand out by glyph and glow.
+- Not measured yet: Q-008 (Deep rock vs low Beam Power). Left for the Design session.

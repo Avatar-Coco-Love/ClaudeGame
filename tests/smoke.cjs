@@ -51,6 +51,33 @@ async function lootChecks() {
     && Math.round(h.pickups[405].x) === Math.round(g.pickups[405].x), `${h.pickups.length} restored, ${count(h.pickups, 'prism')} prisms`);
 }
 
+// S-8 depth rings: ring by distance, Deep rock takes 2× the beam time, layout and cell types unchanged, one toast per ring.
+async function ringChecks() {
+  const { World } = await import('../src/world.js');
+  const { Game } = await import('../src/game.js');
+  const w = new World(77), cx = w.w / 2, cy = w.h / 2;
+  const rs = [10, 30, 60].map(d => w.ring(cx + d, cy));
+  check('ring() at d 10/30/60 = Hearth/Veil/Deep (S-8)', rs.join() === '0,1,2', rs.join());
+  const beamTime = (x, y) => { let n = 0; while (!(w.hit(x, y, 0.01) || {}).broken && n < 1e4) n++; return n + 1; };
+  const rockAt = (dMin, dMax) => { for (let y = 2; y < w.h - 2; y++) for (let x = 2; x < w.w - 2; x++) {
+    const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy); if (d >= dMin && d < dMax && w.get(x, y) === 1) return [x, y]; } };
+  const [hx, hy] = rockAt(10, 20), [dx, dy] = rockAt(55, 70);
+  const th = beamTime(hx, hy), td = beamTime(dx, dy);
+  check('Deep ROCK takes 2× the beam time of Hearth ROCK (S-8)', Math.abs(td / th - 2) < 0.03, `${th} vs ${td} ticks`);
+  // Hashes of seed 77 as generated before S-8 (empty/solid bitset, then full cell types): rings must only recolour (D-023).
+  const g0 = new World(77); let lay = 0x811c9dc5, typ = 0x811c9dc5;
+  for (let i = 0; i < g0.cells.length; i++) { lay = Math.imul(lay ^ (g0.cells[i] ? 1 : 0), 0x01000193) >>> 0; typ = Math.imul(typ ^ g0.cells[i], 0x01000193) >>> 0; }
+  check('seed 77 layout + cell types identical to pre-ring generation (S-8, D-023)', lay === 2394919557 && typ === 3824047980, `${lay} / ${typ}`);
+  const pitches = [];
+  const audio = new Proxy({}, { get: (_, k) => k === 'setRing' ? r => pitches.push(r) : () => {} });
+  const g = new Game({ seed: 77, mode: 'drift', audio });
+  const toasts = [], go = d => { g.player.x = g.nexus.x + d * 32; g.player.y = g.nexus.y; g.player.vx = g.player.vy = 0;
+    g.update(1 / 60, { move: { x: 0, y: 0 } }); toasts.push(...g.events.filter(e => e === 'ring').map(() => g.ringName())); g.events.length = 0; };
+  for (const d of [30, 10, 30, 60, 30, 60]) go(d);
+  check('each ring toasts once per session, hum pitch follows the ring (S-8)', toasts.join() === 'Veil,Deep' && pitches.join() === '0,1,0,1,2,1,2',
+    `toasts ${toasts.join()} · pitch ${pitches.join()}`);
+}
+
 async function rngChecks() {
   const { Game } = await import('../src/game.js');
   const audio = new Proxy({}, { get: () => () => {} });
@@ -79,6 +106,7 @@ async function rngChecks() {
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
+  await ringChecks().catch(e => check('S-8 ring checks ran', false, e.message));
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;

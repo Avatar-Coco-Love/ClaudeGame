@@ -1,5 +1,5 @@
 // All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RINGS, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S } from './config.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -7,6 +7,12 @@ const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44], [T.ROCK]: [34, 51, 122], [T.DENSE]: [74, 47, 138],
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
 };
+// S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
+const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const MINI_RING = RINGS.map(r => ({
+  [T.ROCK]: mix(rgb(r.rockFill), rgb(r.rockEdge), 0.22), [T.DENSE]: mix(rgb(r.denseFill), rgb(r.denseEdge), 0.3),
+}));
 
 export class Renderer {
   constructor(canvas, minimap) {
@@ -48,7 +54,8 @@ export class Renderer {
   }
 
   setMini(i) {
-    const c = MINI_COLORS[this.game.world.cells[i]];
+    const w = this.game.world, t = w.cells[i];
+    const c = (t === T.ROCK || t === T.DENSE) ? MINI_RING[w.rings[i]][t] : MINI_COLORS[t];
     const d = this.miniData.data, o = i * 4;
     d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
   }
@@ -96,7 +103,7 @@ export class Renderer {
     for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
       const t = w.get(x0 + x, y0 + y);
       if (t === T.EMPTY) continue;
-      const m = MATERIAL[t];
+      const m = w.look(x0 + x, y0 + y, t);
       g.fillStyle = m.fill;
       g.fillRect(x * CELL, y * CELL, CELL, CELL);
       if (t !== T.BEDROCK) {
@@ -127,7 +134,7 @@ export class Renderer {
     for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
       const gx = x0 + x, gy = y0 + y, t = w.get(gx, gy);
       if (t === T.EMPTY) continue;
-      const m = MATERIAL[t];
+      const m = w.look(gx, gy, t);
       g.strokeStyle = m.edge; g.shadowColor = m.edge;
       const px = x * CELL, py = y * CELL;
       g.beginPath();
