@@ -12,6 +12,8 @@ const $ = id => document.getElementById(id);
 const store = {
   read() { try { const s = localStorage.getItem(SAVE_KEY); return s ? upgradeSave(JSON.parse(s)) : null; } catch { return null; } },
   write(data) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage unavailable */ } },
+  // True when anything is stored, even a save this build can't read (newer format or corrupt): D-005 says never drop it unasked.
+  exists() { try { return localStorage.getItem(SAVE_KEY) != null; } catch { return false; } },
   clear() { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } },
   pref(k, v) {
     try { if (v === undefined) return localStorage.getItem('lumencore.' + k); localStorage.setItem('lumencore.' + k, v); } catch { return null; }
@@ -67,7 +69,11 @@ function start(save) {
 
 $('continue').addEventListener('click', () => start(store.read()));
 $('new-world').addEventListener('click', () => {
-  if (store.read() && !confirm('Start a new world? Your current world and upgrades will be replaced.')) return;
+  if (store.exists()) {
+    const msg = store.read() ? 'Start a new world? Your current world and upgrades will be replaced.'
+      : 'A save this version of the game cannot read (from a newer version, or damaged) is stored. Replace it with a new world?';
+    if (!confirm(msg)) return;
+  }
   store.clear();
   start(null);
 });
@@ -121,7 +127,7 @@ function updateHud() {
 
 // ---------- Core Matrix panel ----------
 function openPanel() {
-  if (!game || !game.inNexus()) return;
+  if (!game || paused || !game.inNexus()) return; // never over the title screen (B-003)
   panelOpen = true;
   renderPanel();
   $('matrix').classList.remove('hidden');

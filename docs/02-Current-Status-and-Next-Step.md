@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 3** · **Version: v0.1.5** (session 3 was the Design session; rotation is back on track)
+**Session counter: 4** · **Version: v0.1.6** (session 4 was the first Audit; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -23,11 +23,10 @@ _Last updated: 2026-11-23_
 - Surge spawns Glitches away from the Nexus, and the beam kills them.
 - Reloading restores the mode, upgrades, bank, and mined terrain.
 - Touch sticks move the core and mine. No page errors.
+- Title-screen hotkeys can't open the Core Matrix; New World asks before replacing an unreadable save (audit, session 4).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (4) is an **Audit** (counter % 5 == 4): parallel subagents per CLAUDE.md, fix the top issues in one PR, log the rest under Debt in `04`,
-and check D-001…D-009 against the code. Archiving `09` is not needed yet: there's no earlier audit.
-The Build after that takes **S-1 (Nexus Radiance)** from `07`.
+Next session (5) is a **Build**: implement **S-1 (Nexus Radiance)** from `07` (Prism-only sink, D-009). Smoke must cover buying a level and the save round-trip.

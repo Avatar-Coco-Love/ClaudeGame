@@ -32,8 +32,11 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.waitForTimeout(400);
     check('title screen visible', await pg.isVisible('#title'));
     check('version shown on title', /^v\d+\.\d+\.\d+$/.test(await pg.textContent('#version')));
-    await pg.click('#new-world');
+    await pg.keyboard.press('e'); await pg.waitForTimeout(150);
+    check('E on the title does not open the Core Matrix (B-003)', !(await pg.isVisible('#matrix')));
+    await pg.focus('#new-world'); await pg.keyboard.press('Enter'); // keyboard start: Enter is the button's, not a Matrix toggle
     await pg.waitForTimeout(300);
+    check('Enter on New World starts without opening the Matrix', !(await pg.isVisible('#matrix')));
     check('game started', await pg.evaluate(() => !!window.__lumen?.game && document.getElementById('title').classList.contains('hidden')));
 
     // Mine straight down from the Nexus.
@@ -80,6 +83,16 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.click('#continue'); await pg.waitForTimeout(200);
     const old = await pg.evaluate(() => window.__lumen.game.stats.mined);
     check('unversioned (format 1) save still loads', old === snap.mined, `mined ${old}`);
+
+    // A save this build can't read (newer format) must not be wiped without asking (D-005, B-004).
+    // demo = true stops the running game's pagehide save from overwriting the planted one during reload.
+    await pg.evaluate(() => window.__lumen.game.demo = true);
+    await pg.evaluate(() => localStorage.setItem('lumencore.save.v1', JSON.stringify({ v: 99, seed: 5, mode: 'drift', bank: { shard: 1, prism: 1 } })));
+    await pg.reload(); await pg.waitForTimeout(300);
+    let asked = false; pg.once('dialog', d => { asked = true; d.dismiss(); });
+    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    const kept = await pg.evaluate(() => JSON.parse(localStorage.getItem('lumencore.save.v1'))?.v);
+    check('New World asks before replacing an unreadable save', asked && kept === 99, `asked ${asked}, v ${kept}`);
 
     // Frame budget: average frame time while mining.
     const fps = await pg.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { if (++n < 120) requestAnimationFrame(f); else r(1000 * n / (performance.now() - t0)); }; requestAnimationFrame(f); }));

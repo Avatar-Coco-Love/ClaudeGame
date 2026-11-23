@@ -36,3 +36,13 @@
 - **Decided:** D-008 (dense rock stays ungated, answers Q-005), D-009. Specs S-1…S-5 written in the new `docs/07-Build-Specs.md`; `04` reordered to match.
 - **Bug found (not fixed, logged in 04 Debt):** B-002, phones show the desktop hint ("WASD…", truncated) and an `E` badge until the first touch.
 - **Not a bug:** Integrity is hidden from the Core Matrix in Drift until bought (`main.js`), by design: it only matters in Surge.
+
+## 2026-11-23 — Session 4 (v0.1.6): Audit
+- **How:** no subagent tool in this session, so the five dimensions (correctness, perf, mobile, code health, docs drift) were done in-line, each finding reproduced before acting.
+- **B-003 → fixed:** E (or Enter on a focused title button) opened the Core Matrix over the title screen, for the demo world or a paused real world, with live mode and buy buttons. `openPanel` now refuses while paused; Enter on a button isn't a Matrix toggle (D-010).
+- **B-004 → fixed:** "New World" checked `store.read()`, which is null for a newer-format or corrupt save, so it erased that save with no prompt (breaks D-005). Now `store.exists()` gates a confirm with its own message.
+- **Tests:** 3 new smoke checks (28 total). Each failed on the old code (stash/partial revert). The first draft of the save check passed wrongly: reload's `pagehide` saved the running game over the planted save. Setup marks the game `demo` first.
+- **Measured, not a bug:** a Surge player idling in the Nexus with a 25-cell cleared ring gets ~1 Glitch kill per 10 min and 0 loot (20 seeds × 600 s in Node). No AFK rim farm today; the bot runner should re-probe it.
+- **Logged in 04 Debt:** B-005 (cargo lost past the pickup cap on death), unculled pickup/particle drawing, touch sticks not cleared on blur (unverified).
+- **B-006 (logged):** "beam mines terrain" failed once (mined 3, needs 4), then passed 4×. Pre-existing timing variance under load.
+- **D-check:** D-001…D-009 match the code, except D-005, which B-004 broke and is now fixed. D-009 isn't built yet (S-1). `09` archive: nothing older than this first audit.
