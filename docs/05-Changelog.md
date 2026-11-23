@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.11 — 2026-11-23 (#11)
+- Phones: leaving the game mid-drag (switching apps, locking the screen) now lets go of both thumb sticks, so the core doesn't drift off on its own when you come back.
+- Checked that Surge doesn't out-earn Drift since Glitches started dropping Prisms: a Drift miner still banks slightly more Prisms per minute. Nothing changes in play.
+
 ## v0.1.10 — 2026-11-23 (#10)
 - Surge: Glitches that can't reach you (stuck behind rock or lost in the dark) now give up after a few seconds and fade away, so new ones come hunting. Surge stays tense in tunnels.
 - Surge: with Glitches arriving far more often, a destroyed Glitch now drops a Prism half the time (Shards unchanged).
