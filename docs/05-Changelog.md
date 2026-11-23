@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.17 — 2026-11-23 (#17)
+- For testing: add `?dev` to the address (or press the backtick key) to open a small dev panel: free Shards and Prisms, jump
+  0/30/60 cells out, god mode, switch Drift/Surge, max every upgrade. Normal play is unchanged; the panel is hidden unless asked for.
+
 ## v0.1.16 — 2026-11-23 (#16)
 - Loot left on the ground (including the cargo you drop when your core destabilizes in Surge) is now kept when you close and reopen the game.
 - Your cargo can no longer vanish when you fall on a floor already littered with pickups.

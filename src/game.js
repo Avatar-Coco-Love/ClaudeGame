@@ -407,6 +407,7 @@ export class Game {
   }
 
   hurtPlayer(amount, dx, dy) {
+    if (this.god) return; // dev god mode (S-7); never saved
     const p = this.player;
     p.integrity -= amount;
     p.invuln = 0.5; p.hurtFlash = 0.3;

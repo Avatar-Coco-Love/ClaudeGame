@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 14** · **Version: v0.1.16** (session 14 was an Audit; next is a Build)
+**Session counter: 15** · **Version: v0.1.17** (session 15 was a Build; next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -20,7 +20,8 @@ _Last updated: 2026-11-23_
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups) every 10 s, on deposit, and on page hide. Saves carry a format number (now 3); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
-- Build-ready specs live in `07`, in build order: S-7, S-8 (depth rings), S-9 (vaults), S-10 (Lumen, right before Research v1).
+- Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
+- Build-ready specs live in `07`, in build order: S-8 (depth rings), S-9 (vaults), S-10 (Lumen, right before Research v1).
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -40,9 +41,10 @@ _Last updated: 2026-11-23_
 - Real-time play: 32 crystal breaks → 32 hitstops in 60 s, none on rock; a room 62 cells out looks like the start (session 12).
 - Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
+- `dev.teleport(60)` lands 1936 px out in an open room; no panel without `?dev`; god mode is never saved (session 15).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (15) is a **Build**: S-7 dev panel (spec in `07`).
+Next session (16) is a **Build**: S-8 depth rings (spec in `07`).
