@@ -1,7 +1,7 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
 import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
-import { World, packBits, unpackBits, mulberry32 } from './world.js';
+import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
@@ -94,7 +94,8 @@ export class Game {
     this.hitstop = 0;    // real seconds the main loop skips update() for (S-4); tools never read it
     this.lastHitstop = -Infinity;
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
-    this.rand = mulberry32((seed ^ Date.now()) >>> 0);
+    // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
+    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
     if (save) this.load(save);
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
@@ -265,7 +266,7 @@ export class Game {
     this.burst(cx, cy, type === T.ROCK ? 8 : 16, mat.edge, 150);
     this.addShake(type === T.ROCK ? 1.5 : 3);
     if (mat.yield) {
-      const n = mat.yield.min + Math.floor(this.rand() * (mat.yield.max - mat.yield.min + 1));
+      const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
       for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
       this.audio.break(mat.yield.kind);
       if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }
@@ -276,7 +277,7 @@ export class Game {
 
   spawnPickup(x, y, kind) {
     if (this.pickups.length >= PICKUP_CAP) return;
-    const a = this.rand() * Math.PI * 2, s = 40 + this.rand() * 90;
+    const r = this.rng.pickup, a = r() * Math.PI * 2, s = 40 + r() * 90;
     this.pickups.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, kind, age: 0, r: 4 });
   }
 
@@ -332,7 +333,7 @@ export class Game {
     const maxCount = distFromNexus < NEXUS_RADIUS * 2 ? 1 : Math.min(9, 2 + Math.floor(distFromNexus / 520));
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) {
-      this.spawnTimer = 2.2 + this.rand() * 1.8;
+      this.spawnTimer = 2.2 + this.rng['glitch-spawn']() * 1.8;
       if (this.enemies.length < maxCount) this.trySpawnEnemy(distFromNexus);
     }
     const list = this.enemies;
@@ -350,7 +351,7 @@ export class Game {
       }
       let tx = 0, ty = 0;
       if (d < 560) { tx = dx / d; ty = dy / d; e.alert = true; }
-      else { e.wander += (this.rand() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
+      else { e.wander += (this.rng['glitch-wander']() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
       const nd = Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y);
       if (nd < NEXUS_RADIUS + 40) { // the nexus repels glitches
         tx = (e.x - this.nexus.x) / nd * 1.5; ty = (e.y - this.nexus.y) / nd * 1.5;
@@ -374,7 +375,7 @@ export class Game {
       if (e.hp <= 0) {
         this.stats.glitches++;
         this.burst(e.x, e.y, 22, '#ff7a3d', 220);
-        if (this.rand() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
+        if (this.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
         for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
         this.audio.enemyDie();
         this.addShake(4);
@@ -388,7 +389,7 @@ export class Game {
   trySpawnEnemy(distFromNexus) {
     const p = this.player;
     for (let tries = 0; tries < 12; tries++) {
-      const a = this.rand() * Math.PI * 2, r = 480 + this.rand() * 260;
+      const rs = this.rng['glitch-spawn'], a = rs() * Math.PI * 2, r = 480 + rs() * 260;
       const x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
       if (Math.hypot(x - this.nexus.x, y - this.nexus.y) < NEXUS_RADIUS * 2.2) continue;
       const probe = { x, y, r: ENEMY_R };

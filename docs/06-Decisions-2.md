@@ -7,7 +7,7 @@ D-015's rule (no 24 px gain on the core for 6 s → fade, no loot, slot freed) n
 - Rejected: alert-only (the spec; measured no effect); spawning inside the alert range (shrinks the 480–740 px spawn ring the player can't see into); despawning wanderers sooner by distance (they sit 700–1500 px, the same as live ones).
 
 ### D-018 — Glitch Prism drop is a 50 % chance (2026-11-23, Q-007 fallback)
-After D-017 a parked Surge farm hits 4.1–4.7 kills/min at any upgrade level, over S-6's 3/min trigger, so each kill drops a Prism half the time (`GLITCH_PRISM_CHANCE`); Shards unchanged. That is ~2▲/min renewable against 246▲ for a full Matrix. Uses `game.rand()` until S-5 gives it its own stream.
+After D-017 a parked Surge farm hits 4.1–4.7 kills/min at any upgrade level, over S-6's 3/min trigger, so each kill drops a Prism half the time (`GLITCH_PRISM_CHANCE`); Shards unchanged. That is ~2▲/min renewable against 246▲ for a full Matrix. Draws from `game.rng['glitch-loot']` (D-025).
 - Rejected: fewer Glitches (Surge would go quiet again, pillar 2); no Prism at all (removes Surge's own reward); a cap per minute (invisible rule, intent ≠ realized).
 
 ### D-019 — Keep the 50 % Glitch Prism drop: Surge doesn't out-earn Drift (2026-11-23, audit 9; checks D-018 against D-002)
@@ -53,3 +53,11 @@ Pillar 4 says a layer closes its loop before the next starts, so S-10 Lumen and 
 Vaults (S-9) pay 20◆ + 6▲, equal in both modes (D-002), so they are useful the day they ship.
 - Rejected: Lumen first and Research "later" (a currency with nothing to buy); Lumen in vault caches (ties S-9 to S-10); a
   Surge-only vault guard (Surge would get the harder path to the same loot; M6 owns Surge depth).
+
+### D-025 — Gameplay randomness: one seeded stream per draw (2026-11-23, Build 13, S-5)
+`game.rng` holds five streams, `seededStream(worldSeed, salt)` (FNV-1a salt hash mixed with the seed, then mulberry32): `yield`,
+`pickup` (scatter), `glitch-spawn` (timer + place), `glitch-wander`, `glitch-loot` (D-018 Prism roll). Particles and shake stay on
+`Math.random` (visual only). Same seed + same input = same run, so bots and smoke can compare runs. Streams restart on load.
+- Rejected: one shared seeded stream (an extra roll anywhere shifts every later draw); keeping `Date.now()` salting (runs not
+  reproducible); saving stream state in the save (needs a `SAVE_FORMAT` bump for no player benefit; a restart replays nothing a
+  player can steer, since which cell breaks next is up to them).
