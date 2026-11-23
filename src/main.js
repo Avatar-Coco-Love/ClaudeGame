@@ -71,7 +71,7 @@ $('new-world').addEventListener('click', () => {
 });
 
 // ---------- HUD ----------
-function persist() { if (game) store.write(game.toSave()); }
+function persist() { if (game && !game.demo) store.write(game.toSave()); }
 
 function toast(msg, ms = 2600) {
   const t = $('toast');
@@ -199,6 +199,7 @@ addEventListener('pagehide', persist);
 
 // Render a live world behind the title screen so it isn't a blank page.
 game = new Game({ seed: 1337, mode: 'drift', save: null, audio: { beam() {}, break() {}, pickup() {}, deposit() {}, upgrade() {}, hurt() {}, enemyDie() {}, full() {} } });
+game.demo = true; // background world for the title screen — never saved
 renderer.attach(game);
 showTitle();
 requestAnimationFrame(frame);
