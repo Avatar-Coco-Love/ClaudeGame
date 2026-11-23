@@ -4,6 +4,7 @@ Settled decisions, by ID. Open questions live in `03` (Q-xxx); something is deci
 Never edit a decision silently: write a new one that **supersedes** the old one and mark the old one `Superseded by D-xxx`.
 Every entry lists the alternatives rejected and why, so a later session can reverse it cheaply.
 When this file nears 8 KB, move the oldest superseded entries word for word into `docs/archive/decisions-1.md`.
+This file is full: new decisions go in `06-Decisions-2.md` (D-017 on).
 
 ### D-001 — Static vanilla JS, no build step (2026-11-23)
 Vanilla ES modules, Canvas 2D, no framework, no runtime dependencies. Served as static files from GitHub Pages.
@@ -70,10 +71,6 @@ Session 7 (Design, normally no gameplay code) found B-007: dying to one of sever
 ### D-014 — Keep synthesized audio (2026-11-23, answers Q-006)
 No recorded sound pack. Sessions can't listen, so a listen-test can't decide it; synthesized sound stays tunable in code and keeps the game binary-free. S-4 improves the sounds we have.
 - Rejected: a free recorded pack (first binary assets, licence tracking, size budget, and still no way to judge it); asking the owner (not expected to respond).
-
-### D-015 — Glitches give up when rock blocks them (2026-11-23, S-6)
-A Glitch that hasn't gained 24 px on the core for 6 s fades out with no loot and frees its spawn slot. Measured: 37 of 38 live Glitches were stuck on rock and the spawn cap stayed full, so Surge went quiet.
-- Rejected: A* pathing (costly per frame, and Glitches threading tunnels changes Surge's difficulty far more than one PR should); Glitches that bore through rock (that's M6's Burrower); a lower despawn distance (stuck Glitches sit 400–900 px away, inside any sane limit).
 
 ### D-016 — Settings: no reset button, opened from the title (2026-11-23, S-3)
 New World already replaces the world behind a confirm, so a second reset path is cut. ≡ already returns to the title, so Settings lives there. Mute moves into the settings object.

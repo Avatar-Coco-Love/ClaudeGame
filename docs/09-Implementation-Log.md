@@ -1,15 +1,6 @@
 # 09 — Implementation Log
 
-Older entries (v0.1 to session 2): `archive/2026-11-23-09-sessions-0-2.md`.
-
-## 2026-11-23 — Session 3 (v0.1.5): Design — play-test + economy measurement
-- **Play-test:** Playwright, desktop 1280×800 and Pixel 7, deviceScaleFactor 1. A straight-line bot (6 legs × 14 s, deposit each) banked
-  only 12◆ in ~90 s: it ran 63 cells out through open caves and mined 11 cells on leg one. Players must hunt crystals; straight tunnelling barely pays.
-- **Measured (40 seeds, `World` in Node):** world supply ≈ 2750◆ / 1470▲. Full Core Matrix = 2482◆ / 246▲. Prisms first appear 32 cells out (median 32.2).
-  Crystal share falls from 13.6 % (0–15 cells) to ~5 % past 30. → D-009 (Nexus Development costs Prisms only), Q-007 (Surge is the only renewable income).
-- **Decided:** D-008 (dense rock stays ungated, answers Q-005), D-009. Specs S-1…S-5 written in the new `docs/07-Build-Specs.md`; `04` reordered to match.
-- **Bug found (not fixed, logged in 04 Debt):** B-002, phones show the desktop hint ("WASD…", truncated) and an `E` badge until the first touch.
-- **Not a bug:** Integrity is hidden from the Core Matrix in Drift until bought (`main.js`), by design: it only matters in Surge.
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`.
 
 ## 2026-11-23 — Session 4 (v0.1.6): Audit
 - **How:** no subagent tool in this session, so the five dimensions (correctness, perf, mobile, code health, docs drift) were done in-line, each finding reproduced before acting.
@@ -41,3 +32,12 @@ Older entries (v0.1 to session 2): `archive/2026-11-23-09-sessions-0-2.md`.
 - **Q-007 measured** with the new `tools/surgefarm.mjs` (10 seeds × 300 s): a parked Surge bot makes 0.2–0.6 kills/min at 1000–1700 px, any upgrade level. Not a money printer today. Why: 37 of 38 live Glitches (20 seeds, 120 s idle) were pressed against rock, holding every spawn slot. Surge goes quiet in tunnels → D-015, spec S-6 (next build).
 - **Decided:** D-013 (crash fixes in any session), D-014 (keep synthesized audio, answers Q-006), D-015, D-016 (S-3 trimmed: no reset button, opened from the title, mute folded in).
 - **Specs:** S-6 (Glitch give-up) and S-7 (dev panel) written; S-3 refined; built S-1/S-2 removed from `07`. **B-008** (logged): the "Press E" hint shows under the open Matrix.
+
+## 2026-11-23 — Session 8 (v0.1.10): Build — S-6 Glitch give-up
+- **Built:** every Glitch keeps `best`/`stall`; no 24 px gain on its best distance to the core for 6 s → `fade` 0.6 s (drifts to a stop, no contact, no loot, skipped by the beam), then removed. A contact hit resets the stall. Render fades alpha and shrinks to 40 %. Constants in `config.js`.
+- **Spec was wrong, measured:** alert-only (as specced) left `surgefarm 1000 0 300` at 0.36 kills/min, 28/29 stuck. A probe showed the slot-holders were *unalerted* wanderers spawned 560–740 px out, drifting in rock. Applying the rule to all Glitches → D-017.
+- **surgefarm before → after (10 seeds × 300 s):** 1000 px lvl0 0.38 → 4.30 kills/min (deaths 0.02 → 0.80); lvl3 0.42 → 4.14; 1700 px lvl0 1.10 → 4.74; lvl6 0.78 → 4.10. Stuck at end 30–50 → 4–9. Over 3/min, so the Q-007 fallback shipped: Prism drop 50 % (D-018).
+- **Tests:** 2 smoke checks (37 total), stepped in-page by game time (480 × 1/60 s). Boxed one failed on the old code (still present). First run of it failed on the new code too: the open Glitch's hits knocked the core toward the box, which counted as progress; the core is now invulnerable for the check.
+- **Screenshot (800×500, DSF 1):** full, mid-fade and almost-gone Glitches side by side read as one shape shrinking and dimming; no new effect.
+- **Docs:** `09` session 3 archived word for word. `06` hit 8 KB: D-015 (superseded) archived word for word to `docs/archive/decisions-1.md`, new decisions go in `06-Decisions-2.md`; `tests/docs.cjs` checks ID uniqueness across both.
+- **Watch:** a core that outruns a Glitch also makes it give up (it lost the trail). Fine for now; Glitches still can't path (logged in `04` Debt).

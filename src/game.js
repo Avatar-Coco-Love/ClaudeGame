@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, MATERIAL, UPGRADES, NEXUS_UPGRADES, upgradeCost, T } from './config.js';
 import { World, packBits, unpackBits, mulberry32 } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 
@@ -214,6 +214,7 @@ export class Game {
     // Enemies along the ray, if closer than the wall.
     let best = null;
     for (const e of this.enemies) {
+      if (e.fade !== undefined) continue; // a Glitch that gave up can't be targeted (S-6)
       const ex = e.x - ox, ey = e.y - oy;
       const t = ex * dx + ey * dy;
       if (t < 0 || t > dist) continue;
@@ -321,6 +322,12 @@ export class Game {
       e.flash = Math.max(0, e.flash - dt);
       e.hitCd = Math.max(0, e.hitCd - dt);
       const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
+      if (e.fade !== undefined) { // gave up (S-6): drift to a stop and vanish; harmless and lootless
+        e.fade -= dt; e.vx *= 0.9; e.vy *= 0.9;
+        moveBody(this.world, e, e.vx * dt, e.vy * dt);
+        if (e.fade <= 0) list.splice(i, 1);
+        continue;
+      }
       let tx = 0, ty = 0;
       if (d < 560) { tx = dx / d; ty = dy / d; e.alert = true; }
       else { e.wander += (this.rand() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
@@ -332,8 +339,14 @@ export class Game {
       e.vx += (tx * e.speed - e.vx) * Math.min(1, dt * 3);
       e.vy += (ty * e.speed - e.vy) * Math.min(1, dt * 3);
       moveBody(this.world, e, e.vx * dt, e.vy * dt);
+      { // S-6 / D-017: no progress on its best distance to the core for GLITCH_GIVE_UP_S -> give up. Covers wanderers too:
+        // they were the real slot-holders (spawned beyond the 560 px alert range, drifting in rock, never alerted).
+        if (!(d > (e.best ?? Infinity) - GLITCH_PROGRESS_PX)) { e.best = d; e.stall = 0; }
+        else if ((e.stall = (e.stall || 0) + dt) >= GLITCH_GIVE_UP_S) { e.fade = GLITCH_FADE_S; continue; }
+      }
       if (d < e.r + p.r && e.hitCd <= 0) {
         e.hitCd = 0.9;
+        e.best = d; e.stall = 0; // reaching the core counts as progress, so knockback doesn't start a give-up
         e.vx = -dx / d * 260; e.vy = -dy / d * 260;
         if (p.invuln <= 0) this.hurtPlayer(e.dmg, dx / d, dy / d);
         if (this.enemies !== list) return; // destabilize() replaced the list mid-loop (B-007: indexing on froze the game)
@@ -341,7 +354,7 @@ export class Game {
       if (e.hp <= 0) {
         this.stats.glitches++;
         this.burst(e.x, e.y, 22, '#ff7a3d', 220);
-        this.spawnPickup(e.x, e.y, 'prism');
+        if (this.rand() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
         for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
         this.audio.enemyDie();
         this.shake = Math.max(this.shake, 4);

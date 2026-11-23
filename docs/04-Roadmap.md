@@ -11,7 +11,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ (#7) **S-1 Nexus Development v1 — Radiance:** a Prism-only sink that grows the Nexus light radius, as a "Nexus" tab in the Core Matrix panel.
 - ✅ (#8) **S-2 Touch-first hints + narrow screens:** fixes B-001 and B-002 and adds the 320×568 overflow smoke check (pulled forward from Tooling).
 - ✅ (#9) Design session 7: play-test, Q-006/Q-007 measured and decided, B-007 crash fixed, specs S-6 and S-7.
-- **S-6 Glitches give up when rock blocks them:** stuck Glitches fade and free their slot so Surge keeps its pressure (D-015).
+- ✅ (#10) **S-6 Glitches give up when they make no progress:** they fade and free their slot so Surge keeps its pressure (D-017); Glitch Prism drop at 50 % (D-018).
 - **S-3 Settings panel:** volume, mute, screen shake on/off, reduced motion (no reset button: New World covers it, D-016).
 - **S-4 Feel pass:** deposit fanfare, an upgrade pulse, crystal-break hitstop, and a beam charge-up sound. After S-3, so effects ship with their off switch.
 - ✅ (#5) Design session 3: play-test, economy measurement, specs S-1…S-5.
@@ -65,5 +65,6 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **B-005:** `destabilize` scatters cargo through `spawnPickup`, which silently drops items past `PICKUP_CAP` (400): cargo can vanish if the floor is littered. Rare; fold into S-4 or the dev panel.
 - **Render cost:** pickups and particles are drawn without viewport culling, each pickup with `shadowBlur`. Headless SwiftShader gave 112 ms/frame at ×4 throttle while mining, which is software GL, not a real device. Measure on the throttled perf check (Tooling) before changing.
 - **B-006:** smoke "beam mines terrain" is timing-dependent (5 s wall clock; 3–8 cells mined across runs, needs ≥ 4). Failed once in 6 runs. Fix: drive it by game time (step `game.update`), not wall time. Don't lower the bar.
+- **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **To verify:** touch sticks aren't cleared on `blur`/page hide (keys are). If a phone drops `touchend` while hidden, the core may drift on return.
 - ✅ **Test trap** (sessions 4, 5): planting a save then reloading let `pagehide` overwrite it. Now a smoke helper, `plantSaveAndReload()`.

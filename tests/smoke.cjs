@@ -97,6 +97,24 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await pg.waitForTimeout(500);
     const d7 = await pg.evaluate(t => { const g = window.__lumen.game; return { ran: g.stats.time - t, home: Math.round(Math.hypot(g.player.x - g.nexus.x, g.player.y - g.nexus.y)) }; }, t0);
     check('death among several Glitches keeps the game running (B-007)', d7.ran > 0.2 && d7.home < 200, JSON.stringify(d7));
+    // S-6: a Glitch boxed in by dense rock gives up (fades, no kill credit); one with a clear line keeps chasing. Stepped in-page, 8 s.
+    const s6 = await pg.evaluate(() => {
+      const g = window.__lumen.game, p = g.player, w = g.world, C = 32;
+      p.x = g.nexus.x + 1200.5; p.y = g.nexus.y + 1216; p.integrity = 1e6; p.vx = p.vy = 0;
+      const set = (cx, cy, t) => { w.cells[w.idx(cx, cy)] = t; w.damage[w.idx(cx, cy)] = 0; };
+      const pcx = Math.floor(p.x / C), pcy = Math.floor(p.y / C);
+      for (let y = -1; y <= 1; y++) for (let x = -10; x <= 1; x++) set(pcx + x, pcy + y, 0); // open corridor to the west (player invulnerable: hits would knock it toward the box)
+      for (let y = -1; y <= 1; y++) for (let x = 8; x <= 10; x++) set(pcx + x, pcy + y, x === 9 && y === 0 ? 0 : 2); // dense box to the east
+      const mk = cx => ({ x: (cx + 0.5) * C, y: (pcy + 0.5) * C, r: 11, vx: 0, vy: 0, tier: 0, hp: 99, maxHp: 99, speed: 120, dmg: 0, spin: 0, flash: 0, hitCd: 0, wander: 0, alert: false });
+      const boxed = mk(pcx + 9), open = mk(pcx - 9);
+      g.enemies = [boxed, open];
+      const kills = g.stats.glitches, d0 = Math.hypot(open.x - p.x, open.y - p.y);
+      for (let i = 0; i < 480; i++) { g.spawnTimer = 99; p.invuln = 9; g.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null }); }
+      return { boxedGone: !g.enemies.includes(boxed), openHere: g.enemies.includes(open), d0: Math.round(d0),
+        d1: Math.round(Math.hypot(open.x - p.x, open.y - p.y)), killsSame: g.stats.glitches === kills };
+    });
+    check('boxed-in Glitch gives up and frees its slot (S-6)', s6.boxedGone && s6.killsSame, JSON.stringify(s6));
+    check('Glitch with a clear line keeps chasing (S-6)', s6.openHere && s6.d1 < s6.d0, JSON.stringify(s6));
 
     // Save / reload.
     const snap = await pg.evaluate(() => { dispatchEvent(new Event('pagehide')); const g = window.__lumen.game; return { mined: g.stats.mined, up: JSON.stringify(g.upgrades), nexus: g.nexusLevels.radiance }; });

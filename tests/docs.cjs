@@ -24,7 +24,7 @@ function run() {
   check('VERSION matches the top changelog entry', !!version && entries[0] === version, `config ${version}, changelog ${entries[0]}`);
   check('changelog versions are unique', new Set(entries).size === entries.length);
 
-  const dec = fs.readFileSync(path.join(ROOT, 'docs/06-Decisions.md'), 'utf8');
+  const dec = docs.filter(f => /^docs\/06-Decisions(-\d+)?\.md$/.test(f)).map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
   const ids = [...dec.matchAll(/^### (D-\d{3})/gm)].map(m => m[1]);
   check('decision IDs are unique', new Set(ids).size === ids.length && ids.length > 0, `${ids.length} decisions`);
 

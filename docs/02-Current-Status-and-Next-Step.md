@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-23_
 
-**Session counter: 7** · **Version: v0.1.9** (session 7 was a Design: B-007 crash fix, Q-006/Q-007, specs S-6/S-7; next is a Build)
+**Session counter: 8** · **Version: v0.1.10** (session 8 was a Build: S-6 Glitch give-up + 50 % Prism drop; next is an Audit)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages.
@@ -12,11 +12,12 @@ _Last updated: 2026-11-23_
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
 - Nexus Development v1: a **Nexus** tab in the Matrix sheet sells Radiance (5 levels, Prisms only, D-009): +96 px Nexus light per level and a wider explored disc.
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
+  A Glitch that gains no ground on the core for 6 s fades out and frees its slot (D-017); kills drop a Prism half the time (D-018).
 - Darkness/light overlay, explored-only minimap, an off-screen Nexus pointer, contextual hints, synthesized audio, and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy) every 10 s, on deposit, and on page hide. Saves carry a format number (now 2); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
-- Build-ready specs live in `07`, in build order: S-6, S-3, S-4, S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Build-ready specs live in `07`, in build order: S-3, S-4, S-5, S-7. Tools: `tools/surgefarm.mjs` (parked Surge probe). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels continuously and collects Shards.
@@ -28,9 +29,10 @@ _Last updated: 2026-11-23_
 - Radiance spends only Prisms, grows the light and minimap, survives reload; Matrix tabs fit at 320 px (session 5).
 - Phone shows the thumb hint before the first touch; nothing in title/HUD/Matrix overflows at 320 px (session 6).
 - Dying among several Glitches near the Nexus no longer freezes the game (B-007, session 7).
+- A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty).
 
 ## Next step (one thing)
-Next session (8) is a **Build**: build **S-6** from `07` (stuck Glitches give up and free their slot), and re-run `tools/surgefarm.mjs` before/after.
+Next session (9) is an **Audit** (counter % 5 == 4): parallel subagent sweep per the manual, fix the top issues (B-006 flaky mining check is a strong candidate), archive old `09` entries.
