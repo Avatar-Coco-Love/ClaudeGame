@@ -31,6 +31,26 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
 
 // S-5: the same seed + the same scripted input -> the same pickups and Glitch spawns (node-side, no browser needed).
 // Each game is built ≥ 3 ms apart so a clock-salted RNG (the old `seed ^ Date.now()`) can't pass by luck.
+// Audit 14: cargo scattered on a death survives a full floor (B-005); floor pickups survive save + load (B-011).
+async function lootChecks() {
+  const { Game } = await import('../src/game.js');
+  const { upgradeSave } = await import('../src/save.js');
+  const audio = new Proxy({}, { get: () => () => {} });
+  const g = new Game({ seed: 77, mode: 'surge', audio });
+  for (let i = 0; i < 400; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard');
+  const floor = g.pickups.length;
+  g.cargo = { shard: 7, prism: 3 };
+  g.player.integrity = 1; g.hurtPlayer(5, 1, 0);
+  const kept = g.pickups.slice(floor);
+  check('death on a full floor keeps every cargo item (B-005)', floor === 400 && kept.length === 10 && kept.filter(q => q.kind === 'prism').length === 3,
+    `floor ${floor}, scattered ${kept.length}`);
+  const s = JSON.parse(JSON.stringify(g.toSave()));
+  const h = new Game({ seed: 77, mode: 'surge', audio, save: upgradeSave(s) });
+  const count = (list, k) => list.filter(q => q.kind === k).length;
+  check('floor pickups survive save + load (B-011)', h.pickups.length === 410 && count(h.pickups, 'prism') === 3
+    && Math.round(h.pickups[405].x) === Math.round(g.pickups[405].x), `${h.pickups.length} restored, ${count(h.pickups, 'prism')} prisms`);
+}
+
 async function rngChecks() {
   const { Game } = await import('../src/game.js');
   const audio = new Proxy({}, { get: () => () => {} });
@@ -59,6 +79,7 @@ async function rngChecks() {
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
+  await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -96,6 +117,13 @@ async function rngChecks() {
     await pg.waitForTimeout(2000);
     const bank = await pg.evaluate(() => ({ ...window.__lumen.game.bank, cargo: window.__lumen.game.cargoTotal() }));
     check('deposit empties cargo into bank', bank.cargo === 0 && bank.shard >= 30, JSON.stringify(bank));
+    // B-010: Shards already banked -> the hint says to upgrade, not to "bring shards home".
+    await pg.evaluate(() => { const g = window.__lumen.game; g.player.y = g.nexus.y + 400; });
+    await pg.waitForTimeout(200);
+    const h10 = await pg.evaluate(() => ({ text: document.getElementById('hint').textContent, up: window.__lumen.game.stats.upgrades }));
+    await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; });
+    await pg.waitForTimeout(100);
+    check('banked Shards: hint says upgrade ready, not "bring home" (B-010)', h10.up === 0 && /upgrade ready/i.test(h10.text), JSON.stringify(h10));
     await pg.keyboard.press('e'); await pg.waitForTimeout(200);
     check('core matrix opens', await pg.isVisible('#matrix'));
     check('no "Press E" hint under the open Matrix (B-008)', !(await pg.isVisible('#hint')), await pg.textContent('#hint'));
@@ -195,6 +223,11 @@ async function rngChecks() {
     await pg.click('#continue'); await pg.waitForTimeout(200);
     const old = await pg.evaluate(() => ({ mined: window.__lumen.game.stats.mined, radiance: window.__lumen.game.nexusLevels.radiance }));
     check('unversioned (format 1) save still loads, Radiance 0', old.mined === snap.mined && old.radiance === 0, JSON.stringify(old));
+    // A format-2 save has no `pickups` (B-011).
+    await plantSaveAndReload(pg, s => { s.v = 2; delete s.pickups; return s; });
+    await pg.click('#continue'); await pg.waitForTimeout(200);
+    const f2 = await pg.evaluate(() => ({ mined: window.__lumen.game.stats.mined, pickups: window.__lumen.game.pickups.length }));
+    check('format-2 save (no pickups) still loads (B-011)', f2.mined === snap.mined && f2.pickups >= 0, JSON.stringify(f2));
 
     // A save this build can't read (newer format) must not be wiped without asking (D-005, B-004).
     await plantSaveAndReload(pg, () => ({ v: 99, seed: 5, mode: 'drift', bank: { shard: 1, prism: 1 } }));

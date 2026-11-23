@@ -61,3 +61,10 @@ Vaults (S-9) pay 20◆ + 6▲, equal in both modes (D-002), so they are useful t
 - Rejected: one shared seeded stream (an extra roll anywhere shifts every later draw); keeping `Date.now()` salting (runs not
   reproducible); saving stream state in the save (needs a `SAVE_FORMAT` bump for no player benefit; a restart replays nothing a
   player can steer, since which cell breaks next is up to them).
+
+### D-026 — Floor pickups are part of the save; dropped cargo ignores the pickup cap (2026-11-23, audit 14, B-005/B-011)
+Every pickup on the floor is saved as `[kind, x, y]` (0 = Shard, 1 = Prism) and comes back at rest, ready to collect (`SAVE_FORMAT` 3).
+A death's cargo scatter skips `PICKUP_CAP`; it is bounded by the hold (≤ 140), so the list can't grow without limit.
+- Why: Surge's promise that dropped cargo can be recovered broke on reload, and S-9 caches drop loot as pickups.
+- Rejected: evicting the oldest pickup at the cap (loses other loot instead); saving velocity/age (no player benefit, bigger save);
+  dropping cargo straight into the bank on reload (removes the retrieval run Surge is built on).

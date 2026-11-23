@@ -275,8 +275,9 @@ export class Game {
     }
   }
 
-  spawnPickup(x, y, kind) {
-    if (this.pickups.length >= PICKUP_CAP) return;
+  // `force` skips the cap: the player's own cargo must never vanish on a littered floor (B-005); it is bounded by the hold.
+  spawnPickup(x, y, kind, force = false) {
+    if (this.pickups.length >= PICKUP_CAP && !force) return;
     const r = this.rng.pickup, a = r() * Math.PI * 2, s = 40 + r() * 90;
     this.pickups.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, kind, age: 0, r: 4 });
   }
@@ -418,7 +419,7 @@ export class Game {
   destabilize() {
     const p = this.player;
     // Cargo isn't destroyed — it scatters where you fell, so a retrieval run is possible.
-    for (const kind of ['shard', 'prism']) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind);
+    for (const kind of ['shard', 'prism']) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind, true);
     this.cargo = { shard: 0, prism: 0 };
     this.burst(p.x, p.y, 50, '#ffffff', 300);
     p.x = this.nexus.x; p.y = this.nexus.y + 40; p.vx = p.vy = 0;
@@ -458,6 +459,7 @@ export class Game {
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored),
+      pickups: this.pickups.map(q => [q.kind === 'prism' ? 1 : 0, Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
     };
   }
   load(s) {
@@ -471,5 +473,6 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
+    for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: k ? 'prism' : 'shard', age: 1, r: 4 });
   }
 }
