@@ -1,0 +1,206 @@
+// Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
+import { UPGRADES, upgradeCost, MODES, RESOURCE } from './config.js';
+import { Game } from './game.js';
+import { Renderer } from './render.js';
+import { Input } from './input.js';
+import { Audio } from './audio.js';
+
+const SAVE_KEY = 'lumencore.save.v1';
+const $ = id => document.getElementById(id);
+
+const store = {
+  read() { try { const s = localStorage.getItem(SAVE_KEY); return s ? JSON.parse(s) : null; } catch { return null; } },
+  write(data) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch { /* storage unavailable */ } },
+  clear() { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } },
+  pref(k, v) {
+    try { if (v === undefined) return localStorage.getItem('lumencore.' + k); localStorage.setItem('lumencore.' + k, v); } catch { return null; }
+  },
+};
+
+const canvas = $('game');
+const audio = new Audio();
+const input = new Input(canvas);
+const renderer = new Renderer(canvas, $('minimap'));
+let game = null;
+let paused = true;
+let panelOpen = false;
+let saveTimer = 0;
+let toastTimer = 0;
+let selectedMode = 'drift';
+
+audio.setMuted(store.pref('muted') === '1');
+updateMuteButton();
+
+// ---------- title screen ----------
+function showTitle() {
+  paused = true;
+  $('title').classList.remove('hidden');
+  $('hud').classList.add('hidden');
+  const save = store.read();
+  $('continue').classList.toggle('hidden', !save);
+  if (save) {
+    $('continue').querySelector('small').textContent =
+      `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph} banked`;
+  }
+  selectMode(save?.mode || 'drift');
+}
+
+function selectMode(mode) {
+  selectedMode = mode;
+  document.querySelectorAll('.mode-card').forEach(el => el.classList.toggle('selected', el.dataset.mode === mode));
+}
+document.querySelectorAll('.mode-card').forEach(el => el.addEventListener('click', () => selectMode(el.dataset.mode)));
+
+function start(save) {
+  audio.unlock();
+  const seed = save ? save.seed : (Math.random() * 2 ** 31) | 0;
+  game = new Game({ seed, mode: save ? save.mode : selectedMode, save, audio });
+  renderer.attach(game);
+  $('title').classList.add('hidden');
+  $('hud').classList.remove('hidden');
+  $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
+  paused = false;
+  persist();
+}
+
+$('continue').addEventListener('click', () => start(store.read()));
+$('new-world').addEventListener('click', () => {
+  if (store.read() && !confirm('Start a new world? Your current world and upgrades will be replaced.')) return;
+  store.clear();
+  start(null);
+});
+
+// ---------- HUD ----------
+function persist() { if (game) store.write(game.toSave()); }
+
+function toast(msg, ms = 2600) {
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  toastTimer = ms / 1000;
+}
+
+function hint() {
+  const g = game, touch = input.usingTouch;
+  if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
+  if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
+  if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
+  if (g.stats.upgrades === 0 && g.bank.shard + g.cargo.shard >= upgradeCost(0).shard) return 'Bring shards home to the Nexus to upgrade';
+  if (g.stats.mined < 12) return 'Cyan crystal veins drop Shards ◆';
+  return '';
+}
+
+let lastHud = '';
+function updateHud() {
+  const g = game;
+  const cap = g.stat('cargo'), total = g.cargoTotal();
+  const key = [g.bank.shard, g.bank.prism, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades].join('|');
+  if (key !== lastHud) {
+    lastHud = key;
+    $('bank-shard').textContent = g.bank.shard;
+    $('bank-prism').textContent = g.bank.prism;
+    $('cargo-text').textContent = `${total}/${cap}`;
+    $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
+    $('cargo-fill').classList.toggle('full', total >= cap);
+    const hull = g.stat('hull');
+    $('integrity-fill').style.width = `${Math.max(0, g.player.integrity / hull * 100)}%`;
+    $('integrity-text').textContent = `${Math.max(0, Math.ceil(g.player.integrity))}/${hull}`;
+    $('matrix-btn').classList.toggle('hidden', !g.inNexus());
+    const h = hint();
+    $('hint').textContent = h;
+    $('hint').classList.toggle('hidden', !h);
+  }
+  for (const ev of g.events) {
+    if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
+    if (ev === 'deposited') { toast('Deposited'); persist(); }
+    if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
+  }
+  g.events.length = 0;
+}
+
+// ---------- Core Matrix panel ----------
+function openPanel() {
+  if (!game || !game.inNexus()) return;
+  panelOpen = true;
+  renderPanel();
+  $('matrix').classList.remove('hidden');
+}
+function closePanel() {
+  panelOpen = false;
+  $('matrix').classList.add('hidden');
+  persist();
+}
+function renderPanel() {
+  const g = game;
+  $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>`;
+  const list = $('upgrade-list');
+  list.innerHTML = '';
+  for (const u of UPGRADES) {
+    if (u.id === 'hull' && g.mode !== 'surge' && g.upgrades.hull === 0) continue;
+    const lvl = g.upgrades[u.id], maxed = lvl >= u.max;
+    const cost = upgradeCost(lvl);
+    const row = document.createElement('div');
+    row.className = 'upgrade';
+    const pips = Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
+    const now = u.fmt(u.value(lvl)), next = maxed ? '' : ` → <b>${u.fmt(u.value(lvl + 1))}</b>`;
+    const costHtml = maxed ? 'MAX' :
+      `<span class="shard">${RESOURCE.shard.glyph}${cost.shard}</span>${cost.prism ? ` <span class="prism">${RESOURCE.prism.glyph}${cost.prism}</span>` : ''}`;
+    row.innerHTML = `
+      <div class="u-main"><div class="u-name">${u.name}</div><div class="u-desc">${u.desc}</div>
+        <div class="u-val">${now}${next}</div><div class="pips">${pips}</div></div>
+      <button class="buy" ${g.canAfford(u.id) ? '' : 'disabled'}>${costHtml}</button>`;
+    row.querySelector('.buy').addEventListener('click', () => { if (g.buy(u.id)) { renderPanel(); persist(); } });
+    list.appendChild(row);
+  }
+  document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));
+  $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m`;
+}
+$('matrix-btn').addEventListener('click', openPanel);
+$('matrix-close').addEventListener('click', closePanel);
+document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
+  game.setMode(b.dataset.mode);
+  $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
+  renderPanel(); persist();
+  toast(`${MODES[game.mode].name} mode — ${MODES[game.mode].blurb}`, 3200);
+}));
+$('menu-btn').addEventListener('click', () => { persist(); closePanel(); showTitle(); });
+
+function updateMuteButton() { $('mute-btn').textContent = audio.muted ? '♪̸' : '♪'; }
+$('mute-btn').addEventListener('click', () => { audio.unlock(); audio.setMuted(!audio.muted); store.pref('muted', audio.muted ? '1' : '0'); updateMuteButton(); });
+
+// ---------- loop ----------
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  if (game) {
+    if (input.consume('mute')) $('mute-btn').click();
+    if (input.consume('matrix')) panelOpen ? closePanel() : openPanel();
+    if (input.consume('escape') && panelOpen) closePanel();
+    if (panelOpen && !game.inNexus()) closePanel();
+    const sp = renderer.worldToScreen(game.player.x, game.player.y);
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : input.read(sp);
+    if (!paused) {
+      const revealed = game.update(dt, intent);
+      renderer.revealed(revealed);
+      updateHud();
+      saveTimer += dt;
+      if (saveTimer > 10) { saveTimer = 0; persist(); }
+    } else {
+      audio.beam(false);
+    }
+    renderer.draw(dt, input);
+  }
+  if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').classList.remove('show'); }
+  requestAnimationFrame(frame);
+}
+
+addEventListener('visibilitychange', () => { if (document.hidden) { persist(); audio.beam(false); } });
+addEventListener('pagehide', persist);
+
+// Render a live world behind the title screen so it isn't a blank page.
+game = new Game({ seed: 1337, mode: 'drift', save: null, audio: { beam() {}, break() {}, pickup() {}, deposit() {}, upgrade() {}, hurt() {}, enemyDie() {}, full() {} } });
+renderer.attach(game);
+showTitle();
+requestAnimationFrame(frame);
+
+window.__lumen = { get game() { return game; }, renderer, input }; // debug handle for tests
