@@ -61,7 +61,7 @@ function cornerAssist(world, b, axis, dirX, dirY, amount) {
 }
 
 export class Game {
-  constructor({ seed, mode, save, audio }) {
+  constructor({ seed, mode, save, audio, settings = null }) {
     this.audio = audio;
     this.mode = mode;
     this.world = new World(seed);
@@ -86,6 +86,7 @@ export class Game {
     this.floaters = [];
     this.events = [];        // UI-facing notifications
     this.shake = 0;
+    this.settings = settings; // live Settings object (S-3); null = all effects on (tools, demo)
     this.depositTimer = 0;
     this.spawnTimer = 3;
     this.depositCount = 0;
@@ -240,12 +241,18 @@ export class Game {
     b.ex = ox + dx * dist; b.ey = oy + dy * dist;
   }
 
+  // Every shake goes through here so the Settings switches (S-3) can turn it off.
+  addShake(n) {
+    if (this.settings && (!this.settings.shake || this.settings.reducedMotion)) return;
+    this.shake = Math.max(this.shake, n);
+  }
+
   onCellBroken(x, y, type) {
     this.stats.mined++;
     const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
     const mat = MATERIAL[type];
     this.burst(cx, cy, type === T.ROCK ? 8 : 16, mat.edge, 150);
-    this.shake = Math.max(this.shake, type === T.ROCK ? 1.5 : 3);
+    this.addShake(type === T.ROCK ? 1.5 : 3);
     if (mat.yield) {
       const n = mat.yield.min + Math.floor(this.rand() * (mat.yield.max - mat.yield.min + 1));
       for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
@@ -357,7 +364,7 @@ export class Game {
         if (this.rand() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
         for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
         this.audio.enemyDie();
-        this.shake = Math.max(this.shake, 4);
+        this.addShake(4);
         this.enemies.splice(i, 1);
         continue;
       }
@@ -389,7 +396,7 @@ export class Game {
     p.integrity -= amount;
     p.invuln = 0.5; p.hurtFlash = 0.3;
     p.vx += dx * 320; p.vy += dy * 320;
-    this.shake = Math.max(this.shake, 8);
+    this.addShake(8);
     this.audio.hurt();
     if (p.integrity <= 0) this.destabilize();
   }

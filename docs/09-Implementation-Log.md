@@ -18,3 +18,9 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **B-009 → fixed (was "to verify" in Debt):** `blur` cleared keys and mouse, not touch sticks; a held stick kept steering after the page hid. `input.release()` on blur and `visibilitychange` hidden. New smoke check (38 total) failed on the old code (stick held, move 0.89).
 - **Perf:** nothing new; the culling item stays in Debt until the throttled perf check exists. **Code health:** no dead code found in touched files; largest file `render.js` 457 lines.
 - **D-check:** D-001…D-018 match the code (spot-read save.js, input.js, main.js tab memory, config costs). `09` sessions 4–7 archived word for word. No screenshot: no visual change.
+
+## 2026-11-23 — Session 10 (v0.1.12): Build — S-3 Settings panel
+- **Built:** `src/settings.js` (load/clean/save `lumencore.settings.v1`, legacy `lumencore.muted` migrated then removed), a Settings sheet over the title (volume slider, mute, shake, reduced motion; ✕, Escape or backdrop closes), `audio.setVolume()`, `game.addShake()` gate (D-020). Mute button and M now write the settings object.
+- **Tests:** 5 new smoke checks (43 total): legacy mute → muted; shake off → `game.shake` max 0 over a stepped Glitch kill + a hit; volume 0 + shake off survive reload; settings never in the world save; sheet fits 320×568 with no scroll and every control ≥ 40 px. Overflow check now covers `#settings`. Shake check failed on the old behaviour (gate disabled: max shake 8).
+- **Screenshots (1280×800 and 320×568, DSF 1):** Settings button reads as secondary under New World; the sheet fits the narrow phone with room to spare; switch states clear (cyan = On).
+- **Watch:** the M badge hides on coarse pointers via a media query, since `body.touch` is only set once a game starts.

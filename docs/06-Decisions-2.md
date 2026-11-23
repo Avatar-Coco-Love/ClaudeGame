@@ -15,3 +15,11 @@ After D-017 a parked Surge farm hits 4.1–4.7 kills/min at any upgrade level, o
 Prism hunt, ▲/min Drift → Surge: lvl0 8.5 → 6.9, lvl3 14.9 → 13.4, lvl6 21.5 → 18.5 (0.81–0.90×); ◆ 1.3–1.5× in Surge but small next to Prisms' value.
 Crystal hunt, ◆/min: 37.0 → 36.6, 51.8 → 48.7, 63.6 → 69.9 (0.94–1.10×). Fighting costs mining time about what the drops pay back. No change.
 - Rejected: drop to 25 % (Surge already earns fewer Prisms); a Drift-only bonus to match (no gap to match); calling it settled for the late game (Drift ore near the Nexus is finite, drops are renewable: Q-007 stays open).
+
+### D-020 — Reduced motion implies no shake; the legacy mute key is removed after migration (2026-11-23, S-3 build)
+Every shake goes through `game.addShake()`, which does nothing when shake is off **or** reduced motion is on, so one switch can't
+leave the other half-working. Reduced motion also adds `body.reduce-motion` (no CSS animations/transitions). On first run the old
+`lumencore.muted` pref is folded into `lumencore.settings.v1` and deleted, so there is one place for one setting (D-016).
+Volume 0–100 maps linearly to master gain 0–0.5 (`config.js`); 70 is the old fixed level, so nobody hears a change.
+- Rejected: shake switch and reduced motion independent (reduced motion with shake on would still shake the screen); keeping the
+  legacy key in sync (two writers); a log/curved volume taper (synth levels are already tuned at 0.35; revisit with S-4 sounds).

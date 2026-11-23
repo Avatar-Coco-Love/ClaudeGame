@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.12 — 2026-11-23 (#12)
+- New **Settings** button on the title screen: a volume slider, mute (M still works), screen shake on/off, and reduced motion.
+- Reduced motion turns off screen shake and the glowing pulse animations. On first launch it follows your device's reduced-motion setting.
+- Your mute choice from earlier versions carries over. Settings are kept apart from your world, so New World never resets them.
+
 ## v0.1.11 — 2026-11-23 (#11)
 - Phones: leaving the game mid-drag (switching apps, locking the screen) now lets go of both thumb sticks, so the core doesn't drift off on its own when you come back.
 - Checked that Surge doesn't out-earn Drift since Glitches started dropping Prisms: a Drift miner still banks slightly more Prisms per minute. Nothing changes in play.

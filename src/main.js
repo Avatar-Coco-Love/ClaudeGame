@@ -5,6 +5,7 @@ import { Game } from './game.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
 import { Audio } from './audio.js';
+import { loadSettings, saveSettings } from './settings.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -15,9 +16,6 @@ const store = {
   // True when anything is stored, even a save this build can't read (newer format or corrupt): D-005 says never drop it unasked.
   exists() { try { return localStorage.getItem(SAVE_KEY) != null; } catch { return false; } },
   clear() { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } },
-  pref(k, v) {
-    try { if (v === undefined) return localStorage.getItem('lumencore.' + k); localStorage.setItem('lumencore.' + k, v); } catch { return null; }
-  },
 };
 
 const canvas = $('game');
@@ -31,9 +29,9 @@ let saveTimer = 0;
 let toastTimer = 0;
 let selectedMode = 'drift';
 
-audio.setMuted(store.pref('muted') === '1');
+const settings = loadSettings(); // shared live object: Game reads shake/reducedMotion from it (S-3)
 $('version').textContent = 'v' + VERSION;
-updateMuteButton();
+applySettings();
 
 // ---------- title screen ----------
 function showTitle() {
@@ -58,7 +56,7 @@ document.querySelectorAll('.mode-card').forEach(el => el.addEventListener('click
 function start(save) {
   audio.unlock();
   const seed = save ? save.seed : (Math.random() * 2 ** 31) | 0;
-  game = new Game({ seed, mode: save ? save.mode : selectedMode, save, audio });
+  game = new Game({ seed, mode: save ? save.mode : selectedMode, save, audio, settings });
   renderer.attach(game);
   $('title').classList.add('hidden');
   $('hud').classList.remove('hidden');
@@ -190,8 +188,33 @@ document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEvent
 }));
 $('menu-btn').addEventListener('click', () => { persist(); closePanel(); showTitle(); });
 
-function updateMuteButton() { $('mute-btn').textContent = audio.muted ? '♪̸' : '♪'; }
-$('mute-btn').addEventListener('click', () => { audio.unlock(); audio.setMuted(!audio.muted); store.pref('muted', audio.muted ? '1' : '0'); updateMuteButton(); });
+// ---------- Settings (S-3) ----------
+function applySettings() {
+  audio.setVolume(settings.volume / 100);
+  audio.setMuted(settings.muted);
+  if (settings.reducedMotion || !settings.shake) { if (game) game.shake = 0; }
+  document.body.classList.toggle('reduce-motion', settings.reducedMotion);
+  $('mute-btn').textContent = settings.muted ? '♪̸' : '♪';
+  $('set-volume').value = settings.volume;
+  $('set-volume-val').textContent = settings.volume;
+  for (const k of ['muted', 'shake', 'reducedMotion']) {
+    const b = document.querySelector(`#settings [data-setting="${k}"]`);
+    b.setAttribute('aria-checked', settings[k]); b.textContent = settings[k] ? 'On' : 'Off';
+  }
+}
+function setSetting(k, v) { settings[k] = v; saveSettings(settings); applySettings(); }
+let settingsOpen = false;
+function openSettings() { settingsOpen = true; applySettings(); $('settings').classList.remove('hidden'); $('settings-close').focus(); }
+function closeSettings() { settingsOpen = false; $('settings').classList.add('hidden'); $('settings-btn').focus(); }
+$('settings-btn').addEventListener('click', openSettings);
+$('settings-close').addEventListener('click', closeSettings);
+$('settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
+$('set-volume').addEventListener('input', e => { audio.unlock(); setSetting('volume', Number(e.target.value)); });
+document.querySelectorAll('#settings [data-setting]').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.setting === 'muted') audio.unlock();
+  setSetting(b.dataset.setting, !settings[b.dataset.setting]);
+}));
+$('mute-btn').addEventListener('click', () => { audio.unlock(); setSetting('muted', !settings.muted); });
 
 // ---------- loop ----------
 let last = performance.now();
@@ -201,7 +224,7 @@ function frame(now) {
   if (game) {
     if (input.consume('mute')) $('mute-btn').click();
     if (input.consume('matrix')) panelOpen ? closePanel() : openPanel();
-    if (input.consume('escape') && panelOpen) closePanel();
+    if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (panelOpen) closePanel(); }
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : input.read(sp);
@@ -224,10 +247,10 @@ addEventListener('visibilitychange', () => { if (document.hidden) { persist(); a
 addEventListener('pagehide', persist);
 
 // Render a live world behind the title screen so it isn't a blank page.
-game = new Game({ seed: 1337, mode: 'drift', save: null, audio: { beam() {}, break() {}, pickup() {}, deposit() {}, upgrade() {}, hurt() {}, enemyDie() {}, full() {} } });
+game = new Game({ seed: 1337, mode: 'drift', save: null, settings, audio: { beam() {}, break() {}, pickup() {}, deposit() {}, upgrade() {}, hurt() {}, enemyDie() {}, full() {} } });
 game.demo = true; // background world for the title screen — never saved
 renderer.attach(game);
 showTitle();
 requestAnimationFrame(frame);
 
-window.__lumen = { get game() { return game; }, renderer, input }; // debug handle for tests
+window.__lumen = { get game() { return game; }, renderer, input, settings, audio }; // debug handle for tests
