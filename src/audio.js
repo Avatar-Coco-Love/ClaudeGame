@@ -1,5 +1,5 @@
 // Tiny synthesized sound kit. No asset files; everything is oscillators.
-import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP, BEAM_HUM } from './config.js';
+import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP, BEAM_HUM, DEPOSIT_TICK } from './config.js';
 
 export class Audio {
   constructor() {
@@ -83,9 +83,18 @@ export class Audio {
   pickup(kind) {
     this.tone(kind === 'lumen' ? 1568 : kind === 'prism' ? 1320 : 990, 0.07, { type: 'sine', vol: 0.12, throttle: 0.03, key: 'pickup' });
   }
+  // B-017: a full hold (up to 140 items, one every 35 ms) used to beep ~14 times a second for ~5 s. Now each tick of one
+  // deposit run is quieter than the last and the run goes silent after ~10 ticks; the closing arpeggio still plays.
   deposit(i) {
+    if (!this.ctx || this.muted) return;
+    const D = DEPOSIT_TICK, now = this.ctx.currentTime, last = this.last.dep;
+    if (last !== undefined && now - last < D.throttle) return;
+    this.depRun = last !== undefined && now - last < D.resetS ? (this.depRun || 0) + 1 : 0;
+    this.last.dep = now;
+    const vol = D.vol * Math.pow(D.decay, this.depRun);
+    if (vol < D.minVol) return;
     const notes = [523, 659, 784, 1047];
-    this.tone(notes[i % 4], 0.14, { type: 'sine', vol: 0.12, throttle: 0.045, key: 'dep' });
+    this.tone(notes[i % 4], 0.14, { type: 'sine', vol });
   }
   // S-4: a rising 3-note arpeggio when the hold is empty: one note per resource kind deposited, then a top note (max 3).
   depositDone(kinds) {
@@ -103,7 +112,8 @@ export class Audio {
     this.tone(2093, 0.25, { type: 'sine', vol: 0.08, delay: 0.12 });
   }
   scan() { this.tone(1200, 0.3, { type: 'sine', vol: 0.14, slide: -600 }); } // S-11 Scanner sweep 1200 -> 600 Hz
-  hurt() { this.tone(160, 0.25, { type: 'square', vol: 0.15, slide: -90 }); }
-  enemyDie() { this.tone(420, 0.2, { type: 'square', vol: 0.1, slide: -300 }); }
+  // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.
+  hurt() { this.tone(160, 0.25, { type: 'triangle', vol: 0.16, slide: -90 }); }
+  enemyDie() { this.tone(420, 0.2, { type: 'triangle', vol: 0.11, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }
 }

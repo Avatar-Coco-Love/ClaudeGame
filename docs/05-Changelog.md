@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.26 — 2026-11-23 (#26)
+- Depositing a full hold no longer beeps for five seconds: the ticks fade out after the first few, then the closing chime plays.
+- Taking a hit and destroying a Glitch sound softer and rounder (no more buzz). Every sound was measured; the rest stay as they are.
+
 ## v0.1.25 — 2026-11-23 (#25)
 - The mining beam is much quieter and softer: a short soft swell when it switches on, then a low, gentle hum that lifts slightly
   only while it is cutting rock or hitting a Glitch. No more buzzing drone or wobble. The volume setting still controls it.

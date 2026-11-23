@@ -1,17 +1,6 @@
 # 09 — Implementation Log
 
-Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`.
-
-## 2026-11-23 — Session 18 (v0.1.20): Build — S-9 vaults
-- **Built:** `T.VAULT` (hp 6) + `T.CACHE` (hp 3), three 7×7 templates and `vaultSites(seed)` in `world.js` (seed-only, stream
-  `'vault'`); 6/6 placed on all 40 seeds, template mix 86/85/69. Cache bursts 20◆ + 6▲ (forced past the cap), chord, double hitstop,
-  toast. `SAVE_FORMAT` 4: the 3→4 step stores `vaultSkip` from the explored/broken bits (D-031). Minimap: shells white.
-- **Tests:** 4 new smoke checks (6 vaults on 40 seeds and nothing changed outside footprints; cache loot + reload; a format-3 save
-  with one explored cell on vault 2 and a tunnel through vault 4 → skip `2,4`, tunnels kept; new world `vaultSkip: []`). With
-  `src/` stashed they fail. The S-8 layout hash now hashes the base generator (all vaults skipped), unchanged values.
-- **Screenshot** (1280×800, DSF 1, `?dev`, teleport beside vault 0): white-edged diamond reads clearly against Veil rock, the cache
-  glyph is distinct from ore; opening it bursts pickups and toasts. Watch: Glitches may spawn in a hollow (Debt). Q-010 opened.
-- **Docs:** sessions 12–13 of this log archived word for word to `archive/2026-11-23-09-sessions-12-13.md` (cap).
+Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, session 3 in `archive/2026-11-23-09-session-3.md`, sessions 4–7 in `archive/2026-11-23-09-sessions-4-7.md`, session 8 in `archive/2026-11-23-09-session-8.md`, session 9 in `archive/2026-11-23-09-session-9.md`, sessions 10–11 in `archive/2026-11-23-09-sessions-10-11.md`, sessions 12–13 in `archive/2026-11-23-09-sessions-12-13.md`, sessions 14–15 in `archive/2026-11-23-09-sessions-14-15.md`, sessions 16–17 in `archive/2026-11-23-09-sessions-16-17.md`, session 18 in `archive/2026-11-23-09-session-18.md`.
 
 ## 2026-11-23 — Session 19 (v0.1.21): Audit
 - **How:** no subagent tool, so correctness, perf, mobile, code health and docs drift were done in-line; each finding reproduced first.
@@ -68,4 +57,18 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   (peak −9.4 dBFS); contact changes now retarget only after the attack.
 - **Tests:** 2 new checks in `tests/audio.cjs` (83 total): level/harshness ceiling, volume 100 > 70 and 0 = silence. With `src/`
   stashed the ceiling check fails (tail −42.3). No visual change, so no screenshot.
+
+## 2026-11-23 — Session 24 (v0.1.26): Audit — every sound measured
+- **Audio check (owner ask after B-016):** all 12 one-shots plus 4 streams rendered offline (volume 70, 44.1 kHz). One-shots peak
+  −22 to −30 dBFS and last ≤ 0.35 s above −45 dBFS. Two problems:
+- **B-017 (new) → fixed:** a deposit ticks one beep per item every 35 ms (throttled to ~14/s), so a full hold (140) was a 4.4 s beep
+  chain. Ticks now fade 0.8× each within a run and stop under gain 0.015 (`DEPOSIT_TICK`, D-039): loud 4.4 → 0.35 s; arpeggio kept.
+- **B-018 (new) → fixed:** hurt and Glitch-death were square waves, the only buzzy sounds: 1.1 % / 2.8 % energy > 4 kHz, centroid
+  355 / 747 Hz. Now triangles (gain 0.16 / 0.11): 0 % / 0 %, centroid 151 / 372 Hz, peak −25.4 / −28.5 dBFS. Kept as is: the cache
+  chord (loudest peak, −21.9, but rare and pure sines), pickup streams (0.6 s), the full-hold nag (≤ 1 per 1.2 s).
+- **Tests:** 2 new checks in `tests/audio.cjs` (85 total): every one-shot under peak/4 kHz/length ceilings; a 140-item deposit loud
+  ≤ 1 s. With `src/` stashed both fail (hurt 1.1 %, enemyDie 3 %; deposit 4.4 s). No visual change, so no screenshot.
+- **Other dimensions (no subagents available, done briefly):** docs vs code — `SAVE_FORMAT` 6, `BEAM_HUM` (D-038), hitstop (D-021),
+  Glitch give-up (D-017) and Research (D-034) match; D-021's per-unit tick is now refined by D-039. Perf / 320 px / touch: smoke
+  checks pass, no new findings; the open Debt watches stand. Session 18 of this log archived word for word.
 

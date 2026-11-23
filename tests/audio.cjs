@@ -48,6 +48,29 @@ async function renderBeam([secs, vol]) {
     above2k: r1(100 * hi / tot, 2), loudUntilS: r1(quietFrom, 2) };
 }
 
+// B-017/B-018 audit (session 24): render a script of one-shot sounds offline. `at(t, fn)` runs fn with the audio clock
+// at t s, so throttles and per-run decay behave as in play. Returns peak, seconds above -45 dBFS (50 ms windows) and
+// the share of energy above 4 kHz (square-wave buzz lives there).
+async function renderSfx([script, secs]) {
+  const { Audio } = await import('/src/audio.js');
+  const sr = 44100, n = Math.floor(sr * secs), ctx = new OfflineAudioContext(1, n, sr);
+  const a = new Audio(); a.ctx = ctx; a.master = ctx.createGain(); a.setVolume(0.7); a.master.connect(ctx.destination);
+  let now = 0; Object.defineProperty(ctx, 'currentTime', { get: () => now });
+  new Function('a', 'at', script)(a, (t, f) => { now = t; f(); });
+  const buf = (await ctx.startRendering()).getChannelData(0), W = sr / 20, N = 1024;
+  let peak = 0, loud = 0, tot = 0, hi = 0;
+  for (const v of buf) peak = Math.max(peak, Math.abs(v));
+  for (let s = 0; s + W <= n; s += W) { let e = 0; for (let i = s; i < s + W; i++) e += buf[i] * buf[i]; if (Math.sqrt(e / W) > 10 ** (-45 / 20)) loud++; }
+  for (let s = 0; s + N <= n; s += N) for (let k = 1; k < N / 2; k++) { // plain DFT bins (short sounds, cheap enough)
+    let re = 0, im = 0; for (let i = 0; i < N; i++) { const w = buf[s + i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1))), ph = 2 * Math.PI * k * i / N; re += w * Math.cos(ph); im -= w * Math.sin(ph); }
+    const p = re * re + im * im; tot += p; if (k * sr / N > 4000) hi += p;
+  }
+  const r1 = x => Math.round(x * 10) / 10;
+  return { peakDb: r1(20 * Math.log10(peak || 1e-50)), loudS: loud / 20, above4k: r1(100 * hi / (tot || 1)) };
+}
+const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
+  'cache()', 'scan()', 'hurt()', 'enemyDie()', 'full()'];
+
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
 async function browserChecks(browser, url, check, errors) {
@@ -62,6 +85,15 @@ async function browserChecks(browser, url, check, errors) {
   const v1 = await measure(pg, 4, 1), v0 = await measure(pg, 4, 0);
   check('beam hum follows the volume setting: 100 louder than 70, 0 silent (B-016, S-3)', v1.tailDb > m.tailDb && v0.peakDb === -999,
     `tail @100 ${v1.tailDb} dB, peak @0 ${v0.peakDb}`);
+  // Old: enemyDie 2.8 %, hurt 1.1 % of energy above 4 kHz (square waves). New: every one-shot ≤ 0.5 %.
+  const shots = {};
+  for (const s of ONE_SHOTS) shots[s] = await pg.evaluate(renderSfx, [`a.${s}`, 1.5]);
+  const bad = Object.entries(shots).filter(([, v]) => v.peakDb > -20 || v.above4k >= 1 || v.loudS > 0.5);
+  check('every one-shot sound: peak ≤ -20 dBFS, < 1 % energy > 4 kHz, loud ≤ 0.5 s (B-018 audit)', bad.length === 0,
+    bad.length ? JSON.stringify(bad) : `${ONE_SHOTS.length} sounds`);
+  // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
+  const dep = await pg.evaluate(renderSfx, ['for (let i = 0; i < 140; i++) at(i * 0.035, () => a.deposit(i)); at(4.9, () => a.depositDone(2))', 6]);
+  check('a 140-item deposit is not a 5 s beep chain: loud ≤ 1 s (B-017)', dep.loudS <= 1, JSON.stringify(dep));
   await pg.close();
   return m;
 }
