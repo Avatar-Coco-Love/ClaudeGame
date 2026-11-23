@@ -36,3 +36,9 @@ step computes `vaultSkip` once; the Game carries it unchanged into every later s
 - Rejected: footprint = the whole 7×7 box (would skip vaults over corners the template never touches); placing sites on open
   ground only (sites would depend on terrain, so a generator tweak could move every vault); a `vaultsOpened` list in the save
   (the broken bitset already remembers the cache, as S-9 said); capped cache loot (a full floor would eat a one-time reward).
+
+### D-032 — Glow draws are culled to the view (2026-11-23, Audit 19, B-014)
+Anything drawn per object with `shadowBlur` (pickups now) is skipped outside the camera view + 16 px. Floor loot is saved and can
+lie anywhere on the map, so its draw cost must follow what is on screen, not what exists. Smoke counts `fill` calls to keep it so.
+- Rejected: dropping pickup glow (pillar 1 look; on-screen cost is not the problem measured); a lower `PICKUP_CAP` (would eat saved
+  loot, against B-005/B-011); a pre-rendered glow sprite (bigger change, unmeasured on a real device; Tooling perf check first).

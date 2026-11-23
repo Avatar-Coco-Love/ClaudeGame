@@ -188,7 +188,7 @@ export class Renderer {
 
     this.drawNexus(ctx);
     this.drawCrack(ctx);
-    this.drawPickups(ctx);
+    this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
     this.drawBeam(ctx);
     this.drawPlayer(ctx);
@@ -277,10 +277,14 @@ export class Renderer {
     ctx.restore();
   }
 
-  drawPickups(ctx) {
+  // Only pickups in view (plus their glow) are drawn: each costs a shadowBlur fill, and the floor keeps loot across the whole
+  // map (saved since B-011), so an uncull'd floor of 400 made every frame pay for loot far off screen (B-014, audit 19).
+  drawPickups(ctx, left, top, vw, vh) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
+    const m = 16, x0 = left - m, y0 = top - m, x1 = left + vw + m, y1 = top + vh + m;
     for (const it of this.game.pickups) {
+      if (it.x < x0 || it.x > x1 || it.y < y0 || it.y > y1) continue;
       const col = it.kind === 'shard' ? '#2ef2ff' : '#ff4fd8';
       const bob = Math.sin(this.time * 5 + it.x) * 0.3 + 1;
       ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10;

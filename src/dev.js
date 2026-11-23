@@ -1,4 +1,4 @@
-// Dev tools (S-7, D-026). Every action is a plain function on `window.__lumen.dev`; the panel only calls them, so bots,
+// Dev tools (S-7, D-027). Every action is a plain function on `window.__lumen.dev`; the panel only calls them, so bots,
 // smoke checks and the panel share one entry point. The panel exists only with `?dev` in the URL or after the backtick key.
 // Nothing here enters the save except what the actions themselves change (bank, upgrades, mode, carved cells).
 import { UPGRADES, NEXUS_UPGRADES, CELL } from './config.js';
@@ -16,7 +16,8 @@ export function createDev(ui) {
       const game = g(), w = game.world;
       const cx = Math.floor(game.nexus.x / CELL) + Math.round(Math.cos(angle) * cells);
       const cy = Math.floor(game.nexus.y / CELL) + Math.round(Math.sin(angle) * cells);
-      const x = Math.max(1 + ROOM, Math.min(w.w - 2 - ROOM, cx)), y = Math.max(1 + ROOM, Math.min(w.h - 2 - ROOM, cy));
+      // The room stays off the 2-cell bedrock border (B-013: the old clamp let it carve the inner bedrock ring).
+      const x = Math.max(2 + ROOM, Math.min(w.w - 3 - ROOM, cx)), y = Math.max(2 + ROOM, Math.min(w.h - 3 - ROOM, cy));
       for (let yy = y - ROOM; yy <= y + ROOM; yy++) for (let xx = x - ROOM; xx <= x + ROOM; xx++) if (w.solid(xx, yy)) w.destroy(xx, yy);
       const p = game.player;
       p.x = (x + 0.5) * CELL; p.y = (y + 0.5) * CELL; p.vx = p.vy = 0;
