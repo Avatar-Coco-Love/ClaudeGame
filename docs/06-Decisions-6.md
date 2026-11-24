@@ -15,3 +15,15 @@ Continues `06-Decisions-5.md` (same rules: supersede, never edit; list rejected 
   cell it breaks (`PULSE_PIERCE`); a Glitch past broken cells takes the rest × 1.6 (`src/beam.js` `releasePulse`).
 - Rejected: holding at full charge until release (a held button would never fire, so held-fire bots and Space players get 0);
   firing on sheet open (opening the Matrix would shoot); a rising charge tone (one more continuous sound to bound, D-039).
+
+### D-053 — Code split layout (2026-11-24, session 36, S-18; builds on D-048)
+- `src/glitch.js` (`updateGlitches`; `game.updateEnemies` stays as a one-line delegate so tests and tools keep their call),
+  `src/hud.js` (minimap, Nexus pointer, touch sticks; `renderer.setMini` delegates), and `src/body.js` (`collides`/`moveBody`,
+  so glitch.js doesn't import game.js back). All Glitch numbers are `GLITCH_*` in `config.js`, plus `NEXUS_HEAL`.
+- `ORE_KIND` (config) is the one ore → resource map: Scanner types, chunk ore glyphs, ping glyphs and minimap blips read it.
+  Scanner text and the Research hint are built from `SCAN_RADIUS` / `LUMEN_D`.
+- `tests/docs.cjs` fails any `src/*.js` or `tests/*.cjs` file over 600 lines (the CLAUDE.md split rule, now a check).
+- Proof of no behaviour change: a 60 s scripted Surge run on 4 starts gives identical stats/digests, and a seeded scene
+  screenshot is byte-identical before and after.
+- Rejected: Glitch methods mixed into `Game.prototype` (hides where code lives); moving `drawLight` too (no need yet: 514 lines);
+  keeping the spec's "unused `mat`" removal literal (`mat` is used; it now lives only in the yield branch).

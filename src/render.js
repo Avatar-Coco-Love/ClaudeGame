@@ -1,22 +1,11 @@
-// All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
+// World drawing (terrain chunk cache, entities, beam, light, Scanner). Screen-space HUD drawing (minimap, Nexus pointer,
+// touch sticks) is in hud.js. Terrain is cached per chunk and only redrawn when mined.
+import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
 import { markAlpha } from './research.js';
+import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
-const MINI_COLORS = {
-  [T.EMPTY]: [10, 16, 44], [T.ROCK]: [34, 51, 122], [T.DENSE]: [74, 47, 138],
-  [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
-  [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
-  [T.LUMEN]: [255, 201, 79],
-};
-// S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
-const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
-const SCAN_KIND = { [T.CRYSTAL]: RESOURCE.shard, [T.PRISM]: RESOURCE.prism, [T.LUMEN]: RESOURCE.lumen }; // S-11 ping glyphs
-const MINI_RING = RINGS.map(r => ({
-  [T.ROCK]: mix(rgb(r.rockFill), rgb(r.rockEdge), 0.22), [T.DENSE]: mix(rgb(r.denseFill), rgb(r.denseEdge), 0.3),
-}));
 
 export class Renderer {
   constructor(canvas, minimap) {
@@ -57,12 +46,7 @@ export class Renderer {
     this.cam.x = p.x; this.cam.y = p.y;
   }
 
-  setMini(i) {
-    const w = this.game.world, t = w.cells[i];
-    const c = (t === T.ROCK || t === T.DENSE) ? MINI_RING[w.rings[i]][t] : MINI_COLORS[t];
-    const d = this.miniData.data, o = i * 4;
-    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
-  }
+  setMini(i) { paintMiniCell(this, i); }
   revealed(indices) {
     if (!indices.length) return;
     for (const i of indices) this.setMini(i);
@@ -120,7 +104,7 @@ export class Renderer {
     g.shadowBlur = 10;
     for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
       const t = w.get(x0 + x, y0 + y);
-      if (t !== T.CRYSTAL && t !== T.PRISM && t !== T.CACHE && t !== T.LUMEN) continue;
+      if (!(t in ORE_KIND) && t !== T.CACHE) continue;
       const m = MATERIAL[t], px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
       if (t === T.CACHE) { // S-9: a square-in-square glyph, upright, so it never reads as ore
         g.shadowColor = m.edge; g.strokeStyle = m.edge; g.lineWidth = 2;
@@ -213,9 +197,9 @@ export class Renderer {
     this.drawScan(ctx);
     ctx.restore();
 
-    this.drawNexusPointer(ctx);
-    this.drawSticks(ctx, input);
-    this.drawMinimap();
+    drawNexusPointer(this, ctx);
+    drawSticks(ctx, input);
+    drawMinimap(this);
   }
 
   drawGrid(ctx, left, top, vw, vh) {
@@ -325,7 +309,7 @@ export class Renderer {
         g.strokeRect(-12, -12, 24, 24); g.fillRect(-5, -5, 10, 10);
         return;
       }
-      const k = SCAN_KIND[type];
+      const k = RESOURCE[ORE_KIND[type]];
       g.font = '600 18px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillStyle = g.shadowColor = k.color;
       g.fillText(k.glyph, 0, 0);
@@ -525,67 +509,5 @@ export class Renderer {
       ctx.drawImage(sp.canvas, cx - sp.half, cy - sp.half, sp.half * 2, sp.half * 2);
     }
     ctx.restore();
-  }
-
-  drawNexusPointer(ctx) {
-    const g = this.game, n = this.worldToScreen(g.nexus.x, g.nexus.y);
-    const m = 40;
-    if (n.x > m && n.x < this.w - m && n.y > m && n.y < this.h - m) return;
-    const cx = this.w / 2, cy = this.h / 2;
-    const a = Math.atan2(n.y - cy, n.x - cx);
-    const rx = this.w / 2 - m, ry = this.h / 2 - m;
-    const t = Math.min(rx / Math.abs(Math.cos(a) || 1e-6), ry / Math.abs(Math.sin(a) || 1e-6));
-    const x = cx + Math.cos(a) * t, y = cy + Math.sin(a) * t;
-    ctx.save();
-    ctx.translate(x, y); ctx.rotate(a);
-    ctx.strokeStyle = '#2ef2ff'; ctx.shadowColor = '#2ef2ff'; ctx.shadowBlur = 10; ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.6 + Math.sin(this.time * 4) * 0.25;
-    ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-2, 0); ctx.lineTo(-6, 8); ctx.closePath(); ctx.stroke();
-    ctx.restore();
-    const full = g.cargoRoom() <= 0;
-    if (full) {
-      ctx.save();
-      ctx.fillStyle = '#ffd23d'; ctx.font = '600 11px system-ui, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('NEXUS', x - Math.cos(a) * 22, y - Math.sin(a) * 22 + 4);
-      ctx.restore();
-    }
-  }
-
-  drawSticks(ctx, input) {
-    if (!input.usingTouch) return;
-    const R = 56;
-    ctx.save();
-    for (const [name, s] of Object.entries(input.sticks)) {
-      if (!s) continue;
-      const col = name === 'move' ? '46,242,255' : '255,79,216';
-      ctx.strokeStyle = `rgba(${col},0.35)`; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(s.ox, s.oy, R, 0, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = `rgba(${col},0.35)`;
-      ctx.beginPath(); ctx.arc(s.x, s.y, 22, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  drawMinimap() {
-    const m = this.mctx, g = this.game, w = g.world;
-    if (this.miniDirty) { this.miniCtx.putImageData(this.miniData, 0, 0); this.miniDirty = false; }
-    const size = this.minimap.width;
-    m.clearRect(0, 0, size, size);
-    m.fillStyle = 'rgba(3,4,12,0.85)'; m.fillRect(0, 0, size, size);
-    m.imageSmoothingEnabled = false;
-    m.drawImage(this.mini, 0, 0, size, size);
-    const sc = size / (w.w * CELL);
-    m.fillStyle = '#ffffff';
-    m.beginPath(); m.arc(g.nexus.x * sc, g.nexus.y * sc, 3, 0, Math.PI * 2); m.fill();
-    for (const q of g.scan.marks) { // S-11 ping blips, same lifetime as the glyphs
-      const a = markAlpha(g, q);
-      if (a <= 0) continue;
-      const r = q.type === T.CACHE ? 2.25 : 1.5; // S-12: a cache blip is white and 1.5x an ore blip
-      m.globalAlpha = a; m.fillStyle = q.type === T.CACHE ? '#ffffff' : SCAN_KIND[q.type].color;
-      m.fillRect((q.x + 0.5) * CELL * sc - r, (q.y + 0.5) * CELL * sc - r, r * 2, r * 2);
-    }
-    m.globalAlpha = 1;
-    m.fillStyle = '#ffd23d';
-    m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
   }
 }

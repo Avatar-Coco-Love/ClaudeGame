@@ -1,66 +1,17 @@
-// Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
+// Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
+import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
+import { collides, moveBody } from './body.js';
+import { updateGlitches } from './glitch.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
-const ENEMY_R = 11;
 const PICKUP_CAP = 400;
 const PARTICLE_CAP = 500;
-
-export function collides(world, x, y, r) {
-  const x0 = Math.floor((x - r) / CELL), x1 = Math.floor((x + r) / CELL);
-  const y0 = Math.floor((y - r) / CELL), y1 = Math.floor((y + r) / CELL);
-  for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) if (world.solid(cx, cy)) return true;
-  return false;
-}
-
-/** Move a body by (dx,dy) resolving each axis separately against the grid. Returns realized displacement. */
-export function moveBody(world, b, dx, dy, assist = false) {
-  const sx = b.x, sy = b.y;
-  const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / (CELL * 0.4)));
-  const ix = dx / steps, iy = dy / steps;
-  for (let s = 0; s < steps; s++) {
-    if (ix) {
-      b.x += ix;
-      if (collides(world, b.x, b.y, b.r)) {
-        b.x = ix > 0 ? Math.floor((b.x + b.r) / CELL) * CELL - b.r - 0.01
-                     : (Math.floor((b.x - b.r) / CELL) + 1) * CELL + b.r + 0.01;
-        if (assist && Math.abs(ix) > Math.abs(iy)) cornerAssist(world, b, 'y', ix > 0 ? 1 : -1, 0, Math.abs(ix));
-      }
-    }
-    if (iy) {
-      b.y += iy;
-      if (collides(world, b.x, b.y, b.r)) {
-        b.y = iy > 0 ? Math.floor((b.y + b.r) / CELL) * CELL - b.r - 0.01
-                     : (Math.floor((b.y - b.r) / CELL) + 1) * CELL + b.r + 0.01;
-        if (assist && Math.abs(iy) >= Math.abs(ix)) cornerAssist(world, b, 'x', 0, iy > 0 ? 1 : -1, Math.abs(iy));
-      }
-    }
-  }
-  return { x: b.x - sx, y: b.y - sy };
-}
-
-/** Blocked head-on? Slide along `axis` toward the nearest offset (within ~half a cell) that opens the way. */
-function cornerAssist(world, b, axis, dirX, dirY, amount) {
-  const probe = 2;
-  for (let off = 1; off <= CELL * 0.55; off += 1) {
-    for (const sign of [1, -1]) {
-      const o = off * sign;
-      const x = axis === 'x' ? b.x + o : b.x, y = axis === 'y' ? b.y + o : b.y;
-      if (!collides(world, x, y, b.r) && !collides(world, x + dirX * probe, y + dirY * probe, b.r)) {
-        const step = Math.sign(o) * Math.min(Math.abs(o), amount);
-        if (axis === 'x') b.x += step; else b.y += step;
-        if (collides(world, b.x, b.y, b.r)) { if (axis === 'x') b.x -= step; else b.y -= step; }
-        return;
-      }
-    }
-  }
-}
 
 export class Game {
   constructor({ seed, mode, save, audio, settings = null }) {
@@ -81,7 +32,7 @@ export class Game {
       vx: 0, vy: 0,
       targetVx: 0, targetVy: 0,     // intent-derived (unconstrained)
       realizedVx: 0, realizedVy: 0, // what actually happened after collision
-      angle: -Math.PI / 2, integrity: 100, invuln: 0, hurtFlash: 0,
+      angle: -Math.PI / 2, invuln: 0, hurtFlash: 0, // integrity: set from the hull stat below
     };
     this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null }; // S-14: Pulse state
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
@@ -93,7 +44,7 @@ export class Game {
     this.shake = 0;
     this.settings = settings; // live Settings object (S-3); null = all effects on (tools, demo)
     this.depositTimer = 0;
-    this.spawnTimer = 3;
+    this.spawnTimer = GLITCH_FIRST_SPAWN_S;
     this.depositCount = 0;
     this.depositKinds = new Set(); // kinds moved this Nexus visit -> arpeggio length (S-4)
     this.hitstop = 0;    // real seconds the main loop skips update() for (S-4); tools never read it
@@ -217,7 +168,7 @@ export class Game {
     if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length) this.enemies = [];
     this.updateParticles(dt);
 
-    if (this.inNexus()) p.integrity = Math.min(this.stat('hull'), p.integrity + 45 * dt);
+    if (this.inNexus()) p.integrity = Math.min(this.stat('hull'), p.integrity + NEXUS_HEAL * dt);
     else if (this.mode === 'drift') p.integrity = this.stat('hull');
 
     this.shake = Math.max(0, this.shake - dt * 30);
@@ -260,7 +211,6 @@ export class Game {
   onCellBroken(x, y, type) {
     this.stats.mined++;
     const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
-    const mat = MATERIAL[type];
     this.burst(cx, cy, type === T.ROCK ? 8 : 16, this.world.look(x, y, type).edge, 150);
     this.addShake(type === T.ROCK ? 1.5 : 3);
     if (type === T.CACHE) {
@@ -270,7 +220,8 @@ export class Game {
       this.audio.cache();
       if (this.motionOn()) { this.hitstop = HITSTOP_S * 2; this.lastHitstop = this.stats.time; }
       this.notify('cache');
-    } else if (mat.yield) {
+    } else if (MATERIAL[type].yield) {
+      const mat = MATERIAL[type];
       const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
       for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
       this.audio.break(mat.yield.kind);
@@ -338,84 +289,8 @@ export class Game {
     }
   }
 
-  // ---------- Surge: Glitches ----------
-  updateEnemies(dt) {
-    const p = this.player;
-    const distFromNexus = Math.hypot(p.x - this.nexus.x, p.y - this.nexus.y);
-    const maxCount = distFromNexus < NEXUS_RADIUS * 2 ? 1 : Math.min(9, 2 + Math.floor(distFromNexus / 520));
-    this.spawnTimer -= dt;
-    if (this.spawnTimer <= 0) {
-      this.spawnTimer = 2.2 + this.rng['glitch-spawn']() * 1.8;
-      if (this.enemies.length < maxCount) this.trySpawnEnemy(distFromNexus);
-    }
-    const list = this.enemies;
-    for (let i = list.length - 1; i >= 0; i--) {
-      const e = list[i];
-      e.spin += dt * (2 + e.tier);
-      e.flash = Math.max(0, e.flash - dt);
-      e.hitCd = Math.max(0, e.hitCd - dt);
-      const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
-      if (e.fade !== undefined) { // gave up (S-6): drift to a stop and vanish; harmless and lootless
-        e.fade -= dt; e.vx *= 0.9; e.vy *= 0.9;
-        moveBody(this.world, e, e.vx * dt, e.vy * dt);
-        if (e.fade <= 0) list.splice(i, 1);
-        continue;
-      }
-      if (e.hp <= 0) { // B-023: before the give-up and contact checks, so a Glitch the beam just killed neither hits nor fades lootless
-        this.stats.glitches++;
-        this.burst(e.x, e.y, 22, '#ff7a3d', 220);
-        if (this.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
-        for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
-        this.audio.enemyDie();
-        this.addShake(4);
-        this.enemies.splice(i, 1);
-        continue;
-      }
-      let tx = 0, ty = 0;
-      if (d < 560) { tx = dx / d; ty = dy / d; e.alert = true; }
-      else { e.wander += (this.rng['glitch-wander']() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
-      const nd = Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y);
-      if (nd < NEXUS_RADIUS + 40) { // the nexus repels glitches
-        tx = (e.x - this.nexus.x) / nd * 1.5; ty = (e.y - this.nexus.y) / nd * 1.5;
-        e.hp -= dt * 0.8;
-      }
-      e.vx += (tx * e.speed - e.vx) * Math.min(1, dt * 3);
-      e.vy += (ty * e.speed - e.vy) * Math.min(1, dt * 3);
-      moveBody(this.world, e, e.vx * dt, e.vy * dt);
-      { // S-6 / D-017: no progress on its best distance to the core for GLITCH_GIVE_UP_S -> give up. Covers wanderers too:
-        // they were the real slot-holders (spawned beyond the 560 px alert range, drifting in rock, never alerted).
-        if (!(d > (e.best ?? Infinity) - GLITCH_PROGRESS_PX)) { e.best = d; e.stall = 0; }
-        else if ((e.stall = (e.stall || 0) + dt) >= GLITCH_GIVE_UP_S) { e.fade = GLITCH_FADE_S; continue; }
-      }
-      if (d < e.r + p.r && e.hitCd <= 0) {
-        e.hitCd = 0.9;
-        e.best = d; e.stall = 0; // reaching the core counts as progress, so knockback doesn't start a give-up
-        e.vx = -dx / d * 260; e.vy = -dy / d * 260;
-        if (p.invuln <= 0) this.hurtPlayer(e.dmg, dx / d, dy / d);
-        if (this.enemies !== list) return; // destabilize() replaced the list mid-loop (B-007: indexing on froze the game)
-      }
-      if (d > 1500) this.enemies.splice(i, 1);
-    }
-  }
-
-  trySpawnEnemy(distFromNexus) {
-    const p = this.player;
-    for (let tries = 0; tries < 12; tries++) {
-      const rs = this.rng['glitch-spawn'], a = rs() * Math.PI * 2, r = 480 + rs() * 260;
-      const x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
-      if (Math.hypot(x - this.nexus.x, y - this.nexus.y) < NEXUS_RADIUS * 2.2) continue;
-      const probe = { x, y, r: ENEMY_R };
-      if (collides(this.world, x, y, ENEMY_R)) continue;
-      const tier = Math.min(3, Math.floor(distFromNexus / 900));
-      this.enemies.push({
-        ...probe, vx: 0, vy: 0, tier,
-        hp: 1.2 + tier * 1.1, maxHp: 1.2 + tier * 1.1,
-        speed: 120 + tier * 22, dmg: 14 + tier * 6,
-        spin: 0, flash: 0, hitCd: 0.5, wander: a, alert: false,
-      });
-      return;
-    }
-  }
+  // ---------- Surge: Glitches (src/glitch.js) ----------
+  updateEnemies(dt) { updateGlitches(this, dt); }
 
   hurtPlayer(amount, dx, dy) {
     if (this.god) return; // dev god mode (S-7); never saved

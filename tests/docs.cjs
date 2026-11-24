@@ -5,6 +5,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const DOC_CAP = 8192; // bytes. A doc near the cap gets split word for word into a "-2" file; docs/archive is exempt.
+const CODE_CAP = 600;  // lines per src/*.js and tests/*.cjs file (CLAUDE.md: split a file as it passes ~600; S-18)
 
 function run() {
   const out = [];
@@ -27,6 +28,10 @@ function run() {
   const dec = docs.filter(f => /^docs\/06-Decisions(-\d+)?\.md$/.test(f)).map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
   const ids = [...dec.matchAll(/^### (D-\d{3})/gm)].map(m => m[1]);
   check('decision IDs are unique', new Set(ids).size === ids.length && ids.length > 0, `${ids.length} decisions`);
+
+  const code = ['src', 'tests'].flatMap(d => fs.readdirSync(path.join(ROOT, d)).filter(f => /\.c?js$/.test(f)).map(f => d + '/' + f));
+  const long = code.map(f => [f, fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').length]).filter(([, n]) => n > CODE_CAP);
+  check(`code files under ${CODE_CAP} lines`, long.length === 0 && code.length > 10, long.map(([f, n]) => `${f}=${n}`).join(', ') || `${code.length} files`);
 
   const inbox = fs.readdirSync(path.join(ROOT, 'docs/inbox')).filter(f => f !== 'README.md');
   check('inbox processed (only README left)', inbox.length === 0, inbox.join(', '));

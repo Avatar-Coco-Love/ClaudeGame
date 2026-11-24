@@ -13,7 +13,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - **Bedrock edge (watch):** the border reads near-black; session 32 saw the beam spark on it (no crack). Fine unless play-tests mind.
 - **Cargo-full toast (watch, audit 34):** with a full hold, sitting on loot re-fires the toast every frame, so it stays up until
   you move off. Reads as a reminder; change only if a play-test minds.
-- **Audit 29 leftovers:** buy-logic dedupe (`game.js` ≈121-163), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
+- **Audit 29 leftovers:** buy-logic dedupe (`game.js` `canAfford`/`buy` vs `canAffordNexus`/`buyNexus`), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21) and drawn as glow sprites, as are Scanner glyphs (B-027, D-051, #39).
   Particles are still drawn uncull'd (short-lived, local). Next to price (S-15): `drawLight` is ≈ 67 % of JS draw time (two radial
