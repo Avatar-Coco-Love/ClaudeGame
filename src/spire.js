@@ -2,7 +2,7 @@
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
 import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
-  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, RESOURCE } from './config.js';
+  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, SPIRE_WAKE_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
 
@@ -239,6 +239,8 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
     if (s.mask === null) continue; // S-28: a relit Spire keeps all 8 facets lit
     const cx = (s.x + 0.5) * CELL, cy = (s.y + 0.5) * CELL, m = CELL * 5;
     if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
+    const clock = g.wake && g.wake.s === s; // S-31: a Wake's lit facets are its clock, drawn in the ring's orange
+    ctx.strokeStyle = ctx.fillStyle = ctx.shadowColor = clock ? `rgb(${SPIRE_WAKE_RGB})` : SPIRE_MARK_COLOR;
     FACET_RING.forEach(([i, j], k) => {
       if (w.get(s.x + i, s.y + j) !== T.FACET) return;
       const on = (wakeMask(g, s) >> k) & 1, x = cx + i * CELL, y = cy + j * CELL;
@@ -249,6 +251,7 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
       if (on) { ctx.globalAlpha = 0.45; ctx.fill(); }
     });
   }
+  ctx.strokeStyle = ctx.fillStyle = ctx.shadowColor = SPIRE_MARK_COLOR;
   const a = g.facetAim; // S-28: the dwell on the aimed facet fills a ring round it, then holds while latched
   if (a && !a.s.lit) {
     const [i, j] = FACET_RING[a.k], x = (a.s.x + i + 0.5) * CELL, y = (a.s.y + j + 0.5) * CELL, f = Math.min(1, a.t / SPIRE_TAP_S);

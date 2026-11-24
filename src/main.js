@@ -117,7 +117,7 @@ function hint() {
   const g = game, touch = input.usingTouch;
   if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
   if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
-  if (primedHere(g) && g.mode === 'surge') return g.wake ? 'Hold the Spire: guard its core until all 8 facets light' // S-23
+  if (primedHere(g) && g.mode === 'surge') return g.wake ? 'Circle the core: beam the Glitches before they reach it' // S-23
     : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';

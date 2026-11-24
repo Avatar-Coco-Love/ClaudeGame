@@ -4,7 +4,7 @@
 // relit, mode 'surge'. Charge 0, a core death or leaving Surge fails it (fed kept); stepping out and back in retries.
 // A Wake is never saved: a reload mid-Wake is a failed Wake. Drift keeps the facet puzzle (spire.js).
 import { CELL, T, SPIRE_WAKE_S, SPIRE_WAVE_S, SPIRE_WAKE_ALIVE, SPIRE_LANE, SPIRE_CHARGE, SPIRE_CHARGE_HIT, SPIRE_MARK_COLOR,
-  SPIRE_WAKE_RGB } from './config.js';
+  SPIRE_WAKE_RGB, SPIRE_WAKE_TIER_DROP } from './config.js';
 import { spireHere, relightSpire, SPIRE_HALF, FACET_RING } from './spire.js';
 import { makeGlitch, glitchTier } from './glitch.js';
 
@@ -33,7 +33,7 @@ export function clearLanes(game, s) {
 export function startWake(game, s) {
   const core = { x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL };
   game.wake = { s, t: 0, lit: 0, charge: SPIRE_CHARGE, lanes: clearLanes(game, s), turn: 0, spawnT: SPIRE_WAVE_S / 2, core,
-    tier: glitchTier(Math.hypot(core.x - game.nexus.x, core.y - game.nexus.y)) };
+    tier: Math.max(0, glitchTier(Math.hypot(core.x - game.nexus.x, core.y - game.nexus.y)) - SPIRE_WAKE_TIER_DROP) }; // S-31
   game.audio.facet(true);
   game.notify('wake-start');
 }

@@ -1,16 +1,7 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). Design 57 added S-31 (D-087) and the first M6 specs (S-32, S-33).
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
-
-## S-31 — Wake fix + tune (M5, before S-24) (D-087; B-048)
-- **B-048:** Wake Glitches skip the `GLITCH_DESPAWN_PX` drop (they end by the beam, at the core, or by giving up). Walking
-  away from a Wake then loses it to charge, instead of the Glitches vanishing and the Wake holding itself.
-- **Tune:** Wake Glitches spawn `SPIRE_WAKE_TIER_DROP` (1) tier below the depth tier (tier 1 at d 64–74). Wave 1.6 s,
-  6 alive, −10 of 100 unchanged. **Clock:** the Wake's lit facets draw in `SPIRE_WAKE_RGB` (orange, like the ring): the
-  puzzle's faint style didn't read as a timer. **Hint:** "Circle the core: beam the Glitches before they reach it".
-- **Smoke:** a core that leaves 60 cells mid-Wake loses it (charge 0; it relit on the old code); `wakeprobe`'s `run`
-  (exported) on 4 seeds at mid: `human` relights ≥ 3, `still` relights 0; a screenshot of the orange clock (view).
 
 ## S-24 — Ending: the sequence and the summary (M5) (D-045)
 - All Spires relit (N/N, N = `game.spires.length`; any mix of modes and broken ones, D-069): an 8 s sequence (each Spire draws a line to the Nexus in turn, the darkness alpha eases

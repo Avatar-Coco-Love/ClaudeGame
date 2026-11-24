@@ -73,7 +73,7 @@ export function updateGlitches(game, dt) {
       if (p.invuln <= 0) game.hurtPlayer(e.dmg, dx / d, dy / d);
       if (game.enemies !== list) return; // destabilize() replaced the list mid-loop (B-007: indexing on froze the game)
     }
-    if (d > GLITCH_DESPAWN_PX) game.enemies.splice(i, 1);
+    if (d > GLITCH_DESPAWN_PX && !e.wake) game.enemies.splice(i, 1); // B-048: a Wake's Glitches stay when the core walks off
   }
 }
 
