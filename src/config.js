@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.43';
+export const VERSION = '0.2.44';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -146,12 +146,13 @@ export const BEAM_MODES = {
   wide: { name: 'Wide', research: 'wide', offsets: [-WIDE_OFFSET, 0, WIDE_OFFSET], range: WIDE_RANGE, dmg: WIDE_DMG },
   pulse: { name: 'Pulse', research: 'pulse', offsets: [0], range: 1, dmg: 1, pulse: true }, // S-14: charge/release, `updatePulse`
 };
-// Pulse (S-14, D-042): held fire charges 0 -> 1 over PULSE_CHARGE_S (auto-fires at 1); a release at >= PULSE_MIN bursts
+// Pulse (S-14, D-042): held fire charges 0 -> 1 over PULSE_CHARGE_S (held at 1, it fires once a Glitch or
+// wall is in reach: S-21 ready shot, D-054); a release at >= PULSE_MIN bursts
 // beam dps × PULSE_CHARGE_S × charge × PULSE_MUL along range × PULSE_RANGE, carrying what a broken cell doesn't use on to
 // the next, up to PULSE_PIERCE cells. A Glitch on the ray takes the rest × PULSE_GLITCH and stops it. Then PULSE_RECOVER_S
 // before charging again: ~0.8× Focus sustained. PULSE_FLASH_S = the release line (half under reduced motion).
 export const BEAM_GLITCH_MUL = 1.6; // Focus/Wide beam damage to a Glitch × this (beam.js castBeam)
-export const PULSE_CHARGE_S = 1.2, PULSE_RANGE = 1.5, PULSE_MIN = 0.2, PULSE_MUL = 1.0, PULSE_PIERCE = 3, PULSE_GLITCH = 1.6;
+export const PULSE_CHARGE_S = 1.2, PULSE_RANGE = 1.5, PULSE_MIN = 0.2, PULSE_MUL = 1.0, PULSE_PIERCE = 3, PULSE_GLITCH = 1.8;
 export const PULSE_RECOVER_S = 0.3, PULSE_FLASH_S = 0.12;
 
 export const MODES = {

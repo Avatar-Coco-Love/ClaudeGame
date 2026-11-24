@@ -68,7 +68,8 @@ export function castBeam(game, dt) {
 }
 
 // ---------- Pulse (S-14, D-042) ----------
-// Intent: `held` fire. Realized: `beam.charge` (0..1) while charging, then one burst on release (or at full charge while held),
+// Intent: `held` fire. Realized: `beam.charge` (0..1) while charging, then one burst on release (or, held at full charge, as
+// soon as a Glitch or wall is in reach: S-21's ready shot),
 // then `beam.recover` seconds before charging can start again. `cancel` (pause / open sheet / death) drops the charge unfired.
 export function updatePulse(game, dt, held, cancel = false) {
   const b = game.beam;
@@ -77,8 +78,27 @@ export function updatePulse(game, dt, held, cancel = false) {
   if (held) {
     if (b.recover > 1e-9) return; // held fire waits out the recovery, then charges again
     b.charge = Math.min(1, b.charge + dt / PULSE_CHARGE_S);
-    if (b.charge >= 1 - 1e-9) releasePulse(game);
+    // S-21 ready shot (D-054): a full charge held fires only once something is in its reach; until then it waits at 1.
+    if (b.charge >= 1 - 1e-9 && pulseInReach(game)) releasePulse(game);
   } else if (b.charge > 0) releasePulse(game);
+}
+
+/** The nearest live Glitch on the aim ray within `range` of the nose: { e, t } or null. */
+function pulseFoe(game, ox, oy, dx, dy, range) {
+  let foe = null;
+  for (const e of game.enemies) {
+    if (e.fade !== undefined) continue;
+    const ex = e.x - ox, ey = e.y - oy, t = ex * dx + ey * dy;
+    if (t < 0 || t > range || Math.abs(ex * dy - ey * dx) >= e.r + 4) continue;
+    if (!foe || t < foe.t) foe = { e, t };
+  }
+  return foe;
+}
+
+/** S-21: would a burst now hit something, a live Glitch on the ray or a solid cell, within the Pulse reach? */
+export function pulseInReach(game) {
+  const p = game.player, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
+  return !!pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range) || !!game.world.raycast(p.x, p.y, dx, dy, range + NOSE);
 }
 
 /** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */
@@ -88,13 +108,7 @@ export function releasePulse(game) {
   if (charge < PULSE_MIN) { game.audio.pulseFizzle(); return null; }
   const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle);
   const ox = p.x + dx * NOSE, oy = p.y + dy * NOSE, range = game.stat('range') * PULSE_RANGE;
-  let amount = game.stat('beam') * PULSE_CHARGE_S * charge * PULSE_MUL, foe = null;
-  for (const e of game.enemies) { // the nearest live Glitch on the ray within reach
-    if (e.fade !== undefined) continue;
-    const ex = e.x - ox, ey = e.y - oy, t = ex * dx + ey * dy;
-    if (t < 0 || t > range || Math.abs(ex * dy - ey * dx) >= e.r + 4) continue;
-    if (!foe || t < foe.t) foe = { e, t };
-  }
+  let amount = game.stat('beam') * PULSE_CHARGE_S * charge * PULSE_MUL, foe = pulseFoe(game, ox, oy, dx, dy, range);
   let end = foe ? foe.t : range, cells = 0, broken = 0, hitFoe = null;
   while (amount > 1e-9 && cells < PULSE_PIERCE) {
     const h = w.raycast(p.x, p.y, dx, dy, end + NOSE);

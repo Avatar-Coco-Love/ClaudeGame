@@ -16,3 +16,15 @@ Continues `06-Decisions-6.md` (same rules: supersede, never edit; list rejected 
 - Rejected: firing on blur but zero damage (still costs the recovery and a sound); ignoring HUD touches by screen position (the
   layout moves per orientation; the event target is exact); keeping shadowBlur Glitches because the cap is 9 (they draw twice
   a frame, and S-19/S-23 add more glowing things); shrinking the bank font instead of wrapping (99999◆ still pushed ✕ out).
+
+### D-059 — S-21 as built: the ready shot uses the burst's own target test (2026-11-24, session 40; implements D-054)
+- **"In reach" = what the burst would hit:** a live Glitch inside the burst's own ray test (`pulseFoe`, shared with
+  `releasePulse`, so hold and burst can never disagree) or any solid cell, bedrock included, within `range × PULSE_RANGE`.
+  The charge sits at exactly 1 while it waits; the renderer reads that as "full" and draws the reach solid at 60 %.
+- **Measured (`tools/standoff.mjs`, 20 angles):** standing, Beam 2: wave3 tier 3 Pulse 96 hp / 20 deaths → 32 hp / 0
+  (Focus 96 / 20); single tier 3 64 → 0 (Focus 32); wave3 tier 2 78 d7 → 26. Swarms stay Focus's: wave5 tier 0 Focus 0,
+  Pulse 64 → 45. Kiting wave5 Beam 2 tier 3: Pulse 66 hp d12 → 3 (Focus 10). Exactly D-054's prototype numbers.
+- **Mining:** deeprun Beam 2 first-Lumen median 43 → 41 s (Focus 30); parity lvl 2 Drift ▲/min 13.5 → 13.1, Surge 9.2 → 9.4.
+  The only change is a bot turning toward open floor no longer wastes a burst into air. Wide and Focus rows are byte-same.
+- Rejected: a separate reach test for the hold (two copies of one rule drift apart); a `b.ready` flag (charge = 1 already
+  says it); pulsing the full line (D-039 spirit: no new attention-grabbing motion, and static under reduced motion is free).

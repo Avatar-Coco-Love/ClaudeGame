@@ -6,7 +6,7 @@ const idle = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, ..
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { upgradeSave } = await import('../src/save.js');
-  const { T, CELL, PULSE_GLITCH } = await import('../src/config.js');
+  const { T, CELL, PULSE_GLITCH, PULSE_RANGE, GLITCH_TIER, GLITCH_R } = await import('../src/config.js');
   const { buyResearch } = await import('../src/research.js');
   const { unlockedModes } = await import('../src/beam.js');
   const calls = [];
@@ -24,8 +24,44 @@ async function nodeChecks(check) {
   };
   const firstBurst = lvl => { const L = lab('pulse', lvl); let f = 0; while (L.g.beam.recover === 0 && f++ < 200) L.g.update(1 / 60, fire()); return { ...L.line(), frames: f }; };
   const b0 = firstBurst(0), b2 = firstBurst(2);
-  check('Pulse: a full charge (auto-fires at 1.2 s) breaks 2 Hearth rock cells at Beam 0 and exactly 3 (the pierce cap) at Beam 2 (S-14)',
+  check('Pulse: a full charge (fires at 1.2 s, a wall in reach) breaks 2 Hearth rock cells at Beam 0 and exactly 3 (the pierce cap) at Beam 2 (S-14)',
     b0.broken === 2 && Math.abs(b0.cells - (2 + 0.1 / 0.55)) < 0.01 && b2.broken === 3 && b0.frames >= 71 && b0.frames <= 73, JSON.stringify({ b0, b2 }));
+
+  // S-21 ready shot (D-054): in an open arena (nothing solid within 12 cells), Beam 2, Surge with no natural spawns. A full
+  // charge held at open floor waits ≥ 2 s; a tier-1 Glitch then comes in from 1.2× reach: the burst fires only once it is in
+  // reach and kills it. Letting go into nothing still fires a full burst into air.
+  {
+    calls.length = 0;
+    const g = new Game({ seed: 77, mode: 'surge', audio }), w = g.world, cx = w.cx + 36, cy = w.cy;
+    for (let y = cy - 14; y <= cy + 14; y++) for (let x = cx - 14; x <= cx + 14; x++) w.cells[w.idx(x, y)] = T.EMPTY;
+    Object.assign(g.player, { x: (cx + 0.5) * CELL, y: (cy + 0.5) * CELL, vx: 0, vy: 0, angle: 0 });
+    g.upgrades.beam = 2; g.research.pulse = true; g.beamMode = 'pulse';
+    const reach = g.stat('range') * PULSE_RANGE, step = () => { g.spawnTimer = 1e9; g.update(1 / 60, fire()); };
+    for (let i = 0; i < 72 + 120; i++) step();
+    const open = { charge: +g.beam.charge.toFixed(3), recover: g.beam.recover, calls: calls.join() };
+    const hp = GLITCH_TIER.hp[0] + GLITCH_TIER.hp[1];
+    const e = { x: g.player.x + 1.2 * reach, y: g.player.y, r: GLITCH_R, vx: 0, vy: 0, tier: 1, hp, maxHp: hp,
+      speed: GLITCH_TIER.speed[0] + GLITCH_TIER.speed[1], dmg: GLITCH_TIER.dmg[0] + GLITCH_TIER.dmg[1], spin: 0, flash: 0, hitCd: 0.5, wander: 0, alert: true };
+    g.enemies = [e];
+    let f = 0, firedAt = null;
+    while (f++ < 120 && g.beam.recover === 0) { const d = Math.hypot(e.x - g.player.x, e.y - g.player.y); step(); if (g.beam.recover > 0) firedAt = d; }
+    const glitch = { firedAt: firedAt && +firedAt.toFixed(1), reachFromCentre: +(reach + 12 + e.r + 4).toFixed(1), frames: f, hp: +e.hp.toFixed(2), alive: g.enemies.includes(e) && e.hp > 0, hit: !!(g.beam.flashLine && g.beam.flashLine.enemy) };
+    for (let i = 0; i < 100; i++) step(); // charge back to full at open floor, then let go
+    g.spawnTimer = 1e9; g.update(1 / 60, idle());
+    const air = { calls: calls.join(), recover: g.beam.recover > 0 };
+    check('Pulse ready shot: a full charge at open floor holds 2 s; fires only once a Glitch is in reach and kills a tier-1 at Beam 2; a let-go still fires (S-21)',
+      open.charge === 1 && open.recover === 0 && open.calls === '' && firedAt !== null && firedAt <= glitch.reachFromCentre && f > 3
+      && !glitch.alive && glitch.hit && air.calls === 'pulse,pulse' && air.recover, JSON.stringify({ reach, open, glitch, air }));
+  }
+  // D-054: at Beam 2 a full burst one-shots a tier-3 Glitch (4.5 hp): 2.1 × 1.2 × PULSE_GLITCH ≥ 4.5 (1.6 gave 4.03).
+  {
+    const L = lab('pulse', 2), g = L.g; g.mode = 'surge';
+    L.w.cells[L.w.idx(L.gx + 2, L.gy)] = T.EMPTY;
+    const hp = GLITCH_TIER.hp[0] + 3 * GLITCH_TIER.hp[1], e = { x: g.player.x + 2 * CELL, y: g.player.y, r: GLITCH_R, hp, maxHp: hp, tier: 3, vx: 0, vy: 0, spin: 0 };
+    g.enemies = [e]; g.beam.charge = 1;
+    const { releasePulse } = await import('../src/beam.js'); releasePulse(g);
+    check('Pulse: a full Beam 2 burst one-shots a tier-3 Glitch (PULSE_GLITCH 1.8, D-054)', e.hp <= 0, JSON.stringify({ hp: +e.hp.toFixed(3), PULSE_GLITCH }));
+  }
 
   // A 0.1 s tap fizzles: no damage, a soft tick, then 0.3 s before charging starts again.
   {

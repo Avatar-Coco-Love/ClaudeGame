@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.44 — 2026-11-24 (#45)
+- Pulse beam: a full charge now waits while you hold it, its reach line turning solid, and fires the moment a Glitch or
+  a wall is in range instead of firing into empty air. Pulse bursts also hit Glitches harder (one shot now drops a
+  tier-3 Glitch at Beam Power 2). Mining with Pulse feels the same.
+
 ## v0.2.43 — 2026-11-24 (#44)
 - Switching apps or tabs while charging a Pulse no longer fires it: the charge is simply dropped, like pausing.
 - On phones, a finger resting on ◎ or ⟂ no longer locks up the aim stick when your other thumb lifts.
