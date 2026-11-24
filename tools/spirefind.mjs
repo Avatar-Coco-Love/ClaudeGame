@@ -2,7 +2,7 @@
 // which candidate each sector took, distances, nearest vault / Spire centre, and how many cells the stamp changed.
 // Also re-chooses with a fully explored map, to show the D-024 fallback (`keep`) path is reachable and bounded.
 // Usage: node tools/spirefind.mjs [seeds = 40] [first seed = 1]
-import { World, vaultSites, packBits } from '../src/world.js';
+import { vaultSites, packBits } from '../src/world.js';
 import { spireCandidates, chooseSpires } from '../src/spire.js';
 import { WORLD_W, WORLD_H } from '../src/config.js';
 

@@ -4,14 +4,18 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 79 leftovers** (5 sweeps; fixed in #86: B-065…B-073, 16 file-local exports). Perf (×4, 1280×800, loot, flushed
+  55 ms): **chunk blits 15 ms** (bilinear under the zoom; pre-scale chunk canvases to `CHUNK_PX·zoom·dpr`, blit at whole
+  px: measured 15 → 2 ms; cap cached chunks by pixels, ~16–20 at DPR 2), `drawLight` 15 (L2 covers), pickups 15 with 300.
+  `drawGrid` re-measured 3–4 ms, `paintChunk` 4 ms (Wide 8–12 spikes), not the audit-74 figures. GC ~6 MB/s, short-lived
+  (`pickupSprite` key strings, per-pickup `cargoRoom`/`buffMul`, `castBeam` Map/Set). Touch: 568×320 Matrix shows ~1.5
+  rows under its header (sticky tabs?), Settings hides 2 rows below the fold. Code: quality numbers 1000 ms / 0.98 / 0.9
+  and `VAULT_HALF` (anomaly.js, `- 3` in world.js) belong in config.
 - **Audit 74 leftovers** (5 sweeps; fixed in #80: SW `?query` offline launch, Anomaly take during a Relay deposit,
   pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` unsmoothed blit done at L2 (S-41, #85); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
   repaints a whole chunk per broken cell (~10 ms; Wide → 20–30 ms spikes: repaint a 3×3 clip); `touch.cjs` 65 s, ~25 s
   of `waitForTimeout` (wait on conditions). Touch: chips ≤ 700 px are glyph-only, name only in `title` (short label or
   tap to re-toast); overlays ignore side insets. Code: H2/H3 below still open; `VAULT_HALF` hard-coded 3 in `world.js`.
-- **Unused exports (one list, audit 74, grep-confirmed):** dead `SCAN_TYPES`, `VAULT_TEMPLATES`, `SPIRE_MODES`,
-  `nexusPointerSpot`, `researchNode`, `makeBeacon`, `primeSpire`, `pulseInReach`; export-only `clearShot`, `pickUpRelay`,
-  `siteOpen`, `scanWithin`, `isBroken`, `startWake`, `clearLanes`. Remove in one code-health PR.
 - **Audit 69 leftovers:** Watch: ~6 % of seeds put another Spire < 24 cells from Spire 0 (gap ≥ 12 allowed), so one look can find two
   ("(2/5)" first); fine in play, but any test that approaches a Spire must pin its seed (D-100).
 - **Audit 64 leftovers:** a reload mid-ending never shows the card by itself (reachable from the Matrix; needs a saved

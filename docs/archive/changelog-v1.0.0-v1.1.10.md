@@ -1,0 +1,57 @@
+# Changelog: v1.0.0–v1.1.10
+
+Moved word for word from `05-Changelog.md` in audit 79.
+
+## v1.1.10 — 2026-11-24 (#76)
+- **Two more Anomalies:** each buried hexagram is now one of three kinds. Orange **Overclock** (beam 1.5×), violet
+  **Lodestone** (the Attractor reaches twice as far and pulls harder) and teal **Ballast** (cargo +50 %). Different
+  kinds stack; each lasts until your next deposit, which banks everything Ballast let you carry. Same in Drift and Surge.
+
+## v1.1.9 — 2026-11-24 (#75)
+- **Behind the scenes:** a health check. A flaky test around finding your first Spire is fixed at its root (it
+  watched the clock instead of game time, and a rare world put two Spires side by side). Nothing changes in play.
+
+## v1.1.8 — 2026-11-24 (#74)
+- **Anomalies:** 16 slowly turning orange hexagrams are buried in the rock, more of them the deeper you go. Mine one
+  open and touch it: **Overclock** makes your beam 1.5× stronger (mining and fighting) until your next deposit at the
+  Nexus or a Relay. A chip under the cargo bar shows it; the site comes back 5 minutes later. Same in Drift and Surge.
+
+## v1.1.7 — 2026-11-24 (#73)
+- **Planning:** weather was play-tested and stays as it is. Next up: **Anomalies**, strange shapes buried in the
+  rock that boost your beam, your Attractor or your cargo until you next deposit, then come back a few minutes later.
+
+## v1.1.6 — 2026-11-24 (#72)
+- **Weather:** every 5–7 minutes of play, the dark changes for 40 s. In Surge a violet **static storm** rolls in and
+  Glitches come faster and in greater numbers (more fights, more loot); in Drift an **aurora** makes the ore in your
+  light shimmer, and breaking it often drops one extra. Never during a Spire Wake or the ending. M6 is complete: v1.1.
+
+## v1.0.5 — 2026-11-24 (#71)
+- **Spitters (Surge, the Deep):** about one Glitch in four out there is now a violet diamond that keeps ~200 px away,
+  points at you, glows orange for a moment and fires a slow bolt. Rock stops bolts, and your beam can pop them.
+
+## v1.0.4 — 2026-11-24 (#70)
+- **Behind the scenes:** new working rules for the sessions that build the game (smaller conversations, cheaper
+  checks). Nothing changes in play.
+
+## v1.0.3 — 2026-11-24 (#69)
+- **Fixes from a health check:** the key you press to skip the ending no longer also presses a button you clicked
+  earlier (it could toggle mute), and holding it can't dismiss the summary before you see it. The hint no longer
+  shows under the summary card, and the card fits a landscape phone without scrolling. The Wake's charge dial has its
+  faint full ring back. A damaged save can no longer freeze the game at the ending or show a strange best time, and a
+  world you finished just before 1.0 keeps its time as your first record.
+
+## v1.0.2 — 2026-11-24 (#68)
+- **Move your Relays** (you asked for this): stand in a Relay's ring and press B, or tap the ⊕↑ button that appears
+  there on phones, to pick it back up for free, then place it further out. You can carry one at a time, and the
+  three-per-world limit still holds, so your remote deposits can now follow you into the Deep.
+
+## v1.0.1 — 2026-11-24 (#67)
+- **Planning from player feedback:** Relays will be movable. The next update lets you pick a placed Relay back up from
+  its ring and set it down further out, so your remote deposits follow you into the Deep.
+
+## v1.0.0 — 2026-11-24 (#66)
+- **Lumen Core 1.0.** The whole arc is in: dig out from the Nexus, upgrade, go deep, relight all five Spires (by puzzle in
+  Drift, by holding them in Surge) and lift the dark.
+- **New Cycle:** after the ending, start a fresh world from the summary card or the title screen. Bank, upgrades, Spires,
+  Beacons and Relays start over; your records carry on (your best time to light all five, and each cycle's result). Each
+  cycle the Nexus glows a new colour. The title shows your cycle and best time.

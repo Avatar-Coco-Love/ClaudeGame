@@ -40,5 +40,19 @@ export function upgradeSave(save) {
   let v = save.v ?? 1;
   if (v > SAVE_FORMAT) return null; // written by a newer build; leave it untouched in storage, don't guess
   while (v < SAVE_FORMAT) { save = STEPS[v - 1](save); v += 1; save.v = v; }
-  return save;
+  return saneSave(save);
+}
+
+const B64_RE = /^[A-Za-z0-9+/]*={0,2}$/;
+const count = x => (Number.isFinite(x) && x >= 0 ? Math.floor(x) : 0);
+/** Audit 79 (B-066, B-067; B-037: never trust a save): a save without a seed or a readable map is no save (title shows
+ *  no Continue rather than throwing); bank and cargo become whole non-negative counts of the known resources. */
+function saneSave(s) {
+  if (!Number.isInteger(s.seed)) return null;
+  for (const k of ['explored', 'broken']) if (typeof s[k] !== 'string' || !B64_RE.test(s[k])) return null;
+  for (const k of ['bank', 'cargo']) {
+    const o = s[k] && typeof s[k] === 'object' ? s[k] : {};
+    s[k] = { shard: count(o.shard), prism: count(o.prism), lumen: count(o.lumen) };
+  }
+  return s;
 }

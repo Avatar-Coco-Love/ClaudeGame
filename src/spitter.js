@@ -14,7 +14,7 @@ export function makeSpitter(e) {
 }
 
 /** Nothing solid between the Spitter and the core. */
-export function clearShot(game, e, d) {
+function clearShot(game, e, d) {
   const p = game.player;
   return !game.world.raycast(e.x, e.y, (p.x - e.x) / d, (p.y - e.y) / d, d - p.r);
 }

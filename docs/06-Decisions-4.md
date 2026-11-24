@@ -65,7 +65,7 @@ minimap. Glitches ignore it. It follows the throttled perf check (S-15), which p
   D-002); a Nexus Development upgrade instead (Nexus upgrades grow the hub; placed items are Crafting, `01`); pick-up/move in v1 (needs
   a hold gesture on touch; cheap to add later if play-tests miss it).
 
-### D-044 — Projects page card: a real frame, served from this site, dark neon in both themes (2026-11-24, session 28, inbox)
+### D-044 — Projects page card: a real frame, served from this site, dark neon in both themes (2026-11-24, session 28, inbox; file pointer corrected by D-111)
 The share image is `og.png` (1200×630): a real frame of seed 7 (the Nexus, an east tunnel, the beam cutting), HUD hidden, no paint-over.
 It lives here and is this page's `og:image`; the Projects card links to it, so a better frame later updates both. `tests/share.cjs`
 checks the meta and the size. The card (`docs/projects-card.html`) is `.card.core`: near-black, cyan title, violet `.go`, in both page

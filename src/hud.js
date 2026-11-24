@@ -67,7 +67,7 @@ const ARROW_R = 12, LABEL = { back: 22, hw: 22, hh: 8 }; // arrow radius; "NEXUS
 
 /** Where the pointer goes for a Nexus at screen point (nx, ny) on a w×h screen: on the 40 px inset edge along the heading,
  *  slid inward along the same ray until neither the arrow nor its "NEXUS" label touches a HUD box. Null when on screen. */
-export function nexusPointerSpot(w, h, nx, ny, rects) {
+function nexusPointerSpot(w, h, nx, ny, rects) {
   const m = 40;
   if (nx > m && nx < w - m && ny > m && ny < h - m) return null;
   const cx = w / 2, cy = h / 2, a = Math.atan2(ny - cy, nx - cx), c = Math.cos(a), s = Math.sin(a);
@@ -96,7 +96,7 @@ export function drawNexusPointer(r, ctx) {
   const full = g.cargoRoom() <= 0;
   if (full) {
     ctx.save();
-    ctx.fillStyle = '#ffd23d'; ctx.font = `600 ${document.documentElement.classList.contains('text-large') ? 14 : 12}px system-ui, sans-serif`; // S-40: 12 px floor ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffd23d'; ctx.font = `600 ${document.documentElement.classList.contains('text-large') ? 14 : 12}px system-ui, sans-serif`; ctx.textAlign = 'center'; // S-40: 12 px floor
     ctx.fillText('NEXUS', p.lx, p.ly + 4);
     ctx.restore();
   }

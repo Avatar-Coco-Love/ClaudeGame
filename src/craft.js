@@ -10,7 +10,7 @@ export const BEACON_COLOR = `rgb(${BEACON_RGB})`; // white-cyan, on the map and 
 export const RELAY_COLOR = `rgb(${RELAY_RGB})`;   // S-22: cyan-white
 export const PLACE_GLYPH = { beacon: '✦', relay: '⊕' };
 
-export function makeBeacon(world, i) {
+function makeBeacon(world, i) {
   const x = i % world.w, y = Math.floor(i / world.w);
   return { i, x: (x + 0.5) * CELL, y: (y + 0.5) * CELL, r: BEACON_LIGHT };
 }
@@ -100,7 +100,7 @@ export function tryPlace(game) {
 
 /** S-34 (D-092): a placed Relay back into stock, free (it never left the world's supply), unless one is carried already.
  *  `game.relays` is spliced in place: it is the Renderer's light set, so the light and the minimap ring go this frame. */
-export function pickUpRelay(game, r) {
+function pickUpRelay(game, r) {
   game.placeKind = 'relay';
   if (game.craft.relay >= RELAY_STOCK) { game.placeResult = 'carrying'; game.notify('beacon'); return false; }
   game.relays.splice(game.relays.indexOf(r), 1);

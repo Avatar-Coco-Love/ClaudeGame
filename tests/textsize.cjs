@@ -70,7 +70,7 @@ async function browserChecks(browser, url, check, errors, shots) {
 
   // ---- Large text at the narrowest phones: no overlap, 44 px targets, no overflow.
   const P7 = devices['Pixel 7'], { isMobile, hasTouch, deviceScaleFactor, userAgent } = P7;
-  for (const vp of [{ width: 320, height: 568 }, { width: 568, height: 320 }]) {
+  for (const vp of [{ width: 320, height: 568 }, { width: 381, height: 800 }, { width: 568, height: 320 }]) {
     const ctx = await browser.newContext({ isMobile, hasTouch, deviceScaleFactor, userAgent, viewport: vp }), pg = await ctx.newPage();
     pg.on('pageerror', e => errors.push(`textsize ${vp.width}: ` + e.message));
     await pg.goto(url); await pg.waitForTimeout(300);
@@ -89,6 +89,20 @@ async function browserChecks(browser, url, check, errors, shots) {
     });
     check(`${vp.width}×${vp.height} Large text, Surge, 3 chips, ${vp.width < vp.height ? 'a world\'s supply' : '4-digit bank'}: no HUD overlap, ◎ ⟂ ✦ ♪ ≡ ≥ 44 px, nothing off screen or overflowing (S-40)`,
       r.large && r.n === 8 && !r.overlaps.length && !r.small.length && !r.off.length && !r.over.length, JSON.stringify(r));
+    // Audit 79 (B-069…B-072): the Matrix button stays one line, the four tabs fit the sheet (no sideways scroll), the
+    // Volume slider is a 44 px target and its "100" fits its box.
+    const [mb, gap] = await pg.evaluate(() => { const m = document.getElementById('matrix-btn').getBoundingClientRect(), h = document.getElementById('hint').getBoundingClientRect(); return [m.height, h.top - m.bottom]; });
+    await pg.evaluate(() => window.__lumen.input.pressed.add('matrix')); await pg.waitForTimeout(250);
+    const tabs = await pg.evaluate(() => { const sh = document.querySelector('#matrix .sheet') || document.querySelector('#matrix'), b = sh.getBoundingClientRect();
+      const t = [...document.querySelectorAll('.tabs button')].map(e => e.getBoundingClientRect()).filter(x => x.width);
+      return { n: t.length, outside: t.filter(x => x.right > b.right - 1 || x.left < b.left + 1).length, sideScroll: [...document.querySelectorAll('#matrix, #matrix *')].some(e => e.clientWidth && getComputedStyle(e).overflowX !== 'visible' && e.scrollWidth > e.clientWidth + 1) }; });
+    await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
+    await pg.evaluate(() => { document.getElementById('set-volume').value = 100; document.getElementById('set-volume').dispatchEvent(new Event('input', { bubbles: true })); });
+    await pg.evaluate(() => { document.getElementById('menu-btn').click(); document.getElementById('settings-btn').click(); }); await pg.waitForTimeout(250);
+    const vol = await pg.evaluate(() => { const v = document.getElementById('set-volume'), o = document.getElementById('set-volume-val');
+      return { h: Math.round(v.getBoundingClientRect().height), shown: !!v.offsetParent, text: o.textContent, over: o.scrollWidth > o.clientWidth + 0.5 || o.getBoundingClientRect().right > o.closest('.set-row').getBoundingClientRect().right + 0.5 }; });
+    check(`${vp.width}×${vp.height} Large text: Matrix button one line (${Math.round(mb)} px) clear of the hint, ${tabs.n} tabs inside the sheet with no sideways scroll, Volume ${vol.h} px tall and "${vol.text}" fits (audit 79)`,
+      mb < 52 && gap >= 4 && tabs.n === 4 && !tabs.outside && !tabs.sideScroll && vol.shown && vol.h >= 44 && vol.text === '100' && !vol.over, JSON.stringify({ mb, gap, tabs, vol }));
     await ctx.close();
   }
 }

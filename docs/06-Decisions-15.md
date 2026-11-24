@@ -33,7 +33,7 @@ Continues `06-Decisions-14.md` (same rules: supersede, never edit; list rejected
   broken); granting it from the **first Spire** (ties a Drift/Surge-neutral tool to a late milestone); **replacing
   recorded audio** with it (the owner says the pack is coming).
 
-### D-109 — S-41 adaptive graphics: sample the frame gap, step-up bar 18 ms, bounce backoff (2026-11-24, session 78, Build)
+### D-109 — S-41 adaptive graphics: sample the frame gap, step-up bar 18 ms, bounce backoff (2026-11-24, session 78, Build; extended by D-110)
 - Built S-41 (`quality.js`, `settings.graphics` Auto/High/Low, levels L0 DPR ≤ 2 · L1 DPR 1 · L2 + half the particles
   drawn (fixed per particle, no flicker) + pickups without glow + unsmoothed light blit, the audit 74 Debt item).
 - **Sampled value:** the real gap between played frames (`now − last`, unclamped), not JS work time. Measured headless:
@@ -43,3 +43,17 @@ Continues `06-Decisions-14.md` (same rules: supersede, never edit; list rejected
   the edge settles instead of cycling every 13 s. Paused / title / ending frames and stalls > 1 s reset the window.
 - Rejected: JS work time (misses raster); a 14 ms bar (unreachable at 60 Hz); a fixed step-up wait (oscillates);
   skipping every other particle by index (flickers as particles die); a no-glow pickup with the glow sprite's size.
+
+### D-110 — Auto graphics judges each step down; DPR ≤ 1 skips L1 (2026-11-24, audit 79, B-073)
+- **A step down must pay:** the first full 3 s window after a step down needs p90 < `QUALITY_GAIN` (0.85) × the p90 that
+  caused it, or the step is undone and Auto stops stepping down until Auto is chosen again in Settings. A 30 Hz rAF cap
+  (iOS Low Power, battery saver) gave 33 ms at every level, so Auto sat at L2 (DPR 1, plainer) for nothing.
+- **DPR ≤ 1 screens step L0 ↔ L2:** there L1 (DPR 1) draws exactly as L0, so a 0↔1 step was a free bounce + 3 s slow.
+- D-109's backoff wording, precisely: any step down whose last step was up doubles the wait; it never shrinks back.
+- Rejected: detecting a cap from the gap's 16.7 ms multiples (a slow 60 Hz device also snaps); a time-limited backoff
+  (no bounce evidence it's needed); stepping down again after a cooldown (the cap doesn't lift mid-session).
+
+### D-111 — Two stale pointers in old decisions (2026-11-24, audit 79, docs drift)
+- D-026: a death's scatter is bounded by the hold, which is 140 normally and 210 with Ballast (D-103); still bounded.
+- D-044: `docs/projects-card.html` never existed in this repo; the card lives in the Projects repo (#14, `04`).
+- Rejected: editing the old entries' text (06 is append-only; only their headings point here).
