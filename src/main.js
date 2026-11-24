@@ -6,7 +6,7 @@ import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, relayAt, P
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { tickEnding, endingSummary, fmtTime } from './ending.js';
 import { upgradeSave } from './save.js';
-import { Game } from './game.js';
+import { Game, cleanRecords } from './game.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
 import { Audio } from './audio.js';
@@ -84,7 +84,7 @@ function newCycle(save) {
   const next = (Number.isInteger(save.cycle) ? save.cycle : 0) + 1;
   if (!confirm(`Begin cycle ${next}? A fresh world: bank, upgrades, Spires, Beacons and Relays start over. Your records and settings carry on.`)) return false;
   store.clear();
-  start(null, { cycle: next, records: save.records || {}, mode: save.mode === 'surge' ? 'surge' : 'drift' });
+  start(null, { cycle: next, records: cleanRecords(save.records), mode: save.mode === 'surge' ? 'surge' : 'drift' });
   return true;
 }
 $('new-cycle').addEventListener('click', () => { const s = store.read(); if (s && s.ended) newCycle(s); });
@@ -150,7 +150,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g)].join('|'); // S-28: the primed hint
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -180,7 +180,7 @@ function updateHud() {
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
-    $('hint').classList.toggle('hidden', !h || panelOpen); // never under the open Matrix (B-008)
+    $('hint').classList.toggle('hidden', !h || panelOpen || endingOpen); // never under the open Matrix (B-008)
   }
   for (const ev of g.events) {
     if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
@@ -189,7 +189,7 @@ function updateHud() {
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'spire-primed') { if (!g.wake) toast('Spire primed', 3200, KEEP); persist(); } // S-20; B-052: a Wake's own toast says it
-    if (ev === 'ending') persist(); // S-24: `ended` is saved at once
+    if (ev === 'ending') { persist(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } // S-24; B-056
     if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
     if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
@@ -338,14 +338,17 @@ function openEnding() {
   $('ending-stats').innerHTML = row('Time to light them all', e.time) + row('Cells mined', e.mined) +
     row('Spires relit in Drift', e.drift) + row('Spires relit in Surge', e.surge) + (e.restored ? row('Spires restored', e.restored) : '') +
     row('Glitches cleared', e.glitches) + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
-  closePanel(); endingOpen = true; $('ending').classList.remove('hidden'); $('ending-continue').focus();
+  closePanel(); endingOpen = true; $('hint').classList.add('hidden'); $('ending').classList.remove('hidden'); $('ending-continue').focus(); // B-054: no hint under the card (B-008)
 }
 function closeEnding() { endingOpen = false; $('ending').classList.add('hidden'); input.pressed.clear(); }
 $('ending-continue').addEventListener('click', closeEnding);
 $('ending-cycle').addEventListener('click', () => { persist(); const s = game.toSave(); if (newCycle(s)) { closeEnding(); toast(`Cycle ${game.cycle}`, 3200, KEEP); } });
 $('ending-open').addEventListener('click', openEnding);
 // Any key or tap skips the sequence (and does nothing else: the press is swallowed).
-for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => { if (game && game.endSeq && !paused) endSkip = true; }, true);
+for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, e => {
+  if (game && game.endSeq && !paused) { endSkip = true; if (ev === 'keydown') e.preventDefault(); } // B-056: no focused button fires
+  else if (ev === 'keydown' && endingOpen && e.repeat) e.preventDefault(); // B-055: a held skip key doesn't click Continue
+}, true);
 
 // ---------- Settings (S-3) ----------
 function applySettings() {

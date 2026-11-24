@@ -176,9 +176,11 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 .end-lead { margin: 0 0 12px; opacity: .85; }
 #ending-stats { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0 0 16px; }
 #ending-stats dt { opacity: .7; } #ending-stats dd { margin: 0; font-weight: 700; text-align: right; }
-.end-btns { display: flex; flex-wrap: wrap; gap: 10px; } .end-btns .big { flex: 1 1 160px; margin: 0; }
+.end-btns { display: flex; flex-wrap: wrap; gap: 10px; } .end-btns .big { flex: 1 1 200px; margin: 0; } /* stacks below ~440 px */
 #ending-cycle small { display: block; font-size: 11px; opacity: .7; }
 #ending-open { margin-top: 10px; min-height: 44px; width: 100%; }
 body.ending-seq #hud { opacity: 0; pointer-events: none; transition: opacity .4s; }
 #cycle-line { margin: -4px 0 12px; color: var(--cyan); letter-spacing: .08em; }
 #new-cycle small { display: block; font-size: 11px; opacity: .7; }
+@media (max-height: 340px) { #ending .sheet { padding-top: 10px; padding-bottom: 10px; } #ending-stats { gap: 2px 14px; margin-bottom: 8px; font-size: 13px; }
+  .end-lead { display: none; } #ending .sheet header { margin-bottom: 4px; } .end-btns .big { padding-top: 8px; padding-bottom: 8px; } } /* B-054: landscape phones, no scroll */

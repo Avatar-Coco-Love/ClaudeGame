@@ -9,11 +9,15 @@ import { CELL, ENDING_S, ENDING_FADE_S, ENDING_LINE_SHARE, ENDING_MARGIN_CELLS, 
 export function checkEnding(game) {
   if (game.ended || !game.spires.length || !game.spires.every(s => s.lit)) return;
   game.ended = true; game.endedAt = game.stats.time; game.endSeq = { t: 0 };
-  // S-29 (D-062): this cycle's record, and the best time to light them all.
-  const by = m => game.spires.filter(s => s.mode === m).length, r = game.records;
-  r.cycles = { ...(r.cycles || {}), [game.cycle]: { time: Math.round(game.endedAt), drift: by('drift'), surge: by('surge') } };
-  r.best = Math.min(r.best ?? Infinity, Math.round(game.endedAt));
+  recordCycle(game);
   game.notify('ending');
+}
+
+/** S-29 (D-062): this cycle's record, and the best time to light them all (records are clean: game.js cleanRecords). */
+export function recordCycle(game) {
+  const by = m => game.spires.filter(s => s.mode === m).length, r = game.records, t = Math.round(game.endedAt);
+  r.cycles = { ...(r.cycles || {}), [game.cycle]: { time: t, drift: by('drift'), surge: by('surge') } };
+  r.best = Number.isFinite(r.best) && r.best >= 0 ? Math.min(r.best, t) : t;
 }
 
 const reduced = game => !!(game.settings && game.settings.reducedMotion);

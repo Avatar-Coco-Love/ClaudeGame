@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.3 — 2026-11-24 (#69)
+- **Fixes from a health check:** the key you press to skip the ending no longer also presses a button you clicked
+  earlier (it could toggle mute), and holding it can't dismiss the summary before you see it. The hint no longer
+  shows under the summary card, and the card fits a landscape phone without scrolling. The Wake's charge dial has its
+  faint full ring back. A damaged save can no longer freeze the game at the ending or show a strange best time, and a
+  world you finished just before 1.0 keeps its time as your first record.
+
 ## v1.0.2 — 2026-11-24 (#68)
 - **Move your Relays** (you asked for this): stand in a Relay's ring and press B, or tap the ⊕↑ button that appears
   there on phones, to pick it back up for free, then place it further out. You can carry one at a time, and the
