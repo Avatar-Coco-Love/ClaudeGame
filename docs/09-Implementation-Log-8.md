@@ -61,3 +61,12 @@ Continues `09-Implementation-Log.md` (sessions 59–63 archived in audit 69: `ar
 - Docs: `09` sessions 59–63 archived word for word; `02` per-system detail → new `08-Systems-Reference.md`; `04` done
   Tooling + M2–M5 → `archive/2026-11-24-04-done-m2-m5.md`. D-099…D-096 spot-checked against config/code: match.
 - Scope note: run as one agent (no parallel sweeps available); perf, touch and code-health sweeps carried to audit 74.
+
+## Session 70 — Build: S-36 Lodestone + Ballast (v1.1.10, #76)
+- `ANOMALY_KINDS` gains Lodestone (magnet ×2, pull ×1.5, violet ✧) and Ballast (cargo ×1.5 floored, teal ⬡); each site
+  draws its kind from `rng['anomaly-kind']`. `buffMul` reads `fx`; toast text per kind (D-101).
+- `surgebot --anomaly`, `takes`/`gainMin` columns; tune table in D-101 (all in bounds, multipliers unchanged).
+- Tests: `anomaly.cjs` +5 (kinds, effects, pull ×1.5, stacking, Ballast deposit + death), `surgebot.cjs` +1 (6 seeds ×
+  10 min mine ratio: 1.072 / 1.079, ~8 s). The S-35 browser chip check now pins its site's kind (kinds vary by seed).
+  Screenshot viewed: three hexagram colours in a room, three chips, cargo 0/30 with Ballast.
+- Seen: the S-35 tests assumed every site was Overclock; 3 node + 1 browser check failed until pinned (no bug).

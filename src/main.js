@@ -199,7 +199,7 @@ function updateHud() {
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
     if (ev === 'weather-end') toast(g.weather.was === 'storm' ? 'The storm passes' : 'The aurora fades', 2600, KEEP);
-    if (ev === 'anomaly') { const k = ANOMALY_KINDS[g.lastBuff]; toast(`${k.name} — ${k.stat} ×${k.mul} until you deposit`, 3200, KEEP); persist(); } // S-35
+    if (ev === 'anomaly') { const k = ANOMALY_KINDS[g.lastBuff]; toast(`${k.name} — ${k.text} until you deposit`, 3200, KEEP); persist(); } // S-35
     if (ev === 'buffs-end') { buffFlash(g.endedBuffs); persist(); }
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }

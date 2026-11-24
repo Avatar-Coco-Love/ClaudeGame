@@ -125,7 +125,7 @@ export class Game {
     return true;
   }
 
-  stat(id) { const u = UPGRADES.find(u => u.id === id); return u.value(this.upgrades[id]) * buffMul(this, id); } // S-35: × active buffs
+  stat(id) { const u = UPGRADES.find(u => u.id === id), v = u.value(this.upgrades[id]) * buffMul(this, id); return id === 'cargo' ? Math.floor(v) : v; } // S-35: × active buffs; S-36: Ballast's cargo rounds down
   cargoTotal() { return this.cargo.shard + this.cargo.prism + this.cargo.lumen; }
   cargoRoom() { return this.stat('cargo') - this.cargoTotal(); }
   inNexus() { return Math.hypot(this.player.x - this.nexus.x, this.player.y - this.nexus.y) < NEXUS_RADIUS; }
@@ -304,7 +304,7 @@ export class Game {
       const dx = p.x - it.x, dy = p.y - it.y, d = Math.hypot(dx, dy);
       const room = this.cargoRoom() > 0;
       if (room && d < mag && it.age > PICKUP_SETTLE_S) {
-        const pull = ATTRACT_PULL[0] * (1 - d / mag) + ATTRACT_PULL[1];
+        const pull = (ATTRACT_PULL[0] * (1 - d / mag) + ATTRACT_PULL[1]) * buffMul(this, 'pull'); // S-36: Lodestone
         it.vx += (dx / d) * pull * dt; it.vy += (dy / d) * pull * dt;
         it.vx *= 0.9; it.vy *= 0.9;
       } else {

@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.1.9';
+export const VERSION = '1.1.10';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -243,7 +243,12 @@ export const WEATHER_TINT = { storm: [14, 4, 26], aurora: [3, 13, 13] }; // dark
 export const ANOMALY_COUNTS = [3, 5, 8], ANOMALY_D = [[9, 23], [25, 47], [49, 76]], ANOMALY_GAP = 12, ANOMALY_CLEAR = 1;
 export const ANOMALY_TRIES = 600, ANOMALY_TAKE = 0.6, ANOMALY_RECHARGE_S = 300;
 export const ANOMALY_BEAM_MUL = 1.5;
-// One entry per buff kind: the Matrix stat it scales, by how much, and how it shows (chip glyph, hexagram colour 'r, g, b').
+// S-36 (D-101): Lodestone scales Attractor reach and pull, Ballast the cargo limit (rounded down). Bot-tuned (`surgebot --anomaly`).
+export const ANOMALY_MAGNET_MUL = 2, ANOMALY_PULL_MUL = 1.5, ANOMALY_CARGO_MUL = 1.5;
+// One entry per buff kind (drawn 1/3 each per site from rng['anomaly-kind'], seed-only): the Matrix stats it scales (`fx`;
+// 'pull' is the Attractor's pull, not a Matrix stat), the toast text, and how it shows (chip glyph, hexagram colour 'r, g, b').
 export const ANOMALY_KINDS = {
-  overclock: { name: 'Overclock', glyph: '✶', stat: 'beam', mul: ANOMALY_BEAM_MUL, rgb: '255, 190, 120' },
+  overclock: { name: 'Overclock', glyph: '✶', fx: { beam: ANOMALY_BEAM_MUL }, text: `beam ×${ANOMALY_BEAM_MUL}`, rgb: '255, 190, 120' },
+  lodestone: { name: 'Lodestone', glyph: '✧', fx: { magnet: ANOMALY_MAGNET_MUL, pull: ANOMALY_PULL_MUL }, text: `pull reach ×${ANOMALY_MAGNET_MUL}`, rgb: '196, 140, 255' },
+  ballast: { name: 'Ballast', glyph: '⬡', fx: { cargo: ANOMALY_CARGO_MUL }, text: `cargo +${Math.round((ANOMALY_CARGO_MUL - 1) * 100)} %`, rgb: '90, 230, 210' },
 };

@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.1.10 — 2026-11-24 (#76)
+- **Two more Anomalies:** each buried hexagram is now one of three kinds. Orange **Overclock** (beam 1.5×), violet
+  **Lodestone** (the Attractor reaches twice as far and pulls harder) and teal **Ballast** (cargo +50 %). Different
+  kinds stack; each lasts until your next deposit, which banks everything Ballast let you carry. Same in Drift and Surge.
+
 ## v1.1.9 — 2026-11-24 (#75)
 - **Behind the scenes:** a health check. A flaky test around finding your first Spire is fixed at its root (it
   watched the clock instead of game time, and a rare world put two Spires side by side). Nothing changes in play.

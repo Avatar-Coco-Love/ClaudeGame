@@ -4,10 +4,14 @@
 // beat mine), spire (nearest Spire by path, feed the banked ▲, mine prism cells within 24 cells and carry them in until
 // primed, then hold the interior). S-23 adds "Wake held / failed" to the spire route.
 // Usage: node tools/surgebot.mjs [--route=mine,spire] [--build=start,mid,max] [--mode=drift,surge] [--seeds=12]
-//        [--minutes=20] [--bank=20] [--hold=40] [--weather=on|off] [--v]   (one line per route × build × mode: medians + p90 over seeds)
+//        [--minutes=20] [--bank=20] [--hold=40] [--weather=on|off] [--anomaly=on,off,overclock,…] [--v]
+//        (one line per route × build × mode × anomaly: medians + p90 over seeds)
+// S-36: --anomaly=on (default) detours to a charged site whose kind isn't active, open or one dig away, within
+// ANOMALY_DETOUR_S path-seconds; off voids every site (none can be taken, even in passing); a kind id voids the other kinds.
 import { Game } from '../src/game.js';
 import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS, SPITTER_TIER, GLITCH_TIER_PX } from '../src/config.js';
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
+import { siteCharged } from '../src/anomaly.js';
 
 /** S-23 guard helpers (one copy for surgebot, wakeprobe and tests/wake.cjs, audit 59): the live Glitch nearest the
  *  Spire core, the spot between the core and a target 3.2 cells out (clamped inside the interior), and the move toward it. */
@@ -21,6 +25,7 @@ export function steer(p, to) { const m = Math.hypot(to.x - p.x, to.y - p.y);
 export const LEVELS = { start: {}, mid: { beam: 4, range: 3, thrust: 3, cargo: 4, magnet: 2, hull: 2 }, max: null };
 const WALL = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE, T.FACET]); // the bot never digs these (spec: walls)
 const ORE = new Set([T.CRYSTAL, T.PRISM, T.LUMEN]);
+const ANOMALY_DETOUR_S = 20;
 const dt = 1 / 60, REPLAN_S = 2, STUCK_S = 5, STUCK_PX = 8, FIGHT_PX = 160, RETREAT = 0.35, SPIRE_R = 24;
 const audio = new Proxy({}, { get: () => () => {} });
 
@@ -50,8 +55,9 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
   return null;
 }
 
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null }) {
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on' }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
+  for (const s of g.anomaly.sites) if (anomaly !== 'on' && s.kind !== anomaly) s.void = true; // S-36: off / one kind only
   if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[build] ? (LEVELS[build][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull');
@@ -107,7 +113,18 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   };
   const bankRun = () => { setGoal('bank', depositCell); const r = drive(); if (r === 'arrived') { for (let k = 0; k < 600 && g.cargoTotal() > 0 && t < capT; k++) tick(g.player); setGoal('', null); } return r; };
   const bad = new Set();
-  const out = { seed, route, build, mode, deaths: 0, stuck: 0, skipped: 0, minutes: 0 };
+  const out = { seed, route, build, mode, anomaly, deaths: 0, stuck: 0, skipped: 0, minutes: 0, buffs: 0 };
+  const take = g.notify.bind(g); g.notify = ev => { if (ev === 'anomaly') out.buffs++; take(ev); };
+  /** S-36: the nearest takeable site (charged, kind not active, its cell open or next to an open one) within
+   *  ANOMALY_DETOUR_S path-seconds, as a cell index; or -1. */
+  const siteGoal = () => {
+    const want = new Set(), wc = (x, y) => w.get(x, y) === T.EMPTY;
+    g.anomaly.sites.forEach((s, i) => { const j = s.y * W + s.x;
+      if (siteCharged(g, i) && !g.buffs.includes(s.kind) && !bad.has(j) && (wc(s.x, s.y) || wc(s.x + 1, s.y) || wc(s.x - 1, s.y) || wc(s.x, s.y + 1) || wc(s.x, s.y - 1))) want.add(j); });
+    if (!want.size) return -1;
+    const r = search(g, cellOf(g.player.x, g.player.y), i => want.has(i), () => 0, ANOMALY_DETOUR_S);
+    return r && r.cost <= ANOMALY_DETOUR_S ? r.end : -1;
+  };
 
   if (route === 'mine' || route === 'deep' || route === 'rim' || route === 'hug') {
     // rim: a spot 1.4 R out (only 1 Glitch near the Nexus, GLITCH_CAP); hug: just inside the ring's edge.
@@ -118,6 +135,13 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
       if (retreat()) continue;
       if (g.cargoRoom() < 2) { if (bankRun() === 'skip') break; continue; }
       if (route === 'mine' || route === 'deep') { // deep (S-32): only ore at Spitter depth (tier >= SPITTER_TIER)
+        if (!goalKey && anomaly !== 'off') { const j = siteGoal(); if (j >= 0) setGoal(`site${j}`, i => i === j); }
+        if (goalKey.startsWith('site')) { // S-36: the detour; on arrival, settle onto the site's centre to take it
+          const r = drive(), j = Number(goalKey.slice(4));
+          if (r === 'skip') { bad.add(j); skipped++; setGoal('', null); }
+          else if (r === 'arrived') { const n0 = out.buffs; for (let k = 0; k < 90 && out.buffs === n0 && t < capT; k++) tick({ x: cx(j), y: cy(j) }); if (out.buffs === n0) bad.add(j); setGoal('', null); }
+          continue;
+        }
         const far = route === 'deep' ? SPITTER_TIER * GLITCH_TIER_PX : 0;
         setGoal('ore', i => ORE.has(w.cells[i]) && !bad.has(i) && Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) >= far);
         const r = drive();
@@ -130,6 +154,8 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     }
     Object.assign(out, { shardMin: (g.bank.shard - banked0.shard) / minutes, prismMin: (g.bank.prism - banked0.prism) / minutes });
     out.haulMin = out.shardMin + out.prismMin;
+    out.carried = g.cargoTotal(); // S-36: still in cargo at the cap (a Ballast run carries more): `gainMin` counts it
+    out.gainMin = out.haulMin + out.carried / minutes;
   } else if (route === 'spire') {
     const H = SPIRE_HALF - 1, inSpire = (s, i) => Math.abs((i % W) - s.x) <= H && Math.abs(((i / W) | 0) - s.y) <= H && w.cells[i] === T.EMPTY;
     const first = search(g, cellOf(g.player.x, g.player.y), i => g.spires.some(s => inSpire(s, i)));
@@ -195,7 +221,7 @@ const fmt = v => { const a = q(v, 0.5), b = q(v, 0.9); return Number.isNaN(a) ? 
 /** One report line per (route, build, mode), medians/p90 over seeds. */
 export function summarize(rows) {
   const r0 = rows[0], n = rows.length, col = k => rows.map(r => r[k]), cnt = f => rows.filter(f).length;
-  let line = `${r0.route} ${r0.build} ${r0.mode} (${n} seeds, med/p90): deaths/min ${fmt(col('deathsMin'))}`;
+  let line = `${r0.route} ${r0.build} ${r0.mode} anomaly=${r0.anomaly} (${n} seeds, med/p90): deaths/min ${fmt(col('deathsMin'))}`;
   if (r0.route === 'spire') {
     const held = rows.filter(r => r.held !== null);
     line += `, min to primed ${fmt(col('toPrimed'))}, primed ${cnt(r => r.primed)}/${n} (went past 24 cells ${cnt(r => r.far)}), deaths ${fmt(col('deaths'))}, hold deaths ${fmt(col('holdDeaths'))}, ` +
@@ -203,7 +229,7 @@ export function summarize(rows) {
         `fail rate ${Math.round(100 * col('wakeFails').reduce((a, b) => a + b, 0) / Math.max(1, col('wakes').reduce((a, b) => a + b, 0)))} %, primed→relit min ${fmt(col('toRelit'))}`
         : `holds survived ${held.length ? Math.round(100 * held.filter(r => r.held).length / held.length) : 0} % of ${held.length}`);
   } else line += `, ◆/min ${fmt(col('shardMin'))}, ▲/min ${fmt(col('prismMin'))}, haul/min ${fmt(col('haulMin'))}`;
-  line += `, kills/min ${fmt(rows.map(r => r.kills / Math.max(r.minutes, 1e-9)))}`;
+  line += `, buffs taken ${fmt(col('buffs'))}, kills/min ${fmt(rows.map(r => r.kills / Math.max(r.minutes, 1e-9)))}`;
   return line + `, stuck ${cnt(r => r.stuck > 0)}, skipped goals ${col('skipped').reduce((a, b) => a + b, 0)}, capped ${cnt(r => r.capped)}`;
 }
 
@@ -212,9 +238,10 @@ if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop()
   const routes = arg('route', 'mine,spire').split(','), builds = arg('build', 'start,mid,max').split(','), modes = arg('mode', 'drift,surge').split(',');
   const seeds = Number(arg('seeds', 12)), minutes = Number(arg('minutes', 20)), bank = Number(arg('bank', 20)), hold = Number(arg('hold', 40));
   const V = process.argv.includes('--v');
-  for (const route of routes) for (const build of builds) for (const mode of modes) {
+  const anomalies = arg('anomaly', 'on').split(',');
+  for (const route of routes) for (const build of builds) for (const mode of modes) for (const anomaly of anomalies) {
     const rows = [];
-    for (let k = 1; k <= seeds; k++) { const r = runBot({ seed: k * 7919, route, build, mode, minutes, bank, hold, weather: arg('weather', null) }); if (V) console.log(JSON.stringify(r)); rows.push(r); }
+    for (let k = 1; k <= seeds; k++) { const r = runBot({ seed: k * 7919, route, build, mode, minutes, bank, hold, weather: arg('weather', null), anomaly }); if (V) console.log(JSON.stringify(r)); rows.push(r); }
     console.log(summarize(rows));
   }
 }

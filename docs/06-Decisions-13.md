@@ -65,3 +65,15 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
   Guard: the 320 px Spire page runs with `slowFrames` (130 ms busy frames); the old wait fails it every run.
 - Rejected: retries or a longer wall-clock timeout (hides the cause, slower); a minimum Spire gap > 12 (changes worlds
   of existing saves for a test's sake; two Spires seen at once is fine in play, the toast counts both).
+
+### D-101 — S-36 Lodestone + Ballast as built and tuned (2026-11-24, session 70)
+- Kinds from `seededStream(seed, 'anomaly-kind')`, one draw per placed site (own salt: placement unchanged); 320 sites
+  over 20 seeds: 114 / 105 / 101. `ANOMALY_KINDS[id].fx` maps stat → multiplier; `'pull'` scales the Attractor pull
+  in `updatePickups`; `stat('cargo')` floors. Ballast's end = the existing full-deposit end (D-099), so no cargo strands.
+- Bot (`surgebot --anomaly=on|off|<kind>`): detours to a takeable site ≤ 20 path-s away; `gainMin` = banked + carried
+  at the cap (banked alone read Ballast as a loss at 5 min). Mid, 12 seeds × 10 min, gain ÷ off, Drift / Surge:
+  mine all 1.048 / 1.067, Overclock 1.041 / 1.057, Lodestone 1.019 / 1.027, Ballast 1.038 / 1.054; deep all
+  1.151 / 1.130, Overclock 1.060 / 1.064, Lodestone 1.048 / 1.042, Ballast 1.173 / 1.134. Drift ÷ Surge 0.98–1.04.
+  All in bounds (alone ≤ 1.20, all ≤ 1.30): the spec multipliers stay (1.5; 2 + 1.5; 1.5).
+- Rejected: Ballast ×2 (tried: mine 0.93 / 0.96, deep Drift ÷ Surge 0.85: longer trips cost the bot more than they
+  carry); counting only banked haul (an end-of-run artefact); a stronger kind to make buffs "felt" (budget is a cap).

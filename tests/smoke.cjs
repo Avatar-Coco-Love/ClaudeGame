@@ -109,6 +109,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     check('core tunnels forward', m.dy > 150, `moved ${Math.round(m.dy)}px`);
     // S-35: an open Anomaly site taken by touch -> an "✶ Overclock" chip under the cargo bar and the take toast; a deposit ends it.
     const an = await pg.evaluate(async () => { const g = window.__lumen.game, s = g.anomaly.sites[0], w = g.world, back = { x: g.player.x, y: g.player.y };
+      s.kind = 'overclock'; // S-36: a site's kind varies by seed
       w.cells[s.y * w.w + s.x] = 0; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 0.5) * 32; g.player.vx = g.player.vy = 0;
       for (let i = 0; i < 6; i++) await new Promise(r => requestAnimationFrame(r));
       const out = { buffs: g.buffs.join(), chip: document.querySelector('#buffs .chip')?.textContent, toast: document.getElementById('toast').textContent };
