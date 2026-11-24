@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.1.8 — 2026-11-24 (#74)
+- **Anomalies:** 16 slowly turning orange hexagrams are buried in the rock, more of them the deeper you go. Mine one
+  open and touch it: **Overclock** makes your beam 1.5× stronger (mining and fighting) until your next deposit at the
+  Nexus or a Relay. A chip under the cargo bar shows it; the site comes back 5 minutes later. Same in Drift and Surge.
+
 ## v1.1.7 — 2026-11-24 (#73)
 - **Planning:** weather was play-tested and stays as it is. Next up: **Anomalies**, strange shapes buried in the
   rock that boost your beam, your Attractor or your cargo until you next deposit, then come back a few minutes later.

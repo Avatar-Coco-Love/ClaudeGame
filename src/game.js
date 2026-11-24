@@ -13,6 +13,7 @@ import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
+import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
 
@@ -34,6 +35,8 @@ export class Game {
     this.world = new World(seed, skip);
     // S-19 (D-049): the saved Spires, or chosen now from the seed (+ what an old/malformed save has seen, D-024).
     this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
+    this.anomaly = makeAnomalies(this.world, this.spires); // S-35: sites from the generated terrain, before the stamp (seed-only)
+    this.buffs = [];       // S-35: active Anomaly buff ids (saved); they end at the next deposit that banks ≥ 1 item
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
     this.cycle = 0; this.records = {}; // S-29: carried into every New Cycle (records: { best, cycles: { n: { time, drift, surge } } })
@@ -122,7 +125,7 @@ export class Game {
     return true;
   }
 
-  stat(id) { const u = UPGRADES.find(u => u.id === id); return u.value(this.upgrades[id]); }
+  stat(id) { const u = UPGRADES.find(u => u.id === id); return u.value(this.upgrades[id]) * buffMul(this, id); } // S-35: × active buffs
   cargoTotal() { return this.cargo.shard + this.cargo.prism + this.cargo.lumen; }
   cargoRoom() { return this.stat('cargo') - this.cargoTotal(); }
   inNexus() { return Math.hypot(this.player.x - this.nexus.x, this.player.y - this.nexus.y) < NEXUS_RADIUS; }
@@ -202,6 +205,7 @@ export class Game {
     this.updateBeam(dt, intent);
     this.updatePickups(dt);
     this.updateDeposit(dt);
+    updateAnomalies(this, dt); // S-35: after the deposit, so a buff taken this frame is never ended by it
     updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
     updateWake(this, dt); // S-23: Surge's Spire Wake (starts, clock, waves, end)
     updateWeather(this, dt); // S-33: after the Wake, so a Wake starting this frame cancels the event at once
@@ -337,7 +341,7 @@ export class Game {
       this.audio.deposit(this.depositCount++);
       this.depositKinds.add(kind);
       this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx, ty, life: 0.4, max: 0.4, color: RESOURCE[kind].color, size: 3 });
-      if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); }
+      if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); endBuffs(this); } // S-35: a deposit that banked ≥ 1 item ends every buff
     }
   }
 
@@ -410,6 +414,7 @@ export class Game {
       spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
       ended: this.ended, endedAt: this.endedAt, // S-24
       cycle: this.cycle, records: this.records, // S-29
+      anomalies: { ...this.anomaly.taken }, buffs: [...this.buffs], // S-35
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
@@ -432,6 +437,7 @@ export class Game {
     this.craft.relay = Math.min(RELAY_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.relay)) || 0)); // S-22
     this.craft.last = s.craft && s.craft.last === 'relay' ? 'relay' : 'beacon';
     loadRelays(this, s.relays);
+    loadAnomalies(this, s.anomalies, s.buffs); // S-35
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y, kp] of (Array.isArray(s.pickups) ? s.pickups : []).filter(Array.isArray)) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });

@@ -168,7 +168,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     const L = window.__lumen, g = L.game, c = L.renderer.minimap, m = c.getContext('2d'), sc = c.width / (g.world.w * 32);
     const at = s => { const d = m.getImageData(Math.round((s.x + 0.5) * 32 * sc) - 4, Math.round((s.y + 0.5) * 32 * sc) - 4, 9, 9).data;
       let v = 0; for (let i = 0; i < d.length; i += 4) v = Math.max(v, d[i] + d[i + 1] + d[i + 2]); return v; };
-    return { seen: at(g.spires[0]), unseen: at(g.spires[1]), flags: g.spires.map(s => s.seen) };
+    return { seen: at(g.spires[0]), unseen: at(g.spires[1]), flags: g.spires.map(s => s.seen), seed: g.world.seed, sp: g.spires.map(s => [s.x, s.y]), p: [g.player.x / 32 | 0, g.player.y / 32 | 0] };
   });
   check('minimap: a hollow hexagon at the seen Spire, nothing at an unseen one (S-27)', mini.seen >= 650 && mini.unseen < 200
     && mini.flags[0] && !mini.flags[1], JSON.stringify(mini));

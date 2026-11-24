@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.1.7';
+export const VERSION = '1.1.8';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -235,3 +235,15 @@ export const MODES = {
 export const WEATHER_EVERY_S = [300, 120], WEATHER_S = 40, WEATHER_EASE_S = 2;
 export const STORM_SPAWN_MUL = 0.75, STORM_CAP_ADD = 2, AURORA_BONUS = 1, AURORA_CHANCE = 0.4;
 export const WEATHER_TINT = { storm: [14, 4, 26], aurora: [3, 13, 13] }; // darkness RGB at full strength (base 2, 3, 10)
+// S-35 Anomalies (D-098, D-099, anomaly.js): ANOMALY_COUNTS sites per depth ring (Hearth / Veil / Deep), seed-only
+// (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre
+// distance ANOMALY_D[ring] cells, ≥ ANOMALY_GAP cells apart, clear of vault footprints and Spire footprints by ANOMALY_CLEAR
+// cells (Chebyshev, from the footprint edge). Taken when the core's centre is within ANOMALY_TAKE cells of an open site's
+// centre; a taken site recharges ANOMALY_RECHARGE_S of play time later. A buff lasts until a deposit banks ≥ 1 item.
+export const ANOMALY_COUNTS = [3, 5, 8], ANOMALY_D = [[9, 23], [25, 47], [49, 76]], ANOMALY_GAP = 12, ANOMALY_CLEAR = 1;
+export const ANOMALY_TRIES = 600, ANOMALY_TAKE = 0.6, ANOMALY_RECHARGE_S = 300;
+export const ANOMALY_BEAM_MUL = 1.5;
+// One entry per buff kind: the Matrix stat it scales, by how much, and how it shows (chip glyph, hexagram colour 'r, g, b').
+export const ANOMALY_KINDS = {
+  overclock: { name: 'Overclock', glyph: '✶', stat: 'beam', mul: ANOMALY_BEAM_MUL, rgb: '255, 190, 120' },
+};

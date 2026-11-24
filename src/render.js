@@ -11,6 +11,7 @@ import { endingView, drawOverview } from './ending.js';
 import { paintChunk } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
+import { drawAnomalies } from './anomaly.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -138,6 +139,7 @@ export class Renderer {
     }
 
     drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
+    drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16
@@ -361,6 +363,7 @@ export class Renderer {
     // S-13: Wide draws each of its parallel rays at 0.6× width, joined by a thin emitter bar across the nose.
     const rays = b.rays.length ? b.rays : [{ ox: p.x + Math.cos(p.angle) * 12, oy: p.y + Math.sin(p.angle) * 12, ex: b.ex, ey: b.ey, enemy: b.enemy }];
     const w = rays.length > 1 ? 0.6 : 1, flick = 0.75 + Math.random() * 0.25;
+    const hot = this.game.buffs.includes('overclock') ? '255,226,190' : '255,255,255'; // S-35: Overclock warms the core line
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';
@@ -371,7 +374,7 @@ export class Renderer {
     for (const r of rays) {
       const col = r.enemy ? '255,122,61' : '46,242,255';
       for (const [a, lw] of [[0.25, 9], [0.7, 3.5], [0, 1.2]]) {
-        ctx.strokeStyle = a ? `rgba(${col},${a * flick})` : `rgba(255,255,255,${0.9 * flick})`; ctx.lineWidth = lw * w;
+        ctx.strokeStyle = a ? `rgba(${col},${a * flick})` : `rgba(${hot},${0.9 * flick})`; ctx.lineWidth = lw * w;
         ctx.beginPath(); ctx.moveTo(r.ox, r.oy); ctx.lineTo(r.ex, r.ey); ctx.stroke();
       }
       const R = 14 * w, g = ctx.createRadialGradient(r.ex, r.ey, 0, r.ex, r.ey, R);
