@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.61 — 2026-11-24 (#62)
+- **Design pass:** the Surge Wake was play-tested with simulated players of different reaction speeds. A bug was found
+  (walking away from a waking Spire made its Glitches vanish) and is fixed in the next update, along with a fairer tune.
+  The next big additions after v1.0 are planned: a ranged Glitch for Surge and a weather event for each mode.
+
 ## v0.4.60 — 2026-11-24 (#61)
 - **The Wake (Surge):** step into a primed Spire in Surge and it wakes. Four lanes blast open from its gaps (any ore in
   them drops at your feet) and Glitches pour down them toward the Spire's core. Guard it for 40 seconds (one facet lights

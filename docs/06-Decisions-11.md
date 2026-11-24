@@ -72,3 +72,5 @@ Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected
 - Tune (bot guard, 12 seeds): fail 20 % start, 0 % mid/max; primed → relit 0.7 min. Kept as the first tune; Q-017.
 - Rejected: Wake Glitches always chasing the player (no reason to guard); a charge bar in the HUD (the ring sits on
   the thing being guarded); restarting at once after a fail (a wipe would loop with no breath).
+
+Continued in `06-Decisions-12.md` (D-087 on).
