@@ -141,7 +141,7 @@ async function nodeChecks(check) {
   {
     const r = await solveInGame(77, 0, 'drift', A), sv = upgradeSave(JSON.parse(JSON.stringify(r.g.toSave())));
     const again = new Game({ seed: 77, mode: 'drift', audio: quiet, save: sv }), a0 = again.spires[0];
-    const old = JSON.parse(JSON.stringify(make().toSave())); old.v = SAVE_FORMAT - 1; Object.assign(old.spires[1], { fed: 80, mask: 255, lit: true });
+    const old = JSON.parse(JSON.stringify(make().toSave())); old.v = 11; Object.assign(old.spires[1], { fed: 80, mask: 255, lit: true }); // the format before S-28's `mode` step (pin-ok: an old save)
     const up = new Game({ seed: 77, mode: 'drift', audio: quiet, save: upgradeSave(old) });
     const junk = JSON.parse(JSON.stringify(sv)); junk.spires[0].mode = 'banana';
     const jg = new Game({ seed: 77, mode: 'drift', audio: quiet, save: upgradeSave(junk) });

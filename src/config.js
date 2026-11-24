@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.4.63';
+export const VERSION = '0.4.64';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -112,6 +112,9 @@ export const SPIRE_LANE = { len: 6, half: 1, min: 3 }; // cells cleared past eac
 export const SPIRE_CHARGE = 100, SPIRE_CHARGE_HIT = 10; // the Spire's charge; a Glitch reaching the core costs this and bursts
 export const SPIRE_CORE_CONTACT_PX = 2; // how close (past touching) a Wake Glitch gets to the core before it counts as reaching it
 export const SPIRE_WAKE_TIER_DROP = 1; // S-31 (D-087): Wake Glitches spawn this many tiers below the Spire's depth tier
+// S-24 Ending (D-045, D-090): the sequence's length (reduced motion: a short fade) and the darkness before -> after.
+export const ENDING_S = 8, ENDING_FADE_S = 1;
+export const DARK_ALPHA = [0.93, 0.5];
 export const WAKE_FRAME_PX = 6 * 32; // the camera frames a waking Spire's core while the player core is within this (audit 59)
 export const SPIRE_GUARD_CELLS = 3;    // a Wake Glitch chases the player core instead when it is this close
 export const SPIRE_WAKE_RGB = '255, 122, 61'; // the charge ring + clock facets while a Wake runs (Glitch orange, D-088)

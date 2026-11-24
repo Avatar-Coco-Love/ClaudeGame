@@ -30,3 +30,14 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
 - **Toasts:** a Surge prime with a Wake on the same frame shows only "Spire waking — hold 40 s" (NOW tier); copy cut to one
   line at 568×320. Lane order stays N E S W: south-first let a standing core hold on its third try (the tune depends on it).
 - Kept: the "Circle the core" hint (touch audit thought standing still works; `wakeprobe` `still` fails 100 %).
+
+### D-090 — S-24 Ending as built (2026-11-24, session 60, Build; implements D-045)
+- `src/ending.js`. The last `relightSpire` calls `checkEnding`: `ended` + `endedAt` (stats time, for S-29's records) are
+  saved (`SAVE_FORMAT` 13; old saves `ended: false`; a save that already lit all 5 gets the ending on load).
+- **The sequence (8 s) is an overview frame, not the world zoomed out:** the explored map (minimap pixels scaled up),
+  the dark easing `DARK_ALPHA` 0.93 → 0.5, Spire glows, the Nexus, lines drawn in turn over the first 80 %. Zooming the
+  world to 0.16 cost 131 ms a frame (100 chunk blits, software canvas); the overview costs 1.7 ms. Reduced motion: a 1 s
+  fade at normal zoom. The sim holds during the sequence and under the card; the HUD fades out; any key/tap only skips.
+- Card: time to 5/5 (`endedAt`), cells mined + Glitches cleared (live stats), Drift / Surge / restored counts, Continue,
+  New Cycle disabled ("Next update"). Reopened from the Matrix ("Ending summary"). The lifted dark stays (`darkAlpha`).
+- Rejected: animating the zoom (sprite caches rebuild per zoom step); a separate "lifted" save field (`ended` implies it).

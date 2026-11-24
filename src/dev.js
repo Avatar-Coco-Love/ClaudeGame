@@ -3,6 +3,7 @@
 // Nothing here enters the save except what the actions themselves change (bank, upgrades, mode, carved cells).
 import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH } from './config.js';
 import { UNBREAKABLE } from './world.js';
+import { relightSpire } from './spire.js';
 
 const ROOM = 1; // carve (2*ROOM+1)² cells: a 3×3 room around the teleport target
 
@@ -45,13 +46,19 @@ export function createDev(ui) {
       game.revealQueue.push(...game.world.reveal(game.nexus.x, game.nexus.y, game.nexusLight()));
       ui.persist();
     },
+    /** S-24: relight every unlit Spire in the current mode (the last one starts the ending). */
+    relightAll() {
+      const game = g();
+      for (const s of game.spires) if (!s.lit) { s.fed = 80; relightSpire(game, s, game.mode); }
+      ui.persist();
+    },
   };
 
   let panel = null;
   const buttons = [
     ['+100◆', () => dev.addShards()], ['+50▲', () => dev.addPrisms()], ['+20●', () => dev.addLumen()],
     ['Ring 0', () => dev.teleport(0)], ['Ring 30', () => dev.teleport(30)], ['Ring 60', () => dev.teleport(60)],
-    ['God', () => dev.god()], ['Drift/Surge', () => dev.setMode()], ['Max all', () => dev.maxAll()],
+    ['God', () => dev.god()], ['Drift/Surge', () => dev.setMode()], ['Max all', () => dev.maxAll()], ['Relight all', () => dev.relightAll()],
   ];
   function refresh() { if (panel) panel.querySelector('[data-dev="God"]').classList.toggle('on', !!g().god); }
   dev.showPanel = (show = !panel || panel.classList.contains('hidden')) => {

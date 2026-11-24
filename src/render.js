@@ -7,6 +7,7 @@ import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.
 import { drawBeacons, drawRelays } from './craft.js';
 import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
+import { endingView, drawOverview } from './ending.js';
 import { paintChunk } from './terrain.js';
 
 const CHUNK_PX = CHUNK * CELL;
@@ -107,6 +108,8 @@ export class Renderer {
     const k = Math.min(1, dt * 6);
     this.cam.x += (p.x + lookX - this.cam.x) * k;
     this.cam.y += (p.y + lookY - this.cam.y) * k;
+    const ov = endingView(this); // S-24: the ending's overview (camera on the Nexus, zoomed out to every Spire) replaces the world
+    if (ov) { drawOverview(this, this.ctx, ov); return; }
     const shx = (Math.random() - 0.5) * game.shake, shy = (Math.random() - 0.5) * game.shake;
 
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
