@@ -44,7 +44,7 @@ export class Game {
       realizedVx: 0, realizedVy: 0, // what actually happened after collision
       angle: -Math.PI / 2, invuln: 0, hurtFlash: 0, // integrity: set from the hull stat below
     };
-    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null }; // S-14: Pulse state
+    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null, facetLatch: null, midEnemy: false }; // S-14: Pulse state
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
@@ -212,7 +212,7 @@ export class Game {
     this.audio.beam(b.on);
     if (!b.on) { this.facetAim = null; return; }
     castBeam(this, dt);
-    updateFacetAim(this, dt, b.target); // S-28 (D-080): the centre ray's cell only
+    updateFacetAim(this, dt, b.target, !!b.midEnemy); // S-28 (D-080): the centre ray's cell only; B-044: a Glitch on it keeps the latch
     this.audio.beamContact(!!(b.target || b.enemy));
   }
 
@@ -284,7 +284,7 @@ export class Game {
           if (it.kind === 'lumen') this.stats.lumen++;
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
-        } else if (!this.atDeposit()) { // B-033: in the Nexus the deposit makes room this frame; no "return to the Nexus"
+        } else if (!this.atDeposit()) { // B-033: at a deposit (Nexus ring or Relay, `atDeposit`) the deposit makes room this frame; no "return to the Nexus"
           this.audio.full();
           this.notify('cargo-full');
         }

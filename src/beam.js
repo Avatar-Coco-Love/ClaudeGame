@@ -66,7 +66,7 @@ export function castBeam(game, dt) {
     if (res && res.broken) game.onCellBroken(hit.x, hit.y, res.type);
   }
   const mid = b.rays[mode.offsets.indexOf(0)];
-  b.ex = mid.ex; b.ey = mid.ey; b.target = mid.target;
+  b.ex = mid.ex; b.ey = mid.ey; b.target = mid.target; b.midEnemy = !!mid.enemy; // B-044: the facet latch reads it
   b.enemy = mid.enemy || (b.rays.find(r => r.enemy) || {}).enemy || null;
 }
 
@@ -77,13 +77,29 @@ export function castBeam(game, dt) {
 export function updatePulse(game, dt, held, cancel = false) {
   const b = game.beam;
   b.recover = Math.max(0, b.recover - dt);
-  if (cancel) { b.charge = 0; return; }
+  if (cancel) { b.charge = 0; b.facetLatch = null; return; }
   if (held) {
+    // B-043 (D-083): a burst that toggled a facet latches it; the latch holds while the held aim still rests on that facet.
+    if (b.facetLatch && !aimsAtFacet(game, b.facetLatch)) b.facetLatch = null;
     if (b.recover > 1e-9) return; // held fire waits out the recovery, then charges again
     b.charge = Math.min(1, b.charge + dt / PULSE_CHARGE_S);
     // S-21 ready shot (D-054): a full charge held fires only once something is in its reach; until then it waits at 1.
     if (b.charge >= 1 - 1e-9 && pulseInReach(game)) releasePulse(game);
-  } else if (b.charge > 0) releasePulse(game);
+  } else {
+    // Letting go ends the aim, so the next press may toggle again; a charge let go on the facet it already toggled (nothing
+    // else in reach) is dropped unfired, else it would flip that facet back (B-043).
+    if (b.charge > 0) {
+      if (b.facetLatch && aimsAtFacet(game, b.facetLatch) && !pulseInReach(game)) b.charge = 0; else releasePulse(game);
+    }
+    b.facetLatch = null;
+  }
+}
+
+/** The aim ray's first cell (within Pulse reach) is facet `f` = { s, k }. */
+function aimsAtFacet(game, f) {
+  const p = game.player, dx = Math.cos(p.angle), dy = Math.sin(p.angle);
+  const h = game.world.raycast(p.x, p.y, dx, dy, game.stat('range') * PULSE_RANGE + NOSE), g = h && facetAt(game, h.x, h.y);
+  return !!g && g.s === f.s && g.k === f.k;
 }
 
 /** The nearest live Glitch on the aim ray within `range` of the nose: { e, t } or null. */
@@ -100,12 +116,15 @@ function pulseFoe(game, ox, oy, dx, dy, range) {
 
 /** S-21: would a burst now hit something, a live Glitch on the ray or a breakable cell, within the Pulse reach?
  *  Bedrock, a Spire core or facet (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting
- *  (B-036). A primed Spire's facet does count: a burst toggles it (S-28). */
+ *  (B-036). A primed Spire's facet does count: a burst toggles it (S-28), once per aim (B-043: not the latched facet). */
 export function pulseInReach(game) {
   const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
   if (pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range)) return true;
   const h = w.raycast(p.x, p.y, dx, dy, range + NOSE);
-  return !!h && (!UNBREAKABLE.has(w.get(h.x, h.y)) || !!facetAt(game, h.x, h.y));
+  if (!h) return false;
+  if (!UNBREAKABLE.has(w.get(h.x, h.y))) return true;
+  const f = facetAt(game, h.x, h.y), L = game.beam.facetLatch;
+  return !!f && !(L && L.s === f.s && L.k === f.k);
 }
 
 /** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */
@@ -127,7 +146,7 @@ export function releasePulse(game) {
     if (!res || !res.broken) { // unbreakable, or cracked but standing: the burst ends on its face
       end = dist; foe = null; amount = 0;
       const f = !res && facetAt(game, h.x, h.y); // S-28 (D-080): a burst that stops on a primed facet toggles it once
-      if (f) toggleFacet(game, f.s, f.k);
+      if (f) { toggleFacet(game, f.s, f.k); b.facetLatch = f; } // B-043: one toggle per aim
       if (res) for (let k = 0; k < 8; k++) game.particle(ox + dx * dist, oy + dy * dist, (-dx + (Math.random() - 0.5) * 1.6) * 130, (-dy + (Math.random() - 0.5) * 1.6) * 130, 0.35, w.look(h.x, h.y, type).edge, 2);
       break;
     }

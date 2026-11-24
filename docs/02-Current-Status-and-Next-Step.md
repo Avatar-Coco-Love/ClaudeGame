@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 53** · **Version: v0.4.57** (session 53: build; rotation: 54 Audit, 55 Build, 57 Design).
+_Last updated: 2026-11-24_ · **Session counter: 54** · **Version: v0.4.58** (session 54: audit; rotation: 55 Build, 56 Build, 57 Design, 59 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -28,10 +28,11 @@ _Last updated: 2026-11-24_ · **Session counter: 53** · **Version: v0.4.57** (s
   start pattern (`startMask`, `FACET_RING`; lit facets glow) + "Spire primed"; a broken Spire (D-069) relights instead. Wake lanes D-071.
   Facets (S-28, D-080, D-083): 0.35 s of the aim ray (or one Pulse burst) flips a primed facet + neighbours; all 8 →
   relit: 260 px light (`game.spireLights` = `R.lightSets[2]`), chime, filled hexagon, `mode` saved; primed hint. Surge too until S-23.
-- Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
+  One toggle per aim for every beam (D-084: Pulse `beam.facetLatch`; a Glitch on the ray pauses the dwell latch).
+- Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073; phones: below the core / under the bank panel, tap answers first, D-084), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons) every 10 s, on deposit, and on page hide. Saves carry a format number (now 12); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires) every 10 s, on deposit, and on page hide. Saves carry a format number (now 12); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-6`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
@@ -45,5 +46,6 @@ _Last updated: 2026-11-24_ · **Session counter: 53** · **Version: v0.4.57** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 54 (Audit): parallel subagents per CLAUDE.md; archive `09` entries older than audit 49; check D-xxx vs code
-(new: D-083's Pulse-at-facet rule vs B-036); fix the top issues in one PR. After it: S-30 Surge bot, S-23, S-24, S-29.
+Session 55 (Build): **S-30 Surge bot** (`07-Build-Specs-4.md`; D-082, D-063 order). Then S-23 (Surge Spire defence),
+S-24 (ending + New Cycle, closes M5 → v1.0), S-29. Debt from audit 54 (H1, H2, H4, T3) is in `04-Roadmap-2.md`.
+Handoff: audit 54 fixed B-043…B-047; `tests/audit54.cjs` + `touch.cjs` T1 guard them. Read only this file to start.

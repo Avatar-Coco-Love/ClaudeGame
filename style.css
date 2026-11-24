@@ -161,3 +161,12 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
   #beacon-btn { right: 108px; }
   .top-left { min-width: 0; } .bank { font-size: 15px; gap: 10px; }
 }
+/* Audit 54 (T1): on phones the toast keeps to a band no HUD control uses. At top 30% it covered ◎ ⟂ in the portrait column
+   (320×568) and the minimap + ✦ by the landscape row (568×320). Portrait: just below the core (it sits ≤ 32 px from the
+   centre, camera look-ahead). Landscape: under the bank panel (Surge height), left of the core. tests/touch.cjs checks the overlap. */
+@media (orientation: portrait) and (max-width: 700px) { #toast { top: calc(50% + 40px); } }
+@media (max-height: 480px) and (pointer: coarse) {
+  #toast { top: calc(max(12px, env(safe-area-inset-top)) + 100px); left: max(16px, env(safe-area-inset-left)); max-width: calc(50% - 64px);
+    transform: translate(0, -10px); text-align: left; padding-left: 4px; }
+  #toast.show { transform: translate(0, 0); }
+}

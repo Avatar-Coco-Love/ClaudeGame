@@ -50,6 +50,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./world.cjs').nodeChecks(check);
   await require('./saveformat.cjs').nodeChecks(check).catch(e => check('save-format checks ran', false, e.message));
   await require('./audit49.cjs').nodeChecks(check).catch(e => check('audit 49 checks ran', false, e.message));
+  await require('./audit54.cjs').nodeChecks(check).catch(e => check('audit 54 checks ran', false, e.message));
   await research.nodeChecks(check).catch(e => check('S-11 research checks ran', false, e.message));
   await beam.nodeChecks(check).catch(e => check('S-13 beam checks ran', false, e.message));
   await pulse.nodeChecks(check).catch(e => check('S-14 pulse checks ran', false, e.message));
@@ -320,6 +321,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await spire.browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./spirefeed.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./facet.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
+    await require('./audit54.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 54 browser checks ran', false, e.message));
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
