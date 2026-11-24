@@ -1,7 +1,13 @@
 # 05 — Changelog
 
-One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
+One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
+
+## v1.2.14 — 2026-11-24 (#80)
+- **Fixes from a health check:** the installed app now opens offline even if you only ever visited through a shared
+  link; an Anomaly beside a Relay no longer hands you a buff that the deposit you are making ends a moment later;
+  floor loot draws faster when lots of it is on screen; on landscape phones messages no longer clip the bank panel
+  when three Anomaly buffs show; the game fills the screen properly in mobile Safari; the hint now says "fly into it".
 
 ## v1.2.13 — 2026-11-24 (#79)
 - **Install it, play it offline:** Lumen Core can be added to your home screen or installed as an app, with its own

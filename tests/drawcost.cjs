@@ -49,6 +49,14 @@ async function browserChecks(browser, url, check, errors) {
     for (const [k, f] of blurOps) P[k] = f;
     g.enemies = [];
     for (const k of ops) P[k] = orig[k];
+    // Audit 74: 300 on-screen pickups → 300 drawImage and no per-pickup save / rotate (spin baked into sprite frames).
+    g.pickups.length = 0;
+    for (let i = 0; i < 300; i++) g.pickups.push({ x: away.x - 450 + (i % 30) * 30, y: away.y - 150 + Math.floor(i / 30) * 30, vx: 0, vy: 0, kind: ['shard', 'prism', 'lumen'][i % 3], age: 1, r: 4, kept: true });
+    const pk = { save: 0, rotate: 0, drawImage: 0 }, pkOrig = Object.fromEntries(Object.keys(pk).map(k => [k, P[k]]));
+    for (const k in pk) P[k] = function (...a) { if (this === ctx) pk[k]++; return pkOrig[k].apply(this, a); };
+    R.time = 1.234; R.drawPickups(ctx, ...view(away));
+    for (const k in pk) P[k] = pkOrig[k];
+    g.pickups.length = 0;
 
     // Relative: median flushed draw time per scene, scenes interleaved so drift hits all alike.
     const time = fn => { const s = performance.now(); fn(); flush(); return performance.now() - s; };
@@ -70,10 +78,12 @@ async function browserChecks(browser, url, check, errors) {
     for (let i = 0; i < 9; i++) for (const k in scenes) t[k].push(time(scenes[k]));
     loot(false);
     const m = Object.fromEntries(Object.entries(t).map(([k, v]) => [k, +median(v).toFixed(2)]));
-    return { nexusOff, nexusOn, holesOff, holesOn, holesTwoSets, grads, enemiesOff, enemiesOn, blurred, m };
+    return { nexusOff, nexusOn, holesOff, holesOn, holesTwoSets, grads, enemiesOff, enemiesOn, blurred, pk, m };
   });
   check('an off-screen Nexus issues no draws; on screen it draws (S-15)', r.nexusOff === 0 && r.nexusOn > 3, `${r.nexusOff} / ${r.nexusOn}`);
   check('9 off-screen Glitches issue no draws; on screen they draw (audit 39)', r.enemiesOff === 0 && r.enemiesOn >= 9, `${r.enemiesOff} / ${r.enemiesOn}`);
+  check('300 on-screen pickups: 300 drawImage, ≤ 1 save, no rotate (spin baked into sprite frames, audit 74)',
+    r.pk.drawImage === 300 && r.pk.save <= 1 && r.pk.rotate === 0, JSON.stringify(r.pk));
   check('on-screen Glitch bodies and eyes draw with no shadowBlur (glow sprites, audit 39, D-051)', r.blurred === 0, `${r.blurred} blurred draws`);
   check('off-screen light holes issue no fills (S-15)', r.holesOn - r.holesOff >= 15, `light-canvas draws: 20 off ${r.holesOff}, 20 on ${r.holesOn}`);
   check('two light sets of 10 cut as many holes as one set of 20 (R.lightSets, S-26)', r.holesTwoSets === r.holesOn, `${r.holesTwoSets} / ${r.holesOn}`);

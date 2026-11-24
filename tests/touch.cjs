@@ -213,13 +213,14 @@ async function browserChecks(browser, url, check, errors, shots) {
   }
   // ---- B-047 (audit 54 T1): a long toast (the death line, the longest mode line) never covers a HUD control, the bank panel,
   // the hint or the core, portrait or landscape. Old CSS (top 30% everywhere): at 320×568 the death toast covered ◎ (230–308 × 164–208).
-  for (const vp of [{ width: 320, height: 568 }, { width: 375, height: 667 }, { width: 412, height: 915 }, { width: 568, height: 320 }, { width: 915, height: 412 }]) {
+  // Audit 74: with all three Anomaly chips showing (the panel's tallest state) — at +100 px the toast overlapped the panel by 2–4 px.
+  for (const vp of [{ width: 320, height: 568 }, { width: 375, height: 667 }, { width: 412, height: 915 }, { width: 568, height: 320 }, { width: 667, height: 375 }, { width: 915, height: 412 }]) {
     const ctx = await phone(vp), pg = await ctx.newPage();
     pg.on('pageerror', e => errors.push('touch toast: ' + e.message));
     await pg.goto(url); await pg.waitForTimeout(300);
     await intoGame(pg);
     // Surge: the integrity row makes the bank panel its tallest. Wait for the camera to settle on the core first.
-    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; });
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; g.buffs = ['overclock', 'lodestone', 'ballast']; });
     await pg.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 2; }, null, { timeout: 5000 }).catch(() => {});
     await pg.evaluate(() => { document.getElementById('integrity-row').classList.remove('hidden'); window.__lumen.game.notify('destabilized'); }); // the row main.js shows in Surge
     await pg.waitForTimeout(450);

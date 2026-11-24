@@ -85,6 +85,15 @@ async function nodeChecks(check) {
     check('S-35 ends: a Nexus or Relay deposit that banks ≥ 1 item; not a 0-item visit, a death or a mode switch', ok,
       `nexus ${nx.buffs.length} (bank ${nx.bank.shard}), zero ${zero.buffs.length}, death ${dead.buffs.length}, switch ${sw.buffs.length}, relay ${rl.buffs.length} (bank ${rl.bank.prism})`);
   }
+  // Audit 74: a site beside a Relay isn't taken while the deposit runs (it would end ticks later); once banked, it is, and it lasts.
+  {
+    const g = make(), s = open(g, 2), i = s.y * g.world.w + s.x + 1; g.anomaly.sites[2].kind = 'overclock';
+    g.world.cells[i] = T.EMPTY; g.relays.push(makeRelay(g.world, i)); g.cargo.prism = 3;
+    step(g, 2); const during = g.buffs.length;
+    step(g, Math.ceil(4 * DEPOSIT_TICK_S * 60) + 5);
+    check('Audit 74: no Anomaly take during a Relay deposit beside the site; taken once the cargo is banked, and it stays',
+      during === 0 && g.bank.prism === 3 && g.buffs.join() === 'overclock', `during ${during}, bank ${g.bank.prism}, after ${g.buffs}`);
+  }
   // Recharge at 300 s of play time.
   {
     const g = make(); open(g, 0); g.stats.time = 10; updateAnomalies(g, 0.01); g.buffs = [];

@@ -67,8 +67,10 @@ export function updateAnomalies(game, dt) {
   const a = game.anomaly, p = game.player, now = game.stats.time;
   a.flash = Math.max(0, a.flash - dt);
   for (const k of Object.keys(a.taken)) if (now >= a.taken[k]) delete a.taken[k];
+  // Audit 74: not while a deposit is under way (a Relay can sit by a site): the deposit would end the buff ticks later.
+  const depositing = game.atDeposit() && game.cargoTotal() > 0;
   a.sites.forEach((s, i) => {
-    if (!siteCharged(game, i) || game.buffs.includes(s.kind)) return;
+    if (depositing || !siteCharged(game, i) || game.buffs.includes(s.kind)) return;
     if (Math.hypot(p.x - (s.x + 0.5) * CELL, p.y - (s.y + 0.5) * CELL) > ANOMALY_TAKE * CELL || !siteOpen(game, s)) return;
     a.taken[i] = now + ANOMALY_RECHARGE_S;
     game.buffs.push(s.kind);

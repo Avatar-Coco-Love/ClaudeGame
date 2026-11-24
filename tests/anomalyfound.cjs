@@ -1,6 +1,6 @@
 // S-37 Anomalies found (D-098). smoke.cjs calls nodeChecks + browserChecks. Node: minimap dot states (unseen / charged /
 // recharging / void); a Scanner ping marks a charged site in range and not a taken one (and a mark fades once its site is
-// taken); the "touch it" hint line shows near a charged site until the first take. Browser: the minimap dot is drawn in the kind's
+// taken); the "fly into it" hint line shows near a charged site until the first take. Browser: the minimap dot is drawn in the kind's
 // colour; the chips sit under the bank panel, clear of the ◎ ⟂ ♪ ≡ row and the minimap, at 568×320 and 320×568 (touch).
 // Usage: node tests/anomalyfound.cjs (node checks only)
 const quiet = new Proxy({}, { get: () => () => {} });
@@ -40,7 +40,7 @@ async function nodeChecks(check) {
     const g = make(), [s, t] = g.anomaly.sites, p = g.player, seen = [];
     const go = (q, dx) => { p.x = (q.x + 0.5) * CELL + dx; p.y = (q.y + 0.5) * CELL; p.vx = p.vy = 0; updateAnomalies(g, 0.016); seen.push(g.anomaly.near ? 1 : 0); };
     go(s, LIGHT_RADIUS + 40); go(s, LIGHT_RADIUS - 8); g.world.cells[s.y * g.world.w + s.x] = 0; go(s, 0); go(t, LIGHT_RADIUS - 8);
-    check('S-37 hint: "touch it" while a charged site is in the light, gone for the session after the first take',
+    check('S-37 hint: "fly into it" while a charged site is in the light, gone for the session after the first take',
       seen.join() === '0,1,0,0' && g.buffs.length === 1, `${seen.join()} buffs ${g.buffs}`);
   }
 }

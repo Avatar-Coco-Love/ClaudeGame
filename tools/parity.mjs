@@ -56,4 +56,5 @@ const min = SECS / 60 * SEEDS, f = v => (v / min).toFixed(2);
 for (const mode of ['drift', 'surge'])
   console.log(`${BEAM_MODE} ${mode.padEnd(5)} hunt=${ORE === T.PRISM ? 'prism' : 'crystal'} lvl=${LVL} ${SEEDS} seeds x ${SECS}s: prisms/min ${f(sum[mode].prism)}, shards/min ${f(sum[mode].shard)}, ` +
     `kills/min ${f(sum[mode].kills)}, deaths/min ${f(sum[mode].deaths)}`);
-console.log(`surge/drift prism ratio ${(sum.surge.prism / sum.drift.prism).toFixed(2)}, shard ratio ${(sum.surge.shard / sum.drift.shard).toFixed(2)}`);
+const ratio = k => sum.drift[k] ? (sum.surge[k] / sum.drift[k]).toFixed(2) : 'n/a (drift 0)'; // audit 74: 0/0 printed NaN
+console.log(`surge/drift prism ratio ${ratio('prism')}, shard ratio ${ratio('shard')}`);

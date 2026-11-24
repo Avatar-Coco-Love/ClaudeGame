@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.2.13';
+export const VERSION = '1.2.14';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -63,6 +63,7 @@ export const CORE_REVEAL = 230;     // px: cells within this of the core become 
 export const SPAWN_OFFSET = 40;     // px south of the Nexus centre: start + respawn point
 export const ATTRACT_PULL = [900, 250]; // px/s²: Attractor pull = [0] × (1 − d / reach) + [1]
 export const PICKUP_SETTLE_S = 0.25; // a fresh pickup can't be pulled or collected this young
+export const PICKUP_FRAMES = 16;    // audit 74: a pickup's spin is baked into this many sprites per turn (no per-pickup rotate)
 export const DEPOSIT_TICK_S = 0.035; // one cargo item banked per tick inside the Nexus ring
 export const HURT_INVULN_S = 0.5, HURT_KNOCKBACK = 320; // after a hit: grace seconds, push speed (px/s)
 export const RESPAWN_INVULN_S = 2, RESPAWN_CLEAR_PX = 900; // after a death: grace seconds; Glitches within this of the Nexus vanish
@@ -112,7 +113,7 @@ export const SPIRE_TAPS = [3, 3, 4, 4, 5];    // S-20/S-28: facets toggled from 
 export const SPIRE_TAP_S = 0.35;              // S-28 (D-080): seconds of aim-ray contact before a primed facet toggles (then it latches)
 export const SPIRE_LIGHT = 260;               // S-28 (D-055): a relit Spire's light hole, px
 export const SPIRE_LIT_RGB = '214, 200, 255'; // S-28: its floor glow (violet-white, S-25's layer)
-// S-23 (D-055, D-071): the Surge Wake. Starting values; tuned with `tools/surgebot.mjs --route=spire`.
+// S-23 (D-055, D-071): the Surge Wake. Retuned in S-31 (D-087) with `tools/surgebot.mjs --route=spire`; re-run it before changing these.
 export const SPIRE_WAKE_S = 40;        // seconds held -> relit; one facet lights every SPIRE_WAKE_S / 8
 export const SPIRE_WAVE_S = 1.6;       // seconds between lane spawns (lanes take turns)
 export const SPIRE_WAKE_ALIVE = 6;     // most Wake Glitches alive at once
