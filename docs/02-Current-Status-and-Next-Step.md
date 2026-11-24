@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 76** · **Version: v1.2.16** (session 76: Build; rotation: 77 Design, 78 Build, 79 Audit, 80 Build).
-**Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-24_ · **Session counter: 77** · **Version: v1.2.17** (session 77: Design/inbox; rotation: 78 Build, 79 Audit, 80 Build, 81 Build, 82 Design).
+**Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -37,7 +37,7 @@ _Last updated: 2026-11-24_ · **Session counter: 76** · **Version: v1.2.16** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-9`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-40 built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-40 built. M9 Echo (owner's ally ask, D-108): S-42, S-43 in `07-Build-Specs-7.md`. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -46,5 +46,5 @@ _Last updated: 2026-11-24_ · **Session counter: 76** · **Version: v1.2.16** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 77 (Design): play-test M8 so far (PWA, keys, Large text) and write the ambient-music spec (S-42) in `07`; keep S-41 next for Build 78.
-Audit 74 leftovers (perf grid/chunk repaint, unused exports, chip labels) wait in `04-…-2` Debt.
+Session 78 (Build): S-41 adaptive graphics (`07-Build-Specs-6.md`). Then M9 S-42, S-43 (D-108); Design 82 play-tests M8 and
+specs ambient music (S-44). Recorded audio waits for the owner's pack (confirmed coming, Q-021). Audit 74 leftovers (perf grid/chunk repaint, unused exports, chip labels) wait in `04-…-2` Debt.
