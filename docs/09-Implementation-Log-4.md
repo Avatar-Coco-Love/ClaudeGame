@@ -15,3 +15,19 @@ Continues `09-Implementation-Log-3.md` (split at the 8 KB cap, session 46). Newe
   skips unbreakable cells. Viewed: shell ring with 4 gaps, 8 facet hexagons, core hexagon read at DSF 1 in the Deep.
 - First hexagon alpha (0.45) measured 26 vs 18 fill luma at 7 cells; raised to 0.6 / 0.3 (inner). The pixel check
   (brightest in 9×9 at the vertex vs between the hexagons, camera settled) ran on random seeds: 49/22 … 310/61; bar ≥ 1.8×.
+
+## Session 47 — Design: Spire trip, supply, Q-015, M5 specs re-checked (v0.2.51, #52)
+- Probe `tools/spirerun.mjs` (straight-line bot, Nexus → nearest Spire gap → interior; `GAME=surge`), 40/20 seeds:
+  start build out median 57 s (p90 109), mid (beam 4 range 3 thrust 3 cargo 4) 21 s (p90 38), max 15 s; back down the
+  open tunnel 14 / 11 / 7 s. Surge (bot ignores Glitches, god off): mid 19 s, 6 deaths in 20 runs; start 62 s, 31 deaths.
+- ▲ near a Spire (prism cells × 1.5, 40 seeds, 200 Spires): within 14 cells mean 40, < 80 for 179, none for 8; within
+  20, < 80 for 122; within 30, < 80 for 23. D-055's "dig the 80▲ near the Spire" does not hold → D-070 (cargo, then bank).
+- Lanes (400 seeds): 467/8000 Wake lanes blocked within 6 cells (bedrock 404, vault 43, Spire 20); 455 Spires have a
+  short lane, the worst 1 full lane → D-071. Q-015 → D-069 (broken Spire relights when primed). Q-016 opened.
+- Play-test (Playwright, DSF 1, mid build, 3 Beacons dropped every 16 cells on the way, both modes + 320×568): in-page
+  trips 37.5 s (Drift), 11.9 s (Surge, another seed), 20.0 s (320). Viewed: the Spire reads in the dark as a pale shell
+  ring + hexagon core even outside the core light; facets read as small hexagons; interior is black; the minimap shows
+  the tunnel but no Spire (S-27). At 320 px the 9×9 Spire spans 288 px, nearly the whole width: facets are all on screen.
+- B-039 measured (320×568, DSF 2, Surge): 2750◆ 1470▲ 141● → panel right 215 vs minimap 212 (3 px over); 4-digit ● 225;
+  999/999/141 touches (212). Scheduled as an S-27 rider (`.bank` gap 10 px at ≤ 380 px).
+- Changelog v0.2.34–v0.2.38 archived word for word (`archive/changelog-v0.2.34-v0.2.38.md`) for the 8 KB cap.

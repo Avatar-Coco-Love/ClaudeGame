@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 46** · **Version: v0.2.50** (session 46: build; rotation: 47 Design, 48 Build, 49 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 47** · **Version: v0.2.51** (session 47: design; rotation: 48 Build, 49 Audit, 50 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -22,6 +22,7 @@ _Last updated: 2026-11-24_ · **Session counter: 46** · **Version: v0.2.50** (s
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
   (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Static, no toast/minimap mark yet (S-27).
+  Design 47: feed = cargo ▲ then bank ▲ (D-070), a broken Spire relights when primed (D-069), Wake lanes D-071.
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
@@ -30,7 +31,7 @@ _Last updated: 2026-11-24_ · **Session counter: 46** · **Version: v0.2.50** (s
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
 - Specs (`07-…-2/3/4`, 1 PR each, D-063): S-27 Spires found, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
-- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (spirerun D-070, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Older per-session checks (shake, hitstop, Surge determinism, teleport: sessions 10–15) live in `09` and the smoke suite.
@@ -55,4 +56,4 @@ _Last updated: 2026-11-24_ · **Session counter: 46** · **Version: v0.2.50** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 47 (Design): play-test the Spires in the Deep (DSF 1 + 320×568), decide Q-015, re-check S-27 / S-22 specs against D-068; then 48 Build S-27.
+Session 48 (Build): S-27 Spires found (`07-Build-Specs-2.md`, with the B-039 rider); then 49 Audit, 50 Build S-22.
