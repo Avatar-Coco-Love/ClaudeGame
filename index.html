@@ -31,6 +31,7 @@
       <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
       <button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd>F</kbd></button>
       <button id="mode-btn" class="hidden" title="Beam mode (Q)" aria-label="Switch beam mode">⟂<span class="mode-name" id="mode-name">Focus</span> <kbd>Q</kbd></button>
+      <button id="beacon-btn" class="hidden" title="Place a Beacon (B)" aria-label="Place a Beacon">✦<span id="beacon-count">0</span> <kbd>B</kbd></button>
     </div>
     <div id="hint" class="hidden"></div>
     <button id="matrix-btn" class="hidden">Core Matrix <kbd>E</kbd></button>
@@ -40,7 +41,7 @@
   <div id="matrix" class="hidden">
     <div class="sheet">
       <header><h2 id="matrix-title">Core Matrix</h2><div id="matrix-bank"></div><button id="matrix-close" aria-label="Close">✕</button></header>
-      <div class="tabs" role="tablist"><button data-tab="core" role="tab">Core</button><button data-tab="nexus" role="tab">Nexus</button><button data-tab="research" role="tab">Research</button></div>
+      <div class="tabs" role="tablist"><button data-tab="core" role="tab">Core</button><button data-tab="nexus" role="tab">Nexus</button><button data-tab="research" role="tab">Research</button><button data-tab="craft" role="tab">Craft</button></div>
       <div id="upgrade-list"></div>
       <div class="mode-row">
         <span>Mode</span>

@@ -39,6 +39,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #mode-btn .mode-name { font-size: 14px; font-weight: 600; letter-spacing: .04em; margin-left: 5px; }
 #mode-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--cyan); background: rgba(10, 40, 60, .85); color: var(--cyan);
   font-size: 20px; box-shadow: 0 0 14px rgba(46,242,255,.3); } /* S-13 beam mode switch */
+#beacon-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid #bff8ff; background: rgba(20, 44, 56, .85); color: #bff8ff;
+  font-size: 20px; box-shadow: 0 0 14px rgba(191,248,255,.25); } /* S-16 place a Beacon */
+#beacon-count { font-size: 14px; font-weight: 700; margin-left: 5px; font-variant-numeric: tabular-nums; }
 .research-hint { padding: 12px 0 4px; border-top: 1px solid rgba(90,120,255,.15); font-size: 13px; color: var(--gold); text-align: center; }
 .touch kbd { display: none; }
 kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border-radius: 4px; padding: 1px 5px; margin-left: 6px; opacity: .7; }
@@ -125,6 +128,7 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
   .sheet h2 { font-size: 15px; letter-spacing: .06em; }
   #matrix-bank { gap: 8px; font-size: 14px; }
   .sheet header { gap: 8px; }
+  .tabs { gap: 4px; } .tabs button { padding: 0 4px; font-size: 12px; letter-spacing: .02em; } /* S-16: four tabs share 256 px */
 }
 /* S-17 touch pass. Hint: under 380 px it wraps to at most 2 lines instead of an ellipsis. */
 @media (max-width: 380px) {
@@ -146,4 +150,5 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 @media (max-height: 480px) and (pointer: coarse) {
   .top-right { flex-direction: row; align-items: flex-start; gap: 8px; }
   #scan-btn { order: 1; } #mode-btn { order: 2; } .top-right .buttons { order: 3; } #minimap { order: 4; width: 112px; height: 112px; }
+  #beacon-btn { position: absolute; top: 52px; right: 120px; } /* S-16: under the row, beside the minimap: the row stays as wide as before */
 }

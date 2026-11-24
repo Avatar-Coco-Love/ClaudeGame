@@ -20,8 +20,8 @@ async function nodeChecks(check) {
     JSON.stringify({ afterKept, loose, kept, newest }));
   const s = JSON.parse(JSON.stringify(g.toSave())), h = new Game({ seed: 77, mode: 'surge', audio, save: upgradeSave(s) });
   const old = upgradeSave({ ...JSON.parse(JSON.stringify(g.toSave())), v: 7, pickups: [[0, 10, 10], [1, 20, 20]] });
-  check('kept tags survive save + load; a format-7 save keeps its whole floor as kept (B-022)', SAVE_FORMAT === 8
-    && h.pickups.filter(q => q.kept).length === CAP && old.v === 8 && old.pickups.every(q => q[3] === 1),
+  check('kept tags survive save + load; a format-7 save keeps its whole floor as kept (B-022)', SAVE_FORMAT >= 8
+    && h.pickups.filter(q => q.kept).length === CAP && old.v === SAVE_FORMAT && old.pickups.every(q => q[3] === 1),
     JSON.stringify({ kept: h.pickups.filter(q => q.kept).length, old: old.pickups }));
 
   // B-023: a Glitch the beam killed this frame neither hits the core nor fades lootless.

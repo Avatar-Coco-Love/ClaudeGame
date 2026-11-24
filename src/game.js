@@ -7,6 +7,7 @@ import { tryScan, updateScan, emptyScan } from './research.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
+import { tryPlace, loadBeacons } from './craft.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
@@ -26,6 +27,9 @@ export class Game {
     this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0 }; // lumen: ever picked up (S-10 shows ● after the first)
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
+    this.craft = { beacon: 0 }; // S-16: crafted, not yet placed
+    this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's extraLights
+    this.placeResult = null;    // S-16: last placement outcome, read by the HUD toast
     this.player = {
       x: c.x, y: c.y + 40, r: PLAYER_R,
       vx: 0, vy: 0,
@@ -161,6 +165,7 @@ export class Game {
     updateScan(this, dt);
     if (intent.scan) tryScan(this);
     if (intent.beamMode && cycleBeamMode(this)) this.notify('beam-mode');
+    if (intent.place) tryPlace(this); // S-16
     this.updateBeam(dt, intent);
     this.updatePickups(dt);
     this.updateDeposit(dt);
@@ -342,7 +347,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
@@ -359,6 +364,8 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     Object.assign(this.research, s.research || {});
+    this.craft.beacon = Math.max(0, Math.floor((s.craft && s.craft.beacon) || 0)); // S-16
+    loadBeacons(this, s.beacons);
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y, kp] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });

@@ -1,7 +1,8 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT } from './config.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
+import { canCraft, craftBeacon } from './craft.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -105,7 +106,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode].join('|');
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -125,6 +126,8 @@ function updateHud() {
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
+    $('beacon-btn').classList.toggle('hidden', g.craft.beacon < 1); // S-16: shown while a Beacon is carried, with the count
+    $('beacon-count').textContent = g.craft.beacon;
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -136,6 +139,7 @@ function updateHud() {
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
     if (ev === 'cache') toast('Vault cache opened');
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200);
+    if (ev === 'beacon') { toast(BEACON_TOAST[g.placeResult] || '', 1400); if (g.placeResult === 'placed') persist(); } // S-16
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
   }
   g.events.length = 0;
@@ -155,6 +159,24 @@ function closePanel() {
 }
 let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1)
 const costHtml = c => ['shard', 'prism', 'lumen'].filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
+// S-16: placement outcomes, short so they read mid-run (Relays will reuse them, D-048).
+const BEACON_TOAST = { placed: 'Beacon placed', none: 'No Beacons — craft at the Nexus', blocked: 'Blocked', nexus: 'Too near the Nexus',
+  near: 'Too near a Beacon', max: `Beacon limit (${BEACON_MAX})` };
+// S-16: the Craft tab's one row. Stock, not levels: the value line says what is carried and placed.
+function craftRow() {
+  const g = game, row = document.createElement('div');
+  row.className = 'upgrade'; row.dataset.id = 'beacon';
+  row.innerHTML = `
+    <div class="u-main"><div class="u-name">Beacon</div><div class="u-desc">Placed light: brightens ${BEACON_LIGHT} px for good and marks the map. ${input.usingTouch ? 'Tap ✦' : 'Press B'} out in the caves</div>
+      <div class="u-val">Carried <b>${g.craft.beacon}/${BEACON_STOCK}</b> · Placed ${g.beacons.length}/${BEACON_MAX}</div></div>
+    <button class="buy" ${canCraft(g) ? '' : 'disabled'}>${costHtml({ prism: BEACON_COST })}</button>`;
+  row.querySelector('.buy').addEventListener('click', () => {
+    if (!craftBeacon(g)) return;
+    renderPanel(); persist();
+    $('upgrade-list').querySelector('[data-id="beacon"]')?.classList.add('flash');
+  });
+  return row;
+}
 // S-11: a Research node is a one-time unlock, so its row has no levels or pips.
 function researchRow(r) {
   const g = game, owned = !!g.research[r.id];
@@ -199,7 +221,7 @@ function renderBank() {
 }
 function renderPanel() {
   const g = game;
-  $('matrix-title').textContent = { nexus: 'Nexus', research: 'Research' }[panelTab] || 'Core Matrix';
+  $('matrix-title').textContent = { nexus: 'Nexus', research: 'Research', craft: 'Craft' }[panelTab] || 'Core Matrix';
   document.querySelectorAll('#matrix .tabs button').forEach(b => {
     const on = b.dataset.tab === panelTab;
     b.classList.toggle('selected', on); b.setAttribute('aria-selected', on);
@@ -207,7 +229,9 @@ function renderPanel() {
   renderBank();
   const list = $('upgrade-list');
   list.innerHTML = '';
-  if (panelTab === 'research') {
+  if (panelTab === 'craft') {
+    list.appendChild(craftRow());
+  } else if (panelTab === 'research') {
     for (const r of RESEARCH) list.appendChild(researchRow(r));
     if (RESEARCH.every(r => g.research[r.id] || !canResearch(g, r.id)) && !RESEARCH.every(r => g.research[r.id])) {
       const tip = document.createElement('div');
@@ -232,6 +256,7 @@ function renderPanel() {
 $('matrix-btn').addEventListener('click', openPanel);
 $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
 $('mode-btn').addEventListener('click', () => input.pressed.add('beamMode'));
+$('beacon-btn').addEventListener('click', () => input.pressed.add('place'));
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -283,8 +308,8 @@ function frame(now) {
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
-    const scan = take('scan'), beamMode = take('beamMode');
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode };
+    const scan = take('scan'), beamMode = take('beamMode'), place = take('place'); // S-16: B / ✦ follows the same rule
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place };
     if (!paused) {
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));

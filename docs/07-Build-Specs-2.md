@@ -3,7 +3,7 @@
 Continues `07-Build-Specs.md` (same rules; build order is in its header, D-048). Supply numbers are in that file's header.
 Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 110 Lumen cells, 5580 open of 11440.
 
-## S-16 — Beacons v1 (Crafting, 5▲ each) (D-043)
+## S-16 — Beacons v1 (Crafting, 5▲ each) (D-043) — built #46, as-built notes D-060
 - New Matrix tab **Craft** (after Research). Item `beacon`, "Beacon", 5▲, holds up to `BEACON_STOCK` 3 unplaced; Crafting is
   its own layer: Radiance grows the Nexus light, a Beacon is light you carry out (no overlap, pillar rule).
 - **Place:** B key / `✦` button (hidden until stock ≥ 1, shows the count) drops one on the core's cell. Refused with a 1-word toast

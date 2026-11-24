@@ -113,6 +113,7 @@ export class Audio {
   }
   scan() { this.tone(1200, 0.3, { type: 'sine', vol: 0.14, slide: -600 }); } // S-11 Scanner sweep 1200 -> 600 Hz
   scanCache() { this.tone(784, 0.16, { type: 'sine', vol: 0.07 }); } // S-12: the cache chord's top note, short, when the ping finds one
+  beacon() { this.tone(660, 0.22, { type: 'sine', vol: 0.07, slide: 220 }); } // S-16: a soft rising placement tone
   modeSwitch() { this.tone(520, 0.06, { type: 'sine', vol: 0.06 }); } // S-13: a short soft click when Q / ⟂ changes the beam
   // S-14: Pulse release, a soft low thump (sine, pitch drops) that grows with the charge; a fizzle is a faint short tick.
   pulse(charge) { this.tone(150, 0.2, { type: 'sine', vol: 0.04 + 0.06 * charge, slide: -80 }); }

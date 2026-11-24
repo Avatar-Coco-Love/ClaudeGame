@@ -5,6 +5,8 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 
 ## Debt
 - Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
+- **B-034 Landscape 568×320 (session 41):** with ◎ and ⟂ both unlocked the top row overlaps the bank panel (◎ starts at 168 px,
+  the panel ends at 244). Pre-dates Beacons; 640 px and wider are clear. Fix: let the bank panel shrink in short landscape.
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
@@ -23,7 +25,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   per-item save/rotate/drawImage), holes 145 / 200 (light 70 %). Batch pickups without per-item save/restore if loot matters.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
-- **Audit 39 leftovers (code health):** **split `drawLight` (+ light holes) out of `render.js` (540 lines) before S-19** adds Spire
+- **Audit 39 leftovers (code health):** **split `drawLight` (+ light holes) out of `render.js` (544 lines after S-16) before S-19** adds Spire
   drawing; `game.js` inline tuning → `config.js` (reveal 230, deposit tick 0.035, attractor 900/250 + age 0.25, hurt invuln 0.5 +
   knockback 320, death clear 900 px, respawn +40, `PLAYER_R`, `ACCEL`); unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`,
   `VAULT_TEMPLATES`, `WIDE_OFFSET` (low).

@@ -1,7 +1,7 @@
 // S-15 throttled perf probe (not in smoke: ~2 min). Headless Chromium 1280×800 DSF 1, CPU throttled 4× over CDP, seed 77,
 // dev.teleport(30), then real mining in Wide (mouse held, S held) with 300 floor pickups kept on screen. Reports frame time
 // mean / p95 / max from requestAnimationFrame deltas, plus where draw time goes (renderer steps timed in the page).
-// Runs: home (idle at the Nexus), base (idle 30 cells out, beam off, no pickups), loot (the S-15 scenario), holes (loot + 20 extra light holes = S-16's beacon budget),
+// Runs: home (idle at the Nexus), base (idle 30 cells out, beam off, no pickups), loot (the S-15 scenario), holes (loot + 20 placed beacons, S-16's cap),
 // surge (base in Surge, god mode, kept at GLITCH_CAP Glitches 250–750 px out: some on screen, some off; audit 39).
 // Headless Chromium paints the canvas in software, so the absolute numbers are far above a real GPU-backed browser's
 // (audit 34: ~121 ms/frame at 4× with no loot). Read the ratios between runs and the per-step split, not the 16.7 ms budget.
@@ -56,9 +56,11 @@ async function run(browser, url, name, { loot, holes, home, surge }) {
       g.cargo.shard = g.cargo.prism = 0; // never cap out, so pickups keep flowing
       while (g.pickups.length < 300) { const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 260; g.spawnPickup(g.player.x + Math.cos(a) * d, g.player.y + Math.sin(a) * d * 0.6, 'shard', true); }
     };
-    // Extra holes stand where S-16 beacons would: 20 spread over and around the screen, 140 px each (BEACON_LIGHT).
-    R.extraLights = [];
-    for (let i = 0; i < holes; i++) R.extraLights.push({ x: g.player.x - 560 + (i % 5) * 280, y: g.player.y - 300 + Math.floor(i / 5) * 200, r: 140 });
+    // S-16: 20 real beacons (BEACON_MAX) spread over and around the screen, 140 px each; R.extraLights is g.beacons, so each
+    // costs its light hole and its glyph. Pushed straight in (no placement rules): the point is the draw cost.
+    g.beacons.length = 0;
+    for (let i = 0; i < holes; i++) { const x = g.player.x - 560 + (i % 5) * 280, y = g.player.y - 300 + Math.floor(i / 5) * 200;
+      g.beacons.push({ i: Math.floor(y / 32) * g.world.w + Math.floor(x / 32), x, y, r: 140 }); }
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
