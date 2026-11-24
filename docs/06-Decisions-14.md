@@ -30,3 +30,15 @@ Continues `06-Decisions-13.md` (same rules: supersede, never edit; list rejected
   would run a stale version for a visit after each deploy); remapping touch controls (D-050 layout already measured);
   a fixed "low-end device" sniff by user agent (measure frame time instead); a colour-blind palette toggle (the
   measured pairs already pass; a failing pair gets a shape, not a mode).
+
+### D-104 — S-38 PWA as built; v1.2.13 (2026-11-24, session 73, Build; implements D-103)
+- `manifest.webmanifest` + `icons/` (192, 512, maskable 512; `tools/icons.cjs` draws the Nexus rings, no text);
+  `sw.js` network first, caching each same-origin 200 into `lumen-<VERSION>`; `src/pwa.js` registers it two frames
+  after the title is drawn, skipped on `file:` and `?dev`. The deploy's `cp` list ships all three (B-020 rule).
+- **VERSION reaches the worker as `sw.js?v=<VERSION>`:** one source of truth, and a new deploy changes the script URL,
+  so the browser installs the new worker, which deletes older `lumen-*` caches.
+- **Warm list:** the page that registers the worker was fetched before it existed, so it posts its own URL plus
+  `performance` resource entries (same-origin) and the worker caches them. That makes the *next* visit offline-ready
+  (spec: "one online visit"). An unknown navigation URL offline falls back to the cached `./`.
+- Rejected: a module worker importing `config.js` (Firefox/Safari support for `type: 'module'` workers is recent);
+  a second VERSION constant in `sw.js` (drifts); precaching a file list (D-103); waiting for a second online visit.

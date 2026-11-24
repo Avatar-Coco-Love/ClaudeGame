@@ -6,7 +6,7 @@ const path = require('path');
 const { chromium, devices } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 const server = http.createServer((req, res) => {
   const p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
   if (!p.startsWith(ROOT) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
@@ -39,6 +39,7 @@ const relay = require('./relay.cjs');
 const glow = require('./glow.cjs');
 const audit44 = require('./audit44.cjs');
 const spire = require('./spire.cjs');
+const pwa = require('./pwa.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -46,6 +47,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./share.cjs').run()) check(r.name, r.ok, r.detail);
+  pwa.nodeChecks(check);
   for (const r of require('./tuning.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./comments.cjs').run()) check(r.name, r.ok, r.detail);
   await require('./world.cjs').nodeChecks(check);
@@ -337,6 +339,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await craft.browserChecks(browser, url, check, errors, plantSaveAndReload);
     await relay.browserChecks(browser, url, check, errors, plantSaveAndReload, process.env.RELAY_SHOT);
     await glow.browserChecks(browser, url, check, errors);
+    await pwa.browserChecks(browser, url, check, errors);
     await spire.browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./spirefeed.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./facet.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);

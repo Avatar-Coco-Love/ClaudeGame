@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 72** · **Version: v1.2.12** (session 72: Design, M8 specs; rotation: 73 Build, 74 Audit, 75 Build, 76 Build, 77 Design).
+_Last updated: 2026-11-24_ · **Session counter: 73** · **Version: v1.2.13** (session 73: Build, S-38 PWA; rotation: 74 Audit, 75 Build, 76 Build, 77 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -19,6 +19,8 @@ _Last updated: 2026-11-24_ · **Session counter: 72** · **Version: v1.2.12** (s
   (beam ×1.5), Lodestone (reach ×2, pull ×1.5), Ballast (cargo ×1.5) via `stat()`; kinds stack; end when a deposit banks
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
+- PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
+  from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`). Test `pwa.cjs`.
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -31,7 +33,7 @@ _Last updated: 2026-11-24_ · **Session counter: 72** · **Version: v1.2.12** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-9`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38 built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -40,5 +42,6 @@ _Last updated: 2026-11-24_ · **Session counter: 72** · **Version: v1.2.12** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 73 (Build): build **S-38 PWA** (`07-Build-Specs-6.md`): manifest + icons, network-first `sw.js` with a
-`VERSION`-named cache, `tests/pwa.cjs` (offline reload reaches the title and starts a New World).
+Session 74 (Audit): run the audit/health check per `CLAUDE.md` (parallel subagents: bugs, perf, mobile, code health,
+docs drift; include the new service worker: stale-cache and update paths). Fix the top issues, log the rest as Debt,
+archive `09` entries older than audit 69, re-check D-xxx vs code. S-39 (keys) follows in session 75.

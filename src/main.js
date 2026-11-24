@@ -13,6 +13,7 @@ import { Input } from './input.js';
 import { Audio } from './audio.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { createDev } from './dev.js';
+import { registerOffline } from './pwa.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -439,6 +440,7 @@ game.demo = true; // background world for the title screen — never saved
 renderer.attach(game);
 showTitle();
 requestAnimationFrame(frame);
+requestAnimationFrame(() => requestAnimationFrame(registerOffline)); // S-38: after the first frame is drawn
 
 const dev = createDev({ game: () => game, persist, modeChanged() {
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');

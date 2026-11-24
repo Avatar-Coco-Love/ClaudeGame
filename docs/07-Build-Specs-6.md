@@ -7,7 +7,7 @@ the owner's pack (D-037, Q-021); ambient music gets its spec in a later Design s
 controlled, read and drawn. **Save:** no world-save change (`SAVE_FORMAT` stays 15); new player choices go in
 `lumencore.settings.v1` through `clean()` (D-016), which already drops unknown or damaged fields.
 
-## S-38 — PWA: installable, plays offline (M8) (D-103)
+## S-38 — PWA: installable, plays offline (M8) (D-103) — ✅ built #79 (D-104)
 - `manifest.webmanifest` (name, short_name "Lumen Core", `start_url: "./"`, `scope: "./"`, `display: "standalone"`,
   `orientation: "any"`, background/theme `#03040c`) + `<link rel="manifest">`. Icons 192 and 512 px PNG (+ maskable
   512) rendered once from the Nexus hexagon with Playwright (like `og.png`, D-044): neon geometry, no text.
