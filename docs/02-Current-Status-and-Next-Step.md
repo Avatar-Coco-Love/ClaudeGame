@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 47** · **Version: v0.2.51** (session 47: design; rotation: 48 Build, 49 Audit, 50 Build).
+_Last updated: 2026-11-24_ · **Session counter: 48** · **Version: v0.2.52** (session 48: build; rotation: 49 Audit, 50 Build, 51 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -21,7 +21,7 @@ _Last updated: 2026-11-24_ · **Session counter: 47** · **Version: v0.2.51** (s
   ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
-  (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Static, no toast/minimap mark yet (S-27).
+  (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
   Design 47: feed = cargo ▲ then bank ▲ (D-070), a broken Spire relights when primed (D-069), Wake lanes D-071.
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 47** · **Version: v0.2.51** (s
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
 - Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36); a full Pulse fires out of reach (37); draw cost as counts + ratios (38, `drawcost.cjs`);
-  blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`); full Pulse holds at open floor, one-shots tier 3 at Beam 2 (40); beacons: rules, light pixel, reload, format 8, phones ×3 (41, `craft.cjs`); pool floor 3.3 → 7.1 luma, walls same (43, `glow.cjs`); no HUD overlap at 4 landscape sizes (43); Pulse waits at bedrock, bad saves load, HUD text fits, no bare tuning in `game.js` (audit 44); S-26 split byte-same ×8 scenes (45).
+  blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`); full Pulse holds at open floor, one-shots tier 3 at Beam 2 (40); beacons: rules, light pixel, reload, format 8, phones ×3 (41, `craft.cjs`); pool floor 3.3 → 7.1 luma, walls same (43, `glow.cjs`); no HUD overlap at 4 landscape sizes (43); Pulse waits at bedrock, bad saves load, HUD text fits, no bare tuning in `game.js` (audit 44); S-26 split byte-same ×8 scenes (45); Spire found once, breath, minimap mark, 320 bank (48).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no square-wave buzz (audit 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 48 (Build): S-27 Spires found (`07-Build-Specs-2.md`, with the B-039 rider); then 49 Audit, 50 Build S-22.
+Session 49 (Audit): health check per CLAUDE.md (subagents; archive `09` entries before audit 44; D-xxx vs code); then 50 Build S-22.

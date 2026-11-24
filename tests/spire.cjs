@@ -62,39 +62,131 @@ async function nodeChecks(check) {
     && r.world.get(alt.x, alt.y) === T.SPIRE && again.spires[0].fed === 12 && key(junk) === key(a), JSON.stringify(again.spires[0]));
 }
 
-/** `dev.teleport` beside a Spire in the Deep; screenshot at DSF 1 (looked at in session 46) and a pixel on the core's hexagon. */
-async function browserChecks(browser, url, check, errors, shot) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+/** S-27 found: first sight toasts + tones once per Spire, never again after a reload; a pre-seen save is marked silently. */
+async function foundChecks(check) {
+  const { Game } = await import('../src/game.js');
+  const { packBits, unpackBits } = await import('../src/world.js');
+  const { spireFootprint, spireBreath } = await import('../src/spire.js');
+  const { upgradeSave } = await import('../src/save.js');
+  const { CELL } = await import('../src/config.js');
+  const idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
+  const res = {};
+  for (const mode of ['drift', 'surge']) {
+    let tones = 0;
+    const au = new Proxy({}, { get: (_, k) => k === 'spire' ? () => tones++ : () => {} });
+    const g = new Game({ seed: 77, mode, audio: au }), s = g.spires[2];
+    const look = q => q.revealQueue.push(...q.world.reveal((s.x + 0.5) * CELL, (s.y + 5.5) * CELL, 2 * CELL)); // touches the bottom row only
+    g.update(1 / 60, idle);
+    const before = { ev: g.events.includes('spire'), seen: g.spires.filter(q => q.seen).length };
+    look(g); g.update(1 / 60, idle);
+    const first = { ev: g.events.filter(e => e === 'spire').length, n: g.spireCount, seen: s.seen, others: g.spires.filter(q => q.seen).length };
+    g.events.length = 0; for (let i = 0; i < 30; i++) g.update(1 / 60, idle);
+    const again = g.events.includes('spire');
+    const r = new Game({ seed: 77, mode, audio: au, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
+    r.revealQueue.push(...r.world.reveal((s.x + 0.5) * CELL, (s.y + 0.5) * CELL, 6 * CELL)); r.update(1 / 60, idle);
+    res[mode] = { before, first, again, reload: r.events.includes('spire'), keptSeen: r.spires[2].seen, tones };
+  }
+  const ok = m => !m.before.ev && m.before.seen === 0 && m.first.ev === 1 && m.first.n === 1 && m.first.seen && m.first.others === 1
+    && !m.again && !m.reload && m.keptSeen && m.tones === 1;
+  check('first sight of a Spire: one "spire" event + one tone, n = 1, never again (nor after a reload), Drift + Surge (S-27)',
+    ok(res.drift) && ok(res.surge), JSON.stringify(res));
+
+  // A v0.2.50 save (format 10, every `seen` false) whose explored bitset covers two footprints: both seen on load, no event.
+  let tones = 0;
+  const au = new Proxy({}, { get: (_, k) => k === 'spire' ? () => tones++ : () => {} });
+  const base = new Game({ seed: 77, mode: 'drift', audio: au }), sv = JSON.parse(JSON.stringify(base.toSave())), n = base.world.w * base.world.h;
+  const ex = unpackBits(sv.explored, n);
+  for (const k of [0, 3]) for (const i of spireFootprint(sv.spires[k].x, sv.spires[k].y)) ex[i] = 1;
+  sv.explored = packBits(ex);
+  const pre = new Game({ seed: 77, mode: 'drift', audio: au, save: upgradeSave(sv) });
+  for (let i = 0; i < 10; i++) pre.update(1 / 60, idle);
+  const seen = pre.spires.map(q => q.seen);
+  check('a pre-seen v0.2.50 save marks its explored Spires seen on load, silently (S-27)', seen.join() === 'true,false,false,true,false'
+    && !pre.events.includes('spire') && tones === 0 && pre.toSave().spires[3].seen === true, JSON.stringify({ seen, events: pre.events, tones }));
+
+  const b = [0, 1.5, 3, 4.5].map(t => +spireBreath(t, true).toFixed(3)), still = [0, 3].map(t => spireBreath(t, false));
+  check('the core hexagon breathes 0.35–0.6 over 6 s; held at 0.6 under reduced motion (S-27)',
+    b[0] === 0.6 && b[2] === 0.35 && b[1] === 0.475 && still.every(v => v === 0.6), JSON.stringify({ b, still }));
+}
+
+// Teleport 7 cells out from Spire k's core on the side facing the Nexus (the carved 3×3 room stays clear of the 9×9
+// footprint), snap the camera and let it settle on the core, so screen pixels map to the world asked for.
+async function nearSpire(page, k) {
+  const info = await page.evaluate(k => {
+    const L = window.__lumen, g = L.game, s = g.spires[k], cx = g.world.w / 2, cy = g.world.h / 2;
+    const side = Math.abs(s.x + 0.5 - cx) > Math.abs(s.y + 0.5 - cy) ? [Math.sign(cx - s.x - 0.5) * 7, 0] : [0, Math.sign(cy - s.y - 0.5) * 7];
+    const tx = s.x + side[0] + 0.5 - cx, ty = s.y + side[1] + 0.5 - cy;
+    g.demo = true; L.dev.god(true); g.enemies = []; g.spawnTimer = 1e9;
+    const at = L.dev.teleport(Math.hypot(tx, ty), Math.atan2(ty, tx));
+    const p = g.player, cam = L.renderer.cam; // snap to where it eases to (the core + a 36 px look-ahead), so the toast is still up
+    cam.x = p.x + Math.cos(p.angle) * 36; cam.y = p.y + Math.sin(p.angle) * 36;
+    return { at, d: Math.hypot(tx, ty) };
+  }, k);
+  await page.waitForTimeout(250);
+  return info;
+}
+
+/** Beside a Deep Spire (DSF 1): hexagon pixel + breath, the found toast, the minimap mark, the stats line; 320×568 too.
+ *  `shots` (env SPIRE_SHOT, a directory) saves spire-1280x800.png and spire-320x568.png (viewed in sessions 46 and 48). */
+async function browserChecks(browser, url, check, errors, shots) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(url + '?dev'); await page.waitForTimeout(200);
   await page.click('#new-world'); await page.waitForTimeout(300);
-  const info = await page.evaluate(() => {
-    const L = window.__lumen, g = L.game, s = g.spires[0], cx = g.world.w / 2, cy = g.world.h / 2;
-    // Stand 7 cells out from the core on the side facing the Nexus (the carved 3×3 room stays clear of the 9×9 footprint).
-    const side = Math.abs(s.x + 0.5 - cx) > Math.abs(s.y + 0.5 - cy) ? [Math.sign(cx - s.x - 0.5) * 7, 0] : [0, Math.sign(cy - s.y - 0.5) * 7];
-    const tx = s.x + side[0] + 0.5 - cx, ty = s.y + side[1] + 0.5 - cy, a = Math.atan2(ty, tx), d = Math.hypot(tx, ty);
-    g.demo = true; L.dev.god(true);
-    const at = L.dev.teleport(d, a);
-    return { s, at, d };
-  });
-  // Wait for the camera to settle on the core (it eases), so screen pixels map to the world positions asked for.
-  await page.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 1; }, null, { timeout: 5000 }).catch(() => {});
-  await page.waitForTimeout(200);
-  if (shot) await page.screenshot({ path: shot });
-  const px = await page.evaluate(() => {
+  const info = await nearSpire(page, 0);
+  const toastText = await page.evaluate(() => { const t = document.getElementById('toast'); return t.classList.contains('show') ? t.textContent : 'hidden'; });
+  // Brightest pixel in a 9×9 box: on the core hexagon's top vertex (CELL·1.35 above the centre) vs midway between the
+  // outer and inner hexagons (CELL·1.0 above), where only the core's fill is. `t` sets the breath clock first.
+  const sample = (t, dir = -1, h = 4) => page.evaluate(async ([t, dir, h]) => {
     const L = window.__lumen, g = L.game, s = g.spires[0], R = L.renderer;
-    // Brightest pixel in a 9×9 box: on the core hexagon's top vertex (CELL·1.35 above the centre) vs midway between the
-    // outer and inner hexagons (CELL·1.0 above), where only the core's fill is.
-    const cx = (s.x + 0.5) * 32, cy = (s.y + 0.5) * 32, at = r => {
-      const p = R.worldToScreen(cx, cy - r), d = R.ctx.getImageData(Math.round(p.x * R.dpr) - 4, Math.round(p.y * R.dpr) - 4, 9, 9).data;
+    if (t != null) { R.time = t; await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }
+    const cx = (s.x + 0.5) * 32, cy = (s.y + 0.5) * 32, at = r => { r *= -dir;
+      const p = R.worldToScreen(cx, cy - r), d = R.ctx.getImageData(Math.round(p.x * R.dpr) - h, Math.round(p.y * R.dpr) - h, 2 * h + 1, 2 * h + 1).data;
       let m = 0; for (let i = 0; i < d.length; i += 4) m = Math.max(m, d[i] + d[i + 1] + d[i + 2]); return m;
     };
-    const p = at(32 * 1.35), q = at(32);
-    return { line: p, fill: q, core: g.world.get(s.x, s.y) };
+    return { line: at(32 * 1.35), fill: at(32), core: g.world.get(s.x, s.y) };
+  }, [t, dir, h]);
+  const peak = await sample(0);
+  if (shots) await page.screenshot({ path: `${shots}/spire-1280x800.png` });
+  // Breath, measured in the core's light: stand in the Spire's interior, 3 cells below the core, and read the near vertex
+  // (measured: 347 at the peak, 264 at the trough).
+  await page.evaluate(() => { const g = window.__lumen.game, s = g.spires[0]; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; });
+  await page.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 40; }, null, { timeout: 5000 }).catch(() => {});
+  const hi = await sample(0, 1, 1), low = await sample(3, 1, 1); // a 3×3 box: the cell bevel 4 px off the vertex is static
+  check('beside a Deep Spire the core hexagon draws ≥ 1.8× its fill at the breath peak (S-19, DSF 1)', peak.core === 10
+    && peak.line >= 1.8 * peak.fill && peak.line > 30, JSON.stringify({ ...peak, at: info.at, d: info.d.toFixed(1) }));
+  check('the core hexagon breathes: dimmer at the trough than at the peak, still above its fill (S-27)',
+    low.line < 0.9 * hi.line && low.line > low.fill, JSON.stringify({ peak: hi.line, low: low.line, fill: low.fill }));
+  check('first sight toasts "A dormant Spire (1/5)" (S-27)', /A dormant Spire \(1\/5\)/.test(toastText), toastText);
+  // Minimap: the brightest pixel in a 9×9 box at a Spire's centre. The mark (#e4dcff, sum 703) is brighter than any
+  // explored Spire cell (shell 510); an unseen Spire's box stays dark.
+  const mini = await page.evaluate(() => {
+    const L = window.__lumen, g = L.game, c = L.renderer.minimap, m = c.getContext('2d'), sc = c.width / (g.world.w * 32);
+    const at = s => { const d = m.getImageData(Math.round((s.x + 0.5) * 32 * sc) - 4, Math.round((s.y + 0.5) * 32 * sc) - 4, 9, 9).data;
+      let v = 0; for (let i = 0; i < d.length; i += 4) v = Math.max(v, d[i] + d[i + 1] + d[i + 2]); return v; };
+    return { seen: at(g.spires[0]), unseen: at(g.spires[1]), flags: g.spires.map(s => s.seen) };
   });
-  check('beside a Deep Spire the core hexagon draws ≥ 1.8× its fill (S-19, DSF 1)', px.core === 10 && px.line >= 1.8 * px.fill && px.line > 30,
-    JSON.stringify({ ...px, at: info.at, d: info.d.toFixed(1) }));
+  check('minimap: a hollow hexagon at the seen Spire, nothing at an unseen one (S-27)', mini.seen >= 650 && mini.unseen < 200
+    && mini.flags[0] && !mini.flags[1], JSON.stringify(mini));
+  // Back at the Nexus the Matrix stats line counts lit Spires.
+  await page.evaluate(() => { window.__lumen.dev.teleport(0); }); await page.waitForTimeout(200);
+  await page.evaluate(() => window.__lumen.input.pressed.add('matrix')); await page.waitForTimeout(200);
+  const stats = await page.textContent('#stats');
+  check('the Matrix stats line adds "Spires 0/5 lit" once one is found (S-27)', /· Spires 0\/5 lit$/.test(stats), stats);
   await page.close();
+
+  // 320×568 portrait (DSF 1): the same scene on the narrowest phone, for the screenshot; the toast fits on screen.
+  const ph = await browser.newPage({ viewport: { width: 320, height: 568 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+  ph.on('pageerror', e => errors.push('spire 320: ' + e.message));
+  await ph.goto(url + '?dev'); await ph.waitForTimeout(200);
+  await ph.tap('#new-world'); await ph.waitForTimeout(300);
+  await ph.evaluate(() => { window.__lumen.game.setMode('surge'); });
+  await nearSpire(ph, 0);
+  if (shots) await ph.screenshot({ path: `${shots}/spire-320x568.png` });
+  const t = await ph.evaluate(() => { const e = document.getElementById('toast'), r = e.getBoundingClientRect();
+    return { l: Math.round(r.left), r: Math.round(r.right), text: e.classList.contains('show') ? e.textContent : 'hidden' }; });
+  check('320×568 Surge: the Spire toast shows and fits the screen (S-27)', /1\/5/.test(t.text) && t.l >= 0 && t.r <= 320, JSON.stringify(t));
+  await ph.close();
 }
 
-module.exports = { nodeChecks, browserChecks };
+module.exports = { nodeChecks, foundChecks, browserChecks };

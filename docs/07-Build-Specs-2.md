@@ -26,7 +26,7 @@ Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 
 
 ## S-19 — ✅ built session 46 (#51); as-built notes D-068 (candidates, Spire gap 12, `keep`).
 
-## S-27 — Spires v1a: found (M5) (D-049; re-checked Design 47 against D-068/D-069)
+## S-27 — Spires v1a: found (M5) (D-049; re-checked Design 47 against D-068/D-069) — ✅ built #53 (D-072)
 - **Look:** the core hexagon breathes (6 s, alpha 0.35–0.6; static under reduced motion). Minimap: a hollow violet-white
   hexagon at the record's centre once any footprint cell is explored, always shown after that (a broken Spire too, D-069).
 - **Found:** first sight in a save → toast "A dormant Spire (n/N)" (N = `game.spires.length`, 5 on every seed so far) + one

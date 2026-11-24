@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.52 — 2026-11-24 (#53)
+- The Spires are now found: the first time one comes into view you hear a soft low tone and see "A dormant Spire (1/5)",
+  a pale hexagon marks it on the minimap from then on, and its core hexagon slowly breathes (still, with reduced motion).
+  The Core Matrix's stats line counts "Spires 0/5 lit" once you've found one. Worlds that already saw a Spire keep it
+  found, quietly.
+- On the narrowest phones the ◆ ▲ ● bank row sits a little tighter, so even a full world's haul stays clear of the minimap.
+
 ## v0.2.51 — 2026-11-24 (#52)
 - No gameplay change: a design pass on the road to the Spires. Waking a Spire will take 80 Prisms from your cargo first
   and then from your bank, so a world you have already mined out can still be finished in either mode; Surge's Spire

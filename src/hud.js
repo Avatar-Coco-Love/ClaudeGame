@@ -3,13 +3,14 @@
 import { CELL, T, RINGS, RESOURCE, ORE_KIND } from './config.js';
 import { markAlpha } from './research.js';
 import { BEACON_COLOR } from './craft.js';
+import { drawSpireMarks } from './spire.js';
 
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44],
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
   [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
   [T.LUMEN]: [255, 201, 79],
-  [T.SPIRE_SHELL]: [150, 140, 220], [T.SPIRE]: [120, 104, 200], [T.FACET]: [150, 140, 220], // S-19: dim violet; S-27 adds the mark
+  [T.SPIRE_SHELL]: [150, 140, 220], [T.SPIRE]: [120, 104, 200], [T.FACET]: [150, 140, 220], // S-19: dim violet; S-27's mark is spire.js drawSpireMarks
 };
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
@@ -47,6 +48,7 @@ export function drawMinimap(r) {
   m.globalAlpha = 1;
   m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
+  drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
 }

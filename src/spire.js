@@ -1,7 +1,8 @@
 // S-19 Spires v1a (D-049, D-068): where the 5 dormant Spires go, their 9×9 shape, and the saved record.
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
-import { WORLD_W, WORLD_H, T, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP } from './config.js';
+import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
+  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
@@ -97,4 +98,63 @@ export function stampSpires(world, spires) {
       if (!keep.has(c)) world.cells[c] = spireTypeAt(i, j);
     }
   }
+}
+
+// ---------- S-27 found (D-049, D-069) ----------
+
+/** Mark every unseen Spire whose 9×9 footprint has an explored cell as `seen`. `newly` (cell indices just revealed)
+ *  limits the test to Spires those cells touch; without it every footprint is scanned (load). Returns how many it marked. */
+export function markSpiresSeen(game, newly = null) {
+  const w = game.world, H = SPIRE_HALF;
+  let marked = 0;
+  for (const s of game.spires) {
+    if (s.seen) continue;
+    const hit = newly
+      ? newly.some(i => Math.abs((i % w.w) - s.x) <= H && Math.abs(Math.floor(i / w.w) - s.y) <= H)
+      : spireFootprint(s.x, s.y, w.w).some(i => w.explored[i]);
+    if (hit) { s.seen = true; marked++; }
+  }
+  return marked;
+}
+
+/** Spires found so far (n of the toast "A dormant Spire (n/N)"), and lit (the Matrix stats line). */
+export const spiresSeen = game => game.spires.filter(s => s.seen).length;
+export const spiresLit = game => game.spires.filter(s => s.lit).length;
+
+/** The core hexagon's alpha: breathes 0.35–0.6 over SPIRE_BREATH_S; held at the top under reduced motion. */
+export function spireBreath(time, motion) {
+  const [lo, hi] = SPIRE_BREATH_ALPHA;
+  return motion ? lo + (hi - lo) * (0.5 + 0.5 * Math.cos(time * 2 * Math.PI / SPIRE_BREATH_S)) : hi;
+}
+
+/** The breathing outer hexagon over each on-screen Spire core (world transform, before the light layer). Drawn from
+ *  the record, but only where the core cells exist (a broken Spire, D-069, has none to breathe). */
+export function drawSpireBreath(r, ctx, left, top, vw, vh) {
+  const g = r.game, w = g.world, a = spireBreath(r.time, g.motionOn()), C = MATERIAL[T.SPIRE];
+  let open = false;
+  for (const s of g.spires) {
+    const cx = (s.x + 0.5) * CELL, cy = (s.y + 0.5) * CELL, m = CELL * 2;
+    if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
+    if (w.get(s.x, s.y) !== T.SPIRE || w.get(s.x - 1, s.y) !== T.SPIRE || w.get(s.x + 1, s.y) !== T.SPIRE
+      || w.get(s.x, s.y - 1) !== T.SPIRE || w.get(s.x, s.y + 1) !== T.SPIRE) continue;
+    if (!open) { ctx.save(); ctx.shadowBlur = 8; ctx.shadowColor = C.edge; ctx.strokeStyle = C.edge; ctx.lineWidth = 2; open = true; }
+    ctx.globalAlpha = a;
+    ctx.beginPath();
+    for (let k = 0; k < 6; k++) { const t = Math.PI / 6 + k * Math.PI / 3; ctx[k ? 'lineTo' : 'moveTo'](cx + Math.cos(t) * CELL * 1.35, cy + Math.sin(t) * CELL * 1.35); }
+    ctx.closePath(); ctx.stroke();
+  }
+  if (open) ctx.restore();
+}
+
+/** Minimap mark: a hollow violet-white hexagon at each seen Spire's centre (a broken one too, D-069). */
+export function drawSpireMarks(m, g, sc) {
+  m.save(); m.strokeStyle = SPIRE_MARK_COLOR; m.lineWidth = 1.25;
+  for (const s of g.spires) {
+    if (!s.seen) continue;
+    const x = (s.x + 0.5) * CELL * sc, y = (s.y + 0.5) * CELL * sc;
+    m.beginPath();
+    for (let k = 0; k < 6; k++) { const t = Math.PI / 6 + k * Math.PI / 3; m[k ? 'lineTo' : 'moveTo'](x + Math.cos(t) * 3.5, y + Math.sin(t) * 3.5); }
+    m.closePath(); m.stroke();
+  }
+  m.restore();
 }
