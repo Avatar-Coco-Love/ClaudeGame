@@ -50,3 +50,13 @@ Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected
   desktop keeps top 30 %. Rejected: a narrower centred toast (≤ 124 px at 320 wide); placing it by JS measurement.
 - A `now` toast (answer to a key/tap) shows at once even over a `keep` milestone, which returns for its rest (≥ 1.5 s).
 - All D-001…D-083 re-checked against the code in audit 54: they match.
+
+### D-085 — S-30: how the Surge bot plays (2026-11-24, session 55, Build; implements D-082)
+- `tools/surgebot.mjs` sees the whole grid (an oracle, not the explored map): it measures balance, not exploration.
+  A* cost is seconds: crossing time (CELL / thrust) per cell + remaining hp / beam dps per solid cell; bedrock, vault
+  shell + cache, Spire core + facets are walls (the Spire shell can be cut). Stuck = no move ≥ 8 px, no break and no
+  beam damage for 5 s (so slow digs don't count); re-plan once, then skip the goal.
+- `spire`: when no prism cell is left within 24 cells, it takes the nearest prism anywhere by path cost (3 of 12
+  seeds need it) instead of stopping. It feeds at ≥ 8▲ carried, or when full / out of targets.
+- Rejected: unit cost per open cell (spec text; mixes cells with seconds, so a 1-cell detour outweighed a 3 s dig);
+  pathing over explored cells only (needs an exploration policy, out of scope); stopping when the 24-cell ring runs dry.

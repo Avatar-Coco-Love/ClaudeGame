@@ -63,6 +63,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await spire.foundChecks(check).catch(e => check('S-27 spire found checks ran', false, e.message));
   await require('./spirefeed.cjs').nodeChecks(check).catch(e => check('S-20 spire feed checks ran', false, e.message));
   await require('./facet.cjs').nodeChecks(check).catch(e => check('S-28 facet checks ran', false, e.message));
+  await require('./surgebot.cjs').nodeChecks(check).catch(e => check('S-30 surge bot checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

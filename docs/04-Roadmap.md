@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28 built) S-30 Surge bot, S-23, S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30 built) S-23, S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -13,8 +13,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#38) **S-17 Touch pass:** landscape title + ◎⟂♪≡ row, 44 px targets, hint wrap, ⟂ label, 2nd finger, tools reject unknown `MODE` (D-050).
 - ✅ (#41) **S-18 Code split:** `glitch.js`, `hud.js`, `body.js`, `GLITCH_*` in `config.js`, dead code out, 600-line check (D-053).
 - ✅ (#42) **Standoff probe** `tools/standoff.mjs`: Glitches walk in from 420 px, all beam modes, `KITE=1` (D-054).
-- **S-30 Surge bot runner** (after S-28, before S-23: it tunes the Wake): `tools/surgebot.mjs`, A* by dig cost, fights in Surge, routes `mine` / `rim` / `hug` / `spire`,
-  3 builds × both modes (answers Q-007). Spec in `07-Build-Specs-4.md` (D-082); seed bot `tools/spireloop.mjs` (Design 52), probes `surgefarm`, `parity` (D-019).
+- ✅ (#60) **S-30 Surge bot runner** `tools/surgebot.mjs`: A* by dig time, fights + heals in Surge, routes `mine` / `rim` / `hug` / `spire`, 3 builds × both modes (D-085).
 - ✅ (#57) Design session 52: Spire route play-tested in both modes, facet puzzle proven on 2000 seeds (`tools/facetprobe.mjs`), Q-016 closed (D-079…D-082).
 - ✅ (#43) **S-15 Perf check:** `tools/perf.cjs` (×4 CPU throttle, Wide + 300 pickups, 20 holes) + `tests/drawcost.cjs` in smoke (counts, ratios; D-057).
 - ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`pulse` exits 1 until S-14 adds it, #38); B-019.

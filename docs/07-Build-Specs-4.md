@@ -1,26 +1,7 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (S-30 added, D-081/D-082).
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085): `tools/surgebot.mjs --route=spire` measures S-23.
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
-
-## S-30 — Surge bot runner (Tooling, before S-23) (D-019, D-082) — no sink, no game code
-- `tools/surgebot.mjs`, headless like the other tools (`Game` + a no-op audio Proxy), deterministic: no `Math.random` in
-  the bot; same seed + args → same report. Args: route, build (`start|mid|max`, the `spirerun` levels), mode
-  (`drift|surge`), seeds, minutes. Start from `tools/spireloop.mjs` (Design 52's greedy route bot).
-- **Pathing:** A* over the known grid, cost = 1 per open cell + the cell's hp / beam dps (seconds to dig) per solid
-  cell; bedrock, vault shell, Spire core and facets are walls. Re-plan when the next cell changes or every 2 s.
-  Stuck (< 8 px moved in 5 s) → re-plan once, then skip that goal; report stuck counts apart from deaths.
-- **Fighting (Surge):** a Glitch within 160 px takes the aim (nearest first); integrity < 35 % → path to the Nexus
-  (the only heal), bank on the way only if a Relay lies on the path. A death counts, then the route restarts.
-- **Routes:** `mine` (nearest ore by path cost, bank at the nearest Nexus/Relay when full: ◆ ▲ per minute, deaths/min);
-  `rim` and `hug` (degenerate loops: farm Glitches at the Nexus rim; hug the Nexus edge: haul/min, should not beat
-  `mine`); `spire` (with B▲ banked: nearest Spire by path, enter by its cheapest gap, feed, mine prism cells by path cost
-  within 24 cells and carry them in until primed; then **hold** the interior for `--hold` s, default 40: minutes to
-  primed, deaths, deaths during the hold, % of holds survived; S-23 adds "Wake held / failed" to the same route).
-- **Output:** one line per (route, build, mode): medians + p90 over seeds, stuck and capped counts. Both modes always.
-- **Smoke:** `tests/surgebot.cjs` runs `spire` and `mine` for 2 seeds × 1 game-minute (< 5 s wall): numbers are finite,
-  same seed twice → identical output, and the bot gets stuck on 0 of 2 seeds. Log the full table (12 seeds × 3 builds ×
-  2 modes × `mine`/`spire`) in `09` and update Q-007 with it.
 
 ## S-23 — Spire Wake: the Surge defence (M5) (D-055; starting values for the bot to tune)
 - In Surge, a primed Spire starts a **Wake** when the core enters its interior: `SPIRE_WAKE_S` 40 s. The Spire clears a

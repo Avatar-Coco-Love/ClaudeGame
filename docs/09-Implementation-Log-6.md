@@ -69,3 +69,5 @@ Continues `09-Implementation-Log-5.md` (split at the 8 KB cap, session 51). Newe
 - Docs: README controls (⊕, facets), `01` Crafting, built S-20/S-22/S-28 text deleted from `07-…-3`, Debt refreshed
   (H1, H2, H4, T3 logged), stale comments (`light.js`, `RELAY_GAP`, B-033). `09` parts 3–4 (sessions 44–48) archived
   word for word. All D-001…D-083 re-checked: match. Smoke 244/244 (9 new checks).
+
+Continued in `09-Implementation-Log-7.md` (session 55 on).
