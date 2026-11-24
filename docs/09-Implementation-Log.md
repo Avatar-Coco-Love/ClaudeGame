@@ -12,8 +12,9 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **B-021 (new) → fixed (#33):** #32's deploy failed 4× (3 re-runs + a fresh dispatch): upload OK, then `deploy-pages`
   "Found 0 artifact(s)" ~0.2 s later. #31 had deployed with the same one-job workflow 20 min before. Split into
   `build` + `deploy` jobs (`needs: build`), the shape of GitHub's own starter workflows. Unclear if GitHub-side.
-- **Audit findings (5 subagents, to verify and fix in part 2):** floor pickups at the 400 cap stop all ore yields and persist
+- **Audit findings (#34 → `08-Audit-29-Findings.md`, not yet verified by hand; owner asked to wrap up):** floor pickups at the 400 cap stop all ore yields and persist
   in the save; a Glitch killed by the beam still hits the core that frame; Q/F presses during hitstop are lost; the Matrix
   bank doesn't refresh during a deposit; landscape phones clip the title and put ◎/⟂ under the aim thumb; tap targets < 44 px;
-  `MODE=pulse` probes silently run Focus; `01` calls built layers "planned"; README controls incomplete. Perf report pending.
+  `MODE=pulse` probes silently run Focus; `01` calls built layers "planned"; README controls incomplete. Perf audit stopped
+  unreported: redo it next audit. All 43 D-xxx match the code (docs-drift agent).
 - `09` entries for sessions 24–28 archived word for word (`archive/2026-11-24-09-sessions-24-28.md`).
