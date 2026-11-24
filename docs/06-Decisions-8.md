@@ -58,3 +58,13 @@ Continues `06-Decisions-7.md` (same rules: supersede, never edit; list rejected 
 - Rejected: an ESLint `no-magic-numbers` rule (new dev dependency + config, against the no-build rule); checking every `src`
   file (render/audio are cosmetic by nature, the list would be the whole file); a line-count ratchet (passes a swapped number).
 - **Audit 44 D-check:** every D-001…D-064 was compared with the code; all match except D-041's ⟂ label (superseded above).
+
+### D-067 — Light in `light.js`, chunk paint in `terrain.js`, cached hole sprites (2026-11-24, session 45, S-26; amends D-060's `extraLights`)
+- `R.lightSets` (list of `{x, y, r, glow?}` arrays, iterated in place) replaces `extraLights`; `extraLights` stays as an alias
+  of `lightSets[0]` (= `game.beacons`) so tests/tools are unchanged. `paintChunk` also moved (`terrain.js`): the light move
+  alone left `render.js` at 525 lines; the spec asks < 480 (now 464), and S-19 draws Spire cells there.
+- Pure split proven byte-same: 4 seeded scenes (home, 20 beacons, Wide in the Deep, Pulse flash) × DSF 1 and 2, RGBA sha256.
+- **Hole cache (audit 44 T3):** one full-strength sprite per light-canvas radius, drawn with `globalAlpha` = strength; cleared
+  on zoom change. Not byte-same (sub-pixel resampling): max 2/255 per channel, 99.9 % of changed channels ±1, mean 0.004–0.04
+  levels over the frame: below a visible step. `perf.cjs` holes (×4): draw JS 27.5 → 22.7 ms, FLUSH light 34 → 29 ms.
+- Rejected: one sprite per (radius, strength) (the Pulse flash fades through every strength); per-frame `concat` of sets.

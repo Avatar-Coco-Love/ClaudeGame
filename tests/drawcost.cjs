@@ -30,7 +30,13 @@ async function browserChecks(browser, url, check, errors) {
     const ring = (k, d) => Array.from({ length: k }, (_, i) => ({ x: away.x + Math.cos(i) * d, y: away.y + Math.sin(i) * d, r: 140 }));
     R.extraLights = ring(20, 3000); const holesOff = count(R.lctx, () => R.drawLight(ctx));
     R.extraLights = ring(20, 200); const holesOn = count(R.lctx, () => R.drawLight(ctx));
-    R.extraLights = [];
+    // S-26: a second light set lights like the first (relays, lit Spires), and a warm frame builds no hole gradients
+    // (cached hole sprites per radius, audit 44 T3).
+    R.extraLights = []; R.lightSets = [ring(10, 200), ring(10, 200).map(e => ({ ...e, x: e.x + 1 }))]; const holesTwoSets = count(R.lctx, () => R.drawLight(ctx));
+    const mkGrad = P.createRadialGradient; let grads = 0;
+    P.createRadialGradient = function (...a) { if (this === R.lctx) grads++; return mkGrad.apply(this, a); };
+    R.drawLight(ctx); grads = 0; R.drawLight(ctx); P.createRadialGradient = mkGrad;
+    R.lightSets = [g.beacons]; R.extraLights = [];
     // Audit 39 (T3): 9 Glitches (GLITCH_CAP) off screen cost no draws; on screen none draws with shadowBlur (sprites, D-051).
     const foes = d => Array.from({ length: 9 }, (_, i) => ({ x: away.x + Math.cos(i) * d, y: away.y + Math.sin(i) * d, r: 11, tier: i % 4,
       hp: 1, maxHp: 1, spin: i, flash: i === 0 ? 0.1 : 0, wander: i, fade: i === 1 ? 0.3 : undefined }));
@@ -64,12 +70,14 @@ async function browserChecks(browser, url, check, errors) {
     for (let i = 0; i < 9; i++) for (const k in scenes) t[k].push(time(scenes[k]));
     loot(false);
     const m = Object.fromEntries(Object.entries(t).map(([k, v]) => [k, +median(v).toFixed(2)]));
-    return { nexusOff, nexusOn, holesOff, holesOn, enemiesOff, enemiesOn, blurred, m };
+    return { nexusOff, nexusOn, holesOff, holesOn, holesTwoSets, grads, enemiesOff, enemiesOn, blurred, m };
   });
   check('an off-screen Nexus issues no draws; on screen it draws (S-15)', r.nexusOff === 0 && r.nexusOn > 3, `${r.nexusOff} / ${r.nexusOn}`);
   check('9 off-screen Glitches issue no draws; on screen they draw (audit 39)', r.enemiesOff === 0 && r.enemiesOn >= 9, `${r.enemiesOff} / ${r.enemiesOn}`);
   check('on-screen Glitch bodies and eyes draw with no shadowBlur (glow sprites, audit 39, D-051)', r.blurred === 0, `${r.blurred} blurred draws`);
   check('off-screen light holes issue no fills (S-15)', r.holesOn - r.holesOff >= 15, `light-canvas draws: 20 off ${r.holesOff}, 20 on ${r.holesOn}`);
+  check('two light sets of 10 cut as many holes as one set of 20 (R.lightSets, S-26)', r.holesTwoSets === r.holesOn, `${r.holesTwoSets} / ${r.holesOn}`);
+  check('a warm frame with 20 light holes builds no gradients (cached hole sprites, S-26)', r.grads === 0, `${r.grads} gradients`);
   // Measured session 38 (09): 300 pickups ≈ 2.1× an empty frame (pre-B-027 shadowBlur pickups: 112×), 20 holes ≈ 1.3×,
   // the Nexus glow ≈ 16 % of a frame at home (unclipped, as in v0.2.41: 57 %).
   const lootX = r.m.loot / r.m.away, holesX = r.m.holes / r.m.away, nexusShare = r.m.nexus / r.m.home;
