@@ -121,11 +121,30 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     const H = SPIRE_HALF - 1, inSpire = (s, i) => Math.abs((i % W) - s.x) <= H && Math.abs(((i / W) | 0) - s.y) <= H && w.cells[i] === T.EMPTY;
     const first = search(g, cellOf(g.player.x, g.player.y), i => g.spires.some(s => inSpire(s, i)));
     const s = first && g.spires.find(q => inSpire(q, first.end));
-    let primedT = null, holdT = 0, holdDeaths = 0, holdOk = null;
+    let primedT = null, holdT = 0, holdDeaths = 0, holdOk = null, relitT = null, wakes = 0, wakeFails = 0;
+    const note = g.notify.bind(g); g.notify = ev => { if (ev === 'wake-start') wakes++; if (ev === 'wake-failed') wakeFails++; note(ev); };
+    /** S-23 guard: stand between the core and the Glitch nearest it (inside the interior), beam that Glitch. */
+    const guard = () => {
+      const p = g.player, c = g.wake.core; let e = null, bd = Infinity;
+      for (const q of g.enemies) { const d = Math.hypot(q.x - c.x, q.y - c.y); if (q.fade === undefined && d < bd) { bd = d; e = q; } }
+      if (!e) { tick(p); return; }
+      const lim = (SPIRE_HALF - 1.4) * CELL, k = 3.2 * CELL / bd;
+      const to = { x: c.x + Math.max(-lim, Math.min(lim, (e.x - c.x) * k)), y: c.y + Math.max(-lim, Math.min(lim, (e.y - c.y) * k)) };
+      const m = Math.hypot(to.x - p.x, to.y - p.y), move = m < 3 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (to.x - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (to.y - p.y) / m * 2)) };
+      g.update(dt, { move, fire: true, aim: { x: e.x - p.x, y: e.y - p.y } }); t += dt;
+    };
     while (s && t < capT) {
       if (retreat()) continue;
       const fed = s.fed >= SPIRE_PRISMS;
       if (fed && primedT === null) { primedT = t; holdT = 0; }
+      if (fed && mode === 'surge') { // S-23: the Wake. Guard the core until relit; a failed Wake -> step out, come back in
+        if (s.lit) { relitT = t; break; }
+        if (g.wake) { guard(); continue; }
+        if (g.wakeBlock === s) setGoal('out', i => Math.max(Math.abs(i % W - s.x), Math.abs(((i / W) | 0) - s.y)) > SPIRE_HALF + 1 && w.cells[i] === T.EMPTY);
+        else setGoal('spire', i => inSpire(s, i));
+        if (drive() === 'skip') { out.end = 'no path'; break; }
+        continue;
+      }
       if (fed) { // hold the interior for `hold` s; a death during it fails the hold
         const d0 = deaths;
         setGoal('spire', i => inSpire(s, i)); drive();
@@ -155,7 +174,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
       if (r === 'skip') { if (!plan) { out.end = 'no path'; break; } bad.add(plan.end); skipped++; setGoal('', null); }
       else if (r === 'arrived') { for (let k = 0; k < 50 && t < capT; k++) tick(g.player); setGoal('', null); } // let the Attractor pull
     }
-    Object.assign(out, { primed: primedT !== null, toPrimed: primedT === null ? null : primedT / 60, holdDeaths, held: holdOk, fed: s ? s.fed : 0 });
+    Object.assign(out, { wakes, wakeFails, wakeHeld: relitT !== null, toRelit: relitT === null || primedT === null ? null : (relitT - primedT) / 60, primed: primedT !== null, toPrimed: primedT === null ? null : primedT / 60, holdDeaths, held: holdOk, fed: s ? s.fed : 0 });
   }
   Object.assign(out, { kills: g.stats.glitches, deaths, stuck, skipped, minutes: t / 60, deathsMin: deaths / Math.max(t / 60, 1e-9), capped: t >= capT });
   return out;
@@ -171,7 +190,9 @@ export function summarize(rows) {
   if (r0.route === 'spire') {
     const held = rows.filter(r => r.held !== null);
     line += `, min to primed ${fmt(col('toPrimed'))}, primed ${cnt(r => r.primed)}/${n} (went past 24 cells ${cnt(r => r.far)}), deaths ${fmt(col('deaths'))}, hold deaths ${fmt(col('holdDeaths'))}, ` +
-      `holds survived ${held.length ? Math.round(100 * held.filter(r => r.held).length / held.length) : 0} % of ${held.length}`;
+      (r0.mode === 'surge' ? `Wake held ${cnt(r => r.wakeHeld)}/${cnt(r => r.wakes > 0)}, Wakes failed ${col('wakeFails').reduce((a, b) => a + b, 0)} of ${col('wakes').reduce((a, b) => a + b, 0)}, ` +
+        `fail rate ${Math.round(100 * col('wakeFails').reduce((a, b) => a + b, 0) / Math.max(1, col('wakes').reduce((a, b) => a + b, 0)))} %, primed→relit min ${fmt(col('toRelit'))}`
+        : `holds survived ${held.length ? Math.round(100 * held.filter(r => r.held).length / held.length) : 0} % of ${held.length}`);
   } else line += `, ◆/min ${fmt(col('shardMin'))}, ▲/min ${fmt(col('prismMin'))}, haul/min ${fmt(col('haulMin'))}`;
   line += `, kills/min ${fmt(rows.map(r => r.kills / Math.max(r.minutes, 1e-9)))}`;
   return line + `, stuck ${cnt(r => r.stuck > 0)}, skipped goals ${col('skipped').reduce((a, b) => a + b, 0)}, capped ${cnt(r => r.capped)}`;

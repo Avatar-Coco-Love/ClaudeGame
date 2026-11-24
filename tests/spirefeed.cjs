@@ -139,14 +139,15 @@ async function browserChecks(browser, url, check, errors, shots) {
     await page.waitForTimeout(150);
     const after = await facets();
     const st = await page.evaluate(() => { const g = window.__lumen.game, s = g.spires[0], e = document.getElementById('toast'), r = e.getBoundingClientRect();
-      return { fed: s.fed, mask: s.mask, lit: s.lit, toast: e.classList.contains('show') ? e.textContent : 'hidden', l: Math.round(r.left), r: Math.round(r.right) }; });
+      return { fed: s.fed, mask: s.mask, drawn: g.wake && g.wake.s === s ? (1 << g.wake.lit) - 1 : s.mask, lit: s.lit, toast: e.classList.contains('show') ? e.textContent : 'hidden', l: Math.round(r.left), r: Math.round(r.right) }; });
     if (shots) await page.screenshot({ path: `${shots}/primed-${vw}x${vh}.png` });
     // Light falls off across the Spire, so compare each facet with itself: every on-screen lit facet gains more (after /
     // before, measured 2.4–2.7×) than any unlit one (its sharper outline: 1.2–1.3×).
     const gain = after.map((v, k) => v === null || !before[k] ? null : v / before[k]);
-    const on = gain.filter((v, k) => v !== null && (st.mask >> k & 1)), off = gain.filter((v, k) => v !== null && !(st.mask >> k & 1));
-    const brighter = on.length > 0 && on.every(v => v > 1.6) && (off.length === 0 || Math.min(...on) > Math.max(...off));
-    check(`${vw}×${vh} ${mode}: at 80 the toast "Spire primed" fits the screen and the lit facets brighten (S-20, DSF 1)`, st.fed === 80
+    // S-23: in Surge the Wake starts at once and the facets show its clock (0 lit), not the puzzle: none brightens.
+    const on = gain.filter((v, k) => v !== null && (st.drawn >> k & 1)), off = gain.filter((v, k) => v !== null && !(st.drawn >> k & 1));
+    const brighter = st.drawn === 0 ? off.every(v => v < 1.6) : on.length > 0 && on.every(v => v > 1.6) && (off.length === 0 || Math.min(...on) > Math.max(...off));
+    check(`${vw}×${vh} ${mode}: at 80 the toast "Spire primed" fits the screen and the drawn lit facets brighten (S-20, DSF 1; Surge: the Wake clock, S-23)`, st.fed === 80
       && st.mask !== null && !st.lit && /Spire primed/.test(st.toast) && st.l >= 0 && st.r <= vw && brighter, JSON.stringify({ st, before, after }));
     await page.close();
   }

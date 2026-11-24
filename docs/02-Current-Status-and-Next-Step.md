@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 55** · **Version: v0.4.59** (session 55: build; rotation: 56 Build, 57 Design, 58 Build, 59 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 56** · **Version: v0.4.60** (session 56: build; rotation: 57 Design, 58 Build, 59 Audit, 60 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -27,7 +27,8 @@ _Last updated: 2026-11-24_ · **Session counter: 55** · **Version: v0.4.59** (s
   Feed (S-20, D-078): in the 7×7 interior ▲ flows in 8/s, cargo then bank (D-070), arc fed / 80; at 80 `mask` = S-28's
   start pattern (`startMask`, `FACET_RING`; lit facets glow) + "Spire primed"; a broken Spire (D-069) relights instead. Wake lanes D-071.
   Facets (S-28, D-080, D-083): 0.35 s of the aim ray (or one Pulse burst) flips a primed facet + neighbours; all 8 →
-  relit: 260 px light (`game.spireLights` = `R.lightSets[2]`), chime, filled hexagon, `mode` saved; primed hint. Surge too until S-23.
+  relit: 260 px light (`game.spireLights` = `R.lightSets[2]`), chime, filled hexagon, `mode` saved; primed hint. Drift only (S-23).
+  Wake (S-23, D-086, `wake.js`): Surge, enter primed → 4 lanes cleared, Glitches go for the core (charge 100, −10), 40 s → relit 'surge'; fail → step out/in.
   One toggle per aim for every beam (D-084: Pulse `beam.facetLatch`; a Glitch on the ray pauses the dwell latch).
 - Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073; phones: below the core / under the bank panel, tap answers first, D-084), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -36,7 +37,7 @@ _Last updated: 2026-11-24_ · **Session counter: 55** · **Version: v0.4.59** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-7`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-4`, 1 PR each, D-063; refreshed Design 52, D-079…D-082): S-23, S-24, S-29. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-4`, 1 PR each, D-063; refreshed Design 52, D-079…D-082): S-24, S-29. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
@@ -46,6 +47,6 @@ _Last updated: 2026-11-24_ · **Session counter: 55** · **Version: v0.4.59** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 56 (Build): **S-23 Spire Wake** (`07-Build-Specs-4.md`; D-055, D-081). Tune with `node tools/surgebot.mjs --route=spire`
-(today: mid primes in 2.4 min, 0 deaths, hold 100 %: the Wake must bring the threat; add "Wake held / failed" to that route).
-Then S-24, S-29. Debt from audit 54 (H1, H2, H4, T3) is in `04-Roadmap-2.md`. Read only this file to start.
+Session 57 (Design): play-test the Wake (Surge) and the facet puzzle (Drift) with Playwright screenshots; settle Q-017
+(is the Wake hard enough for a person at mid?) and tune if not; re-check S-24 + S-29 specs against the built Spires.
+Then S-24 (ending), S-29 (New Cycle → v1.0). Debt from audit 54 (H1, H2, H4, T3) in `04-Roadmap-2.md`. Read only this file to start.

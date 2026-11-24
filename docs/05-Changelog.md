@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.60 — 2026-11-24 (#61)
+- **The Wake (Surge):** step into a primed Spire in Surge and it wakes. Four lanes blast open from its gaps (any ore in
+  them drops at your feet) and Glitches pour down them toward the Spire's core. Guard it for 40 seconds (one facet lights
+  every five) and it relights. An orange ring round the core shows its charge: each Glitch that reaches the core takes
+  a tenth. Lose all of it, or your core, and the Wake fails (your Prisms stay fed); step out and back in to try again.
+  In Drift the facet puzzle is unchanged; in Surge the facets no longer flip.
+
 ## v0.4.59 — 2026-11-24 (#60)
 - **Behind the scenes:** a test pilot now plays the game by itself in both Drift and Surge (digging the cheapest way,
   fighting Glitches, going home to heal) so the coming Spire defence can be tuned with real numbers. Nothing changes on screen.

@@ -4,6 +4,7 @@
 import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
   SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
+import { wakeMask, drawWake } from './wake.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
 
@@ -240,7 +241,7 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
     if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
     FACET_RING.forEach(([i, j], k) => {
       if (w.get(s.x + i, s.y + j) !== T.FACET) return;
-      const on = (s.mask >> k) & 1, x = cx + i * CELL, y = cy + j * CELL;
+      const on = (wakeMask(g, s) >> k) & 1, x = cx + i * CELL, y = cy + j * CELL;
       ctx.beginPath();
       for (let n = 0; n < 6; n++) { const t = Math.PI / 6 + n * Math.PI / 3; ctx[n ? 'lineTo' : 'moveTo'](x + Math.cos(t) * 9, y + Math.sin(t) * 9); }
       ctx.closePath();
@@ -254,8 +255,9 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
     ctx.globalAlpha = 0.9; ctx.lineWidth = 2.5; ctx.shadowBlur = 8;
     ctx.beginPath(); ctx.arc(x, y, 15, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke();
   }
+  drawWake(ctx, g); // S-23: the charge ring round a waking Spire's core
   const s = spireHere(g);
-  if (s && !s.lit) {
+  if (s && !s.lit && !g.wake) {
     const p = g.player, f = Math.min(1, s.fed / SPIRE_PRISMS), a0 = -Math.PI / 2;
     ctx.shadowBlur = 0; ctx.lineWidth = 3; ctx.globalAlpha = 0.22;
     ctx.beginPath(); ctx.arc(p.x, p.y, 24, 0, Math.PI * 2); ctx.stroke();
@@ -276,7 +278,7 @@ export const spireLight = s => ({ x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL, 
 
 /** { s, k } when cell (x, y) is facet k of a primed, unlit Spire (the only facets that toggle); otherwise null. */
 export function facetAt(game, x, y) {
-  if (game.world.get(x, y) !== T.FACET) return null;
+  if (game.mode === 'surge' || game.world.get(x, y) !== T.FACET) return null; // S-23 (D-055): Surge relights by the Wake
   for (const s of game.spires) {
     if (s.lit || s.mask === null) continue;
     const k = FACET_RING.findIndex(([i, j]) => s.x + i === x && s.y + j === y);

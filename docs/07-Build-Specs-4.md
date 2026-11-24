@@ -1,23 +1,7 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085): `tools/surgebot.mjs --route=spire` measures S-23.
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
-
-## S-23 — Spire Wake: the Surge defence (M5) (D-055; starting values for the bot to tune)
-- In Surge, a primed Spire starts a **Wake** when the core enters its interior: `SPIRE_WAKE_S` 40 s. The Spire clears a
-  3-cell lane up to 6 cells out from each gap: ROCK/DENSE/ore become EMPTY up to the first cell it can't clear (bedrock,
-  vault, Spire); ore drops its normal yield as loot. A lane under 3 cells gets no spawns (D-071). Natural spawns pause.
-- Glitches spawn at the usable lane ends in turn every `SPIRE_WAVE_S` 1.6 s, ≤ 6 alive, tier by depth (2 at d 64–74). They chase
-  the Spire core (charge 100; contact −10, the Glitch bursts lootless) unless the player core is within 3 cells. Kills drop
-  loot as usual. One facet lights every 5 s as the Wake's clock.
-- Charge 0 or a core death fails the Wake (fed Prisms kept; retry after leaving and re-entering). 40 s held → relit (S-28's
-  reward; `mode: 'surge'`, D-081). A Wake is never saved: a reload mid-Wake is a failed Wake. Once S-23 ships, Surge
-  facets stop toggling (D-055); Drift keeps the puzzle.
-- **Smoke:** a scripted god-mode hold relights in 40 s; charge 0 fails and keeps `fed`; Drift never starts a Wake; lanes
-  clear only rock/ore and drop ore loot; Glitches spawn only at usable lane
-  ends; a planted Spire against bedrock (one short lane) still runs. Bot at 3 upgrade strengths: fail rate ≤ 30 % at mid upgrades,
-  median time near the Drift puzzle's (45–90 s), measured with S-30's `spire` route. If the first tune misses, ship the
-  mechanic and roadmap a tuning PR.
 
 ## S-24 — Ending: the sequence and the summary (M5) (D-045)
 - All Spires relit (N/N, N = `game.spires.length`; any mix of modes and broken ones, D-069): an 8 s sequence (each Spire draws a line to the Nexus in turn, the darkness alpha eases

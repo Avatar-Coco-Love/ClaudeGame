@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S } from './config.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
@@ -117,6 +117,8 @@ function hint() {
   const g = game, touch = input.usingTouch;
   if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
   if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
+  if (primedHere(g) && g.mode === 'surge') return g.wake ? 'Hold the Spire: guard its core until all 8 facets light' // S-23
+    : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
   if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : 'Upgrade ready — press E at the Nexus'; // B-010
@@ -131,7 +133,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g)].join('|'); // S-28: the primed hint
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -169,6 +171,8 @@ function updateHud() {
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'spire-primed') { toast('Spire primed', 3200, KEEP); persist(); } // S-20
     if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
+    if (ev === 'wake-start') toast(`The Spire wakes — hold it ${SPIRE_WAKE_S} s`, 3200, KEEP); // S-23
+    if (ev === 'wake-failed') { toast('Wake failed — the Spire sleeps. Step out and back in to retry', 3800, KEEP); persist(); }
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16, S-22
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);

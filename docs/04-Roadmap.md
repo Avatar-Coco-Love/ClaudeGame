@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30 built) S-23, S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23 built) S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -48,7 +48,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#53) **S-27 Spires found:** breath, minimap hexagon, "A dormant Spire (n/N)" toast + tone, stats line; B-039 fixed (D-072).
 - ✅ (#56) **S-20 Spire feed:** 80▲ (cargo, then bank) primes a Spire; a broken one relights (D-055, D-069, D-070, D-078).
 - ✅ (#58) **S-28 Facet puzzle + relit:** aim-ray dwell toggles, primed hint, 260 px light + chime, `mode` saved, `SAVE_FORMAT` 12 (D-080, D-081, D-083).
-- **S-23 Spire Wake:** Surge's path, hold the Spire 40 s down 4 lanes; tuned by the Surge bot (D-055).
+- ✅ (#61) **S-23 Spire Wake:** Surge's path, hold the Spire 40 s against Glitches down 4 cleared lanes; bot-tuned (D-055, D-086).
 - **S-24 Ending:** 5/5 relit → 8 s sequence → summary card, Continue (D-045).
 - **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
 

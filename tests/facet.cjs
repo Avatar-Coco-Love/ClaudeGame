@@ -83,9 +83,9 @@ async function nodeChecks(check) {
   }
   check('in-game: beaming each start pattern\'s tap set relights the Spire, mode "drift" (40 seeds × 5, S-28)', bad.length === 0, `bad ${bad.slice(0, 8).join()}`);
 
-  // Surge (D-055 interim, until S-23): the same puzzle works with Glitches about, and records "surge".
+  // Surge (S-23, D-055): facets stop toggling; the Wake relights instead (tests/wake.cjs).
   const sr = await solveInGame(77, 3, 'surge', A);
-  check('Surge: the facet puzzle works too and records mode "surge" (D-055 interim, D-081)', sr.lit && sr.mode === 'surge', JSON.stringify({ lit: sr.lit, mode: sr.mode, mask: sr.mask }));
+  check('Surge: beaming the tap set toggles no facet, the Spire stays primed (S-23, D-055)', !sr.lit && sr.mask === sr.start, JSON.stringify({ lit: sr.lit, start: sr.start, mask: sr.mask }));
 
   // Dwell: a 0.2 s brush doesn't toggle; a 2 s hold toggles once; leaving and coming back toggles again.
   {
@@ -163,10 +163,10 @@ async function nodeChecks(check) {
   }
 }
 
-/** A primed Spire, its hint, one real facet aim (mouse at 1280×800 Drift; the aim stick at 320×568 Surge), then the
+/** A primed Spire, its hint, one real facet aim (mouse at 1280×800, the aim stick at 320×568; Drift both, S-23), then the
  *  relit Spire. `shots` (env SPIRE_SHOT) saves facet-primed-*.png and facet-relit-*.png. */
 async function browserChecks(browser, url, check, errors, shots) {
-  for (const [vw, vh, mode] of [[1280, 800, 'drift'], [320, 568, 'surge']]) {
+  for (const [vw, vh, mode] of [[1280, 800, 'drift'], [320, 568, 'drift']]) { // S-23: Surge relights by the Wake (wake.cjs)
     const touch = vw < 400;
     const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: 1, ...(touch ? { isMobile: true, hasTouch: true } : {}) });
     const page = await ctx.newPage();
