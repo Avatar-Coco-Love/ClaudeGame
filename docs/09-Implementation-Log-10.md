@@ -66,3 +66,12 @@ Continues `09-Implementation-Log-9.md` (part 9 neared the 8 KB cap at session 77
 - **B-075** (fixed): `echo.cjs` browser check waited a fixed 700 ms for a 0.5 s blink; failed 1 in 6 on the old code
   too (alpha 0.27 mid fade-in). Now waits for the settled state, ≤ 2 s (the spec's blink bound).
 - Smoke: 399/399 (one earlier full run hit B-075 before the fix).
+
+## Session 82 — Design: M9 ✅, Q-021 + Q-024 settled, S-44 music spec (v1.2.22, #89)
+- Play-test (Playwright, `?dev` max build, ring 34): 1280×800 Echo at 1.8 cells, 0 blinks, mining a Prism with its
+  thin beam; R → chip "◇ Guard"; 568×320 touch row + ◇ fit. No page errors. Screenshots viewed: desktop, phone.
+- `echobot --build=max` (8 seeds × 10 min): Drift ◆/min 35.7 → 58.9 (×1.65), Surge 42.2 → 64.5 (×1.53), strands 0,
+  lag 2.79 / 2.81 cells, blinks/min med 2.0 / 1.6, p90 3.6 / 3.2 (higher than mid's 1.0 / 1.2: faster Thrusters).
+- D-114: keep `ECHO_DMG` (Q-024); recorded audio out of M8 until the pack lands (Q-021); M9 ✅, v1.4 arrives with
+  M8 (1.3 skipped, D-046 "in a row"); S-44 ambient music specced in `07-Build-Specs-7.md`. No code change but VERSION.
+- Smoke: 399/399.

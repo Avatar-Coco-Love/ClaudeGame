@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.22 — 2026-11-24 (#89)
+- **Plan, no gameplay change.** A play-test of the Echo and the phone layout found nothing to fix; the Echo keeps its
+  strength. The Echo milestone is marked done. Next up: a quiet ambient music bed that follows depth and mode, with its
+  own Music slider. Recorded sound effects now wait for the audio pack without holding anything else back.
+
 ## v1.2.21 — 2026-11-24 (#88)
 - **New: Echo orders.** Press R (or tap ◇ on a phone) to switch your Echo between **Gather** (mine exposed ore) and
   **Guard**: it stays at your side and fires a short bolt at the nearest Glitch or Spitter bolt within reach, about one

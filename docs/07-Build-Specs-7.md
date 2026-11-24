@@ -1,11 +1,11 @@
 # 07 — Build Specs, part 7
 
 Continues `07-Build-Specs-6.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 77
-for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43. Ambient music gets S-44 in Design 82.
+for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43 (built) → S-44 (ambient music, Design 82, M8).
 **Sink:** 30 ● (Research). Supply ~141 ● per world; Research before this costs 75 ●, after it 105 ● (36 left).
 **Layer:** Research only. **Save:** S-42 none (owning it is a Research id, already saved); S-43 adds `echoOrder`.
 
-## S-42 — Echo v1: follow, keep up, Gather (M9) (D-108)
+## S-42 — Echo v1: follow, keep up, Gather (M9) (D-108) — ✅ built (#87, D-112)
 - `src/echo.js`. Research row `echo` (30 ●, after Pulse): "Echo: a lesser core that follows you and mines exposed ore".
 - Body: radius 6 px, same axis-separated collision as the core (`body.js`); spawns on an open cell beside the core when
   researched and on load. Drawn as a hollow diamond (core colour, 0.8 alpha) + a 1 px tether line at 0.25 alpha.
@@ -39,3 +39,28 @@ for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43. Ambi
   median time by more than 20 %, Guard's dmg drops inside a Wake (not off: the owner asked for defend).
 - **Smoke:** cycling by key and by button; Guard kills a held Glitch, Gather ignores it; Guard pops a Spitter bolt;
   touch row fits with ◇ at both phone sizes; old save (format 15) loads with 'gather'.
+
+## S-44 — Ambient music: a quiet generative bed by depth and mode (M8) (D-114)
+**Sink:** none. **Layer:** none (a setting). **Save:** settings only (`music`, D-016 store); no `SAVE_FORMAT` change.
+- `src/music.js`, Web Audio synthesis only (no files, no dependency). One `Music` object fed by `audio.js`'s context
+  and its own gain node under `master` (so Volume and Mute apply); `update(dt, state)` from the frame loop with
+  `state = { ring, mode, wake, ending }`. Nothing plays before the first gesture (the context unlocks there).
+- **Pad (both modes):** 3 voices (sine + triangle, lowpass ≤ 900 Hz), one chord every 10–14 s, 3 s attack / 4 s
+  release, from a short progression per ring: Hearth bright (major pentatonic), Veil modal (dorian), Deep dark (aeolian).
+  The root drops `RING_PITCH_STEP` semitones per ring, like the beam hum (S-8).
+- **Mode layer (equal weight, pillar 3):** Drift adds a soft sine bell (one note of the chord's scale every 3–7 s,
+  0.8 s decay); Surge adds a low sine pulse on the chord root (~70 bpm, 0.2 s notes). Same level budget each.
+- **Changes:** ring or mode change → crossfade the layers over 4 s at the next chord. Wake: bells stop, the pulse plays
+  in both modes at ×1.5 rate, pad holds the root. Ending card: fade to silence over 3 s; back to play → fade in.
+  Page hidden: the existing context handling covers it (no extra timers run while hidden).
+- **Draws:** its own small PRNG seeded from the world seed + salt `'music'`; never `game.rng` (D-025: gameplay draws
+  must not shift). Same seed + same state sequence → same note list.
+- **Budget:** ≤ 6 live voices; every node stopped and disconnected after its release (count them in a test).
+- **Settings:** a "Music" slider (0–100, default 50) under Volume, saved as `settings.music`; old settings without it
+  load 50; 0 builds no nodes. Config: every number in `src/config.js` (`MUSIC_*`).
+- **Smoke (`tests/music.cjs` + `audio.cjs` ceilings, D-037 measured not heard):** render 30 s offline for each of
+  Hearth / Veil / Deep × Drift / Surge and a Wake at default Volume + Music: sustained RMS between −58 and −44 dBFS
+  (a bed under one-shots, which peak ≤ −20), peak ≤ −30 dBFS, < 1 % energy > 2 kHz, no 50 ms window above
+  −36 dBFS; Drift and Surge RMS within 3 dB of each other per ring; Music 0 → silent; voices ≤ 6 at every step;
+  same seed → same first 20 notes; a ring change reaches the new chord set within 14 s; Ending → silent within 3.5 s;
+  old settings load 50. The new test must fail with `music.js` stubbed out (prove once).
