@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 35** · **Version: v0.2.39** (session 35: build, Pulse beam; rotation: 36 Build, 37 Design, 39 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 36** · **Version: v0.2.40** (session 36: build, S-18 code split; rotation: 37 Design, 38 Build, 39 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -22,10 +22,10 @@ _Last updated: 2026-11-24_ · **Session counter: 35** · **Version: v0.2.39** (s
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Phones: touch hints, no key badges, 44 px buttons, landscape ◎⟂♪≡ top row (S-17, D-050).
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups + beam mode) every 10 s, on deposit, and on page hide. Saves carry a format number (now 8); old formats are upgraded on load (`src/save.js`).
-- History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
+- History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log (tail: `09-…-2`). The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs (`07`, `07-…-2`), order D-048: S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
+- Build specs (`07-…-2`), order D-048: S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053); no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 35** · **Version: v0.2.39** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
-- Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`).
+- Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 36 (Build): S-18 code split (`07`): no behaviour change. Design 37 must look at Q-011: Pulse wins no probe (`09` session 35).
+Session 37 (Design): settle Pulse's role (Q-011: Pulse wins no probe, `09` session 35; play-test it vs Glitches at range), decide Spire relight rules (Q-012), and spec Relays in `07`.

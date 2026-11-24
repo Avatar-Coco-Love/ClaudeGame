@@ -1,8 +1,8 @@
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen: the Scanner ping (here) and Wide Beam (`beam.js`).
 // The ping is intent -> realized like movement: `intent.scan` asks, `tryScan` realizes it only if unlocked and off cooldown.
-import { CELL, T, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
+import { CELL, T, ORE_KIND, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
 
-export const SCAN_TYPES = new Set([T.CRYSTAL, T.PRISM, T.LUMEN, T.CACHE]); // S-12 (D-035): vault caches show like ore
+export const SCAN_TYPES = new Set([...Object.keys(ORE_KIND).map(Number), T.CACHE]); // S-12 (D-035): vault caches show like ore
 
 /** Ore + unopened vault-cache cells whose centre lies within SCAN_RADIUS cells of (px, py). Pure: tests reuse it. */
 export function scanWithin(world, px, py, radius = SCAN_RADIUS) {

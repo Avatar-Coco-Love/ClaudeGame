@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.39';
+export const VERSION = '0.2.40';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -26,6 +26,21 @@ export const GLITCH_GIVE_UP_S = 6;
 export const GLITCH_FADE_S = 0.6;
 // D-018 (Q-007 fallback): once Glitches stop sticking, a kill drops a Prism only this often (Shards unchanged).
 export const GLITCH_PRISM_CHANCE = 0.5;
+// Glitch tuning (moved out of game.js unchanged by S-18; `src/glitch.js` uses them). Alive cap: 1 within 2 Nexus radii of it,
+// else min(GLITCH_CAP, GLITCH_CAP_BASE + floor(core distance / GLITCH_CAP_STEP_PX)). Spawns every GLITCH_SPAWN_S[0] + rand × [1] s,
+// GLITCH_SPAWN_RING[0] + rand × [1] px from the core, never within GLITCH_SPAWN_CLEAR Nexus radii of the Nexus.
+export const GLITCH_R = 11;
+export const GLITCH_CAP = 9, GLITCH_CAP_BASE = 2, GLITCH_CAP_STEP_PX = 520;
+export const GLITCH_FIRST_SPAWN_S = 3, GLITCH_SPAWN_S = [2.2, 1.8], GLITCH_SPAWN_RING = [480, 260], GLITCH_SPAWN_CLEAR = 2.2;
+export const GLITCH_AGGRO_PX = 560, GLITCH_DESPAWN_PX = 1500; // chase inside aggro, wander outside; dropped past despawn
+// Tier = min(GLITCH_TIER_MAX, floor(core distance from the Nexus / GLITCH_TIER_PX)); each stat is base + tier × step.
+export const GLITCH_TIER_PX = 900, GLITCH_TIER_MAX = 3;
+export const GLITCH_TIER = { hp: [1.2, 1.1], speed: [120, 22], dmg: [14, 6] };
+export const GLITCH_LOOT_SHARDS = 2; // + tier Shards per kill (Prism: GLITCH_PRISM_CHANCE)
+export const GLITCH_HIT_CD_S = 0.9, GLITCH_KNOCKBACK = 260; // contact: re-hit delay, the Glitch's bounce-off speed
+// The Nexus pushes Glitches out from NEXUS_RADIUS + GLITCH_NEXUS_MARGIN (× REPEL speed) and burns BURN hp/s; it heals the core.
+export const GLITCH_NEXUS_MARGIN = 40, GLITCH_NEXUS_REPEL = 1.5, GLITCH_NEXUS_BURN = 0.8;
+export const NEXUS_HEAL = 45; // integrity per second inside the Nexus ring (Surge)
 
 // S-4 Feel pass (D-021). Reduced motion turns off hitstop and the upgrade ring (shake already off); sounds stay.
 export const HITSTOP_S = 0.035;     // sim freeze on a crystal/prism break
@@ -35,8 +50,8 @@ export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core M
 export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8 };
 
 export const MATERIAL = {
-  [T.ROCK]:    { hp: 0.55, fill: '#17215a', edge: '#3d6bff', yield: null },
-  [T.DENSE]:   { hp: 2.6,  fill: '#231658', edge: '#8a5cff', yield: null },
+  [T.ROCK]:    { hp: 0.55, yield: null }, // ROCK/DENSE colours come from their depth ring (RINGS, world.look)
+  [T.DENSE]:   { hp: 2.6,  yield: null },
   [T.CRYSTAL]: { hp: 0.9,  fill: '#0c3446', edge: '#2ef2ff', yield: { kind: 'shard', min: 1, max: 3 } },
   [T.PRISM]:   { hp: 2.4,  fill: '#3a1046', edge: '#ff4fd8', yield: { kind: 'prism', min: 1, max: 2 } },
   [T.BEDROCK]: { hp: Infinity, fill: '#05060f', edge: '#1b2140', yield: null },
@@ -74,6 +89,8 @@ export const RESOURCE = {
 };
 // Resource kinds in deposit / scatter / save order. A saved floor pickup stores its index here (0 shard, 1 prism, 2 lumen).
 export const KINDS = ['shard', 'prism', 'lumen'];
+// Ore cell type -> the resource it yields: the one ore set the Scanner (research.js) and the glyph drawing (render.js) share.
+export const ORE_KIND = { [T.CRYSTAL]: 'shard', [T.PRISM]: 'prism', [T.LUMEN]: 'lumen' };
 
 // Core Matrix upgrades. value(level) gives the live stat; cost(level) the price of the NEXT level.
 export const UPGRADES = [
@@ -108,16 +125,16 @@ export const NEXUS_UPGRADES = [
 
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen. The Scanner ping shows CRYSTAL/PRISM/LUMEN cells within
 // SCAN_RADIUS cells for SCAN_SHOW_S as a ring sweeps out at SCAN_SPEED; nothing is marked explored or saved.
-export const RESEARCH = [
-  { id: 'scanner', name: 'Scanner', desc: 'Ping: shows ore and vault caches within 12 cells for a few seconds', cost: 10 },
-  { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
-  { id: 'pulse', name: 'Pulse Beam', desc: 'Hold to charge, release to fire: 1.5× reach, pierces 3 cells', cost: 40 },
-];
-export const RESEARCH_HINT = 'Gold Lumen ● hides past 55 cells, in the Deep';
 export const SCAN_RADIUS = 12;     // cells
 export const SCAN_COOLDOWN_S = 20;
 export const SCAN_SHOW_S = 6;
 export const SCAN_SPEED = 600;     // px/s, the ring's growth
+export const RESEARCH = [
+  { id: 'scanner', name: 'Scanner', desc: `Ping: shows ore and vault caches within ${SCAN_RADIUS} cells for a few seconds`, cost: 10 },
+  { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
+  { id: 'pulse', name: 'Pulse Beam', desc: 'Hold to charge, release to fire: 1.5× reach, pierces 3 cells', cost: 40 },
+];
+export const RESEARCH_HINT = `Gold Lumen ● hides past ${LUMEN_D} cells, in the Deep`;
 
 // Beam modes (S-13, D-036), in Q / ⟂ cycle order. Rays are parallel, `offsets` px sideways; range and damage are multipliers
 // on the Core Matrix stats (per ray, per cell: a cell or Glitch under two rays takes damage once). Wide: ~1.35× cells/s, 2.2× slower each.
