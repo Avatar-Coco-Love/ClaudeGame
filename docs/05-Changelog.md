@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.43 — 2026-11-24 (#44)
+- Switching apps or tabs while charging a Pulse no longer fires it: the charge is simply dropped, like pausing.
+- On phones, a finger resting on ◎ or ⟂ no longer locks up the aim stick when your other thumb lifts.
+- Phone menus: the Matrix tabs, buy buttons, Settings switches and ✕ are all thumb-sized now, and ✕ stays inside the sheet
+  on narrow screens (your bank moves to its own row).
+- "Cargo full" no longer pops up while you are already unloading in the Nexus. Glitches draw more cheaply; they look the same.
+
 ## v0.2.42 — 2026-11-24 (#43)
 - Smoother frames: the Nexus's glowing rings are now drawn only where they can be seen, and much more cheaply when they are.
   It looks the same; in a slowed-down test browser a frame away from the Nexus takes half as long (106 → 52 ms), at home 117 → 65 ms.
@@ -72,27 +79,4 @@ One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D
 - The **Scanner** ping now also finds sealed **vault caches**: if one lies within its 12 cells, a white square-in-square glyph
   lights up where it is (and a white blip on the minimap) as the ring reaches it, with one soft chime. Opened caches don't show.
 
-## v0.1.26 — 2026-11-23 (#26)
-- Depositing a full hold no longer beeps for five seconds: the ticks fade out after the first few, then the closing chime plays.
-- Taking a hit and destroying a Glitch sound softer and rounder (no more buzz). Every sound was measured; the rest stay as they are.
-
-## v0.1.25 — 2026-11-23 (#25)
-- The mining beam is much quieter and softer: a short soft swell when it switches on, then a low, gentle hum that lifts slightly
-  only while it is cutting rock or hitting a Glitch. No more buzzing drone or wobble. The volume setting still controls it.
-
-## v0.1.24 — 2026-11-23 (#24)
-- No change in play. Planned next: the Scanner ping will also reveal a nearby **vault cache**, and Research gains two new beams
-  for Lumen: **Wide** (a 3-cell swath) and **Pulse** (charge, then a burst that punches through rock). Switch with Q.
-
-## v0.1.23 — 2026-11-23 (#23)
-- A third Matrix tab, **Research**, spends gold Lumen ●. First node: the **Scanner** (10●, one-time unlock).
-- Once unlocked, press **F** (or tap the gold ◎ under the minimap): a gold ring sweeps out 12 cells and every Shard, Prism and
-  Lumen cell it passes glows through the dark for 6 s, with blips on the minimap. 20 s cooldown; the button dims meanwhile.
-- With reduced motion on, the ore shows at once without the ring. Old saves load with nothing researched.
-
-## v0.1.22 — 2026-11-23 (#22)
-- Gold **Lumen ●** now glints in the Deep, 55+ cells from the Nexus: round beads with a halo, tougher than Prisms, one Lumen each.
-  Carry it home like Shards. A gold ● joins your bank once you have held one. Nothing spends it yet: Research comes next.
-- Old saves keep everything; ground you already explored out there may now show a few gold cells.
-
-Older entries: v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.
+Older entries: v0.1.22–v0.1.26 in `archive/changelog-v0.1.22-v0.1.26.md`, v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.

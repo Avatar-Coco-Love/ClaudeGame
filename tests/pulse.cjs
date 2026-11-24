@@ -6,7 +6,7 @@ const idle = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, ..
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { upgradeSave } = await import('../src/save.js');
-  const { T, CELL } = await import('../src/config.js');
+  const { T, CELL, PULSE_GLITCH } = await import('../src/config.js');
   const { buyResearch } = await import('../src/research.js');
   const { unlockedModes } = await import('../src/beam.js');
   const calls = [];
@@ -54,7 +54,7 @@ async function nodeChecks(check) {
   check('Pulse: 10 s held on a rock line breaks 0.7–0.9× the cells Focus does (S-14, D-042)', ratio >= 0.7 && ratio <= 0.9, JSON.stringify({ focus: +tf.toFixed(2), pulse: +tp.toFixed(2), ratio }));
 
   // The burst stops at the first Glitch: a full burst at Beam 0 kills a tier-0 (1.2 hp) Glitch and leaves the rock behind it whole;
-  // a Glitch behind one rock cell takes what that cell didn't use, × 1.6.
+  // a Glitch behind one rock cell takes what that cell didn't use, × PULSE_GLITCH.
   {
     const L = lab('pulse'), g = L.g; g.mode = 'surge';
     L.w.cells[L.w.idx(L.gx + 2, L.gy)] = T.EMPTY; // open floor to gx+2, the Glitch in it, rock again from gx+3
@@ -68,8 +68,8 @@ async function nodeChecks(check) {
     M.w.cells[M.w.idx(M.gx + 3, M.gy)] = T.EMPTY; M.w.cells[M.w.idx(M.gx + 4, M.gy)] = T.EMPTY; // rock at gx+2, the Glitch at gx+4, rock again from gx+5
     h.enemies = [e2]; h.beam.charge = 1;
     const r = releasePulse(h);
-    const behind = { hp: +e2.hp.toFixed(3), want: +(10 - (1.2 - 0.55) * 1.6).toFixed(3), broken: r.broken, after: M.w.damage[M.w.idx(M.gx + 5, M.gy)] };
-    check('Pulse: a full burst kills a tier-0 Glitch and stops there; through one rock cell a Glitch takes the rest × 1.6 (S-14)',
+    const behind = { hp: +e2.hp.toFixed(3), want: +(10 - (1.2 - 0.55) * PULSE_GLITCH).toFixed(3), broken: r.broken, after: M.w.damage[M.w.idx(M.gx + 5, M.gy)] };
+    check('Pulse: a full burst kills a tier-0 Glitch and stops there; through one rock cell a Glitch takes the rest × PULSE_GLITCH (S-14)',
       killed.hp <= 0 && killed.rock === 1 && killed.enemy && Math.abs(behind.hp - behind.want) < 1e-3 && behind.broken === 1 && behind.after === 0,
       JSON.stringify({ killed, behind }));
   }

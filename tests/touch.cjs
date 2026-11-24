@@ -1,5 +1,5 @@
 // S-17 touch pass checks (Pixel 7 emulation): landscape title, ◎/⟂ row out of the aim thumb, 44 px targets, hint wrap at 320 px,
-// the ⟂ label, and the second-finger stick handoff. smoke.cjs calls browserChecks.
+// the ⟂ label, the second-finger stick handoff, and (audit 39) sheet tap targets at three phone sizes. smoke.cjs calls browserChecks.
 const { devices } = require('playwright');
 
 const rect = (page, sel) => page.evaluate(s => { const r = document.querySelector(s).getBoundingClientRect();
@@ -86,6 +86,31 @@ async function browserChecks(browser, url, check, errors, shots) {
     await ctx.close();
   }
 
+  // ---- Audit 39 (B-031): every Matrix/Settings control ≥ 44×44 at 320×568, Pixel 7 portrait and landscape, on all three tabs.
+  for (const vp of [{ width: 320, height: 568 }, { width: 412, height: 839 }, { width: 844, height: 390 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push('touch targets: ' + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    await pg.evaluate(() => { const g = window.__lumen.game; Object.assign(g.bank, { shard: 99999, prism: 9999, lumen: 999 }); window.__lumen.input.pressed.add('matrix'); });
+    await pg.waitForTimeout(150);
+    const small = [];
+    for (const tab of ['core', 'nexus', 'research']) {
+      await pg.evaluate(t => document.querySelector(`.tabs [data-tab="${t}"]`).click(), tab); await pg.waitForTimeout(80);
+      small.push(...await pg.evaluate(t => { const sr = document.querySelector('#matrix .sheet').getBoundingClientRect().right;
+        return [...document.querySelectorAll('#matrix button, #matrix-bank')].filter(e => e.offsetParent)
+          .map(e => { const b = e.getBoundingClientRect(); return [t + ':' + (e.id || e.dataset.tab || e.dataset.mode || e.className || e.textContent.trim().slice(0, 8)), Math.round(b.width), Math.round(b.height), Math.round(sr - b.right)]; })
+          .filter(([n, w, h, room]) => room < 0 || (n !== t + ':matrix-bank' && (w < 44 || h < 44))); }, tab));
+    }
+    await pg.evaluate(() => { window.__lumen.input.pressed.add('matrix'); }); await pg.waitForTimeout(100);
+    await pg.evaluate(() => document.getElementById('settings-btn').click()).catch(() => {}); await pg.waitForTimeout(100);
+    small.push(...await pg.evaluate(() => [...document.querySelectorAll('#settings button')].filter(e => e.offsetParent)
+      .map(e => { const b = e.getBoundingClientRect(); return ['settings:' + (e.id || e.textContent.trim().slice(0, 8)), Math.round(b.width), Math.round(b.height)]; })
+      .filter(([, w, h]) => w < 44 || h < 44)));
+    check(`${vp.width}×${vp.height}: every Matrix tab, ✕, buy and Settings button ≥ 44×44, none past the sheet edge (B-031)`, small.length === 0, JSON.stringify(small));
+    await ctx.close();
+  }
+
   // ---- Second finger: two touches on the right half; lift the first, the second steers the aim from where it is.
   {
     const ctx = await phone({ width: 412, height: 839 }), pg = await ctx.newPage();
@@ -105,6 +130,21 @@ async function browserChecks(browser, url, check, errors, shots) {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     check('second finger: lift the first aim touch, the second one steers from its own spot (S-17)',
       !!mid && Math.round(mid.ox) === B.x && Math.round(mid.oy) === B.y && aim.aim && aim.aim.y < -0.99 && aim.fire, JSON.stringify({ mid, aim }));
+    // B-030: a finger resting on a HUD button (◎ in the right column) is never adopted: its touchend goes to the button, so the stick would stick.
+    const sb = await rect(pg, '#scan-btn'), S = { x: Math.round((sb.l + sb.r) / 2), y: Math.round((sb.t + sb.b) / 2), id: 3 }, A2 = { ...A, id: 4 };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [A2] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [A2, S] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [A2] });
+    await pg.waitForTimeout(50);
+    const adopted = await pg.evaluate(() => { const s = window.__lumen.input.sticks.aim; return s && s.id; });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [S] });
+    await pg.waitForTimeout(50);
+    const C = { x: 300, y: 650, id: 5 };
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [C] }); await pg.waitForTimeout(50);
+    const fresh = await pg.evaluate(() => { const s = window.__lumen.input.sticks.aim; return s && Math.round(s.oy); });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [C] });
+    check('second finger: a touch resting on ◎ is not adopted; the next aim touch still takes the stick (B-030)', adopted == null && fresh === C.y,
+      JSON.stringify({ adopted, fresh, scan: sb }));
     await ctx.close();
   }
 }

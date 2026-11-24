@@ -33,6 +33,7 @@ const audit29 = require('./audit29.cjs');
 const touch = require('./touch.cjs');
 const audit34 = require('./audit34.cjs');
 const drawcost = require('./drawcost.cjs');
+const audit39 = require('./audit39.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -43,14 +44,15 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
 async function lootChecks() {
   const { Game } = await import('../src/game.js');
   const { upgradeSave } = await import('../src/save.js');
+  const { PICKUP_CAP } = await import('../src/config.js');
   const audio = new Proxy({}, { get: () => () => {} });
   const g = new Game({ seed: 77, mode: 'surge', audio });
-  for (let i = 0; i < 400; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard');
+  for (let i = 0; i < PICKUP_CAP; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard');
   const floor = g.pickups.length;
   g.cargo = { shard: 7, prism: 3 };
   g.player.integrity = 1; g.hurtPlayer(5, 1, 0);
   const kept = g.pickups.slice(floor);
-  check('death on a full floor keeps every cargo item (B-005)', floor === 400 && kept.length === 10 && kept.filter(q => q.kind === 'prism').length === 3,
+  check('death on a full floor keeps every cargo item (B-005)', floor === PICKUP_CAP && kept.length === 10 && kept.filter(q => q.kind === 'prism').length === 3,
     `floor ${floor}, scattered ${kept.length}`);
   const s = JSON.parse(JSON.stringify(g.toSave()));
   const h = new Game({ seed: 77, mode: 'surge', audio, save: upgradeSave(s) });
@@ -201,6 +203,7 @@ async function rngChecks() {
   await beam.nodeChecks(check).catch(e => check('S-13 beam checks ran', false, e.message));
   await pulse.nodeChecks(check).catch(e => check('S-14 pulse checks ran', false, e.message));
   await audit29.nodeChecks(check).catch(e => check('audit 29 checks ran', false, e.message));
+  await audit39.nodeChecks(check).catch(e => check('audit 39 checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -270,7 +273,7 @@ async function rngChecks() {
     check('Matrix remembers the last tab', await pg.evaluate(() => document.querySelector('#matrix .tabs .selected')?.dataset.tab === 'nexus'));
     await pg.keyboard.press('Escape');
 
-    // S-4 feel: hitstop on crystal/prism breaks only (rate-limited) and the loop really pauses the sim for it;
+    // S-4 feel: hitstop on yield-cell breaks only (crystal, prism, Lumen; caches too, D-048; rate-limited) and the loop really pauses the sim for it;
     // deposit arpeggio once per emptied hold, sized by kinds; beam sweep only on the off -> on edge.
     const fx = await pg.evaluate(() => {
       const g = window.__lumen.game, calls = { beamStart: 0, depositDone: [] }, a = g.audio;
@@ -290,7 +293,7 @@ async function rngChecks() {
       Object.assign(a, orig);
       return { rock, crystal, tooSoon, ...calls };
     });
-    check('hitstop on crystal/prism breaks only, at most once per 150 ms (S-4)', fx.rock === 0 && fx.crystal > 0 && fx.tooSoon === 0, JSON.stringify(fx));
+    check('hitstop on yield-cell breaks only (not rock), at most once per 150 ms (S-4)', fx.rock === 0 && fx.crystal > 0 && fx.tooSoon === 0, JSON.stringify(fx));
     check('deposit arpeggio sized by kinds; beam sweep once per switch-on (S-4)', JSON.stringify(fx.depositDone) === '[2,1]' && fx.beamStart === 2, JSON.stringify(fx));
     const rm = await pg.evaluate(() => { const g = window.__lumen.game, st = window.__lumen.settings; st.reducedMotion = true;
       g.hitstop = 0; g.lastHitstop = -Infinity; g.coreRing = 0; g.bank.shard += 999; g.onCellBroken(1, 1, 3); g.buy('magnet');
@@ -452,6 +455,7 @@ async function rngChecks() {
     await touch.browserChecks(browser, url, check, errors);
     await audit34.browserChecks(browser, url, check, errors);
     await drawcost.browserChecks(browser, url, check, errors);
+    await audit39.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----
