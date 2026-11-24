@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.4.56';
+export const VERSION = '0.4.57';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -101,6 +101,9 @@ export const SPIRE_MARK_COLOR = '#e4dcff';    // S-27: the minimap hexagon at a 
 export const SPIRE_PRISMS = 80;               // S-20 (D-055, D-070): ▲ fed to prime a Spire (400 for all 5)
 export const SPIRE_FEED_RATE = 8;             // S-20: ▲ per second moved in while the core is in the 7×7 interior (cargo first, then bank)
 export const SPIRE_TAPS = [3, 3, 4, 4, 5];    // S-20/S-28: facets toggled from all-lit to make Spire i's start pattern (= its minimum taps)
+export const SPIRE_TAP_S = 0.35;              // S-28 (D-080): seconds of aim-ray contact before a primed facet toggles (then it latches)
+export const SPIRE_LIGHT = 260;               // S-28 (D-055): a relit Spire's light hole, px
+export const SPIRE_LIT_RGB = '214, 200, 255'; // S-28: its floor glow (violet-white, S-25's layer)
 
 // S-8 depth rings (D-022). d = cells from the Nexus centre; a cell belongs to the last ring whose r0 ≤ d (the corners are Deep).
 // Each ring recolours ROCK/DENSE and multiplies only their hp; ore, bedrock and the cell layout are the same everywhere.

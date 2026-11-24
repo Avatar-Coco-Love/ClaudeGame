@@ -2,7 +2,7 @@
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
 import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
-  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, RESOURCE } from './config.js';
+  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
@@ -85,6 +85,7 @@ export function loadSpires(raw, w = WORLD_W, h = WORLD_H) {
     const rec = { x: s.x, y: s.y, seen: s.seen === true, fed: Math.max(0, Math.floor(Number(s.fed)) || 0),
       mask: Number.isInteger(s.mask) && s.mask >= 0 && s.mask <= 255 ? s.mask : null, lit: s.lit === true };
     rec.fed = Math.min(SPIRE_PRISMS, rec.fed); // S-20: a fed count past the cap is a malformed save (B-037)
+    if (rec.lit && SPIRE_MODES.includes(s.mode)) rec.mode = s.mode; // S-28 (D-081): an unknown mode is dropped (B-037)
     if (s.keep) rec.keep = [...s.keep];
     return rec;
   });
@@ -138,16 +139,19 @@ export function drawSpireBreath(r, ctx, left, top, vw, vh) {
     if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
     if (w.get(s.x, s.y) !== T.SPIRE || w.get(s.x - 1, s.y) !== T.SPIRE || w.get(s.x + 1, s.y) !== T.SPIRE
       || w.get(s.x, s.y - 1) !== T.SPIRE || w.get(s.x, s.y + 1) !== T.SPIRE) continue;
-    if (!open) { ctx.save(); ctx.shadowBlur = 8; ctx.shadowColor = C.edge; ctx.strokeStyle = C.edge; ctx.lineWidth = 2; open = true; }
-    ctx.globalAlpha = a;
+    if (!open) { ctx.save(); ctx.lineWidth = 2; open = true; }
+    const col = s.lit ? SPIRE_MARK_COLOR : C.edge; // S-28: a relit core is bright and still (no breath)
+    ctx.shadowColor = ctx.strokeStyle = ctx.fillStyle = col; ctx.shadowBlur = s.lit ? 20 : 8;
     ctx.beginPath();
     for (let k = 0; k < 6; k++) { const t = Math.PI / 6 + k * Math.PI / 3; ctx[k ? 'lineTo' : 'moveTo'](cx + Math.cos(t) * CELL * 1.35, cy + Math.sin(t) * CELL * 1.35); }
-    ctx.closePath(); ctx.stroke();
+    ctx.closePath();
+    if (s.lit) { ctx.globalAlpha = 0.3; ctx.fill(); }
+    ctx.globalAlpha = s.lit ? 1 : a; ctx.stroke();
   }
   if (open) ctx.restore();
 }
 
-/** Minimap mark: a hollow violet-white hexagon at each seen Spire's centre (a broken one too, D-069). */
+/** Minimap mark: a violet-white hexagon at each seen Spire's centre (a broken one too, D-069): hollow, filled once relit. */
 export function drawSpireMarks(m, g, sc) {
   m.save(); m.strokeStyle = SPIRE_MARK_COLOR; m.lineWidth = 1.25;
   for (const s of g.spires) {
@@ -156,6 +160,7 @@ export function drawSpireMarks(m, g, sc) {
     m.beginPath();
     for (let k = 0; k < 6; k++) { const t = Math.PI / 6 + k * Math.PI / 3; m[k ? 'lineTo' : 'moveTo'](x + Math.cos(t) * 3.5, y + Math.sin(t) * 3.5); }
     m.closePath(); m.stroke();
+    if (s.lit) { m.fillStyle = SPIRE_MARK_COLOR; m.fill(); } // S-28: relit = filled
   }
   m.restore();
 }
@@ -212,14 +217,11 @@ export function updateSpireFeed(game, dt) {
 }
 
 /** At SPIRE_PRISMS: `mask` gets the start pattern (S-28 only reads it) and the toast "Spire primed". A broken Spire
- *  (D-069) has no puzzle and relights at once: `lit`, all facets set, toast "Spire relit (n/N)" (S-28 adds its effects). */
+ *  (D-069) has no puzzle and relights at once, with the same effects as a solved one (relightSpire, mode 'broken'). */
 export function primeSpire(game, s) {
   game.audio.depositDone(3);
-  if (isBroken(s, game.world.w)) {
-    s.mask = 255; s.lit = true;
-    game.spireLitCount = spiresLit(game);
-    game.notify('spire-relit');
-  } else {
+  if (isBroken(s, game.world.w)) relightSpire(game, s, 'broken');
+  else {
     s.mask = startMask(game.world.seed, game.spires.indexOf(s));
     game.notify('spire-primed');
   }
@@ -232,7 +234,7 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
   ctx.save();
   ctx.strokeStyle = SPIRE_MARK_COLOR; ctx.fillStyle = SPIRE_MARK_COLOR; ctx.shadowColor = SPIRE_MARK_COLOR;
   for (const s of g.spires) {
-    if (s.lit || s.mask === null) continue;
+    if (s.mask === null) continue; // S-28: a relit Spire keeps all 8 facets lit
     const cx = (s.x + 0.5) * CELL, cy = (s.y + 0.5) * CELL, m = CELL * 5;
     if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
     FACET_RING.forEach(([i, j], k) => {
@@ -245,6 +247,12 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
       if (on) { ctx.globalAlpha = 0.45; ctx.fill(); }
     });
   }
+  const a = g.facetAim; // S-28: the dwell on the aimed facet fills a ring round it, then holds while latched
+  if (a && !a.s.lit) {
+    const [i, j] = FACET_RING[a.k], x = (a.s.x + i + 0.5) * CELL, y = (a.s.y + j + 0.5) * CELL, f = Math.min(1, a.t / SPIRE_TAP_S);
+    ctx.globalAlpha = 0.9; ctx.lineWidth = 2.5; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.arc(x, y, 15, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); ctx.stroke();
+  }
   const s = spireHere(g);
   if (s && !s.lit) {
     const p = g.player, f = Math.min(1, s.fed / SPIRE_PRISMS), a0 = -Math.PI / 2;
@@ -256,4 +264,58 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
     }
   }
   ctx.restore();
+}
+
+// ---------- S-28 facet puzzle + relit (D-055, D-078, D-080, D-081) ----------
+
+export const SPIRE_MODES = ['drift', 'surge', 'broken']; // D-081: how a lit Spire was relit (saved as `mode`)
+
+/** The light a relit Spire adds to the Renderer's light sets (S-26): a 260 px hole + violet-white floor glow. */
+export const spireLight = s => ({ x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL, r: SPIRE_LIGHT, glow: SPIRE_LIT_RGB });
+
+/** { s, k } when cell (x, y) is facet k of a primed, unlit Spire (the only facets that toggle); otherwise null. */
+export function facetAt(game, x, y) {
+  if (game.world.get(x, y) !== T.FACET) return null;
+  for (const s of game.spires) {
+    if (s.lit || s.mask === null) continue;
+    const k = FACET_RING.findIndex(([i, j]) => s.x + i === x && s.y + j === y);
+    if (k >= 0) return { s, k };
+  }
+  return null;
+}
+
+/** Toggle facet k (and its two ring neighbours); all 8 lit relights the Spire in the mode the game is in (D-055 interim). */
+export function toggleFacet(game, s, k) {
+  s.mask = toggleMask(s.mask, k);
+  const [i, j] = FACET_RING[k], on = (s.mask >> k) & 1;
+  game.burst((s.x + i + 0.5) * CELL, (s.y + j + 0.5) * CELL, 10, SPIRE_MARK_COLOR, 120);
+  game.audio.facet(!!on);
+  if (s.mask === 255) relightSpire(game, s, game.mode);
+}
+
+/** D-080: only the aim (centre) ray's cell counts. `SPIRE_TAP_S` of unbroken contact with one facet toggles it once;
+ *  it then stays latched until the ray leaves that facet. `target` is the centre ray's cell this frame (null = none). */
+export function updateFacetAim(game, dt, target) {
+  const f = target && facetAt(game, target.x, target.y);
+  if (!f) { game.facetAim = null; return; }
+  let a = game.facetAim;
+  if (!a || a.s !== f.s || a.k !== f.k) a = game.facetAim = { s: f.s, k: f.k, t: 0, done: false };
+  a.t += dt;
+  if (!a.done && a.t >= SPIRE_TAP_S - 1e-9) { a.done = true; toggleFacet(game, f.s, f.k); }
+}
+
+/** Relit (S-28): lit, all facets set, `mode` recorded (D-081), its light joins the light sets, a rising tone, the toast
+ *  "Spire relit (n/N)" (main.js reads `spireLitCount`). Used by the puzzle and by S-20's broken path. */
+export function relightSpire(game, s, mode) {
+  s.mask = 255; s.lit = true; s.mode = mode;
+  game.spireLitCount = spiresLit(game);
+  game.spireLights.push(spireLight(s));
+  game.audio.spireRelit();
+  game.notify('spire-relit');
+}
+
+/** The hint's test: the core stands in a primed, unlit Spire's interior. */
+export function primedHere(game) {
+  const s = spireHere(game);
+  return !!s && !s.lit && s.mask !== null;
 }

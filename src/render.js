@@ -46,7 +46,7 @@ export class Renderer {
 
   attach(game) {
     this.game = game;
-    this.lightSets = [game.beacons, game.relays]; // S-16, S-22: the same arrays, so a placed item lights at once
+    this.lightSets = [game.beacons, game.relays, game.spireLights]; // S-16, S-22, S-28: the same arrays, so a new light shows at once
     this.chunks.clear();
     const w = game.world;
     this.mini.width = w.w; this.mini.height = w.h;

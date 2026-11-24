@@ -115,6 +115,9 @@ export class Audio {
   scanCache() { this.tone(784, 0.16, { type: 'sine', vol: 0.07 }); } // S-12: the cache chord's top note, short, when the ping finds one
   // S-27: a dormant Spire comes into view: one soft low tone (a sine fifth, G3 + D4, slow fade), quieter than a cache.
   spire() { this.tone(196, 0.45, { type: 'sine', vol: 0.05 }); this.tone(294, 0.4, { type: 'sine', vol: 0.025, delay: 0.05 }); }
+  // S-28: a facet flips: one short soft sine, higher when it turns on. A relit Spire: a rising 3-note sine (G4 B4 D5).
+  facet(on) { this.tone(on ? 740 : 494, 0.12, { type: 'sine', vol: 0.06 }); }
+  spireRelit() { [392, 494, 587].forEach((f, i) => this.tone(f, 0.3, { type: 'sine', vol: 0.07, delay: i * 0.1 })); }
   beacon() { this.tone(660, 0.22, { type: 'sine', vol: 0.07, slide: 220 }); } // S-16: a soft rising placement tone
   modeSwitch() { this.tone(520, 0.06, { type: 'sine', vol: 0.06 }); } // S-13: a short soft click when Q / ⟂ changes the beam
   // S-14: Pulse release, a soft low thump (sine, pitch drops) that grows with the charge; a fizzle is a faint short tick.

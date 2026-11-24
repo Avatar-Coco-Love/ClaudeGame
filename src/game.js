@@ -10,7 +10,7 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
-import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed } from './spire.js';
+import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
 
 export class Game {
@@ -22,6 +22,8 @@ export class Game {
     // S-19 (D-049): the saved Spires, or chosen now from the seed (+ what an old/malformed save has seen, D-024).
     this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
     stampSpires(this.world, this.spires);
+    this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
+    this.facetAim = null; // S-28: { s, k, t, done } while the aim ray rests on a primed facet (spire.js)
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
     this.bank = { shard: 0, prism: 0, lumen: 0 };
@@ -200,7 +202,7 @@ export class Game {
     b.target = null; b.enemy = null; b.rays = [];
     b.flash = Math.max(0, b.flash - dt);
     if (BEAM_MODES[this.beamMode] && BEAM_MODES[this.beamMode].pulse) { // S-14: no continuous beam, no hum; charge -> burst
-      b.on = false; this.audio.beam(false);
+      b.on = false; this.audio.beam(false); this.facetAim = null;
       updatePulse(this, dt, held, !!intent.cancel);
       return;
     }
@@ -208,8 +210,9 @@ export class Game {
     b.on = held;
     if (b.on && !was) this.audio.beamStart();
     this.audio.beam(b.on);
-    if (!b.on) return;
+    if (!b.on) { this.facetAim = null; return; }
     castBeam(this, dt);
+    updateFacetAim(this, dt, b.target); // S-28 (D-080): the centre ray's cell only
     this.audio.beamContact(!!(b.target || b.enemy));
   }
 

@@ -3,6 +3,14 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.57 — 2026-11-24 (#58)
+- **Relight a Spire:** once a Spire is primed, hold your beam on one of its eight facets for a moment and it flips,
+  along with its two neighbours (a small ring fills round the facet you are aiming at). Light all eight and the Spire
+  wakes: its core shines, a wide violet-white light opens round it, the map marks it filled, and a rising chime plays.
+  A hint inside a primed Spire tells you the rule. Works with every beam (Wide flips only with its centre ray; a Pulse
+  burst flips one facet), with a mouse or the aim stick, and in Surge too until Surge gets its own Spire challenge.
+  The game remembers how each Spire was relit; older saves load as before.
+
 ## v0.4.56 — 2026-11-24 (#57)
 - **Design pass, no gameplay change:** the whole route to a primed Spire was play-tested in Drift and Surge, with a Relay on the way.
   The next updates are planned from it: the facet puzzle (only the beam's centre ray flips a facet, with a hint telling you the rule),
