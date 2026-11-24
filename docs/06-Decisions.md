@@ -19,7 +19,7 @@ One world, one economy, one progression. Mode can be switched at the Nexus. Neit
 `VERSION` (`0.<milestone>.<PR count>`) in `src/config.js`, shown on the title screen, with a matching top entry in `05-Changelog.md`.
 - Why: tracking across versions was asked for, and a sister project (Gloamdeep) found it the backbone of its history.
 - Rejected: git tags only (invisible to players and to sessions that read docs, not git); semver majors (no public API to break).
-- Refined by D-046: the milestone digit counts shipped milestones; 1.0 = M5 shipped.
+- Refined by D-046: the milestone digit counts shipped milestones; 1.0 = M5 shipped. D-105: the patch digit counts PRs since 1.0.0.
 
 ### D-004 — Numbered IDs for decisions, questions and bugs (2026-11-23)
 D-xxx here, Q-xxx in `03`, B-xxx for bugs in `09` entries. Status is shown by which file holds the entry, not by a status field.

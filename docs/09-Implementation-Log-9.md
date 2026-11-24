@@ -20,3 +20,20 @@ Continues `09-Implementation-Log-8.md` (part 8 hit the 8 KB cap at session 71). 
 - Proved the test fails without registration (ready never resolves → cache empty; offline reload =
   ERR_INTERNET_DISCONNECTED). First attempt hung on `serviceWorker.ready`; the test now races it with a 5 s timeout.
 - Observed: 27 same-origin files warmed on the first visit. No bugs found.
+
+## Session 74 — Audit: SW query launch, Anomaly vs Relay deposit, pickup sprites, D-105 (v1.2.14, #80)
+- Five sweeps (correctness, perf at ×4, touch at 7 sizes, code health, docs drift), each finding re-checked here.
+- **B-061** (sw.js): offline navigation matched the URL query-exact, so a player whose only visit was `?fbclid=` or
+  `index.html` had no `./` cached → home-screen launch offline = browser error. Fallback now ignores the query and tries
+  `./` then `./index.html`. `pwa.cjs` check fails on the old worker (title false), passes now.
+- **B-062** (anomaly.js): a site within reach of a Relay was taken during a deposit, and the deposit ended the buff a few
+  ticks later. No take while `atDeposit()` with cargo; taken once banked. `anomaly.cjs` check: old code during 1, after none.
+- **B-063** (style.css): landscape toast at inset+100 overlapped the bank panel by 2–4 px with three chips (568×320,
+  667×375, 915×412 all failed the extended B-047 check); now +110. Screenshot 568×320 viewed: clear gap.
+- Perf: pickups drew save/translate/rotate/scale/restore each; spin is now 16 baked frames (`PICKUP_FRAMES`), one
+  axis-aligned `drawImage` per pickup. `drawcost.cjs` counts: old 301 save / 300 rotate, now 1 / 0.
+- Canvas `100%` instead of `100vw/vh` (iOS Safari); hint/Matrix button clear the home indicator (+10 px); `.sheet` uses dvh.
+  Not testable headless (insets 0, no Safari toolbar): px values unchanged there.
+- `tools/parity.mjs` 0/0 guard; Wake config comment now cites S-31/D-087. D-105 settles the patch digit (PRs since 1.0).
+- D-xxx check: the drift sweep compared every decision with code; only D-046 had drifted (D-105). D-096…D-104 spot-checked.
+- Archived sessions 64–68 word for word to `archive/2026-11-24-09-sessions-64-68.md`. Rest of the findings → `04-…-2` Debt.

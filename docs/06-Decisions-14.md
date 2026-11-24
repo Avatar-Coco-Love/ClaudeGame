@@ -42,3 +42,14 @@ Continues `06-Decisions-13.md` (same rules: supersede, never edit; list rejected
   (spec: "one online visit"). An unknown navigation URL offline falls back to the cached `./`.
 - Rejected: a module worker importing `config.js` (Firefox/Safari support for `type: 'module'` workers is recent);
   a second VERSION constant in `sw.js` (drifts); precaching a file list (D-103); waiting for a second online visit.
+
+### D-105 — Audit 74: the patch digit counts PRs since v1.0.0 (2026-11-24, session 74, Audit; supersedes D-046's "never resets")
+- D-046 said the PR count never resets, but v1.0.0 (D-091, #66) restarted it at 0 and every entry since followed
+  (#79 = v1.2.13). Settled as built: the third digit counts PRs merged since v1.0.0 and never resets again; the PR
+  number itself is in every `05` header, so the one-entry-per-PR history D-046 protected is intact.
+- Also: the worker's offline navigation fallback (D-104) ignores the query and tries `./` then `./index.html`, so a player
+  whose only visit was a `?fbclid=` / `index.html` URL still gets the home-screen launch; an Anomaly isn't taken while a
+  deposit is under way (a Relay can sit by a site, and the deposit would end the buff ticks later).
+- Rejected: restoring the global count (v1.2.14 → v1.2.80 reads as a jump to players and rewrites nothing useful);
+  editing D-046 in place (decisions are superseded, never edited); refusing Relays near sites (a placement rule players
+  can't see; the deposit guard covers the same case).

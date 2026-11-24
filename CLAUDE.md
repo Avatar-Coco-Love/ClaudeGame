@@ -10,7 +10,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
    Open other docs only when the task needs them: `01` for pillars, `04` for the roadmap, `03` for open decisions, `07` for build-ready specs, `09` for history (read the tail only).
 2. **Check inbox:** if `docs/inbox/` contains anything besides `README.md`, processing it *is* this session's task (see the inbox README).
 3. **Do exactly one PR-sized unit** of the session type that's due (below). If the task turns out bigger, split it. Ship the first slice and put the rest in the roadmap.
-4. **Verify:** `node tests/smoke.cjs` must pass (16+ checks, headless Chromium, no install needed). Add or extend checks for what you built.
+4. **Verify:** `node tests/smoke.cjs` must pass (300+ checks, headless Chromium, no install needed). Add or extend checks for what you built.
    Look at the result: take a screenshot with Playwright and actually view it at least once for any visual change.
 5. **Record (every PR, no exceptions; see "Tracking across versions"):** bump `VERSION`, add a `docs/05` changelog entry,
    update `docs/02` (increment the session counter, set exactly one next task), add an entry to `docs/09` (what changed, what you observed, bugs as B-xxx).
@@ -44,7 +44,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 
 ## Tracking across versions
 - `src/config.js` `VERSION` = `<major>.<minor>.<PR count>`, shown on the title screen (D-046): minor = milestones shipped in a row (M1…MN all ✅);
-  **1.0 = M5 shipped** (the v1.0 scope, `01` + D-045); after 1.0, M6 → 1.1, M7 → 1.2, M8 → 1.3. The PR count never resets. `docs/05-Changelog.md` gets one player-facing entry per PR.
+  **1.0 = M5 shipped** (the v1.0 scope, `01` + D-045); after 1.0, M6 → 1.1, M7 → 1.2, M8 → 1.3. The patch digit counts PRs since v1.0.0 and never resets again (D-105; it restarted once, at 1.0, superseding D-046). `docs/05-Changelog.md` gets one player-facing entry per PR.
 - `docs/06-Decisions.md` is the only place a decision is settled. Supersede, never silently edit. Bugs get B-xxx IDs in `09`.
 - `tests/docs.cjs` (run inside smoke) enforces: docs ≤ 8 KB, `02` ≤ 60 lines with one Next step, VERSION = top changelog entry, inbox empty.
 - A rule asked for or learned goes into the docs **in the same PR**. A rule broken twice gets a check (test or tool), not more words.

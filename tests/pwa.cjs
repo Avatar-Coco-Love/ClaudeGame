@@ -66,6 +66,25 @@ async function browserChecks(browser, url, check, errors, shots) {
     errors.push(...errs.map(e => 'pwa: ' + e));
     await ctx.close();
   }
+  // Audit 74: first and only visit by a shared `?fbclid=` link; offline, the home-screen launch (start_url `./`) opens.
+  const ctx2 = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  try {
+    const p2 = await ctx2.newPage();
+    await p2.goto(url + 'index.html?fbclid=x');
+    await p2.evaluate(async () => {
+      await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(r, 5000))]);
+      for (let i = 0; i < 100; i++) {
+        const names = await caches.keys(), c = names.length && await caches.open(names[0]);
+        const keys = c ? (await c.keys()).map(r => new URL(r.url).pathname) : [];
+        if (keys.includes('/index.html') && keys.includes('/src/main.js')) return;
+        await new Promise(r => setTimeout(r, 50));
+      }
+    });
+    await ctx2.setOffline(true);
+    await p2.goto(url).catch(() => {});
+    const title = await p2.waitForSelector('#title', { state: 'visible', timeout: 3000 }).then(() => true, () => false);
+    check('Audit 74: offline launch at ./ works after only a ?fbclid= / index.html visit (start_url never fetched)', title, `title ${title}`);
+  } finally { await ctx2.close(); }
 }
 
 module.exports = { nodeChecks, browserChecks };

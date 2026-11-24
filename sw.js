@@ -31,9 +31,13 @@ self.addEventListener('fetch', e => {
   }).catch(async () => {
     const hit = await caches.match(req, { cacheName: CACHE });
     if (hit) return hit;
-    if (req.mode === 'navigate') { // e.g. a ?seed= link never visited before: the game's own page still opens
-      const home = await caches.match(new URL('./', self.registration.scope).href, { cacheName: CACHE });
-      if (home) return home;
+    if (req.mode === 'navigate') { // e.g. a ?seed= link never visited before: the game's own page still opens.
+      // Audit 74: the query is ignored and both spellings of the page are tried, so a player who only ever opened
+      // `?fbclid=…` or `index.html` still gets the home-screen launch (start_url `./`) offline.
+      for (const u of ['./', './index.html']) {
+        const home = await caches.match(new URL(u, self.registration.scope).href, { cacheName: CACHE, ignoreSearch: true });
+        if (home) return home;
+      }
     }
     return Response.error();
   }));

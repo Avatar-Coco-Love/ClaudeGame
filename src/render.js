@@ -1,7 +1,7 @@
 // World drawing (terrain chunk cache, entities, beam, Scanner). Screen-space HUD drawing (minimap, Nexus pointer, touch
 // sticks) is in hud.js; darkness, light holes and floor glow in light.js; painting one terrain chunk in terrain.js (S-26).
 // Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS } from './config.js';
+import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS, PICKUP_FRAMES } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
@@ -264,9 +264,13 @@ export class Renderer {
     paint(g); // shadowBlur is in canvas pixels here, as on the main canvas
     return (this.sprites[key] = { canvas: c, half });
   }
-  pickupSprite(kind) {
-    return this.glowSprite('p-' + kind, 5 + 16 / (this.zoom * this.dpr), g => {
+  // Audit 74: the spin is baked into PICKUP_FRAMES sprites (one turn), so drawing one is an axis-aligned drawImage with
+  // no save / rotate / restore (300 on screen: 137 → 94 ms at a 4× CPU throttle). Lumen ● looks the same at any angle.
+  pickupSprite(kind, frame = 0) {
+    if (kind === 'lumen') frame = 0;
+    return this.glowSprite('p-' + kind + '-' + frame, 5 + 16 / (this.zoom * this.dpr), g => {
       const col = RESOURCE[kind].color;
+      g.rotate(frame * Math.PI * 2 / PICKUP_FRAMES);
       g.fillStyle = col; g.shadowColor = col; g.shadowBlur = 10;
       g.beginPath();
       if (kind === 'shard') { g.moveTo(0, -5); g.lineTo(3, 0); g.lineTo(0, 5); g.lineTo(-3, 0); }
@@ -304,13 +308,12 @@ export class Renderer {
   drawPickups(ctx, left, top, vw, vh) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const m = 16, x0 = left - m, y0 = top - m, x1 = left + vw + m, y1 = top + vh + m;
+    const m = 16, x0 = left - m, y0 = top - m, x1 = left + vw + m, y1 = top + vh + m, turn = Math.PI * 2;
     for (const it of this.game.pickups) {
       if (it.x < x0 || it.x > x1 || it.y < y0 || it.y > y1) continue;
-      const sp = this.pickupSprite(it.kind), bob = Math.sin(this.time * 5 + it.x) * 0.3 + 1;
-      ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(this.time * 2 + it.y); ctx.scale(bob, bob);
-      ctx.drawImage(sp.canvas, -sp.half, -sp.half, sp.half * 2, sp.half * 2);
-      ctx.restore();
+      const a = ((this.time * 2 + it.y) % turn + turn) % turn, f = Math.floor(a / turn * PICKUP_FRAMES) % PICKUP_FRAMES;
+      const sp = this.pickupSprite(it.kind, f), h = sp.half * (Math.sin(this.time * 5 + it.x) * 0.3 + 1);
+      ctx.drawImage(sp.canvas, it.x - h, it.y - h, h * 2, h * 2);
     }
     ctx.restore();
   }
