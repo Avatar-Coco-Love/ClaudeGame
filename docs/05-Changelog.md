@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.30 — 2026-11-24 (#31)
+- Sharing a link to Lumen Core now shows a real frame of the game (the Nexus, a fresh tunnel, the beam) and a one-line summary.
+  A Lumen Core card for the owner's Projects page is ready to add there.
+
 ## v0.1.29 — 2026-11-23 (#29)
 - Design pass, no gameplay change: Wide Beam play-tested and measured against Focus (Focus travels faster, Wide harvests
   more Shards). Next up: the **Pulse** beam (charge and release, longer reach) and the first craftable item, **Beacons**.
