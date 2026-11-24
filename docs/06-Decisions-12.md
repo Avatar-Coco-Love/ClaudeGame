@@ -50,3 +50,13 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
 - Rejected: carrying Research or Radiance (D-062: nothing that plays twice; a cycle is a fresh run); a records screen
   (the card + title line hold the two numbers that matter until a play-test asks for more).
 - **v1.0.0:** M1–M5 shipped (D-045, D-046). After 1.0, M6 → 1.1 (S-32, S-33 specced; Q-018 Relay reclaim open).
+
+### D-092 — Design 62: Relays can be picked up (2026-11-24, session 62, Design; settles Q-018)
+- Player feedback: a Relay is permanent and ≤ 3 per world, so the first one is stranded once you dig past it. The cap
+  stays (D-056: Relays thin out the haul, not remove it); moving one is free: B / ✦ in its ring → back to stock (S-34).
+- Why the ring, not the Relay's own cell: on a phone the ring is where you already stand to bank; a mistaken pickup
+  costs one press to undo (place it again). Why no refund: it was never spent, only placed.
+- Rejected: a craftable "Relay+" with a bigger ring / heal (the Nexus stays the only heal, D-056); raising the cap to 5
+  (the 3 just move deeper with the player now); reclaiming Beacons too (5▲, 20 per world: nobody asked; revisit on feedback).
+- Play-test (Playwright, v1.0.0): New World → relight all (dev) → card → New Cycle → cycle 1 green Nexus + title line
+  read well at 1280×800 and 320×568 (viewed `ending-*`, `cycle-*`). S-32 / S-33 re-read against v1.0: unchanged.

@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.1 — 2026-11-24 (#67)
+- **Planning from player feedback:** Relays will be movable. The next update lets you pick a placed Relay back up from
+  its ring and set it down further out, so your remote deposits follow you into the Deep.
+
 ## v1.0.0 — 2026-11-24 (#66)
 - **Lumen Core 1.0.** The whole arc is in: dig out from the Nexus, upgrade, go deep, relight all five Spires (by puzzle in
   Drift, by holding them in Surge) and lift the dark.

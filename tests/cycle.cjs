@@ -23,6 +23,7 @@ async function nodeChecks(check) {
 }
 
 async function browserChecks(browser, url, check, errors, shots) {
+  const { VERSION } = await import('../src/config.js');
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   page.on('pageerror', e => errors.push('cycle: ' + e.message));
   let answer = false; page.on('dialog', d => (answer ? d.accept() : d.dismiss()));
@@ -52,8 +53,8 @@ async function browserChecks(browser, url, check, errors, shots) {
   const title = await page.evaluate(() => ({ line: document.getElementById('cycle-line').textContent, shown: !document.getElementById('cycle-line').classList.contains('hidden'),
     nc: document.getElementById('new-cycle').classList.contains('hidden'), ver: document.getElementById('version').textContent }));
   if (shots) await page.screenshot({ path: `${shots}/cycle-title-1280x800.png` });
-  check('S-29: after a reload the title names the cycle and the best time; New Cycle stays hidden until this world ends; v1.0.0',
-    title.shown && /^Cycle 1 · best \d+m \d\ds to light all five$/.test(title.line) && title.nc && title.ver === 'v1.0.0', JSON.stringify(title));
+  check('S-29: after a reload the title names the cycle and the best time; New Cycle stays hidden until this world ends; version ≥ 1.0 (D-046)',
+    title.shown && /^Cycle 1 · best \d+m \d\ds to light all five$/.test(title.line) && title.nc && title.ver === 'v' + VERSION && VERSION.split('.')[0] >= 1, JSON.stringify(title));
   await page.close();
 }
 

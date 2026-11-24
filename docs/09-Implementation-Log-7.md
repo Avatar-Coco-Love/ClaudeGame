@@ -80,3 +80,5 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
 - `tests/cycle.cjs`: 2 node + 2 browser checks (dismiss keeps the world; confirm → new seed, cycle 1, empty bank/Matrix,
   records kept; the Nexus pixel 16 px right of centre reads green over blue (45, 105, 90; cycle 0's cyan has blue ≥ green);
   title after reload). `ending.cjs` now expects New Cycle enabled. Viewed `cycle-title` + `cycle-nexus`.
+
+Continued in `09-Implementation-Log-8.md` (session 62 on).

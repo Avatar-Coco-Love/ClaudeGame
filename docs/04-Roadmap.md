@@ -53,6 +53,9 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#65) **S-24 Ending:** 5/5 relit → 8 s sequence → summary card, Continue (D-045).
 - ✅ (#66) **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
 
+## v1.0.x — player feedback
+- **S-34 Relay reclaim:** pick a placed Relay back up (B / ✦ in its ring) to move it deeper (Q-018 → D-092).
+
 ## M6 — Surge depth (without making Drift second-class) — post-1.0
 - **S-32 Spitter** (ranged Glitch, Deep); later Swarm (tiny, many), Burrower (moves through rock).
 - **S-33 Weather:** Surge "static storms" and Drift's equivalent calm event (aurora: bonus ore glows), one spec (D-087).
