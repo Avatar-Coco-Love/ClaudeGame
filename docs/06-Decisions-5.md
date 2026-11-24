@@ -32,3 +32,24 @@ evicted. At 400 loose pickups a new one evicts the oldest loose one, so a break 
 a format-7 floor loads all kept, since its scattered cargo can't be told apart.
 - Rejected: refusing new loose loot at the cap (the bug: a stuck floor in the save); evicting the oldest of any pickup (eats
   the player's own cargo, B-005); counting only untagged without eviction (a 400-ore floor still blocks yields).
+
+### D-048 — Build order to v1.0's first Spire; build mode = placement; `08` folded into specs (2026-11-24, session 32, Design)
+Order: **S-17** touch pass → **S-14** Pulse → **S-18** code split → **S-15** perf check → **S-16** Beacons → **S-19** Spires v1a;
+then the Surge bot runner (it tunes the Spire defence), Relays (Design 37) and Spire relights. Touch goes first because session 32's
+play-test reproduced it on screen (landscape title clipped, ◎/⟂ under the aim thumb, hint cut at 320 px) and phones are half the
+audience. S-18 precedes Beacons/Spires so `render.js` (540) and `game.js` (484) stay under 600 lines as they grow.
+- "Build mode UX" is cut as its own item: S-16's B / ✦ placement with refusal toasts is the build mode; Relays reuse it.
+- ≡ keeps "save and go to the title" (Continue resumes): a pause sheet is a new UI system for the same job.
+- Wording fix (D-021 not edited): hitstop fires on every yield cell (crystal, prism, Lumen) and caches, not crystal/prism only.
+- No rebalance: the play-test found no number off; Q-011's Pulse probe comes after S-14.
+- Rejected: Surge bot runner before Spires (it has nothing Spire-shaped to measure yet); Relays before Spires (M4 can't be
+  judged without the destination that makes long routes matter); deleting the touch list to Debt (reproduced, user-facing).
+
+### D-049 — Spires v1a: 5 seed-placed dormant Spires at d 64–74, saved once chosen (2026-11-24, session 32, Design; refines D-045)
+Five, one per 72° sector, so every direction leads somewhere and the win is a tour, not one dig. d 64–74 sits past the vaults'
+mean and inside the Lumen band, where session 32 measured ~648 prism cells per world beyond d 64 (deliveries can be mined nearby).
+Sites are seed-only; an old save takes the first candidate with no explored cell (D-024), and chosen centres are saved so a
+later generator change never moves a Spire. The core is unmineable so the goal can't be destroyed.
+- Rejected: 3 Spires (too short an arc for the end of v1.0); 8 (crowds the ring with vaults, ~20 cells apart); random
+  angles (could cluster on one side); Spires at the world corners (d > 90 exists only diagonally, unfair by direction);
+  skipping seen sites like vaults (the win needs all of them); mineable Spires (a player could erase the ending).
