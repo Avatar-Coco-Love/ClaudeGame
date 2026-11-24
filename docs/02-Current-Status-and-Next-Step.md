@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 34** · **Version: v0.2.38** (session 34: audit, glow sprites; rotation: 35–36 Build, 37 Design, 39 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 35** · **Version: v0.2.39** (session 35: build, Pulse beam; rotation: 36 Build, 37 Design, 39 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -16,7 +16,7 @@ _Last updated: 2026-11-24_ · **Session counter: 34** · **Version: v0.2.38** (s
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
-  Wide Beam (25●, S-13, D-041): Q / ⟂ cycles Focus ↔ Wide (3 parallel rays, 0.45× each, 0.75× reach; `src/beam.js`).
+  Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -25,7 +25,7 @@ _Last updated: 2026-11-24_ · **Session counter: 34** · **Version: v0.2.38** (s
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs (`07`, `07-…-2`), order D-048: S-14 Pulse, S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
+- Build specs (`07`, `07-…-2`), order D-048: S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 34** · **Version: v0.2.38** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
-- Fixes: audit 29 (31, `audit29.cjs`); touch pass (33, `touch.cjs`); glow sprites, 300 pickups 540 → 33 ms/frame (34, `audit34.cjs`).
+- Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 35 (Build): S-14 Pulse beam (`07`, D-042: `PULSE_MUL` 1.0, 0.3 s recover). Debt + watch items now live in `04-Roadmap-2.md`.
+Session 36 (Build): S-18 code split (`07`): no behaviour change. Design 37 must look at Q-011: Pulse wins no probe (`09` session 35).

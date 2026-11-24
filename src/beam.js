@@ -1,7 +1,8 @@
 // Beam modes (S-13, D-036). `game.beamMode` is the intent (which way to cast); `beam.rays[]` is what each ray realized this
 // frame ({ ox, oy, ex, ey, target, enemy }). `beam.ex/ey/target/enemy` stay the centre ray's, so the darkness, crack overlay
 // and older checks keep working. Every mode scales from the Core Matrix Beam Power and Range stats; none adds a stat.
-import { T, BEAM_MODES } from './config.js';
+import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
+  PULSE_FLASH_S } from './config.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -13,6 +14,7 @@ export function cycleBeamMode(game) {
   const modes = unlockedModes(game);
   if (modes.length < 2) return null;
   game.beamMode = modes[(modes.indexOf(game.beamMode) + 1) % modes.length];
+  game.beam.charge = 0; // S-14: switching away drops a Pulse charge unfired
   game.audio.modeSwitch();
   return game.beamMode;
 }
@@ -63,4 +65,56 @@ export function castBeam(game, dt) {
   const mid = b.rays[mode.offsets.indexOf(0)];
   b.ex = mid.ex; b.ey = mid.ey; b.target = mid.target;
   b.enemy = mid.enemy || (b.rays.find(r => r.enemy) || {}).enemy || null;
+}
+
+// ---------- Pulse (S-14, D-042) ----------
+// Intent: `held` fire. Realized: `beam.charge` (0..1) while charging, then one burst on release (or at full charge while held),
+// then `beam.recover` seconds before charging can start again. `cancel` (pause / open sheet / death) drops the charge unfired.
+export function updatePulse(game, dt, held, cancel = false) {
+  const b = game.beam;
+  b.recover = Math.max(0, b.recover - dt);
+  if (cancel) { b.charge = 0; return; }
+  if (held) {
+    if (b.recover > 1e-9) return; // held fire waits out the recovery, then charges again
+    b.charge = Math.min(1, b.charge + dt / PULSE_CHARGE_S);
+    if (b.charge >= 1 - 1e-9) releasePulse(game);
+  } else if (b.charge > 0) releasePulse(game);
+}
+
+/** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */
+export function releasePulse(game) {
+  const b = game.beam, charge = b.charge;
+  b.charge = 0; b.recover = PULSE_RECOVER_S;
+  if (charge < PULSE_MIN) { game.audio.pulseFizzle(); return null; }
+  const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle);
+  const ox = p.x + dx * NOSE, oy = p.y + dy * NOSE, range = game.stat('range') * PULSE_RANGE;
+  let amount = game.stat('beam') * PULSE_CHARGE_S * charge * PULSE_MUL, foe = null;
+  for (const e of game.enemies) { // the nearest live Glitch on the ray within reach
+    if (e.fade !== undefined) continue;
+    const ex = e.x - ox, ey = e.y - oy, t = ex * dx + ey * dy;
+    if (t < 0 || t > range || Math.abs(ex * dy - ey * dx) >= e.r + 4) continue;
+    if (!foe || t < foe.t) foe = { e, t };
+  }
+  let end = foe ? foe.t : range, cells = 0, broken = 0, hitFoe = null;
+  while (amount > 1e-9 && cells < PULSE_PIERCE) {
+    const h = w.raycast(p.x, p.y, dx, dy, end + NOSE);
+    if (!h) break;
+    const dist = Math.max(0, h.dist - NOSE), type = w.get(h.x, h.y), i = h.y * w.w + h.x;
+    const left = w.hpAt(h.x, h.y, type) - w.damage[i];
+    const res = w.hit(h.x, h.y, amount);
+    cells++;
+    if (!res || !res.broken) { // unbreakable, or cracked but standing: the burst ends on its face
+      end = dist; foe = null; amount = 0;
+      if (res) for (let k = 0; k < 8; k++) game.particle(ox + dx * dist, oy + dy * dist, (-dx + (Math.random() - 0.5) * 1.6) * 130, (-dy + (Math.random() - 0.5) * 1.6) * 130, 0.35, w.look(h.x, h.y, type).edge, 2);
+      break;
+    }
+    amount -= left; broken++;
+    game.onCellBroken(h.x, h.y, res.type);
+    if (cells >= PULSE_PIERCE) { end = dist + 16; foe = null; } // the cap: the burst stops in the last cell it broke
+  }
+  if (foe && amount > 1e-9) { foe.e.hp -= amount * PULSE_GLITCH; foe.e.flash = 0.15; hitFoe = foe.e; }
+  b.flash = b.flashMax = game.motionOn() ? PULSE_FLASH_S : PULSE_FLASH_S / 2;
+  b.flashLine = { ox, oy, ex: ox + dx * end, ey: oy + dy * end, enemy: !!hitFoe };
+  game.audio.pulse(charge);
+  return { cells, broken, enemy: hitFoe };
 }

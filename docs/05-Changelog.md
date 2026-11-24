@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.39 — 2026-11-24 (#40)
+- New Research node **Pulse Beam** (40● Lumen): hold fire to charge (a dotted line shows its 1.5× reach, the core glows brighter),
+  let go to fire one burst that punches through up to 3 cells, or a Glitch. Full charge fires by itself; a short tap just fizzles.
+  Q / ⟂ now cycles Focus → Wide → Pulse. Works with the mouse, Space, and the touch aim stick, in Drift and Surge.
+
 ## v0.2.38 — 2026-11-24 (#39)
 - Smoother frames with loot on the floor: glowing Shards, Prisms and Lumen are now drawn from a ready-made glow, so a cache burst
   or a dropped hold no longer slows the game. Scanner pings with many ore marks are smooth too. They look the same as before.

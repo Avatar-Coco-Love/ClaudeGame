@@ -1,5 +1,5 @@
 // All canvas drawing. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RINGS, RESOURCE, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
 import { markAlpha } from './research.js';
 
 const CHUNK_PX = CHUNK * CELL;
@@ -385,6 +385,7 @@ export class Renderer {
 
   drawBeam(ctx) {
     const b = this.game.beam, p = this.game.player;
+    if (b.charge > 0 || b.flash > 0) this.drawPulse(ctx, b, p);
     if (!b.on) return;
     // S-13: Wide draws each of its parallel rays at 0.6× width, joined by a thin emitter bar across the nose.
     const rays = b.rays.length ? b.rays : [{ ox: p.x + Math.cos(p.angle) * 12, oy: p.y + Math.sin(p.angle) * 12, ex: b.ex, ey: b.ey, enemy: b.enemy }];
@@ -409,6 +410,24 @@ export class Renderer {
     ctx.restore();
   }
 
+  // S-14 Pulse: while charging, a dotted aim line to the full reach (brighter with charge); on release, a bright line for b.flash s.
+  drawPulse(ctx, b, p) {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    if (b.charge > 0) {
+      const dx = Math.cos(p.angle), dy = Math.sin(p.angle), reach = this.game.stat('range') * PULSE_RANGE;
+      ctx.setLineDash([3, 7]); ctx.lineWidth = 1.5 + b.charge; ctx.strokeStyle = `rgba(46,242,255,${0.2 + 0.5 * b.charge})`;
+      ctx.beginPath(); ctx.moveTo(p.x + dx * 14, p.y + dy * 14); ctx.lineTo(p.x + dx * (12 + reach), p.y + dy * (12 + reach)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    if (b.flash > 0 && b.flashLine) {
+      const r = b.flashLine, a = b.flash / b.flashMax, col = r.enemy ? '255,122,61' : '46,242,255';
+      for (const [c, lw] of [[`rgba(${col},${0.35 * a})`, 12], [`rgba(${col},${0.9 * a})`, 4], [`rgba(255,255,255,${a})`, 1.6]]) {
+        ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(r.ox, r.oy); ctx.lineTo(r.ex, r.ey); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   drawPlayer(ctx) {
     const p = this.game.player, g = this.game;
     if (p.invuln > 0 && Math.floor(this.time * 20) % 2 && p.hurtFlash <= 0 && g.mode === 'surge') return;
@@ -429,7 +448,8 @@ export class Renderer {
     }
     ctx.rotate(p.angle);
     const col = p.hurtFlash > 0 ? '#ff5a2e' : '#d8fbff';
-    ctx.shadowColor = p.hurtFlash > 0 ? '#ff5a2e' : '#2ef2ff'; ctx.shadowBlur = 18;
+    ctx.shadowColor = p.hurtFlash > 0 ? '#ff5a2e' : '#2ef2ff';
+    ctx.shadowBlur = 18 + (g.motionOn() ? 22 * g.beam.charge : 0); // S-14: the glow brightens with a Pulse charge (not under reduced motion)
     ctx.strokeStyle = col; ctx.lineWidth = 2.2;
     ctx.beginPath(); ctx.moveTo(13, 0); ctx.lineTo(-7, -8); ctx.lineTo(-3, 0); ctx.lineTo(-7, 8); ctx.closePath();
     ctx.stroke();
@@ -480,6 +500,7 @@ export class Renderer {
       const rs = g.beam.rays.length > 1 ? g.beam.rays : [g.beam]; // S-13: each Wide ray end lights its own, smaller hole
       for (const r of rs) hole(r.ex, r.ey, rs.length > 1 ? 48 : 80, 0.7);
     }
+    if (g.beam.flash > 0 && g.beam.flashLine) hole(g.beam.flashLine.ex, g.beam.flashLine.ey, 80, 0.7 * g.beam.flash / g.beam.flashMax); // S-14
     ctx.drawImage(this.light, 0, 0, this.w, this.h);
   }
 
