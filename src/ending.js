@@ -10,6 +10,10 @@ const LINE_SHARE = 0.8; // the lines draw in the first 80 % of the sequence, the
 export function checkEnding(game) {
   if (game.ended || !game.spires.length || !game.spires.every(s => s.lit)) return;
   game.ended = true; game.endedAt = game.stats.time; game.endSeq = { t: 0 };
+  // S-29 (D-062): this cycle's record, and the best time to light them all.
+  const by = m => game.spires.filter(s => s.mode === m).length, r = game.records;
+  r.cycles = { ...(r.cycles || {}), [game.cycle]: { time: Math.round(game.endedAt), drift: by('drift'), surge: by('surge') } };
+  r.best = Math.min(r.best ?? Infinity, Math.round(game.endedAt));
   game.notify('ending');
 }
 
@@ -89,8 +93,11 @@ function drawEnding(ctx, r, zoom) {
 }
 
 /** The summary card's numbers (all from saved state, so the card reads the same after a reload). */
+/** '12m 05s'. */
+export const fmtTime = t => `${Math.floor(t / 60)}m ${String(Math.floor(t % 60)).padStart(2, '0')}s`;
+
 export function endingSummary(game) {
   const by = m => game.spires.filter(s => s.lit && s.mode === m).length, t = game.endedAt ?? game.stats.time;
-  return { time: `${Math.floor(t / 60)}m ${String(Math.floor(t % 60)).padStart(2, '0')}s`, mined: game.stats.mined,
+  return { time: fmtTime(t), cycle: game.cycle, best: game.records.best, mined: game.stats.mined,
     drift: by('drift'), surge: by('surge'), restored: by('broken'), glitches: game.stats.glitches, n: game.spires.length };
 }

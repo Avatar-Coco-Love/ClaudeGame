@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24 built) S-29, M6: S-32, S-33 (D-063, D-087). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24, S-29 built; v1.0.0) M6: S-32, S-33 (D-063, D-087). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -41,7 +41,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#48) **S-25 Beacon floor glow + B-034:** faint cyan floor tint in beacon pools (D-061); short-landscape ◎ ⟂ glyph-only (D-064).
 - ✅ (#55) **S-22 Relays v1** (12▲ + 40◆, ≤ 3, `SAVE_FORMAT` 11): remote deposit, no heal; B / ✦ places `craft.last` (D-056, D-076).
 
-## M5 — The arc (a reason to go deep) — ships v1.0
+## M5 — The arc (a reason to go deep) ✅ (v1.0.0, D-091)
 - ✅ (#50) **S-26 `light.js` split:** darkness + floor glow in `light.js`, chunk painting in `terrain.js`, `R.lightSets`; cached hole sprites (D-067).
 - ✅ (#51) **S-19 Spires v1a:** 5 dormant Spires at d 64–74, one per sector: sites, cells, `SAVE_FORMAT` 10 record (D-049, D-068).
 - ✅ (#52) Design session 47: Spire trip + supply measured (`tools/spirerun.mjs`), Q-015 settled (D-069), feed from cargo then bank (D-070), Wake lanes (D-071).
@@ -51,7 +51,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#61) **S-23 Spire Wake:** Surge's path, hold the Spire 40 s against Glitches down 4 cleared lanes; bot-tuned (D-055, D-086).
 - ✅ (#63) **S-31 Wake fix + tune:** B-048 (Wake Glitches despawned when you walked off), tier −1, orange clock, hint (D-087, D-088).
 - ✅ (#65) **S-24 Ending:** 5/5 relit → 8 s sequence → summary card, Continue (D-045).
-- **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
+- ✅ (#66) **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
 
 ## M6 — Surge depth (without making Drift second-class) — post-1.0
 - **S-32 Spitter** (ranged Glitch, Deep); later Swarm (tiny, many), Burrower (moves through rock).

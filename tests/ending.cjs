@@ -75,8 +75,8 @@ async function browserChecks(browser, url, check, errors, shots) {
         text: document.getElementById('ending-stats').textContent, l: c.left, r: c.right, t: c.top, b: c.bottom, ov: !!L.renderer.game.endSeq,
         cycle: document.getElementById('ending-cycle').disabled, time0: g.stats.time }; });
     if (shots) await page.screenshot({ path: `${shots}/ending-card-${vw}x${vh}.png` });
-    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches), New Cycle waits (S-24)`,
-      !card.seq && card.open && !card.matrix && card.l >= 0 && card.r <= vw && card.t >= 0 && card.b <= vh && !card.ov && card.cycle
+    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches), New Cycle is live (S-24, S-29)`,
+      !card.seq && card.open && !card.matrix && card.l >= 0 && card.r <= vw && card.t >= 0 && card.b <= vh && !card.ov && !card.cycle
       && /Spires relit in Drift5/.test(card.text) && /Cells mined50/.test(card.text) && /Glitches cleared3/.test(card.text), JSON.stringify(card));
     if (touch) await page.tap('#ending-continue'); else await page.click('#ending-continue');
     await page.waitForTimeout(500);

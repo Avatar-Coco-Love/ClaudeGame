@@ -63,6 +63,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await spire.foundChecks(check).catch(e => check('S-27 spire found checks ran', false, e.message));
   await require('./spirefeed.cjs').nodeChecks(check).catch(e => check('S-20 spire feed checks ran', false, e.message));
   await require('./facet.cjs').nodeChecks(check).catch(e => check('S-28 facet checks ran', false, e.message));
+  await require('./cycle.cjs').nodeChecks(check).catch(e => check('S-29 cycle checks ran', false, e.message));
   await require('./ending.cjs').nodeChecks(check).catch(e => check('S-24 ending checks ran', false, e.message));
   await require('./wake.cjs').nodeChecks(check).catch(e => check('S-23 wake checks ran', false, e.message));
   await require('./surgebot.cjs').nodeChecks(check).catch(e => check('S-30 surge bot checks ran', false, e.message));
@@ -326,6 +327,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./facet.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./wake.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./ending.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
+    await require('./cycle.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./audit54.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 54 browser checks ran', false, e.message));
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./hud.cjs').toastChecks(browser, url, check, errors);

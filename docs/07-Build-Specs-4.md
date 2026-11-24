@@ -1,17 +1,7 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). S-24 built (#65, D-090). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). S-24 built (#65, D-090), S-29 built (#66, D-091): v1.0.0. Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
-
-## S-29 — New Cycle (M5, ships v1.0.0) (D-062)
-- **New Cycle** on the summary card (and the title once `ended`): confirm, then a new random seed, `cycle` + 1, and a fresh
-  world save. **Carries:** `cycle`, `records` (best time to 5/5, and per cycle: time, Drift/Surge relights), settings (already
-  separate), and the Nexus hue `NEXUS_HUES[cycle % 5]` (cosmetic, 5 fixed neon hues; cycle 0 = today's cyan).
-  **Resets:** bank, cargo, Matrix, Radiance, Research, Craft stock, beacons, relays, Spires, floor loot, stats. Mode = last used.
-- Title shows "Cycle n" and the best time once `cycle` ≥ 1. VERSION 1.0.0 (D-046).
-- **Save:** next `SAVE_FORMAT` adds `cycle` (0) and `records` ({}); old saves load as cycle 0.
-- **Smoke:** New Cycle gives a different seed, cycle 1, empty bank + Matrix, records kept, hue = `NEXUS_HUES[1]` on the Nexus
-  pixel; cancel keeps the world; reload; an old save is cycle 0; screenshot the title and a cycle-1 Nexus (view).
 
 ## S-32 — Spitter: the first Glitch variant (M6, after v1.0) (D-087)
 - Surge only (M6 is Surge depth; Drift's M6 piece is S-33's aurora). Natural spawns at tier ≥ 2 (Deep): 1 in 4 is a

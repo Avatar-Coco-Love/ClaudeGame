@@ -4,7 +4,7 @@ import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
-import { tickEnding, endingSummary } from './ending.js';
+import { tickEnding, endingSummary, fmtTime } from './ending.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -51,6 +51,11 @@ function showTitle() {
       `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph}${save.bank.lumen ? ` ${save.bank.lumen}${RESOURCE.lumen.glyph}` : ''} banked`;
   }
   selectMode(save?.mode || 'drift');
+  // S-29: once a world has ended its New Cycle waits on the title too; from cycle 1 the title names the cycle and the best time.
+  $('new-cycle').classList.toggle('hidden', !(save && save.ended));
+  const cyc = save && Number.isInteger(save.cycle) ? save.cycle : 0, best = save && save.records && save.records.best;
+  $('cycle-line').classList.toggle('hidden', cyc < 1);
+  $('cycle-line').textContent = cyc >= 1 ? `Cycle ${cyc}${Number.isFinite(best) ? ` · best ${fmtTime(best)} to light all five` : ''}` : '';
 }
 
 function selectMode(mode) {
@@ -59,10 +64,11 @@ function selectMode(mode) {
 }
 document.querySelectorAll('.mode-card').forEach(el => el.addEventListener('click', () => selectMode(el.dataset.mode)));
 
-function start(save) {
+function start(save, carry = null) {
   audio.unlock();
   const seed = save ? save.seed : (Math.random() * 2 ** 31) | 0;
-  game = new Game({ seed, mode: save ? save.mode : selectedMode, save, audio, settings });
+  game = new Game({ seed, mode: save ? save.mode : carry ? carry.mode : selectedMode, save, audio, settings });
+  if (carry) { game.cycle = carry.cycle; game.records = carry.records; } // S-29: all that crosses into a new cycle (+ settings, apart)
   renderer.attach(game);
   $('title').classList.add('hidden');
   $('hud').classList.remove('hidden');
@@ -73,6 +79,15 @@ function start(save) {
 }
 
 $('continue').addEventListener('click', () => start(store.read()));
+/** S-29 (D-062): confirm, then a fresh random world one cycle on. Carries cycle, records, mode; resets everything else. */
+function newCycle(save) {
+  const next = (Number.isInteger(save.cycle) ? save.cycle : 0) + 1;
+  if (!confirm(`Begin cycle ${next}? A fresh world: bank, upgrades, Spires, Beacons and Relays start over. Your records and settings carry on.`)) return false;
+  store.clear();
+  start(null, { cycle: next, records: save.records || {}, mode: save.mode === 'surge' ? 'surge' : 'drift' });
+  return true;
+}
+$('new-cycle').addEventListener('click', () => { const s = store.read(); if (s && s.ended) newCycle(s); });
 $('new-world').addEventListener('click', () => {
   if (store.exists()) {
     const msg = store.read() ? 'Start a new world? Your current world and upgrades will be replaced.'
@@ -318,11 +333,12 @@ function openEnding() {
   const e = endingSummary(game), row = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
   $('ending-stats').innerHTML = row('Time to light them all', e.time) + row('Cells mined', e.mined) +
     row('Spires relit in Drift', e.drift) + row('Spires relit in Surge', e.surge) + (e.restored ? row('Spires restored', e.restored) : '') +
-    row('Glitches cleared', e.glitches);
+    row('Glitches cleared', e.glitches) + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
   closePanel(); endingOpen = true; $('ending').classList.remove('hidden'); $('ending-continue').focus();
 }
 function closeEnding() { endingOpen = false; $('ending').classList.add('hidden'); input.pressed.clear(); }
 $('ending-continue').addEventListener('click', closeEnding);
+$('ending-cycle').addEventListener('click', () => { persist(); const s = game.toSave(); if (newCycle(s)) { closeEnding(); toast(`Cycle ${game.cycle}`, 3200, KEEP); } });
 $('ending-open').addEventListener('click', openEnding);
 // Any key or tap skips the sequence (and does nothing else: the press is swallowed).
 for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => { if (game && game.endSeq && !paused) endSkip = true; }, true);
