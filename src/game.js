@@ -63,6 +63,7 @@ export class Game {
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
+    this.bolts = []; // S-32: Spitter bolts in flight (spitter.js); never saved
     this.particles = [];
     this.floaters = [];
     this.events = [];        // UI-facing notifications
@@ -148,7 +149,7 @@ export class Game {
 
   setMode(mode) {
     this.mode = mode;
-    if (mode === 'drift') this.enemies = [];
+    if (mode === 'drift') { this.enemies = []; this.bolts = []; }
     this.player.integrity = this.stat('hull');
   }
 
@@ -201,7 +202,7 @@ export class Game {
     this.updateDeposit(dt);
     updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
     updateWake(this, dt); // S-23: Surge's Spire Wake (starts, clock, waves, end)
-    if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length) this.enemies = [];
+    if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length || this.bolts.length) { this.enemies = []; this.bolts = []; }
     this.updateParticles(dt);
 
     if (this.inNexus()) p.integrity = Math.min(this.stat('hull'), p.integrity + NEXUS_HEAL * dt);
@@ -359,6 +360,7 @@ export class Game {
     p.x = this.nexus.x; p.y = this.nexus.y + SPAWN_OFFSET; p.vx = p.vy = 0;
     p.integrity = this.stat('hull'); p.invuln = RESPAWN_INVULN_S; this.beam.charge = 0;
     this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > RESPAWN_CLEAR_PX);
+    this.bolts = [];
     this.notify('destabilized');
     if (this.wake) failWake(this); // S-23: a core death fails the Wake
   }

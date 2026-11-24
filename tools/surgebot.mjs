@@ -1,12 +1,12 @@
 // S-30 (D-082): the Surge bot runner. A headless, deterministic bot (no Math.random in the bot; the game's own Math.random
 // only moves particles) that paths with A* over the grid, digs what it must, fights Glitches in Surge and retreats to heal.
-// Routes: mine (nearest ore by path cost, bank when full), rim / hug (degenerate Glitch farms at the Nexus; should not
+// Routes: mine (nearest ore by path cost, bank when full), deep (S-32: mine only ore at Spitter depth), rim / hug (degenerate Glitch farms at the Nexus; should not
 // beat mine), spire (nearest Spire by path, feed the banked ▲, mine prism cells within 24 cells and carry them in until
 // primed, then hold the interior). S-23 adds "Wake held / failed" to the spire route.
 // Usage: node tools/surgebot.mjs [--route=mine,spire] [--build=start,mid,max] [--mode=drift,surge] [--seeds=12]
 //        [--minutes=20] [--bank=20] [--hold=40] [--v]   (one line per route × build × mode: medians + p90 over seeds)
 import { Game } from '../src/game.js';
-import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS } from '../src/config.js';
+import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS, SPITTER_TIER, GLITCH_TIER_PX } from '../src/config.js';
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
 
 /** S-23 guard helpers (one copy for surgebot, wakeprobe and tests/wake.cjs, audit 59): the live Glitch nearest the
@@ -62,7 +62,9 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   // ---- the driver: follow a path, dig the next solid cell, fight Glitches in reach, retreat when hurt ----
   let plan = null, planT = -1, goalFn = null, goalKey = '', replanned = false, watch = { x: 0, y: 0, t: 0, mined: 0 };
   const setGoal = (key, fn) => { if (key !== goalKey) { goalKey = key; goalFn = fn; plan = null; replanned = false; watch = { x: g.player.x, y: g.player.y, t, mined: g.stats.mined }; } };
-  const foe = () => { let best = null, bd = FIGHT_PX; for (const e of g.enemies) { if (e.fade !== undefined) continue;
+  // S-32: a bolt in flight inside FIGHT_PX is a foe too (a player beams it). Spitters count only inside FIGHT_PX, like any
+  // Glitch: aiming at one out of beam reach stalled the dig (stuck on a spire run).
+  const foe = () => { let best = null, bd = FIGHT_PX; for (const e of g.enemies.concat(g.bolts)) { if (e.fade !== undefined) continue;
     const d = Math.hypot(e.x - g.player.x, e.y - g.player.y); if (d < bd) { bd = d; best = e; } } return best; };
   /** One frame toward the current goal. Returns 'arrived' | 'moving' | 'skip' (stuck twice, or no path). */
   const drive = () => {
@@ -106,7 +108,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   const bad = new Set();
   const out = { seed, route, build, mode, deaths: 0, stuck: 0, skipped: 0, minutes: 0 };
 
-  if (route === 'mine' || route === 'rim' || route === 'hug') {
+  if (route === 'mine' || route === 'deep' || route === 'rim' || route === 'hug') {
     // rim: a spot 1.4 R out (only 1 Glitch near the Nexus, GLITCH_CAP); hug: just inside the ring's edge.
     const spot = route === 'rim' ? 1.4 : 0.92, pick = (() => { let best = -1, bd = Infinity;
       for (let i = 0; i < W * w.h; i++) { const d = Math.abs(Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) - NEXUS_RADIUS * spot);
@@ -114,8 +116,9 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     while (t < capT) {
       if (retreat()) continue;
       if (g.cargoRoom() < 2) { if (bankRun() === 'skip') break; continue; }
-      if (route === 'mine') {
-        setGoal('ore', i => ORE.has(w.cells[i]) && !bad.has(i));
+      if (route === 'mine' || route === 'deep') { // deep (S-32): only ore at Spitter depth (tier >= SPITTER_TIER)
+        const far = route === 'deep' ? SPITTER_TIER * GLITCH_TIER_PX : 0;
+        setGoal('ore', i => ORE.has(w.cells[i]) && !bad.has(i) && Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) >= far);
         const r = drive();
         if (r === 'skip') { if (!plan) break; bad.add(plan.end); skipped++; setGoal('', null); }
         else if (r === 'arrived') { for (let k = 0; k < 50 && t < capT; k++) tick(g.player); setGoal('', null); } // let the Attractor pull

@@ -5,6 +5,7 @@ import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE
   PULSE_FLASH_S, BEAM_GLITCH_MUL } from './config.js';
 import { UNBREAKABLE } from './world.js';
 import { facetAt, toggleFacet } from './spire.js';
+import { beamFoes } from './spitter.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -34,7 +35,7 @@ export function castBeam(game, dt) {
     const hit0 = game.world.raycast(cx, cy, dx, dy, range + NOSE);
     const hit = hit0 && { ...hit0, dist: Math.max(0, hit0.dist - NOSE) };
     let dist = hit ? hit.dist : range, best = null;
-    for (const e of game.enemies) { // Glitches along the ray, if closer than the wall
+    for (const e of beamFoes(game)) { // Glitches (and S-32 bolts) along the ray, if closer than the wall
       if (e.fade !== undefined) continue; // a Glitch that gave up can't be targeted (S-6)
       const ex = e.x - ox, ey = e.y - oy, t = ex * dx + ey * dy;
       if (t < 0 || t > dist) continue;
@@ -105,7 +106,7 @@ function aimsAtFacet(game, f) {
 /** The nearest live Glitch on the aim ray within `range` of the nose: { e, t } or null. */
 function pulseFoe(game, ox, oy, dx, dy, range) {
   let foe = null;
-  for (const e of game.enemies) {
+  for (const e of beamFoes(game)) {
     if (e.fade !== undefined) continue;
     const ex = e.x - ox, ey = e.y - oy, t = ex * dx + ey * dy;
     if (t < 0 || t > range || Math.abs(ex * dy - ey * dx) >= e.r + 4) continue;

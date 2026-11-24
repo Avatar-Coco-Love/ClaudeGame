@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.0.4';
+export const VERSION = '1.0.5';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -41,6 +41,13 @@ export const GLITCH_LOOT_SHARDS = 2; // + tier Shards per kill (Prism: GLITCH_PR
 export const GLITCH_HIT_CD_S = 0.9, GLITCH_KNOCKBACK = 260; // contact: re-hit delay, the Glitch's bounce-off speed
 // The Nexus pushes Glitches out from NEXUS_RADIUS + GLITCH_NEXUS_MARGIN (× REPEL speed) and burns BURN hp/s; it heals the core.
 export const GLITCH_NEXUS_MARGIN = 40, GLITCH_NEXUS_REPEL = 1.5, GLITCH_NEXUS_BURN = 0.8;
+// S-32 (D-087, D-096): a natural spawn at tier >= SPITTER_TIER is a Spitter 1 in 1/SPITTER_CHANCE (rng['glitch-spawn']).
+// It eases to a stop at SPITTER_HOLD_PX from the core (over SPITTER_EASE_PX; backs off at up to SPITTER_BACK × speed inside it) and, with a clear line to it inside SPITTER_FIRE_PX, fires a bolt every
+// SPITTER_SHOT_S (glowing for SPITTER_TELL_S first): BOLT_SPEED px/s, BOLT_DMG, BOLT_HP (beam-killable), gone after BOLT_LIFE_S.
+export const SPITTER_TIER = 2, SPITTER_CHANCE = 0.25, SPITTER_HP = 0.8, SPITTER_HOLD_PX = 200, SPITTER_FIRE_PX = 320,
+  SPITTER_EASE_PX = 90, SPITTER_BACK = 0.4;
+export const SPITTER_SHOT_S = 2.2, SPITTER_TELL_S = 0.4, SPITTER_COLORS = ['#a35bff', '#ff9a3d'];
+export const BOLT_SPEED = 150, BOLT_DMG = 8, BOLT_HP = 0.5, BOLT_R = 5, BOLT_LIFE_S = 4;
 export const NEXUS_HEAL = 45; // integrity per second inside the Nexus ring (Surge)
 
 // S-4 Feel pass (D-021). Reduced motion turns off hitstop and the upgrade ring (shake already off); sounds stay.

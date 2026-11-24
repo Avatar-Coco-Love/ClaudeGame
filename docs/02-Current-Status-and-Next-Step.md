@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.4** (session 64: audit + D-095 context rules; v1.0 shipped in 61; rotation: 65 Build, 66 Build, 67 Design, 69 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 65** · **Version: v1.0.5** (session 65: S-32 Spitter; v1.0 shipped in 61; rotation: 66 Build, 67 Design, 68 Build, 69 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -12,6 +12,7 @@ _Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.4** (se
 - Nexus Development v1: a **Nexus** tab in the Matrix sheet sells Radiance (5 levels, Prisms only, D-009): +96 px Nexus light per level and a wider explored disc.
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch that gains no ground on the core for 6 s fades out and frees its slot (D-017); kills drop a Prism half the time (D-018).
+  Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -49,5 +50,5 @@ _Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.4** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 65 (Build): **S-32 Spitter** (`07-Build-Specs-4.md`; M6 → v1.1; D-087), then S-33 weather. Audit 64 Debt in
-`04-Roadmap-2.md` (card after a reload mid-ending is the top one). Read only this file to start.
+Session 66 (Build): **S-33 Weather** (`07-Build-Specs-4.md`; the last M6 spec, D-087); measure haul with
+`surgebot --route=mine` (and `deep`, D-096). Audit 64 Debt in `04-Roadmap-2.md`. Read only this file to start.

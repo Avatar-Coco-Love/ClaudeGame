@@ -32,3 +32,10 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
 ## Session 64 wrap-up — CLAUDE.md context rules (v1.0.4, #70)
 - Owner asked why the conversation hit ~475k tokens after 10 PRs. Cause and rules in D-095; CLAUDE.md "Context
   discipline" gained the 3-PR cap, the orchestration brief and the cheap-verification rule. Docs only; counter stays 64.
+
+## Session 65 — Build: S-32 Spitter (v1.0.5, #71)
+- `src/spitter.js` (behaviour, bolts, sprites), hooks in glitch/beam/game/render, `audio.spit()`, `tests/spitter.cjs`
+  (5 checks: 26.8 % share over 3×400 Deep spawns, 0 at tier 1; open-field hit for 8; rock stops a bolt and silences a
+  blocked Spitter; the beam pops a bolt in 0.23 s; Wake Glitches plain, Drift clears bolts). D-096 has the bot table.
+- Observed: a hard stop at 200 px overshot to 150 px (velocity lerp) → ease + back-off. Screenshot: diamonds aim at
+  the core, orange bolts read through the dark.

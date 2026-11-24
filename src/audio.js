@@ -125,6 +125,7 @@ export class Audio {
   pulseFizzle() { this.tone(360, 0.05, { type: 'sine', vol: 0.025 }); }
   // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.
   hurt() { this.tone(160, 0.25, { type: 'triangle', vol: 0.16, slide: -90 }); }
+  spit() { this.tone(520, 0.12, { type: 'triangle', vol: 0.07, slide: 260, throttle: 0.3, key: 'spit' }); } // S-32: a Spitter fires
   enemyDie() { this.tone(420, 0.2, { type: 'triangle', vol: 0.11, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }
 }
