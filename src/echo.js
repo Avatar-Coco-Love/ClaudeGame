@@ -1,9 +1,28 @@
 // S-42 Echo (D-108): a lesser core that follows the core and Gathers exposed ore. Intent vs realized like the core:
 // `targetVx/Vy` is where it wants to go (down a BFS distance field from the core's cell), `moveBody` is what it got.
 // It never takes damage and Glitches ignore it. Owning it is `research.echo`; its live state is never saved.
+// S-43: `game.echoOrder` (saved) picks what it does at rest: Gather ore or Guard the core (bolts at Glitches / Spitter bolts).
 import { CELL, ORE_KIND, PLAYER_ACCEL, ECHO_R, ECHO_FIELD, ECHO_FIELD_S, ECHO_HOLD, ECHO_SPEED_MUL, ECHO_BLINK_CELLS,
-  ECHO_STUCK_S, ECHO_STUCK_PX, ECHO_FADE_S, ECHO_REACH, ECHO_DMG, ECHO_PICK_S } from './config.js';
+  ECHO_STUCK_S, ECHO_STUCK_PX, ECHO_FADE_S, ECHO_REACH, ECHO_DMG, ECHO_PICK_S,
+  ECHO_ORDERS, ECHO_GUARD_S, ECHO_GUARD_PX, ECHO_GUARD_DMG, ECHO_SHOT_S } from './config.js';
 import { collides, moveBody } from './body.js';
+import { beamFoes } from './spitter.js';
+
+/** S-43: a saved order that isn't one loads as Gather (B-037). */
+export const validOrder = o => (ECHO_ORDERS.includes(o) ? o : 'gather');
+
+/** S-43: the next order; false (nothing changes) until the Echo is researched. */
+export function cycleEchoOrder(game) {
+  if (!game.research.echo) return false;
+  game.echoOrder = ECHO_ORDERS[(ECHO_ORDERS.indexOf(validOrder(game.echoOrder)) + 1) % ECHO_ORDERS.length];
+  if (game.echo) { game.echo.target = null; game.echo.beam = null; }
+  return true;
+}
+
+/** The chip text: "Guard (idle)" in Drift, where there is nothing to shoot. */
+export function orderLabel(game) {
+  return game.echoOrder === 'guard' ? (game.mode === 'drift' ? 'Guard (idle)' : 'Guard') : 'Gather';
+}
 
 const SIDE = 2 * ECHO_FIELD + 1;
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -14,7 +33,7 @@ export function makeEcho(game) {
   if (!game.research.echo) return null;
   const e = { x: 0, y: 0, r: ECHO_R, vx: 0, vy: 0, targetVx: 0, targetVy: 0, angle: game.player.angle, alpha: 0,
     blink: { phase: 'in', t: 0 }, field: new Int16Array(SIDE * SIDE), fx: 0, fy: 0, fieldT: 0, fieldVer: -1,
-    watch: { on: false }, target: null, pickT: 0, beam: null, blinks: 0, paused: false };
+    watch: { on: false }, target: null, pickT: 0, beam: null, blinks: 0, paused: false, guardT: 0, shot: null, shots: 0 };
   placeBeside(game, e);
   buildField(game, e);
   return e;
@@ -76,6 +95,8 @@ export function updateEcho(game, dt) {
   if (!game.echo) game.echo = makeEcho(game);
   const e = game.echo, w = game.world, p = game.player;
   e.beam = null;
+  if (e.shot && (e.shot.t -= dt) <= 0) e.shot = null;
+  e.guardT = Math.max(0, e.guardT - dt);
   if (w.breaks !== e.fieldVer) buildField(game, e); // a cell broke (any cell: a bounded rebuild is cheap, D-108)
   else if ((e.fieldT -= dt) <= 0) buildField(game, e);
 
@@ -135,7 +156,29 @@ export function updateEcho(game, dt) {
     }
   } else e.watch = { on: false };
 
-  if (!e.paused) gather(game, e, dt);
+  if (!e.paused) (game.echoOrder === 'guard' ? guard : gather)(game, e, dt);
+}
+
+/** S-43 Guard: every ECHO_GUARD_S, a bolt at the foe nearest the core within ECHO_GUARD_PX of it that the Echo can see.
+ *  It only takes hp: glitch.js / spitter.js kill or pop it on their next pass (loot as from the beam). */
+function guard(game, e) {
+  e.target = null;
+  if (e.guardT > 0) return;
+  const p = game.player, w = game.world;
+  let best = null;
+  for (const f of beamFoes(game)) {
+    if (f.fade !== undefined || f.hp <= 0) continue; // gave up (S-6) or already dead this frame
+    const dc = Math.hypot(f.x - p.x, f.y - p.y);
+    if (dc > ECHO_GUARD_PX || (best && dc >= best.dc)) continue;
+    const d = Math.hypot(f.x - e.x, f.y - e.y);
+    if (d > 0.01 && w.raycast(e.x, e.y, (f.x - e.x) / d, (f.y - e.y) / d, Math.max(0, d - f.r))) continue; // rock between
+    best = { f, dc };
+  }
+  if (!best) return;
+  const f = best.f;
+  e.guardT = ECHO_GUARD_S; e.shots++;
+  f.hp -= ECHO_GUARD_DMG; f.flash = 0.08;
+  e.shot = { x: f.x, y: f.y, t: ECHO_SHOT_S };
 }
 
 const ORE = new Set(Object.keys(ORE_KIND).map(Number));
@@ -194,6 +237,13 @@ export function drawEcho(r, ctx) {
       ctx.globalAlpha = a * e.alpha; ctx.strokeStyle = a < 0.5 ? '#2ef2ff' : '#ffffff'; ctx.lineWidth = lw;
       ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.beam.ex, e.beam.ey); ctx.stroke();
     }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  if (e.shot) { // S-43 Guard: a short bright dash from the Echo to what it hit, fading over ECHO_SHOT_S
+    const k = e.shot.t / ECHO_SHOT_S, dx = e.shot.x - e.x, dy = e.shot.y - e.y;
+    ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.9 * k * e.alpha; ctx.strokeStyle = '#d8fbff'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(e.x + dx * (1 - k) * 0.6, e.y + dy * (1 - k) * 0.6); ctx.lineTo(e.shot.x, e.shot.y); ctx.stroke();
     ctx.globalCompositeOperation = 'source-over';
   }
   ctx.translate(e.x, e.y); ctx.rotate(e.angle);

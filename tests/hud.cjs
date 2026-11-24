@@ -15,12 +15,12 @@ async function browserChecks(browser, url, check, errors) {
     await page.click('#new-world'); await page.waitForTimeout(300);
     const r = await page.evaluate(async () => {
       // Every optional HUD box shown, as late in a run; the Matrix button only shows at the Nexus, where there's no pointer.
-      const g = window.__lumen.game; Object.assign(g.research, { scanner: true, wide: true }); g.craft.beacon = 3; g.bank.lumen = 9;
+      const g = window.__lumen.game; Object.assign(g.research, { scanner: true, wide: true, echo: true }); g.craft.beacon = 3; g.bank.lumen = 9;
       document.getElementById('matrix-btn').classList.add('hidden'); g.player.x += 3000;
-      for (const id of ['scan-btn', 'mode-btn', 'beacon-btn', 'integrity-row']) document.getElementById(id).classList.remove('hidden');
+      for (const id of ['scan-btn', 'mode-btn', 'echo-btn', 'beacon-btn', 'integrity-row']) document.getElementById(id).classList.remove('hidden');
       document.querySelector('#hud .lumen').classList.remove('hidden');
       await new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)));
-      const boxes = [...document.querySelectorAll('#hud > *:not(#toast):not(.top-right), #hud .top-right > *')]
+      const boxes = [...document.querySelectorAll('#hud > *:not(#toast):not(.top-right), #hud .top-right > *:not(.pair), #hud .top-right .pair > *')] // S-43: ◎ and ◇ live in .pair
         .map(e => e.getBoundingClientRect()).filter(b => b.width > 0 && b.height > 0);
       const { drawNexusPointer } = await import('./src/hud.js');
       const c = document.createElement('canvas').getContext('2d'), W = innerWidth, H = innerHeight, out = { n: 0, hit: [] };

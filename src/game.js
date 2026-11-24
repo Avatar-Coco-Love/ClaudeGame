@@ -6,7 +6,7 @@ import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTO
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
-import { updateEcho } from './echo.js';
+import { updateEcho, cycleEchoOrder, validOrder } from './echo.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
@@ -66,6 +66,7 @@ export class Game {
     };
     this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null, facetLatch: null, midEnemy: false }; // S-14: Pulse state
     this.echo = null; // S-42: the live Echo (echo.js) once research.echo; never saved
+    this.echoOrder = 'gather'; // S-43: 'gather' | 'guard' (saved)
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
@@ -204,6 +205,7 @@ export class Game {
     if (intent.scan) tryScan(this);
     if (intent.beamMode && cycleBeamMode(this)) this.notify('beam-mode');
     if (intent.place) tryPlace(this); // S-16
+    if (intent.echoOrder && cycleEchoOrder(this)) this.notify('echo-order'); // S-43
     this.updateBeam(dt, intent);
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
     this.updatePickups(dt);
@@ -418,6 +420,7 @@ export class Game {
       ended: this.ended, endedAt: this.endedAt, // S-24
       cycle: this.cycle, records: this.records, // S-29
       anomalies: { ...this.anomaly.taken }, buffs: [...this.buffs], // S-35
+      echoOrder: this.echoOrder, // S-43
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
@@ -441,6 +444,7 @@ export class Game {
     this.craft.last = s.craft && s.craft.last === 'relay' ? 'relay' : 'beacon';
     loadRelays(this, s.relays);
     loadAnomalies(this, s.anomalies, s.buffs); // S-35
+    this.echoOrder = validOrder(s.echoOrder); // S-43: anything else loads as Gather (B-037)
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y, kp] of (Array.isArray(s.pickups) ? s.pickups : []).filter(Array.isArray)) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });

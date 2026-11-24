@@ -5,6 +5,7 @@
 //              plus a fixed per-seed aim wobble of ±WOBBLE rad;
 //   still    — never moves from where it entered (the south interior), beams the Glitch nearest the core it can see.
 // Reports fails / tries (a fail → step out, back in, up to 3 tries) and charge left on success.
+// S-43: ECHO=guard runs it with the Echo on Guard (the Wake check in 07-…-7).
 // Usage: node tools/wakeprobe.mjs [build = mid: start|mid|max] [seeds = 20] [REACT = 0.35] [WOBBLE = 0.12]
 import { Game } from '../src/game.js';
 import { CELL, UPGRADES } from '../src/config.js';
@@ -19,6 +20,7 @@ export function run(seed, style, BUILD = 'mid', REACT = 0.35, WOBBLE = 0.12) {
   const g = new Game({ seed, mode: "surge", audio }), rnd = seededStream(seed, 'wakeprobe');
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[BUILD] ? (LEVELS[BUILD][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull'); g.spawnTimer = 1e9;
+  if (process.env.ECHO === 'guard') { g.research.echo = true; g.echoOrder = 'guard'; } // S-43 check: ECHO=guard node tools/wakeprobe.mjs
   const s = g.spires.slice().sort((a, b) => Math.hypot(a.x - g.world.cx, a.y - g.world.cy) - Math.hypot(b.x - g.world.cx, b.y - g.world.cy))[0];
   s.fed = 80;
   let fails = 0, tries = 0, deaths = 0, charge = null, seen = null, react = 0, to = null;

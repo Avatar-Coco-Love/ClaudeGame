@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 80** · **Version: v1.2.20** (session 80: Build; rotation: 81 Build, 82 Design, 83 Build, 84 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 81** · **Version: v1.2.21** (session 81: Build; rotation: 82 Design, 83 Build, 84 Audit, 85 Build).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -27,6 +27,8 @@ _Last updated: 2026-11-24_ · **Session counter: 80** · **Version: v1.2.20** (s
 - Lumen ● (S-10) buys Research (S-11): Scanner ping (S-12), beam modes Wide / Pulse (S-13, S-14, S-21). Detail: `08`.
 - Echo (S-42, D-112, `echo.js`, Research 30 ●): follows down a BFS field, blinks back when stranded, Gathers exposed ore
   at 0.5× beam dps; never saved beyond `research.echo`. `tests/echo.cjs`, bot `tools/echobot.mjs` (strands 0, ◆/min ×1.4 mid).
+  Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp / 0.8 s at the foe nearest the core ≤ 140 px); chip in the
+  `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
 - Crafting (S-16): Beacons (light, S-25 glow) and Relays (remote deposit, S-22; reclaim S-34), `craft.js`. Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light overlay, minimap, Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
@@ -38,11 +40,11 @@ _Last updated: 2026-11-24_ · **Session counter: 80** · **Version: v1.2.20** (s
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 15); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 16); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-10`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 built (#87), S-43 in `07-Build-Specs-7.md`. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 built (#87), S-43 built (#88): M9 specs all built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -51,6 +53,6 @@ _Last updated: 2026-11-24_ · **Session counter: 80** · **Version: v1.2.20** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 81 (Build): M9 S-43 Echo orders, Guard + order key / ◇ button, `echoOrder` save format 16 (spec in
-`07-Build-Specs-7.md`; `game.echo` and its Gather live in `echo.js`). Then Design 82 play-tests M8 + M9, rules on Q-024
-(Echo income) and specs ambient music (S-44). Top perf debt: chunk-blit pre-scale (`04-…-2`). Recorded audio waits (Q-021).
+Session 82 (Design): play-test M8 + M9 (PWA, keys, text, graphics, Echo Gather / Guard) with Playwright screenshots; mark
+M8 ✅ (→ v1.3) and M9 ✅ (→ v1.4) if they hold (D-108); rule on Q-024 (Echo income); spec ambient music as S-44 (D-108,
+Q-021 audio). Top perf debt: chunk-blit pre-scale (`04-…-2`).
