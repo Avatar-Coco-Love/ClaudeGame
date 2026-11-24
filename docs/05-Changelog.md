@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.23 — 2026-11-24 (#90)
+- **New: ambient music.** A quiet synthesized bed now plays under the game: soft pad chords that turn brighter in the
+  Hearth, modal in the Veil and dark in the Deep, with a gentle bell in Drift or a low pulse in Surge (same loudness
+  either way). A Spire Wake drops to a quickened pulse; the ending fades it out. New **Music** slider in Settings
+  (default 50; 0 turns it off). This finishes the Polish & platform milestone: every planned milestone is now done.
+
 ## v1.2.22 — 2026-11-24 (#89)
 - **Plan, no gameplay change.** A play-test of the Echo and the phone layout found nothing to fix; the Echo keeps its
   strength. The Echo milestone is marked done. Next up: a quiet ambient music bed that follows depth and mode, with its

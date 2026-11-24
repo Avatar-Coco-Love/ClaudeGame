@@ -12,6 +12,7 @@ import { Game, cleanRecords } from './game.js';
 import { Renderer } from './render.js';
 import { Input } from './input.js';
 import { Audio } from './audio.js';
+import { Music } from './music.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { createDev } from './dev.js';
 import { registerOffline } from './pwa.js';
@@ -30,7 +31,7 @@ const store = {
 };
 
 const canvas = $('game');
-const audio = new Audio();
+const audio = new Audio(), music = new Music(audio); // S-44: the bed plays under audio.master
 const input = new Input(canvas);
 const renderer = new Renderer(canvas, $('minimap'));
 let game = null;
@@ -77,6 +78,7 @@ function start(save, carry = null) {
   audio.unlock();
   const seed = save ? save.seed : (Math.random() * 2 ** 31) | 0;
   game = new Game({ seed, mode: save ? save.mode : carry ? carry.mode : selectedMode, save, audio, settings });
+  music.setSeed(seed); // S-44: its own draws (seed + 'music'), never game.rng
   if (carry) { game.cycle = carry.cycle; game.records = carry.records; } // S-29: all that crosses into a new cycle (+ settings, apart)
   renderer.attach(game);
   $('title').classList.add('hidden');
@@ -384,6 +386,7 @@ for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, e => {
 function applySettings() {
   audio.setVolume(settings.volume / 100);
   audio.setMuted(settings.muted);
+  music.setLevel(settings.music / 100); // S-44
   if (settings.reducedMotion || !settings.shake) { if (game) game.shake = 0; }
   document.body.classList.toggle('reduce-motion', settings.reducedMotion);
   document.documentElement.classList.toggle('text-large', settings.largeText); // S-40: --ts 1.2 in style.css
@@ -392,6 +395,7 @@ function applySettings() {
   $('mute-btn').textContent = settings.muted ? '♪̸' : '♪';
   $('set-volume').value = settings.volume;
   $('set-volume-val').textContent = settings.volume;
+  $('set-music').value = settings.music; $('set-music-val').textContent = settings.music;
   for (const k of ['muted', 'shake', 'reducedMotion', 'largeText']) {
     const b = document.querySelector(`#settings [data-setting="${k}"]`);
     b.setAttribute('aria-checked', settings[k]); b.textContent = settings[k] ? 'On' : 'Off';
@@ -405,6 +409,7 @@ $('settings-btn').addEventListener('click', openSettings);
 $('settings-close').addEventListener('click', closeSettings);
 $('settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
 $('set-volume').addEventListener('input', e => { audio.unlock(); setSetting('volume', Number(e.target.value)); });
+$('set-music').addEventListener('input', e => { audio.unlock(); setSetting('music', Number(e.target.value)); });
 document.querySelectorAll('#settings [data-setting]').forEach(b => b.addEventListener('click', () => {
   if (b.dataset.setting === 'muted') audio.unlock();
   setSetting(b.dataset.setting, !settings[b.dataset.setting]);
@@ -447,6 +452,8 @@ function frame(now) {
     // S-41 (D-109): the real (unclamped) gap between played frames, which includes the browser's canvas raster
     if (!paused && !game.endSeq && !endingOpen && quality.sample(gap)) renderer.setQuality(quality.level);
   }
+  // S-44: the music bed follows the world (silent on the title and under the Ending sequence / card).
+  music.update(dt, game && !game.demo && !paused ? { ring: game.ringNow, mode: game.mode, wake: !!game.wake, ending: endingOpen || !!game.endSeq } : null);
   tickToast(dt);
   requestAnimationFrame(frame);
 }
@@ -466,4 +473,4 @@ const dev = createDev({ game: () => game, persist, modeChanged() {
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
   if (panelOpen) renderPanel();
 } });
-window.__lumen = { get game() { return game; }, renderer, input, settings, audio, dev, quality }; // debug handle for tests + bots
+window.__lumen = { get game() { return game; }, renderer, input, settings, audio, music, dev, quality }; // debug handle for tests + bots

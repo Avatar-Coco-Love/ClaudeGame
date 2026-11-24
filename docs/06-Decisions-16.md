@@ -38,3 +38,20 @@ Continues `06-Decisions-15.md` (same rules: supersede, never edit; list rejected
 - Rejected: lowering `ECHO_DMG` to 0.35 (would pull mid to ~×1.3 but makes the 30 ● reward feel thin, and both modes
   gain alike, so no pillar is at risk); recorded music loops (needs files and a licence; the pack is SFX); music that
   differs in *amount* by mode (Surge louder) — pillar 3; minor 1.3 for M9 alone (breaks D-046's "in a row").
+
+### D-115 — S-44 ambient music as built: no chord overlap, layers RMS-matched (2026-11-24, session 83, Build)
+- Built per S-44 (`src/music.js`, `MUSIC_*` in config). Clock = the audio context's time, notes scheduled 0.1 s ahead
+  (frame-rate free; a hidden page schedules nothing; after one the next notes restart from now, no catch-up burst).
+- **Pad chords never overlap:** each chord's 4 s release ends exactly when the next chord's 3 s attack starts, so the
+  bed breathes once per chord. Overlapping releases would put 6 pad voices + a layer note over the ≤ 6 budget (max
+  measured now: 4 = 3 pad + 1 layer, 5 during a mode crossfade).
+- **Equal weight measured on the layers alone**, not only the mix (the pad dominates the mix, so the mix was within
+  0.2 dB even with the bell 10 dB under the pulse): bell alone −61.8, pulse alone −61.5 dBFS (Veil). The pulse sits on
+  the chord root at octave 0 (D3 region), not an octave down: same RMS, more audible on small speakers.
+- Mix (30 s, Volume 70, Music 50): sustained RMS −47.6…−47.7 dBFS in all 6 ring × mode states + a Wake; peak ≤ −33.4;
+  loudest 50 ms −42.1; 0 % energy > 2 kHz. Ending → last sound 2.95 s after. Stubbing `music.js` fails 6 of 11 checks.
+- A Wake switches layers at once (not at the next chord: it only lasts 40 s); ring and mode changes wait for the chord.
+  Music plays only in a world (not the title, not under the Ending sequence or card); Settings opens from the title.
+- Rejected: one persistent 3-voice pad gliding between chords (a smooth bed but no "chord every 10–14 s" breath and
+  nodes that never end); scheduling on the frame clock (jitter, catch-up bursts after a hidden tab); measuring equal
+  weight on the mix only (hides a 10 dB layer imbalance).
