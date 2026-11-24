@@ -20,6 +20,7 @@ export class Input {
         if (k === 'm') this.pressed.add('mute');
         if (k === 'f') this.pressed.add('scan'); // S-11 Scanner ping (the game ignores it until unlocked)
         if (k === 'q') this.pressed.add('beamMode'); // S-13 next beam mode (ignored until a second mode is unlocked)
+        if (k === 'b') this.pressed.add('place'); // S-16 place a Beacon (refused with a toast when there is none or no room)
       }
       this.keys.add(k);
       if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();

@@ -3,6 +3,7 @@
 import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
+import { drawBeacons } from './craft.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -20,7 +21,7 @@ export class Renderer {
     this.mini = document.createElement('canvas');
     this.cam = { x: 0, y: 0 };
     this.time = 0;
-    this.extraLights = []; // [{x, y, r}] world-space light holes beyond the core, Nexus and beam
+    this.extraLights = []; // [{x, y, r}] world-space light holes beyond the core, Nexus and beam: the game's beacons (S-16)
     this.resize();
     addEventListener('resize', () => this.resize());
   }
@@ -36,6 +37,7 @@ export class Renderer {
 
   attach(game) {
     this.game = game;
+    this.extraLights = game.beacons; // S-16: the same array, so a placed beacon lights at once
     this.chunks.clear();
     const w = game.world;
     this.mini.width = w.w; this.mini.height = w.h;
@@ -182,6 +184,7 @@ export class Renderer {
     }
 
     this.drawNexus(ctx, left, top, vw, vh);
+    drawBeacons(this, ctx, left, top, vw, vh); // S-16
     this.drawCrack(ctx);
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);

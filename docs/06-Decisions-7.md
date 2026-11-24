@@ -28,3 +28,16 @@ Continues `06-Decisions-6.md` (same rules: supersede, never edit; list rejected 
   The only change is a bot turning toward open floor no longer wastes a burst into air. Wide and Focus rows are byte-same.
 - Rejected: a separate reach test for the hold (two copies of one rule drift apart); a `b.ready` flag (charge = 1 already
   says it); pulsing the full line (D-039 spirit: no new attention-grabbing motion, and static under reduced motion is free).
+
+### D-060 — S-16 as built: beacons are the Renderer's light holes; stock never outruns the cap (2026-11-24, session 41; implements D-043)
+- **One array:** `game.beacons` = `[{ i, x, y, r }]` and `Renderer.attach` points `extraLights` at it, so the S-15 hole path
+  (off-canvas skip) draws them and a placed beacon lights the same frame. `tools/perf.cjs` "holes" now places 20 real beacons.
+- **Crafting stops at stock + placed = 20**, so no Prism buys a beacon with nowhere to go. Placement is intent → realized
+  (`intent.place`, `tryPlace` in `craft.js`); B / ✦ pressed under the Matrix or paused is dropped, like F and Q.
+- **Refusal toasts are 1–3 words** ("Blocked", "Too near the Nexus", "Too near a Beacon", "Beacon limit (20)") instead of 1:
+  one word didn't say which rule. Gap = Euclidean cell distance < 4. Saved beacons load only on open, unique, in-range cells.
+- **Layout:** under 380 px the tabs drop to 12 px / .02em so four fit (Research made the sheet scroll sideways). Landscape
+  phones put ✦ under the ◎ ⟂ ♪ ≡ row, beside the minimap: in the row it pushed ◎ into the bank panel at 667×375.
+- Rejected: a separate beacon loop in `drawLight` (two paths for one cost); ✦ in the landscape row; a 4th row button in
+  portrait only (same rule for both orientations is simpler); letting beacons glow through the dark like Glitch eyes (they
+  sit in their own light hole already).

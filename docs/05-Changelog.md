@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.45 — 2026-11-24 (#46)
+- Beacons: a new **Craft** tab at the Nexus turns 5 Prisms into a Beacon (carry up to 3). Out in the caves press B, or tap ✦,
+  to set one down on your spot: it lights the area around it for good and shows as a white-cyan dot on the minimap. Up to
+  20 per world, 4 cells apart, outside the Nexus ring; a short message says why when a spot won't take one. Same in Drift and Surge.
+- Phones: the four Matrix tabs fit at 320 px; in landscape ✦ sits under the button row, beside the minimap.
+
 ## v0.2.44 — 2026-11-24 (#45)
 - Pulse beam: a full charge now waits while you hold it, its reach line turning solid, and fires the moment a Glitch or
   a wall is in range instead of firing into empty air. Pulse bursts also hit Glitches harder (one shot now drops a

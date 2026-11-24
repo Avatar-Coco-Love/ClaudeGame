@@ -2,6 +2,7 @@
 // and the touch sticks. Each takes the Renderer `r` (its canvases, camera, time and game).
 import { CELL, T, RINGS, RESOURCE, ORE_KIND } from './config.js';
 import { markAlpha } from './research.js';
+import { BEACON_COLOR } from './craft.js';
 
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44],
@@ -43,6 +44,8 @@ export function drawMinimap(r) {
     m.fillRect((q.x + 0.5) * CELL * sc - rr, (q.y + 0.5) * CELL * sc - rr, rr * 2, rr * 2);
   }
   m.globalAlpha = 1;
+  m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
+  for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
 }

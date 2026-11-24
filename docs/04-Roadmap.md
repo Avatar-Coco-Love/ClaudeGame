@@ -36,7 +36,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#45) **S-21 Pulse ready shot:** full charge waits for a target in reach; `PULSE_GLITCH` 1.8; standoff as D-054 predicted (D-059).
 
 ## M4 — Crafting & building
-- **S-16 Beacons v1** (5▲, Craft tab, D-043, `SAVE_FORMAT` 9): placeable light, 140 px, on the minimap. After S-15. Its B / ✦ placement is the build-mode UX (D-048).
+- ✅ (#46) **S-16 Beacons v1** (5▲, Craft tab, `SAVE_FORMAT` 9): placed light, 140 px, minimap dot; B / ✦ is the build-mode UX (D-043, D-048, D-060).
 - **S-22 Relays v1** (12▲ + 40◆, ≤ 3): remote deposit, no heal; reuses S-16 placement (D-056). M4 done → v0.3.
 
 ## M5 — The arc (a reason to go deep) — ships v1.0
