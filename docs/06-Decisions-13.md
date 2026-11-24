@@ -45,3 +45,14 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
   (M7 would empty out by mid game); Anomalies as Glitch drops (a Surge-only source); a random kind per recharge (saved
   RNG state for no play value); a 4th kind for thrust (three closes the loop, pillar 4); Anomaly as a new cell type
   (changes layout under old saves, D-024).
+
+## D-099 — S-35 Anomalies as built (session 68)
+- **Sites** come from the *generated* terrain (World constructor output, before Spires are stamped or a save is
+  applied), so they are seed-only: rock or dense at the draw, ring-bounded distances (Hearth 9–23, Veil 25–47, Deep
+  49–76 cells), ≥ 12 apart, ≥ 1 cell clear of every vault footprint and of the **save-less** Spire choice. An old save
+  whose Spires moved (D-024) marks a site inside its own footprint `void` (never drawn or taken); indices stay stable.
+- **End** = the deposit tick that empties the cargo (so ≥ 1 item banked, then `endBuffs`); leaving a deposit half done
+  keeps the buff. Takes run after the deposit in `update()`, so a buff taken that frame is never ended by it.
+- A taken (recharging) site isn't drawn; S-37 adds the hollow minimap dot. Chip glyph ✶ (one per kind, `ANOMALY_KINDS`).
+- Rejected: storing sites in the save (seed-only is enough and old saves get them free); a new cell type (D-098);
+  ending on the first banked item (cargo half banked would still read as "carrying the buff").

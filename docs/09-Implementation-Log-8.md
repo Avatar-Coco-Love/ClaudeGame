@@ -55,3 +55,12 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
   this short run; Q-007's long-run parity numbers still stand, no change.
 - M7 specs S-35…S-37 in `07-Build-Specs-5.md` (Anomalies: sites, Overclock, deposit end, `SAVE_FORMAT` 15; then
   Lodestone + Ballast bot-tuned; then map / ping / sound / touch). Q-020 opened (timer as well as deposit?).
+
+## Session 68 — Build: S-35 Anomalies v1 (v1.1.8, #74)
+- `src/anomaly.js`: seed-only sites, take on touch once open, `buffMul` in `game.stat()`, ends at a full deposit,
+  300 s recharge, hexagram + take ring, warmer beam core; chip `#buffs` + toast; `SAVE_FORMAT` 15 (D-099).
+- `tests/anomaly.cjs` (7 checks, 20 seeds = 320 sites all valid) + 2 browser checks (chip + toast; deposit ends it);
+  `anomaly()` added to the audio one-shot bounds. Screenshot viewed: chip, toast, hexagram in a carved room, warm beam.
+- **B-060 (open, audit 69):** smoke's S-27 browser check ("first sight toasts 1/5" + minimap) failed in 2 of 3 full
+  runs on this branch (a second Spire already seen), 0 of 44 standalone `browserChecks` runs; main passed once. Random
+  New World seed → likely a seed where the teleport sees two Spires. Its detail now prints seed, Spires, core cell.

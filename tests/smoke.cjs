@@ -71,6 +71,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./surgebot.cjs').nodeChecks(check).catch(e => check('S-30 surge bot checks ran', false, e.message));
   await require('./spitter.cjs').nodeChecks(check).catch(e => check('S-32 spitter checks ran', false, e.message));
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
+  await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -106,12 +107,20 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     const m = await pg.evaluate(() => { const g = window.__lumen.game; return { mined: g.stats.mined, got: g.cargo.shard + g.cargo.prism + g.bank.shard + g.bank.prism, dy: g.player.y - g.nexus.y }; });
     check('beam mines terrain', m.mined >= 4, `seed ${await pg.evaluate(() => window.__lumen.game.world.seed)}, mined ${m.mined} in 5 s game time (${((Date.now() - mineWall) / 1000).toFixed(1)} s wall)`);
     check('core tunnels forward', m.dy > 150, `moved ${Math.round(m.dy)}px`);
+    // S-35: an open Anomaly site taken by touch -> an "✶ Overclock" chip under the cargo bar and the take toast; a deposit ends it.
+    const an = await pg.evaluate(async () => { const g = window.__lumen.game, s = g.anomaly.sites[0], w = g.world, back = { x: g.player.x, y: g.player.y };
+      w.cells[s.y * w.w + s.x] = 0; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 0.5) * 32; g.player.vx = g.player.vy = 0;
+      for (let i = 0; i < 6; i++) await new Promise(r => requestAnimationFrame(r));
+      const out = { buffs: g.buffs.join(), chip: document.querySelector('#buffs .chip')?.textContent, toast: document.getElementById('toast').textContent };
+      g.player.x = back.x; g.player.y = back.y; return out; });
+    check('S-35: taking an open Anomaly shows an "✶ Overclock" chip and the take toast', an.buffs === 'overclock' && an.chip === '✶ Overclock' && /Overclock — beam ×1.5 until you deposit/.test(an.toast), JSON.stringify(an));
 
     // Deposit + upgrade.
     await pg.evaluate(() => { const g = window.__lumen.game; g.cargo.shard = 30; g.cargo.prism = 5; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; });
     await pg.waitForTimeout(2000);
-    const bank = await pg.evaluate(() => ({ ...window.__lumen.game.bank, cargo: window.__lumen.game.cargoTotal() }));
+    const bank = await pg.evaluate(() => ({ ...window.__lumen.game.bank, cargo: window.__lumen.game.cargoTotal(), buffs: window.__lumen.game.buffs.length }));
     check('deposit empties cargo into bank', bank.cargo === 0 && bank.shard >= 30, JSON.stringify(bank));
+    check('S-35: that deposit ended the Overclock', bank.buffs === 0, JSON.stringify(bank));
     // B-010: Shards already banked -> the hint says to upgrade, not to "bring shards home".
     await pg.evaluate(() => { const g = window.__lumen.game; g.player.y = g.nexus.y + 400; });
     await pg.waitForTimeout(200);

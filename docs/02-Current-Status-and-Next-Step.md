@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 67** · **Version: v1.1.7** (session 67: Design, M7 specced; rotation: 68 Build, 69 Audit, 70 Build, 71 Build, 72 Design).
+_Last updated: 2026-11-24_ · **Session counter: 68** · **Version: v1.1.8** (session 68: Build, S-35 Anomalies; rotation: 69 Audit, 70 Build, 71 Build, 72 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -15,6 +15,8 @@ _Last updated: 2026-11-24_ · **Session counter: 67** · **Version: v1.1.7** (se
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
 - Weather (S-33, D-097, `weather.js`): every 300–420 s of `stats.time` (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
   Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending. Play-tested D-098 (Q-019: no).
+- Anomalies (S-35, D-099, `anomaly.js`): 16 seed-only sites (3/5/8 by ring) in rock; open + touch = Overclock (beam ×1.5 via
+  `stat()`), ends when a deposit banks all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`.
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -38,7 +40,7 @@ _Last updated: 2026-11-24_ · **Session counter: 67** · **Version: v1.1.7** (se
 - Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073; phones: below the core / under the bank panel, tap answers first, D-084), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires) every 10 s, on deposit, and on page hide. Saves carry a format number (now 14); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires) every 10 s, on deposit, and on page hide. Saves carry a format number (now 15); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
@@ -52,5 +54,5 @@ _Last updated: 2026-11-24_ · **Session counter: 67** · **Version: v1.1.7** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 68 (Build): **S-35 Anomalies v1** from `07-Build-Specs-5.md` (sites, Overclock, ends at a deposit,
-`SAVE_FORMAT` 15, `tests/anomaly.cjs`). Read only this file and that spec to start.
+Session 69 (Audit): health check per CLAUDE.md (parallel subagents; archive `09` entries before audit 64; check D-xxx).
+Include B-060 (S-27 spire toast flake) in the bug hunt. After it, session 70 builds S-36 from `07-Build-Specs-5.md`.

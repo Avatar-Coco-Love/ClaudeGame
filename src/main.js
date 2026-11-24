@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
@@ -151,7 +151,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen].join('|'); // S-28: the primed hint
+  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -162,6 +162,7 @@ function updateHud() {
     $('cargo-text').textContent = `${total}/${cap}`;
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
     $('cargo-fill').classList.toggle('full', total >= cap);
+    renderBuffs(g); // S-35
     const hull = g.stat('hull');
     $('integrity-fill').style.width = `${Math.max(0, g.player.integrity / hull * 100)}%`;
     $('integrity-text').textContent = `${Math.max(0, Math.ceil(g.player.integrity))}/${hull}`;
@@ -198,9 +199,20 @@ function updateHud() {
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
     if (ev === 'weather-end') toast(g.weather.was === 'storm' ? 'The storm passes' : 'The aurora fades', 2600, KEEP);
+    if (ev === 'anomaly') { const k = ANOMALY_KINDS[g.lastBuff]; toast(`${k.name} — ${k.stat} ×${k.mul} until you deposit`, 3200, KEEP); persist(); } // S-35
+    if (ev === 'buffs-end') { buffFlash(g.endedBuffs); persist(); }
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }
   g.events.length = 0;
+}
+
+// S-35: one chip per active buff; at the deposit that ends them, the chips flash and fade (`.gone`, 0.6 s).
+const chipHtml = (id, cls = '') => { const k = ANOMALY_KINDS[id]; return `<span class="chip${cls}" style="--c:${k.rgb}" title="${k.name} until you deposit"><span class="chip-glyph">${k.glyph}</span><span class="chip-name"> ${k.name}</span></span>`; };
+function renderBuffs(g) { $('buffs').innerHTML = g.buffs.map(id => chipHtml(id)).join(''); }
+function buffFlash(ids) {
+  const el = $('buffs');
+  el.innerHTML = (ids || []).map(id => chipHtml(id, ' gone')).join('');
+  setTimeout(() => { if (game && !game.buffs.length) el.innerHTML = ''; }, 600);
 }
 
 // ---------- Core Matrix panel ----------
