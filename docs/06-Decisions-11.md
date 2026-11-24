@@ -29,3 +29,14 @@ Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected
 - `tools/spireloop.mjs` (this session) is the seed: a straight-line greedy bot stuck on 25 % of seeds (dense corners,
   unbreakable cells), and with Glitches ignored it died ~5 times per Surge run. S-30 plans paths (dig cost) and fights.
 - Rejected: tuning S-23 by hand in the browser (not repeatable; Q-007 needs both modes measured the same way).
+
+### D-083 — S-28 as built: dwell ring, Pulse counts a primed facet, relit look (2026-11-24, session 53, Build; applies D-080, D-081)
+- A facet toggles after `SPIRE_TAP_S` 0.35 s of centre-ray contact, then latches until the ray leaves; a ring fills
+  round the aimed facet meanwhile (feedback for thumbs). Measured: the widest centre-ray window per facet from some
+  interior cell is 45–90°, so the aim stick needs no assist. Lit Spires keep all 8 facets drawn lit.
+- B-036 amended: `pulseInReach` counts a **primed** facet, so a held full Pulse fires at it (one toggle); dormant or lit
+  facets still never count. Relit = core filled + still, `SPIRE_LIGHT` 260 px hole, floor glow `SPIRE_LIT_RGB`
+  (`game.spireLights` = `R.lightSets[2]`), minimap hexagon filled, chime G4-B4-D5 sine (peak −31.8 dBFS, 0.15 s loud).
+- Surge (D-055 interim): the same puzzle, Glitches still spawn, `mode` 'surge'; nobody is stuck before S-23.
+- Rejected: a toggle on beam start (a sweep across facets flips them); aim snapping to facets (windows already wide);
+  letting a full Pulse wait at a primed facet as at bedrock (the burst does something there, B-036's reason is gone).

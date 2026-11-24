@@ -69,7 +69,8 @@ async function renderSfx([script, secs]) {
   return { peakDb: r1(20 * Math.log10(peak || 1e-50)), loudS: loud / 20, above4k: r1(100 * hi / (tot || 1)), above2k: r1(100 * hi2 / (tot || 1)) };
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
-  'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'full()', 'spire()'];
+  'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'full()', 'spire()',
+  'facet(true)', 'facet(false)', 'spireRelit()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -99,6 +100,10 @@ async function browserChecks(browser, url, check, errors) {
   const sp = shots['spire()'];
   check('Spire found tone: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-27)', sp.peakDb <= -28 && sp.above2k < 1 && sp.loudS <= 0.5,
     JSON.stringify(sp));
+  // S-28: a facet flip (one short sine) and the relit chime (rising 3-note sine): soft, low, short, like the found tone.
+  const sf = [shots['facet(true)'], shots['facet(false)'], shots['spireRelit()']];
+  check('facet flip + Spire relit tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-28)',
+    sf.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(sf));
   // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
   const dep = await pg.evaluate(renderSfx, ['for (let i = 0; i < 140; i++) at(i * 0.035, () => a.deposit(i)); at(4.9, () => a.depositDone(2))', 6]);
   check('a 140-item deposit is not a 5 s beep chain: loud ≤ 1 s (B-017)', dep.loudS <= 1, JSON.stringify(dep));

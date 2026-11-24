@@ -4,6 +4,7 @@
 import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
   PULSE_FLASH_S, BEAM_GLITCH_MUL } from './config.js';
 import { UNBREAKABLE } from './world.js';
+import { facetAt, toggleFacet } from './spire.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -98,12 +99,13 @@ function pulseFoe(game, ox, oy, dx, dy, range) {
 }
 
 /** S-21: would a burst now hit something, a live Glitch on the ray or a breakable cell, within the Pulse reach?
- *  Bedrock, a Spire core or facet (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting (B-036). */
+ *  Bedrock, a Spire core or facet (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting
+ *  (B-036). A primed Spire's facet does count: a burst toggles it (S-28). */
 export function pulseInReach(game) {
   const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
   if (pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range)) return true;
   const h = w.raycast(p.x, p.y, dx, dy, range + NOSE);
-  return !!h && !UNBREAKABLE.has(w.get(h.x, h.y));
+  return !!h && (!UNBREAKABLE.has(w.get(h.x, h.y)) || !!facetAt(game, h.x, h.y));
 }
 
 /** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */
@@ -124,6 +126,8 @@ export function releasePulse(game) {
     cells++;
     if (!res || !res.broken) { // unbreakable, or cracked but standing: the burst ends on its face
       end = dist; foe = null; amount = 0;
+      const f = !res && facetAt(game, h.x, h.y); // S-28 (D-080): a burst that stops on a primed facet toggles it once
+      if (f) toggleFacet(game, f.s, f.k);
       if (res) for (let k = 0; k < 8; k++) game.particle(ox + dx * dist, oy + dy * dist, (-dx + (Math.random() - 0.5) * 1.6) * 130, (-dy + (Math.random() - 0.5) * 1.6) * 130, 0.35, w.look(h.x, h.y, type).edge, 2);
       break;
     }

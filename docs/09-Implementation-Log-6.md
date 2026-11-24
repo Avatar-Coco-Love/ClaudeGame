@@ -38,3 +38,18 @@ Continues `09-Implementation-Log-5.md` (split at the 8 KB cap, session 51). Newe
   reaches all 8 from the interior; Wide hit two facets at once in 4.6 % of aims → aim ray only (D-080).
 - **Specs:** S-28 refreshed (aim ray, hint, `mode` save, D-081), S-30 Surge bot written, S-23/S-24 updated for `mode`
   and the bot; S-29 unchanged. Changelog v0.2.43–v0.2.47 archived word for word (cap). No bugs found.
+
+## Session 53 — Build: S-28 facet puzzle + relit (v0.4.57, #58)
+- **What:** on a primed Spire the aim ray's cell (`b.target`, never Wide's side rays) feeds `updateFacetAim`: 0.35 s on
+  one facet toggles it + neighbours, latched until the ray leaves; a Pulse burst stopping on a primed facet toggles it
+  (and `pulseInReach` counts it). Mask 255 → `relightSpire` (also S-20's broken path): `lit`, `mode`, light, chime,
+  toast. Hint in a primed interior. `SAVE_FORMAT` 12: lit without `mode` → 'broken'; unknown `mode` dropped.
+- **Checks** (`tests/facet.cjs`, 16): in-game solve 40 seeds × 5 + Surge; brush / hold / re-aim; dormant + lit never
+  toggle; Wide side ray no, centre ray yes; Pulse once; reload + old save + junk mode; broken path; mouse at 1280×800
+  and the aim stick (CDP touch) at 320×568 each flip a facet and relight; hint fits; audio ceilings for 3 new tones.
+  Stashing `src/` fails 5 node checks (then throws); routing side rays into the aim fails both Wide checks.
+- **Measured:** `facetprobe` 2000 seeds: 308/308 distinct start patterns relit in-game (60 s). Centre-ray window per
+  facet 45–90° from its best interior cell. Tones: flip −33.8 dBFS, chime −31.8, 0 % > 2 kHz.
+- **Observed (screens viewed):** primed: lit facets filled, unlit outlined, hint under the core; relit: core hexagon
+  filled bright, all 8 facets lit, violet pool round the Spire, toast "Spire relit (1/5)". At 320×568 the dev panel
+  covers the hint (dev only). `relay.cjs` pinned `lightSets` as "0,1" → "0,1,0" (a third set now). No bugs found.

@@ -4,10 +4,15 @@
 // 2. The rule is invertible: all 256 tap sets give 256 different masks.
 // 3. Geometry (one real Spire in a seed-1 world): every FACET_RING offset is a T.FACET cell; from the 7×7 interior, a
 //    Focus ray (start-build range) reaches each facet; Wide (3 rays) never has two facets as first hits at once.
+// 4. S-28 (session 53): every distinct start pattern seen in step 1 is solved in-game: the world of the first seed that
+//    drew it, the Spire primed, the core standing in the interior and the real beam (aim ray, SPIRE_TAP_S dwell) held
+//    on each facet of the minimal tap set (tests/facet.cjs `solveInGame`). It must end lit with exactly SPIRE_TAPS[i] taps.
 // Usage: node tools/facetprobe.mjs [seeds = 2000]
 import { Game } from '../src/game.js';
 import { CELL, T, SPIRE_TAPS, WIDE_OFFSET, WIDE_RANGE } from '../src/config.js';
 import { FACET_RING, toggleMask, startMask, spireTypeAt, SPIRE_INTERIOR } from '../src/spire.js';
+import { createRequire } from 'module';
+const { solveInGame } = createRequire(import.meta.url)('../tests/facet.cjs');
 
 const SEEDS = Number(process.argv[2] || 2000), audio = new Proxy({}, { get: () => () => {} });
 const solve = new Map(); // mask -> fewest taps
@@ -18,12 +23,13 @@ for (let set = 0; set < 256; set++) {
 }
 const fail = [];
 if (solve.size !== 256) fail.push(`rule not invertible: ${solve.size} masks reachable`);
-const patterns = SPIRE_TAPS.map(() => new Set()), hist = {};
+const patterns = SPIRE_TAPS.map(() => new Set()), hist = {}, firstSeed = new Map(); // `${i}:${mask}` -> first seed
 for (let k = 1; k <= SEEDS; k++) {
   const seed = (k * 2654435761) >>> 0;
   for (let i = 0; i < SPIRE_TAPS.length; i++) {
     const m = startMask(seed, i), n = solve.get(m);
     patterns[i].add(m); hist[n] = (hist[n] || 0) + 1;
+    if (!firstSeed.has(`${i}:${m}`)) firstSeed.set(`${i}:${m}`, seed);
     if (n !== SPIRE_TAPS[i] || n < 3 || n > 5 || m === 255) fail.push(`seed ${seed} Spire ${i}: mask ${m} needs ${n}`);
   }
 }
@@ -52,5 +58,12 @@ for (let sy = -SPIRE_INTERIOR; sy <= SPIRE_INTERIOR; sy += 0.25) for (let sx = -
 }
 if (reached.size !== 8) fail.push(`Focus reaches only ${reached.size} of 8 facets from the interior (range ${range} px)`);
 console.log(`geometry: Focus (range ${range} px) reaches ${reached.size}/8 facets; Wide hits two facets at once in ${doubles} of ${samples} aims`);
+// 4. In-game solve of every distinct pattern.
+let solved = 0;
+for (const [key, seed] of firstSeed) {
+  const i = Number(key.split(':')[0]), r = await solveInGame(seed, i, 'drift');
+  if (r.lit && r.mode === 'drift' && r.taps.length === SPIRE_TAPS[i]) solved++; else fail.push(`in-game seed ${seed} Spire ${i}: not relit`);
+}
+console.log(`in-game: ${solved}/${firstSeed.size} distinct start patterns relit by beaming their tap sets`);
 console.log(fail.length ? `FAIL ${fail.length}: ${fail.slice(0, 5).join('; ')}` : 'OK');
 process.exitCode = fail.length ? 1 : 0;
