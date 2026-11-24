@@ -39,3 +39,11 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
 - Playtest (Playwright 1280×800, mid, idle in the interior, viewed): 9 s in, charge 80, core 56/160 hp, 4 Glitches;
   the one lit clock facet is hard to see next to the orange ring (→ S-31 orange clock); lanes beyond the light are dark.
 - Specs: S-31 (fix + tune, before S-24), S-24 note (`DARK_ALPHA` to config), S-32 Spitter, S-33 weather. Q-017 → D-087.
+
+## Session 58 — Build: S-31 Wake fix + tune (v0.4.62, #63)
+- **B-048 → fixed** (D-088): `glitch.js` keeps Wake Glitches past `GLITCH_DESPAWN_PX`. `wake.cjs`'s walk-away check
+  failed on the old code (relit at 38 s with the core 60 cells off) and passes now (charge 0 at 15 s).
+- Tune: tier −1. `wakeprobe` mid: perfect/human 0 %, still 100 %. `surgebot spire` Surge: start 98 % fails (it can't
+  hold, by D-087; 469 retries in 30 min), mid 25 % (4 of 16: the bot retreats to heal at 35 % and the Wake drains),
+  max 8 %; primed → relit 0.7/1.2 min. The tune check (`wakeprobe` 4 + 2 seeds) also passes on the old tune: a guard, not proof.
+- Orange clock + hint; viewed `wake-1280x800.png` (lit facet 0 orange-filled, the rest orange outlines). Smoke 256/256.

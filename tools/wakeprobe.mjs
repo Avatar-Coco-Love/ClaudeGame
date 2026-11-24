@@ -12,10 +12,10 @@ import { seededStream } from '../src/world.js';
 import { LEVELS } from './surgebot.mjs';
 
 const audio = new Proxy({}, { get: () => () => {} });
-const BUILD = process.argv[2] || 'mid', SEEDS = Number(process.argv[3] || 20), REACT = Number(process.argv[4] ?? 0.35), WOBBLE = Number(process.argv[5] ?? 0.12);
 const dt = 1 / 60, clamp = v => Math.max(-1, Math.min(1, v));
 
-function run(seed, style) {
+/** One seed with one guard style; exported for tests/wake.cjs (S-31). */
+export function run(seed, style, BUILD = 'mid', REACT = 0.35, WOBBLE = 0.12) {
   const g = new Game({ seed, mode: "surge", audio }), rnd = seededStream(seed, 'wakeprobe');
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[BUILD] ? (LEVELS[BUILD][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull'); g.spawnTimer = 1e9;
@@ -50,8 +50,10 @@ function run(seed, style) {
   return { lit: s.lit, fails, tries, deaths, charge };
 }
 
-for (const style of ['perfect', 'human', 'still']) {
-  const rows = []; for (let k = 1; k <= SEEDS; k++) rows.push(run(k * 7919, style));
+const main = process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop());
+const BUILD = process.argv[2] || 'mid', SEEDS = Number(process.argv[3] || 20), REACT = Number(process.argv[4] ?? 0.35), WOBBLE = Number(process.argv[5] ?? 0.12);
+if (main) for (const style of ['perfect', 'human', 'still']) {
+  const rows = []; for (let k = 1; k <= SEEDS; k++) rows.push(run(k * 7919, style, BUILD, REACT, WOBBLE));
   const f = rows.reduce((a, r) => a + r.fails, 0), t = rows.reduce((a, r) => a + r.tries, 0), ch = rows.filter(r => r.charge != null).map(r => r.charge).sort((a, b) => a - b);
   console.log(`${style.padEnd(7)} ${BUILD} react ${REACT} wobble ${WOBBLE}: relit ${rows.filter(r => r.lit).length}/${SEEDS}, first-try ${rows.filter(r => r.lit && r.fails === 0).length}/${SEEDS}, ` +
     `fails ${f}/${t} (${Math.round(100 * f / Math.max(1, t))} %), deaths ${rows.reduce((a, r) => a + r.deaths, 0)}, charge left median ${ch.length ? ch[ch.length >> 1] : '—'}`);

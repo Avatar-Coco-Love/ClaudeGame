@@ -12,3 +12,9 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
 - **B-048:** the bot healed at the Nexus for ~85 % of its Wakes and still held them: Wake Glitches despawned past
   1500 px from the core. S-31 fixes it; until then walking away holds a Wake (Design sessions change no game code).
 - M6 specs S-32 (Spitter) and S-33 (storm / aurora as one spec, so Drift isn't second-class) written; built after v1.0.
+
+### D-088 — S-31 as built (2026-11-24, session 58, Build; implements D-087, fixes B-048)
+- Wake Glitches (`e.wake`) skip the despawn-by-distance; tier = depth tier − `SPIRE_WAKE_TIER_DROP` (1), floored at 0.
+- The Wake's facets (lit and unlit) draw in `SPIRE_WAKE_RGB` while it runs; after it they return to the violet-white.
+- Rejected: failing the Wake as soon as the core leaves the interior (stepping out to meet a Glitch in a lane is good
+  play); a separate clock dial (the facets already are one, D-055).

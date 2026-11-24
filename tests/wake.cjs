@@ -77,6 +77,21 @@ async function nodeChecks(check) {
     check('S-23: lanes clear only rock/ore, stop at bedrock (that lane spawns nothing), ore drops loot; Glitches spawn only at usable lane ends',
       bad.length === 0 && stopped === 3 && loot >= 12 && spawns > 50, JSON.stringify({ bad: bad.slice(0, 5), stopped, loot, spawns }));
   }
+  // S-31 / B-048: a core that walks 60 cells off mid-Wake loses it to charge (its Glitches used to despawn: it relit).
+  {
+    const g = make(), s = enter(g); for (let t = 0; t < 2; t += DT) g.update(DT, idle);
+    g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 60.5) * 32; let t = 0, left = 0;
+    for (; t < SPIRE_WAKE_S + 2 && g.wake; t += DT) { g.update(DT, idle); left = g.enemies.filter(e => e.wake).length; }
+    check('S-31 (B-048): walking 60 cells off mid-Wake loses it to charge; its Glitches stay', !s.lit && g.ev.includes('wake-failed'),
+      JSON.stringify({ lit: s.lit, t: +t.toFixed(1), left, ev: g.ev.slice(-3) }));
+  }
+  // S-31 tune (D-087): a human-like guard (re-aims every 0.35 s, ±0.12 rad) holds at mid; a core that never moves doesn't.
+  {
+    const { run } = await import('../tools/wakeprobe.mjs');
+    const human = [1, 2, 3, 4].map(k => run(k * 7919, 'human')), still = [1, 2].map(k => run(k * 7919, 'still'));
+    check('S-31 tune: the human-like guard relights ≥ 3 of 4 seeds at mid; standing still relights none (D-087)',
+      human.filter(r => r.lit).length >= 3 && still.every(r => !r.lit), JSON.stringify({ human, still }));
+  }
   // A reload mid-Wake is a failed Wake: the core loads in the interior and the Spire waits for it to step out.
   {
     const g = make(), s = enter(g); for (let t = 0; t < 3; t += DT) g.update(DT, idle);
@@ -107,12 +122,14 @@ async function browserChecks(browser, url, check, errors, shots) {
       const L = window.__lumen, g = L.game, k = g.wake, h = document.getElementById('hint'), r = h.getBoundingClientRect();
       if (!k) return { wake: false };
       const q = L.renderer.worldToScreen(k.core.x, k.core.y - 2.2 * 32), d = L.renderer.ctx.getImageData(Math.round(q.x), Math.round(q.y), 1, 1).data;
-      return { wake: true, lit: k.lit, hint: h.classList.contains('hidden') ? '' : h.textContent, hl: r.left, hr: r.right, hb: r.bottom, ring: [d[0], d[1], d[2]] };
+      const f = L.renderer.worldToScreen((k.s.x + 2 + 0.5) * 32, (k.s.y - 4 + 0.5) * 32), fd = L.renderer.ctx.getImageData(Math.round(f.x) - 4, Math.round(f.y) - 4, 9, 9).data;
+      let fr = 0, fb = 0; for (let n = 0; n < fd.length; n += 4) { fr += fd[n]; fb += fd[n + 2]; } // facet 0 = the first clock facet
+      return { wake: true, lit: k.lit, clock: [Math.round(fr / 81), Math.round(fb / 81)], hint: h.classList.contains('hidden') ? '' : h.textContent, hl: r.left, hr: r.right, hb: r.bottom, ring: [d[0], d[1], d[2]] };
     });
     if (shots) await page.screenshot({ path: `${shots}/wake-${vw}x${vh}.png` });
-    check(`${vw}×${vh}: the Wake toast + hint fit the screen, facets count up, the charge ring is orange at the core's top (S-23)`,
-      toast.show && /hold it 40 s/.test(toast.text) && toast.l >= 0 && toast.r <= vw && st.wake && st.lit >= 1 && /Hold the Spire/.test(st.hint)
-      && st.hl >= 0 && st.hr <= vw && st.hb <= vh && st.ring[0] > 150 && st.ring[0] > st.ring[2] + 60, JSON.stringify({ toast, st }));
+    check(`${vw}×${vh}: the Wake toast + hint fit the screen, facets count up, the charge ring is orange at the core's top, the first clock facet is orange (S-23, S-31)`,
+      toast.show && /hold it 40 s/.test(toast.text) && toast.l >= 0 && toast.r <= vw && st.wake && st.lit >= 1 && /Circle the core/.test(st.hint)
+      && st.hl >= 0 && st.hr <= vw && st.hb <= vh && st.ring[0] > 150 && st.ring[0] > st.ring[2] + 60 && st.clock[0] > st.clock[1] + 20, JSON.stringify({ toast, st }));
     await ctx.close();
   }
 }

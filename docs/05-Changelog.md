@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.62 — 2026-11-24 (#63)
+- **Wake fixes:** walking away from a waking Spire no longer makes its Glitches vanish. Leave it and they wear the core
+  down. The Wake's Glitches are one step weaker than the Deep's usual ones, so circling the core and beaming them works
+  even at mid upgrades. The facets that count the Wake's 40 seconds now light up orange like the charge ring, and the
+  hint says what to do: "Circle the core: beam the Glitches before they reach it".
+
 ## v0.4.61 — 2026-11-24 (#62)
 - **Design pass:** the Surge Wake was play-tested with simulated players of different reaction speeds. A bug was found
   (walking away from a waking Spire made its Glitches vanish) and is fixed in the next update, along with a fairer tune.

@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.4.61';
+export const VERSION = '0.4.62';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -110,6 +110,7 @@ export const SPIRE_WAVE_S = 1.6;       // seconds between lane spawns (lanes tak
 export const SPIRE_WAKE_ALIVE = 6;     // most Wake Glitches alive at once
 export const SPIRE_LANE = { len: 6, half: 1, min: 3 }; // cells cleared past each gap, half-width, shortest lane that spawns
 export const SPIRE_CHARGE = 100, SPIRE_CHARGE_HIT = 10; // the Spire's charge; a Glitch reaching the core costs this and bursts
+export const SPIRE_WAKE_TIER_DROP = 1; // S-31 (D-087): Wake Glitches spawn this many tiers below the Spire's depth tier
 export const SPIRE_GUARD_CELLS = 3;    // a Wake Glitch chases the player core instead when it is this close
 export const SPIRE_WAKE_RGB = '255, 122, 61'; // the charge arc while a Wake runs (Glitch orange)
 
