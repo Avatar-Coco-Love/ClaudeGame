@@ -30,6 +30,7 @@ const research = require('./research.cjs');
 const beam = require('./beam.cjs');
 const audit29 = require('./audit29.cjs');
 const touch = require('./touch.cjs');
+const audit34 = require('./audit34.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -379,13 +380,16 @@ async function rngChecks() {
     const au = await dp.evaluate(() => {
       const L = window.__lumen, g = L.game, w = g.world, isBed = () => [...w.cells].filter(c => c === 5).length;
       const bed0 = isBed(); L.dev.teleport(90); const bedLost = bed0 - isBed();
-      const R = L.renderer, ctx = R.ctx, fill = ctx.fill; let fills = 0; ctx.fill = function (...a) { fills++; return fill.apply(this, a); };
+      // Draws (fill or drawImage: a pickup is a sprite since B-027) made inside drawPickups only, so chunk blits don't count.
+      const R = L.renderer, ctx = R.ctx, fill = ctx.fill, img = ctx.drawImage, dp = R.drawPickups; let fills = 0, inPk = false;
+      ctx.fill = function (...a) { if (inPk) fills++; return fill.apply(this, a); }; ctx.drawImage = function (...a) { if (inPk) fills++; return img.apply(this, a); };
+      R.drawPickups = function (...a) { inPk = true; try { return dp.apply(this, a); } finally { inPk = false; } };
       const saved = g.pickups.splice(0);
       for (let i = 0; i < 400; i++) g.pickups.push({ x: g.nexus.x + (i % 20) * 6, y: g.nexus.y + Math.floor(i / 20) * 6, vx: 0, vy: 0, kind: 'shard', age: 1, r: 4 });
       R.draw(0.016, L.input); const off = fills; fills = 0;
       g.pickups.length = 0; g.pickups.push({ x: R.cam.x + 20, y: R.cam.y, vx: 0, vy: 0, kind: 'prism', age: 1, r: 4 }); // the camera lags the teleport
       R.draw(0.016, L.input); const on = fills;
-      ctx.fill = fill; g.pickups.splice(0, g.pickups.length, ...saved);
+      ctx.fill = fill; ctx.drawImage = img; delete R.drawPickups; g.pickups.splice(0, g.pickups.length, ...saved);
       return { bedLost, offFills: off, onFills: on };
     });
     check('teleport(90) keeps the bedrock border (B-013); 400 off-screen pickups add no draws (B-014)',
@@ -442,6 +446,7 @@ async function rngChecks() {
     await beam.browserChecks(browser, url, check, errors);
     await audit29.browserChecks(browser, url, check, errors);
     await touch.browserChecks(browser, url, check, errors);
+    await audit34.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----

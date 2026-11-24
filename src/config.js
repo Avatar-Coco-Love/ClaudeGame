@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.37';
+export const VERSION = '0.2.38';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -19,7 +19,7 @@ export const WORLD_H = 160;
 export const CHUNK = 16; // cells per render chunk edge
 export const NEXUS_RADIUS = 5.5 * CELL; // px; deposit + safe zone
 export const LIGHT_RADIUS = 260; // px around the core
-// S-6 (D-017): an alert Glitch that hasn't closed GLITCH_PROGRESS_PX on its best distance for GLITCH_GIVE_UP_S gives up
+// S-6 (D-017): any Glitch, alert or wandering, that hasn't closed GLITCH_PROGRESS_PX on its best distance for GLITCH_GIVE_UP_S gives up
 // and fades out over GLITCH_FADE_S (harmless, no loot, not beam-targetable), freeing its spawn slot.
 export const GLITCH_PROGRESS_PX = 24;
 export const GLITCH_GIVE_UP_S = 6;
