@@ -75,6 +75,8 @@ export function placeRefusal(game, kind = placeKind(game)) {
 
 /** Realize a placement. Sets `game.placeKind` + `game.placeResult` ('placed' or a refusal) and notifies the HUD either way. */
 export function tryPlace(game) {
+  const at = relayAt(game);
+  if (at) return pickUpRelay(game, at); // S-34 (D-092): B / ✦ inside a Relay's ring picks it up instead
   const kind = placeKind(game), why = placeRefusal(game, kind);
   game.placeKind = kind;
   game.placeResult = why || 'placed';
@@ -93,6 +95,20 @@ export function tryPlace(game) {
   game.beacons.push(b);
   game.revealQueue.push(...w.reveal(b.x, b.y, BEACON_REVEAL * CELL));
   if (game.motionOn()) game.burst(b.x, b.y, 24, BEACON_COLOR, 160);
+  return true;
+}
+
+/** S-34 (D-092): a placed Relay back into stock, free (it never left the world's supply), unless one is carried already.
+ *  `game.relays` is spliced in place: it is the Renderer's light set, so the light and the minimap ring go this frame. */
+export function pickUpRelay(game, r) {
+  game.placeKind = 'relay';
+  if (game.craft.relay >= RELAY_STOCK) { game.placeResult = 'carrying'; game.notify('beacon'); return false; }
+  game.relays.splice(game.relays.indexOf(r), 1);
+  game.craft.relay++; game.craft.last = 'relay';
+  game.placeResult = 'picked';
+  game.audio.beacon();
+  if (game.motionOn()) game.burst(r.x, r.y, 24, RELAY_COLOR, 160);
+  game.notify('beacon');
   return true;
 }
 

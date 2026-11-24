@@ -60,3 +60,10 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
   (the 3 just move deeper with the player now); reclaiming Beacons too (5▲, 20 per world: nobody asked; revisit on feedback).
 - Play-test (Playwright, v1.0.0): New World → relight all (dev) → card → New Cycle → cycle 1 green Nexus + title line
   read well at 1280×800 and 320×568 (viewed `ending-*`, `cycle-*`). S-32 / S-33 re-read against v1.0: unchanged.
+
+### D-093 — S-34 as built: the place button also lifts (2026-11-24, session 63, Build; implements D-092)
+- `tryPlace` checks `relayAt` first → `pickUpRelay` ('picked' / 'carrying'); `game.relays` spliced in place.
+- **Touch:** ✦ was hidden with nothing carried, so a phone player could never pick up. In a Relay's ring the button now
+  shows ⊕↑ (label "Pick up this Relay") whatever is carried; the hint names it: "Tap ⊕↑ to pick up this Relay"
+  (desktop: "B: pick up this Relay"). Hint only with empty cargo (after banking), so it doesn't sit over every deposit.
+- Rejected: a separate pick-up button (one more HUD box on 320 px phones, D-050); long-press ✦ (undiscoverable).

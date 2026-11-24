@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.2 — 2026-11-24 (#68)
+- **Move your Relays** (you asked for this): stand in a Relay's ring and press B, or tap the ⊕↑ button that appears
+  there on phones, to pick it back up for free, then place it further out. You can carry one at a time, and the
+  three-per-world limit still holds, so your remote deposits can now follow you into the Deep.
+
 ## v1.0.1 — 2026-11-24 (#67)
 - **Planning from player feedback:** Relays will be movable. The next update lets you pick a placed Relay back up from
   its ring and set it down further out, so your remote deposits follow you into the Deep.

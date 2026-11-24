@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 62** · **Version: v1.0.1** (session 62: design; v1.0 shipped in 61; rotation: 63 Build, 64 Audit, 65 Build, 67 Design).
+_Last updated: 2026-11-24_ · **Session counter: 63** · **Version: v1.0.2** (session 63: build; v1.0 shipped in 61; rotation: 64 Audit, 65 Build, 66 Build, 67 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -20,7 +20,7 @@ _Last updated: 2026-11-24_ · **Session counter: 62** · **Version: v1.0.1** (se
 - Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
   ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
   Relays (S-22, D-076): 40◆ + 12▲, carry 1, ≤ 3, d ≥ 24, 16 cells from Relays / vault centres / Spire footprints; cargo
-  within 64 px banks like the Nexus (`game.atDeposit()`), no heal; ⊕ glyph, 100 px light, minimap ring. B places `craft.last`.
+  within 64 px banks like the Nexus (`game.atDeposit()`), no heal; B / ⊕↑ in a ring picks it up (S-34, D-093); ⊕ glyph, 100 px light, minimap ring. B places `craft.last`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
   (`{x, y, seen, fed, mask, lit, mode, keep}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
@@ -39,7 +39,7 @@ _Last updated: 2026-11-24_ · **Session counter: 62** · **Version: v1.0.1** (se
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-4`, 1 PR each, D-063): S-34 Relay reclaim (D-092), M6 S-32, S-33 (D-087). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-4`, 1 PR each, D-063): M6 S-32, S-33 (D-087). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (wakeprobe D-087; surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
@@ -49,5 +49,6 @@ _Last updated: 2026-11-24_ · **Session counter: 62** · **Version: v1.0.1** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 63 (Build): **S-34 Relay reclaim** (`07-Build-Specs-4.md`; D-092, a player's request). Then audit 64, then M6
-(S-32 Spitter, S-33 weather → v1.1). Audit 59 Debt in `04-Roadmap-2.md`. Read only this file to start.
+Session 64 (Audit): parallel subagents over the v1.0 code (ending.js, New Cycle, Relay reclaim, wake.js), perf of the
+ending overview on a throttled CPU, mobile, docs drift; fix the top issues, log the rest; archive `09` parts older than
+audit 59 (`09-…-6`); re-check D-xxx. Then M6: S-32 Spitter, S-33 weather → v1.1. Read only this file to start.
