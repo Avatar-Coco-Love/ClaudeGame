@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.12 — 2026-11-24 (#78)
+- **Behind the scenes:** a design pass. Anomalies were play-tested in both modes and on phones (no changes needed),
+  and the last milestone is planned: play offline as an installed app, keys that work on any keyboard layout and can be
+  rebound, larger readable text, and smoother frames on slower phones.
+
 ## v1.2.11 — 2026-11-24 (#77)
 - **Anomalies, found:** once you've lit an Anomaly's cell it stays on the minimap as a dot in its colour (hollow while
   it recharges), and a Scanner ping now shows the charged ones within reach. A soft falling tone marks a buff ending at
