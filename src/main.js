@@ -4,6 +4,7 @@ import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
+import { tickEnding, endingSummary } from './ending.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -170,6 +171,7 @@ function updateHud() {
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'spire-primed') { if (!g.wake) toast('Spire primed', 3200, KEEP); persist(); } // S-20; B-052: a Wake's own toast says it
+    if (ev === 'ending') persist(); // S-24: `ended` is saved at once
     if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
     if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
@@ -294,6 +296,7 @@ function renderPanel() {
   document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));
   const spires = spiresSeen(g) ? ` · Spires ${spiresLit(g)}/${g.spires.length} lit` : ''; // S-27: once one is found
   $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m${spires}`;
+  $('ending-open').classList.toggle('hidden', !g.ended); // S-24: the card stays reachable
 }
 $('matrix-btn').addEventListener('click', openPanel);
 $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
@@ -308,6 +311,21 @@ document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEvent
   toast(`${MODES[game.mode].name} mode — ${MODES[game.mode].blurb}`, 3200, NOW);
 }));
 $('menu-btn').addEventListener('click', () => { persist(); closePanel(); showTitle(); });
+
+// ---------- Ending (S-24, D-090) ----------
+let endingOpen = false, endSkip = false;
+function openEnding() {
+  const e = endingSummary(game), row = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
+  $('ending-stats').innerHTML = row('Time to light them all', e.time) + row('Cells mined', e.mined) +
+    row('Spires relit in Drift', e.drift) + row('Spires relit in Surge', e.surge) + (e.restored ? row('Spires restored', e.restored) : '') +
+    row('Glitches cleared', e.glitches);
+  closePanel(); endingOpen = true; $('ending').classList.remove('hidden'); $('ending-continue').focus();
+}
+function closeEnding() { endingOpen = false; $('ending').classList.add('hidden'); input.pressed.clear(); }
+$('ending-continue').addEventListener('click', closeEnding);
+$('ending-open').addEventListener('click', openEnding);
+// Any key or tap skips the sequence (and does nothing else: the press is swallowed).
+for (const ev of ['keydown', 'pointerdown']) addEventListener(ev, () => { if (game && game.endSeq && !paused) endSkip = true; }, true);
 
 // ---------- Settings (S-3) ----------
 function applySettings() {
@@ -343,16 +361,22 @@ function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   if (game) {
+    document.body.classList.toggle('ending-seq', !!game.endSeq && !paused); // S-24: the HUD steps aside for the overview
+    if (game.endSeq && !paused) { // S-24: keys and taps during the sequence only skip it
+      if (tickEnding(game, dt, endSkip)) openEnding();
+      if (game.endSeq || endSkip) input.pressed.clear();
+      endSkip = false;
+    }
     if (input.consume('mute')) $('mute-btn').click();
     if (input.consume('matrix')) panelOpen ? closePanel() : openPanel();
-    if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (panelOpen) closePanel(); }
+    if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (endingOpen) closeEnding(); else if (panelOpen) closePanel(); }
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
     const scan = take('scan'), beamMode = take('beamMode'), place = take('place'); // S-16: B / ✦ follows the same rule
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place };
-    if (!paused) {
+    if (!paused && !game.endSeq && !endingOpen) { // S-24: the world holds still under the sequence and the card
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));
       updateHud();

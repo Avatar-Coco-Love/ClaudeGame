@@ -10,6 +10,7 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
+import { checkEnding } from './ending.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
@@ -24,6 +25,7 @@ export class Game {
     this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
+    this.ended = false; this.endedAt = null; this.endSeq = null; // S-24: saved / saved (time of 5/5) / the running sequence
     this.wake = null; this.wakeBlock = null; // S-23: the running Wake (never saved) / the Spire a failed one waits to be left
     this.facetAim = null; // S-28: { s, k, t, done } while the aim ray rests on a primed facet (spire.js)
     const c = this.world.centerPx;
@@ -76,6 +78,7 @@ export class Game {
     this.audio.setRing(this.ringNow);
     this.nexusPulse = 0; // 1 -> 0 after a Nexus Development purchase (ring burst in render.js)
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
+    if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
   }
 
   coreRingIndex() { return this.world.ring(Math.floor(this.player.x / CELL), Math.floor(this.player.y / CELL)); }
@@ -384,6 +387,7 @@ export class Game {
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
+      ended: this.ended, endedAt: this.endedAt, // S-24
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
@@ -397,6 +401,7 @@ export class Game {
     for (const k of Object.keys(this.upgrades)) if (s.upgrades && s.upgrades[k] != null) this.upgrades[k] = s.upgrades[k];
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
+    this.ended = s.ended === true; this.endedAt = Number.isFinite(s.endedAt) ? s.endedAt : null; // S-24 (B-037: never trust a save)
     Object.assign(this.research, s.research || {});
     this.craft.beacon = Math.min(BEACON_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.beacon)) || 0)); // S-16; B-038 clamp
     loadBeacons(this, s.beacons);

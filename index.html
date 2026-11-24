@@ -48,6 +48,16 @@
         <div class="mode-toggle"><button data-mode="drift">Drift · calm</button><button data-mode="surge">Surge · hostile</button></div>
       </div>
       <div id="stats"></div>
+      <button id="ending-open" class="secondary hidden">Ending summary</button>
+    </div>
+  </div>
+
+  <div id="ending" class="hidden" role="dialog" aria-modal="true" aria-labelledby="ending-title">
+    <div class="sheet">
+      <header><h2 id="ending-title">The Deep is lit</h2></header>
+      <p class="end-lead">Every Spire burns again, and the dark has lifted.</p>
+      <dl id="ending-stats"></dl>
+      <div class="end-btns"><button id="ending-continue" class="big">Continue</button><button id="ending-cycle" class="big secondary" disabled>New Cycle<small>Next update</small></button></div>
     </div>
   </div>
 

@@ -64,3 +64,12 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
   58/83, 133/200). Docs drift: no false numbers; supersede links + give-up rule added (D-089).
 - New checks failed on the old code first (B-049, B-050 node; B-052 + camera browser). `09-…-5` + sessions 51–53 archived
   word for word. All D-001…D-088 re-checked by the drift agent and here: match. Smoke 258/258.
+
+## Session 60 — Build: S-24 Ending (v0.4.64, #65)
+- `src/ending.js` + hooks (D-090): `spire.js` relight → `checkEnding`; `light.js` darkness from `darkAlpha`; `render.js`
+  overview frame; `main.js` skip, card, Matrix button, sim hold; `dev.relightAll`; `SAVE_FORMAT` 13 (+ step).
+- First draft zoomed the real world out: 133 ms frames headless (1.2 s of sequence in 3 s). Measured, replaced with the
+  map overview: 1.7 ms draw, 16.7 ms frames.
+- `tests/ending.cjs`: 4 node + 5 browser checks (sequence, skip by E / tap only skips, card fits + matches, Continue,
+  reload keeps the lifted dark + card from the Matrix, reduced motion). facet.cjs's old-save check pinned to format 11
+  (the step it tests) instead of `SAVE_FORMAT - 1`, which moved. Viewed `ending-seq-*` and `ending-card-*`. Smoke 269/269.

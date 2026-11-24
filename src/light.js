@@ -3,6 +3,7 @@
 // string for the floor glow; default beacon cyan). It holds `game.beacons` (S-16), `game.relays` (S-22) and the lit
 // Spires (`game.spireLights`, S-28). Both passes iterate the sets in place: no per-frame concat or allocation.
 import { LIGHT_RADIUS, BEACON_RGB } from './config.js';
+import { darkAlpha } from './ending.js';
 
 const GLOW_RGB = BEACON_RGB;
 const GLOW_DOWN = 4; // floor-glow layer pixels per screen pixel, per axis
@@ -29,7 +30,7 @@ export function drawLight(r, ctx) {
   const l = r.lctx, g = r.game, s = r.zoom / 2, cw = r.light.width, ch = r.light.height; // light canvas is half-res
   l.globalCompositeOperation = 'source-over';
   l.clearRect(0, 0, cw, ch);
-  l.fillStyle = 'rgba(2, 3, 10, 0.93)';
+  l.fillStyle = `rgba(2, 3, 10, ${darkAlpha(g)})`; // S-24: DARK_ALPHA, lifted by the ending
   l.fillRect(0, 0, cw, ch);
   l.globalCompositeOperation = 'destination-out';
   const hole = (wx, wy, rad, strength = 1) => {

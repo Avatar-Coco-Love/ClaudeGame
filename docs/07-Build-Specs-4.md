@@ -1,17 +1,7 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). S-24 built (#65, D-090). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
-
-## S-24 — Ending: the sequence and the summary (M5) (D-045)
-- All Spires relit (N/N, N = `game.spires.length`; any mix of modes and broken ones, D-069): an 8 s sequence (each Spire draws a line to the Nexus in turn, the darkness alpha eases
-  0.93 → 0.5), skippable by any key/tap; reduced motion: a 1 s fade instead of lines. Then a summary card: time, cells
-  mined, Spires relit in Drift / Surge (and "restored" for broken ones), Glitches cleared, with **Continue** (keep playing this world, lifted dark stays).
-  **New Cycle** shows on the card but is disabled ("Next update") until S-29.
-- **Save:** `ended: true` (per-Spire `mode` is already saved by S-28/S-23, D-081; the card counts `'broken'` on its
-  own "restored" line). Move `light.js`'s inline darkness 0.93 to config (`DARK_ALPHA`); the lifted value is saved via `ended`. Next `SAVE_FORMAT`; old saves load with `ended: false`. A reload after the ending skips the sequence; the card is reachable from the Matrix stats line.
-- **Smoke:** `dev` relights all 5 → sequence runs, skip works, card fields match stats; reload keeps `ended` and the lifted
-  dark; reduced motion has no lines; screenshots of the sequence mid-way and the card at 1280×800 and 320×568 (view).
 
 ## S-29 — New Cycle (M5, ships v1.0.0) (D-062)
 - **New Cycle** on the summary card (and the title once `ended`): confirm, then a new random seed, `cycle` + 1, and a fresh

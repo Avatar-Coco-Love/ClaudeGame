@@ -5,6 +5,7 @@ import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES,
   SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, SPIRE_WAKE_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
+import { checkEnding } from './ending.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
 export const SPIRE_CORE = 1;  // the core is (2·1 + 1)² = 3×3 cells
@@ -321,6 +322,7 @@ export function relightSpire(game, s, mode) {
   game.spireLights.push(spireLight(s));
   game.audio.spireRelit();
   game.notify('spire-relit');
+  checkEnding(game); // S-24: the last one ends the world
 }
 
 /** The hint's test: the core stands in a primed, unlit Spire's interior. */
