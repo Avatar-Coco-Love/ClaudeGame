@@ -6,9 +6,10 @@
 //   opened = caches broken by accident.
 // Usage: node tools/vaultfind.mjs [seeds = 20] [lumen goal = 10] [upgrade level for every stat = 2]
 import { Game } from '../src/game.js';
+import { beamModeFromEnv } from './mode.mjs';
 import { CELL, T, SCAN_RADIUS } from '../src/config.js';
 
-const BEAM_MODE = process.env.MODE || 'focus';
+const BEAM_MODE = beamModeFromEnv();
 const audio = new Proxy({}, { get: () => () => {} });
 const [SEEDS = 20, GOAL = 10, LVL = 2] = process.argv.slice(2, 5).map(Number);
 const dt = 1 / 60, CAP = 1800, clamp = v => Math.max(-1, Math.min(1, v));

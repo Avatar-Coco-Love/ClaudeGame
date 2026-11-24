@@ -124,6 +124,7 @@ function updateHud() {
     $('scan-btn').classList.toggle('cooling', !scanReady);
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
+    $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;

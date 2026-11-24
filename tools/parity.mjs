@@ -3,9 +3,10 @@
 // hoovers up loose pickups within 260 px, heads home when cargo is full, and in Surge beams any Glitch in range first.
 // Usage: node tools/parity.mjs [upgrade level 0-6 = 0] [seconds = 600] [seeds = 10] [ore to hunt: prism | crystal = prism]
 import { Game } from '../src/game.js';
+import { beamModeFromEnv } from './mode.mjs';
 import { CELL, T } from '../src/config.js';
 
-const BEAM_MODE = process.env.MODE || 'focus';
+const BEAM_MODE = beamModeFromEnv();
 const audio = new Proxy({}, { get: () => () => {} });
 const [LVL = 0, SECS = 600, SEEDS = 10] = process.argv.slice(2, 5).map(Number);
 const ORE = process.argv[5] === 'crystal' ? T.CRYSTAL : T.PRISM;

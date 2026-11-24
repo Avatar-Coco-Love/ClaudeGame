@@ -53,3 +53,10 @@ later generator change never moves a Spire. The core is unmineable so the goal c
 - Rejected: 3 Spires (too short an arc for the end of v1.0); 8 (crowds the ring with vaults, ~20 cells apart); random
   angles (could cluster on one side); Spires at the world corners (d > 90 exists only diagonally, unfair by direction);
   skipping seen sites like vaults (the win needs all of them); mineable Spires (a player could erase the ending).
+
+## D-050 — Touch layout rules (S-17, session 33)
+Landscape phones (`max-height: 480px` + coarse pointer) put ◎ ⟂ ♪ ≡ in one row left of the minimap, all above y 90; portrait keeps
+the column. Coarse-pointer HUD/sheet buttons are ≥ 44 px. A lifted stick adopts another live touch on its half from where it is now
+(no jump). Probes exit 1 on an unknown `MODE` (`tools/mode.mjs`), so `MODE=pulse` fails until S-14 lands.
+- Rejected: moving the buttons to the left edge (the move thumb lives there); a bottom bar (both thumbs); adopting with the old
+  stick's origin (the core would lurch toward a stale offset); a separate pause sheet (cut in D-048).

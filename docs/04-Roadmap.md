@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; build order S-17, S-14, S-18, S-15, S-16, S-19 (D-048). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; build order S-14, S-18, S-15, S-16, S-19 (D-048). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -10,12 +10,12 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; b
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
 - ✅ (#17) **S-7 Dev panel** (`?dev` or backtick, `__lumen.dev.*`, D-027). Save/load test spots were left out (not in the spec); add when a bot needs them.
-- **S-17 Touch pass** (audit 29 list, now in `07`): landscape title + buttons, 44 px targets, hint wrap, ⟂ label, 2nd finger, README/tools drift.
+- ✅ (#38) **S-17 Touch pass:** landscape title + ◎⟂♪≡ row, 44 px targets, hint wrap, ⟂ label, 2nd finger, tools reject unknown `MODE` (D-050).
 - **S-18 Code split:** `src/glitch.js`, `src/hud.js`, Glitch tuning to `config.js`, dead code out; no behaviour change.
 - **Surge bot runner** (after S-19, before the Surge Spire defence: it tunes that wave) (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining, plus 20 beacon holes. Budget p95 16.7 ms.
-- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`pulse` runs Focus until S-14; S-17 makes unknown modes fail); B-019.
+- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`pulse` exits 1 until S-14 adds it, #38); B-019.
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
 ## M2 — A world worth exploring ✅ (v0.2, D-046)

@@ -2,9 +2,10 @@
 // Usage: node tools/surgefarm.mjs <distance px from Nexus> <upgrade level 0-6> <seconds> [room radius cells = 6]
 // Reports kills/min (each kill drops 2-5◆, plus 1▲ half the time: D-018), deaths/min, and how many Glitches alive at the end are stuck on rock.
 import { Game } from '../src/game.js';
+import { beamModeFromEnv } from './mode.mjs';
 import { CELL, T } from '../src/config.js';
 
-const BEAM_MODE = process.env.MODE || 'focus';
+const BEAM_MODE = beamModeFromEnv();
 const audio = new Proxy({}, { get: () => () => {} });
 const [D = 1000, LVL = 0, SECS = 300, RAD = 6] = process.argv.slice(2).map(Number);
 const SEEDS = 10, dt = 1 / 60;

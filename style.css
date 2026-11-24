@@ -36,6 +36,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #scan-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--gold); background: rgba(40, 30, 8, .85); color: var(--gold);
   font-size: 20px; box-shadow: 0 0 14px rgba(255,201,79,.3); transition: opacity .2s; }
 #scan-btn.cooling { opacity: .35; box-shadow: none; }
+#mode-btn .mode-name { font-size: 14px; font-weight: 600; letter-spacing: .04em; margin-left: 5px; }
 #mode-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--cyan); background: rgba(10, 40, 60, .85); color: var(--cyan);
   font-size: 20px; box-shadow: 0 0 14px rgba(46,242,255,.3); } /* S-13 beam mode switch */
 .research-hint { padding: 12px 0 4px; border-top: 1px solid rgba(90,120,255,.15); font-size: 13px; color: var(--gold); text-align: center; }
@@ -75,9 +76,9 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 .mode-toggle button.selected { border-color: var(--violet); background: rgba(138,92,255,.2); color: #fff; }
 #stats { margin-top: 10px; font-size: 11px; color: var(--dim); }
 
-#title { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;
+#title { position: fixed; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto;
   background: radial-gradient(ellipse at center, rgba(3,4,12,.55), rgba(3,4,12,.92)); }
-.title-inner { width: min(560px, 100%); text-align: center; }
+.title-inner { width: min(560px, 100%); text-align: center; margin: auto 0; } /* S-17: auto margins centre it but never push the h1 above a short viewport */
 #title h1 { font-size: clamp(28px, 10.5vw, 76px); margin: 0; letter-spacing: .14em; font-weight: 800; color: #fff;
   text-shadow: 0 0 18px var(--cyan), 0 0 40px rgba(46,242,255,.5); }
 #title h1 span { color: var(--magenta); text-shadow: 0 0 18px var(--magenta), 0 0 40px rgba(255,79,216,.5); margin-left: .2em; }
@@ -123,4 +124,25 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
   .sheet h2 { font-size: 15px; letter-spacing: .06em; }
   #matrix-bank { gap: 8px; font-size: 14px; }
   .sheet header { gap: 8px; }
+}
+/* S-17 touch pass. Hint: under 380 px it wraps to at most 2 lines instead of an ellipsis. */
+@media (max-width: 380px) {
+  #hint { white-space: normal; width: max-content; text-align: center; border-radius: 14px; line-height: 1.35; }
+  #matrix-btn { bottom: max(84px, calc(env(safe-area-inset-bottom) + 62px)); } /* clears a 2-line hint */
+}
+/* Landscape title: a smaller logo so the buttons and the version line fit or scroll into view. */
+@media (max-height: 480px) {
+  #title h1 { font-size: clamp(24px, 6.3vw, 46px); }
+  .tag { margin: 4px 0 12px; } .modes { margin-top: 10px; }
+}
+/* Coarse pointers: every HUD/sheet control at least 44 px, ♪ and ≡ 8 px apart. */
+@media (pointer: coarse) {
+  .buttons { gap: 8px; }
+  .buttons button, #matrix-close { width: 44px; height: 44px; }
+  .mode-toggle button { min-height: 44px; }
+}
+/* Landscape phone: ◎ ⟂ ♪ ≡ in one row left of the minimap, out of the right (aim) thumb's reach. Portrait keeps the column. */
+@media (max-height: 480px) and (pointer: coarse) {
+  .top-right { flex-direction: row; align-items: flex-start; gap: 8px; }
+  #scan-btn { order: 1; } #mode-btn { order: 2; } .top-right .buttons { order: 3; } #minimap { order: 4; width: 112px; height: 112px; }
 }
