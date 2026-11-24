@@ -49,7 +49,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#56) **S-20 Spire feed:** 80▲ (cargo, then bank) primes a Spire; a broken one relights (D-055, D-069, D-070, D-078).
 - ✅ (#58) **S-28 Facet puzzle + relit:** aim-ray dwell toggles, primed hint, 260 px light + chime, `mode` saved, `SAVE_FORMAT` 12 (D-080, D-081, D-083).
 - ✅ (#61) **S-23 Spire Wake:** Surge's path, hold the Spire 40 s against Glitches down 4 cleared lanes; bot-tuned (D-055, D-086).
-- ✅ (#63) **S-31 Wake fix + tune:** B-048 (Wake Glitches despawned when you walked off), tier −1, orange clock, hint (D-087).
+- ✅ (#63) **S-31 Wake fix + tune:** B-048 (Wake Glitches despawned when you walked off), tier −1, orange clock, hint (D-087, D-088).
 - **S-24 Ending:** 5/5 relit → 8 s sequence → summary card, Continue (D-045).
 - **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
 

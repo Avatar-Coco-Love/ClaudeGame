@@ -6,18 +6,12 @@
 const quiet = new Proxy({}, { get: () => () => {} });
 const DT = 1 / 60, idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 
-/** One frame of the guard: stand between the core and the Glitch nearest it, beam that Glitch (surgebot's guard). */
-function guardStep(g) {
-  const p = g.player, k = g.wake, c = k ? k.core : p; let e = null, bd = Infinity;
-  for (const q of g.enemies) { const d = Math.hypot(q.x - c.x, q.y - c.y); if (q.fade === undefined && d < bd) { bd = d; e = q; } }
-  if (!e || !k) { g.update(DT, idle); return; }
-  const lim = 2.6 * 32, f = 3.2 * 32 / bd, tx = c.x + Math.max(-lim, Math.min(lim, (e.x - c.x) * f)), ty = c.y + Math.max(-lim, Math.min(lim, (e.y - c.y) * f));
-  const m = Math.hypot(tx - p.x, ty - p.y), move = m < 3 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (tx - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (ty - p.y) / m * 2)) };
-  g.update(DT, { move, fire: true, aim: { x: e.x - p.x, y: e.y - p.y } });
-}
 
 async function nodeChecks(check) {
-  const { Game } = await import('../src/game.js');
+  const { Game } = await import('../src/game.js'), bot = await import('../tools/surgebot.mjs');
+  /** One frame of surgebot's guard: stand between the core and the Glitch nearest it, beam that Glitch. */
+  const guardStep = g => { const p = g.player, k = g.wake, e = k && bot.nearestToCore(g, k.core);
+    g.update(DT, e ? { move: bot.steer(p, bot.guardSpot(k.core, e)), fire: true, aim: { x: e.x - p.x, y: e.y - p.y } } : idle); };
   const { T, UPGRADES, SPIRE_WAKE_S, SPIRE_LANE, SPIRE_CHARGE } = await import('../src/config.js');
   const make = (mode = 'surge', seed = 77, save = null) => {
     const g = new Game({ seed, mode, audio: quiet, save }); g.god = true;
@@ -92,6 +86,25 @@ async function nodeChecks(check) {
     check('S-31 tune: the human-like guard relights ≥ 3 of 4 seeds at mid; standing still relights none (D-087)',
       human.filter(r => r.lit).length >= 3 && still.every(r => !r.lit), JSON.stringify({ human, still }));
   }
+  // B-049 (audit 59): a reload mid-feed (not primed yet) doesn't block the Wake that priming then starts.
+  {
+    const g = make(), s = g.spires[0]; s.fed = 40; g.bank.prism = 100;
+    g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; g.update(DT, idle);
+    const h = make('surge', 77, JSON.parse(JSON.stringify(g.toSave()))); h.bank.prism = 100;
+    for (let t = 0; t < 8 && !h.wake; t += DT) h.update(DT, idle);
+    check('B-049: reloading inside a Spire still being fed lets its Wake start once primed', h.spires[0].fed === 80 && !!h.wake && !h.wakeBlock,
+      JSON.stringify({ fed: h.spires[0].fed, wake: !!h.wake, block: !!h.wakeBlock }));
+  }
+  // B-050 (audit 59): an old save's kept rock in the gaps and floor is opened by the Wake (it held itself: Glitches stalled).
+  {
+    const g = make(), s = g.spires[0], w = g.world, rock = [];
+    for (const [i, j] of [[0, -4], [4, 0], [0, 4], [-4, 0], [2, 2]]) { const k = (s.y + j) * w.w + s.x + i; w.cells[k] = T.ROCK; rock.push(k); }
+    s.keep = rock; s.fed = 80; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; g.update(DT, idle);
+    const open = rock.every(k => w.cells[k] === T.EMPTY);
+    for (let t = 0; t < SPIRE_WAKE_S + 1 && g.wake; t += DT) g.update(DT, idle);
+    check('B-050: a Wake opens rock left in a Spire\'s gaps and floor; an idle core then loses it', open && !s.lit && g.ev.includes('wake-failed'),
+      JSON.stringify({ open, lit: s.lit, ev: g.ev.slice(-2) }));
+  }
   // A reload mid-Wake is a failed Wake: the core loads in the interior and the Spire waits for it to step out.
   {
     const g = make(), s = enter(g); for (let t = 0; t < 3; t += DT) g.update(DT, idle);
@@ -104,6 +117,7 @@ async function nodeChecks(check) {
 }
 
 async function browserChecks(browser, url, check, errors, shots) {
+  const WAKE_RING_CELLS = 2.2; // = wake.js's export (the page can't share a node import); a change there must change here
   for (const [vw, vh] of [[1280, 800], [320, 568]]) {
     const touch = vw < 400;
     const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: 1, ...(touch ? { isMobile: true, hasTouch: true } : {}) });
@@ -115,26 +129,27 @@ async function browserChecks(browser, url, check, errors, shots) {
     await page.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.god = true; g.stats.mined = 20;
       const s = g.spires[0]; s.fed = 80; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; g.player.vx = g.player.vy = 0; });
     await page.waitForFunction(() => !!window.__lumen.game.wake, null, { timeout: 3000 }).catch(() => {});
-    await page.waitForFunction(() => /Spire wakes/.test(document.getElementById('toast').textContent), null, { timeout: 9000 }).catch(() => {});
+    await page.waitForFunction(() => /Spire waking/.test(document.getElementById('toast').textContent), null, { timeout: 1500 }).catch(() => {}); // B-052: at once
     const toast = await page.evaluate(() => { const t = document.getElementById('toast'), r = t.getBoundingClientRect(); return { text: t.textContent, show: t.classList.contains('show'), l: r.left, r: r.right }; });
-    await page.waitForTimeout(4200);
-    const st = await page.evaluate(() => {
+    await page.waitForTimeout(5800); // past the first clock facet (5 s)
+    const st = await page.evaluate(RING => {
       const L = window.__lumen, g = L.game, k = g.wake, h = document.getElementById('hint'), r = h.getBoundingClientRect();
       if (!k) return { wake: false };
-      const q = L.renderer.worldToScreen(k.core.x, k.core.y - 2.2 * 32), d = L.renderer.ctx.getImageData(Math.round(q.x), Math.round(q.y), 1, 1).data;
+      const q = L.renderer.worldToScreen(k.core.x, k.core.y - RING * 32), d = L.renderer.ctx.getImageData(Math.round(q.x), Math.round(q.y), 1, 1).data;
       const f = L.renderer.worldToScreen((k.s.x + 2 + 0.5) * 32, (k.s.y - 4 + 0.5) * 32), fd = L.renderer.ctx.getImageData(Math.round(f.x) - 4, Math.round(f.y) - 4, 9, 9).data;
       let fr = 0, fb = 0; for (let n = 0; n < fd.length; n += 4) { fr += fd[n]; fb += fd[n + 2]; } // facet 0 = the first clock facet
-      return { wake: true, lit: k.lit, clock: [Math.round(fr / 81), Math.round(fb / 81)], hint: h.classList.contains('hidden') ? '' : h.textContent, hl: r.left, hr: r.right, hb: r.bottom, ring: [d[0], d[1], d[2]] };
-    });
+      const cam = Math.round(Math.hypot(L.renderer.cam.x - k.core.x, L.renderer.cam.y - k.core.y));
+      return { wake: true, lit: k.lit, cam, clock: [Math.round(fr / 81), Math.round(fb / 81)], hint: h.classList.contains('hidden') ? '' : h.textContent, hl: r.left, hr: r.right, hb: r.bottom, ring: [d[0], d[1], d[2]] };
+    }, WAKE_RING_CELLS);
     if (shots) await page.screenshot({ path: `${shots}/wake-${vw}x${vh}.png` });
-    check(`${vw}×${vh}: the Wake toast + hint fit the screen, facets count up, the charge ring is orange at the core's top, the first clock facet is orange (S-23, S-31)`,
-      toast.show && /hold it 40 s/.test(toast.text) && toast.l >= 0 && toast.r <= vw && st.wake && st.lit >= 1 && /Circle the core/.test(st.hint)
+    check(`${vw}×${vh}: the Wake toast shows at once and fits, the camera frames the Spire core, the hint fits, facets count up, the charge ring is orange at the core's top, the first clock facet is orange (S-23, S-31)`,
+      toast.show && /Spire waking — hold 40 s/.test(toast.text) && st.cam < 24 && toast.l >= 0 && toast.r <= vw && st.wake && st.lit >= 1 && /Circle the core/.test(st.hint)
       && st.hl >= 0 && st.hr <= vw && st.hb <= vh && st.ring[0] > 150 && st.ring[0] > st.ring[2] + 60 && st.clock[0] > st.clock[1] + 20, JSON.stringify({ toast, st }));
     await ctx.close();
   }
 }
 
-module.exports = { nodeChecks, browserChecks, guardStep };
+module.exports = { nodeChecks, browserChecks };
 if (require.main === module) {
   let fail = 0;
   nodeChecks((name, ok, detail) => { if (!ok) fail++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); })

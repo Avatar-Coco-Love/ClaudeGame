@@ -4,6 +4,10 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 59 leftovers:** touch: a full-HUD overlap check for the Wake toasts/hint (`touch.cjs` covers death + mode lines
+  only); `tools/parity.mjs` prints "prism ratio NaN" on runs with no Prisms (guard the 0/0); unused-outside exports
+  (`pulseInReach`, `makeBeacon`, `makeRelay`, `nexusPointerSpot`, `isBroken`, `primeSpire`, `SPIRE_MODES`, `clearLanes`,
+  `startWake`); the Wake tune leans on lane order (south-first let a still core hold): recheck with `wakeprobe` on any change.
 - Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.

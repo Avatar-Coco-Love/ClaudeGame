@@ -66,7 +66,7 @@ export class Game {
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
-    if (save) { this.load(save); markSpiresSeen(this); this.wakeBlock = spireHere(this); } // S-23: a reload mid-Wake is a failed one // S-27: a footprint explored before v0.2.52 is seen, silently
+    if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, CORE_REVEAL);

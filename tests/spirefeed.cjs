@@ -135,7 +135,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     });
     const before = await facets();
     await page.evaluate(() => { window.__lumen.game.spires[0].fed = 78; });
-    await page.waitForFunction(() => { const t = document.getElementById('toast'); return t.classList.contains('show') && /Spire primed/.test(t.textContent); }, null, { timeout: 3000 }).catch(() => {});
+    await page.waitForFunction(() => { const t = document.getElementById('toast'); return t.classList.contains('show') && /Spire primed|Spire waking/.test(t.textContent); }, null, { timeout: 3000 }).catch(() => {});
     await page.waitForTimeout(150);
     const after = await facets();
     const st = await page.evaluate(() => { const g = window.__lumen.game, s = g.spires[0], e = document.getElementById('toast'), r = e.getBoundingClientRect();
@@ -147,8 +147,8 @@ async function browserChecks(browser, url, check, errors, shots) {
     // S-23: in Surge the Wake starts at once and the facets show its clock (0 lit), not the puzzle: none brightens.
     const on = gain.filter((v, k) => v !== null && (st.drawn >> k & 1)), off = gain.filter((v, k) => v !== null && !(st.drawn >> k & 1));
     const brighter = st.drawn === 0 ? off.every(v => v < 1.6) : on.length > 0 && on.every(v => v > 1.6) && (off.length === 0 || Math.min(...on) > Math.max(...off));
-    check(`${vw}×${vh} ${mode}: at 80 the toast "Spire primed" fits the screen and the drawn lit facets brighten (S-20, DSF 1; Surge: the Wake clock, S-23)`, st.fed === 80
-      && st.mask !== null && !st.lit && /Spire primed/.test(st.toast) && st.l >= 0 && st.r <= vw && brighter, JSON.stringify({ st, before, after }));
+    check(`${vw}×${vh} ${mode}: at 80 the toast "Spire primed" (Surge: "Spire waking", B-052) fits the screen and the drawn lit facets brighten (S-20, DSF 1; Surge: the Wake clock, S-23)`, st.fed === 80
+      && st.mask !== null && !st.lit && (mode === 'surge' ? /Spire waking/ : /Spire primed/).test(st.toast) && st.l >= 0 && st.r <= vw && brighter, JSON.stringify({ st, before, after }));
     await page.close();
   }
 }

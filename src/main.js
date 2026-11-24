@@ -3,7 +3,7 @@ import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, 
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
-import { spiresSeen, spiresLit, primedHere } from './spire.js';
+import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -117,8 +117,8 @@ function hint() {
   const g = game, touch = input.usingTouch;
   if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
   if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
-  if (primedHere(g) && g.mode === 'surge') return g.wake ? 'Circle the core: beam the Glitches before they reach it' // S-23
-    : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
+  if (primedHere(g) && g.mode === 'surge') return g.wake && g.wake.s === spireHere(g) ? 'Circle the core: beam the Glitches before they reach it' // S-23; B-051: this Spire's Wake
+    : g.wake ? 'Another Spire is waking — go back and guard it' : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
   if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : 'Upgrade ready — press E at the Nexus'; // B-010
@@ -169,10 +169,10 @@ function updateHud() {
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`, 2600, KEEP);
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
-    if (ev === 'spire-primed') { toast('Spire primed', 3200, KEEP); persist(); } // S-20
+    if (ev === 'spire-primed') { if (!g.wake) toast('Spire primed', 3200, KEEP); persist(); } // S-20; B-052: a Wake's own toast says it
     if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
-    if (ev === 'wake-start') toast(`The Spire wakes — hold it ${SPIRE_WAKE_S} s`, 3200, KEEP); // S-23
-    if (ev === 'wake-failed') { toast('Wake failed — the Spire sleeps. Step out and back in to retry', 3800, KEEP); persist(); }
+    if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
+    if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16, S-22
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);

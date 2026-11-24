@@ -9,10 +9,10 @@
 import { Game } from '../src/game.js';
 import { CELL, UPGRADES } from '../src/config.js';
 import { seededStream } from '../src/world.js';
-import { LEVELS } from './surgebot.mjs';
+import { LEVELS, nearestToCore, guardSpot, steer } from './surgebot.mjs';
 
 const audio = new Proxy({}, { get: () => () => {} });
-const dt = 1 / 60, clamp = v => Math.max(-1, Math.min(1, v));
+const dt = 1 / 60;
 
 /** One seed with one guard style; exported for tests/wake.cjs (S-31). */
 export function run(seed, style, BUILD = 'mid', REACT = 0.35, WOBBLE = 0.12) {
@@ -28,15 +28,13 @@ export function run(seed, style, BUILD = 'mid', REACT = 0.35, WOBBLE = 0.12) {
     enter(); if (!g.wake) break; tries++;
     const wob = (rnd() * 2 - 1) * WOBBLE;
     while (g.wake) {
-      const p = g.player, c = g.wake.core; let e = null, bd = Infinity;
-      for (const q of g.enemies) { const d = Math.hypot(q.x - c.x, q.y - c.y); if (q.fade === undefined && d < bd) { bd = d; e = q; } }
+      const p = g.player, c = g.wake.core, e = nearestToCore(g, c);
       let move = { x: 0, y: 0 }, aim = null;
       if (style === 'still') { if (e) aim = { x: e.x - p.x, y: e.y - p.y }; }
       else {
         react -= dt;
-        if (style === 'perfect' || react <= 0) { react = REACT; seen = e && { x: e.x, y: e.y, d: bd };
-          if (seen) { const lim = 2.6 * CELL, k = 3.2 * CELL / seen.d; to = { x: c.x + Math.max(-lim, Math.min(lim, (seen.x - c.x) * k)), y: c.y + Math.max(-lim, Math.min(lim, (seen.y - c.y) * k)) }; } }
-        if (to) { const m = Math.hypot(to.x - p.x, to.y - p.y); if (m > 3) move = { x: clamp((to.x - p.x) / m * 2), y: clamp((to.y - p.y) / m * 2) }; }
+        if (style === 'perfect' || react <= 0) { react = REACT; seen = e && { x: e.x, y: e.y }; if (seen) to = guardSpot(c, seen); }
+        if (to) move = steer(p, to);
         const tgt = style === 'perfect' ? e : seen;
         if (tgt) { const a = Math.atan2(tgt.y - p.y, tgt.x - p.x) + (style === 'perfect' ? 0 : wob); aim = { x: Math.cos(a), y: Math.sin(a) }; }
       }
