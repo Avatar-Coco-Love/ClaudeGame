@@ -105,7 +105,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload) {
   await pg.close();
 
   // Phones: the ✦ button by touch, the Craft tab at 320 px, and the landscape row not running into the bank panel.
-  for (const [w, h] of [[320, 568], [667, 375], [844, 390]]) { // 568×320 landscape overlaps already with ◎ + ⟂ (B-034, Debt)
+  for (const [w, h] of [[320, 568], [667, 375], [844, 390]]) { // 568×320 + 640×360: touch.cjs (B-034, S-25)
     const ctx = await browser.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
     const ph = await ctx.newPage();
     ph.on('pageerror', e => errors.push(`craft ${w}: ` + e.message));

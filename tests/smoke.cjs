@@ -35,6 +35,7 @@ const audit34 = require('./audit34.cjs');
 const drawcost = require('./drawcost.cjs');
 const audit39 = require('./audit39.cjs');
 const craft = require('./craft.cjs');
+const glow = require('./glow.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -459,6 +460,7 @@ async function rngChecks() {
     await drawcost.browserChecks(browser, url, check, errors);
     await audit39.browserChecks(browser, url, check, errors);
     await craft.browserChecks(browser, url, check, errors, plantSaveAndReload);
+    await glow.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----

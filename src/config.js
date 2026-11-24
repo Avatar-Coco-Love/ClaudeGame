@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.46';
+export const VERSION = '0.2.47';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -159,6 +159,8 @@ export const PULSE_RECOVER_S = 0.3, PULSE_FLASH_S = 0.12;
 // BEACON_MAX placed, ≥ BEACON_GAP cells apart, outside the Nexus ring. Each lights BEACON_LIGHT px for good and, on placement,
 // marks cells within BEACON_REVEAL cells explored. Same in Drift and Surge (Glitches ignore it, D-002).
 export const BEACON_COST = 5, BEACON_STOCK = 3, BEACON_MAX = 20, BEACON_GAP = 4, BEACON_LIGHT = 140, BEACON_REVEAL = 5;
+// S-25 (D-061): an additive cyan floor disc under the walls, so open floor in a pool reads lit. Centre alpha; 0.45× at 60 %, 0 at the edge.
+export const BEACON_GLOW = 0.08;
 
 export const MODES = {
   drift: { name: 'Drift', blurb: 'Calm. No hostiles. Mine, explore, build at your own pace.' },

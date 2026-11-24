@@ -82,3 +82,43 @@ export function drawBeacons(r, ctx, left, top, vw, vh) {
   }
   ctx.restore();
 }
+
+/** S-25 (D-061): a faint additive cyan disc on the floor of every light pool in `r.extraLights` (the beacons), drawn right
+ *  after the grid so walls and ore cover it and the darkness dims it like the floor. One cached sprite per radius (D-051),
+ *  culled to the view. The gradient is smooth, so all visible discs are summed into one quarter-res layer over their union
+ *  box and blitted once (20 overlapping full-res discs cost 2.2x an empty frame in drawcost.cjs; this keeps the 2x budget).
+ *  Static, so reduced motion needs nothing. `r.beaconGlow` is the centre alpha (0 = off, for tests). */
+const GLOW_DOWN = 4; // layer pixels per screen pixel, per axis
+export function drawBeaconGlow(r, ctx, left, top, vw, vh) {
+  const a = r.beaconGlow, ls = r.extraLights;
+  if (!(a > 0) || !ls.length) return;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const e of ls) {
+    if (e.x + e.r < left || e.x - e.r > left + vw || e.y + e.r < top || e.y - e.r > top + vh) continue;
+    x0 = Math.min(x0, e.x - e.r); y0 = Math.min(y0, e.y - e.r); x1 = Math.max(x1, e.x + e.r); y1 = Math.max(y1, e.y + e.r);
+  }
+  if (x0 === Infinity) return;
+  x0 = Math.max(x0, left); y0 = Math.max(y0, top); x1 = Math.min(x1, left + vw); y1 = Math.min(y1, top + vh);
+  const k = r.zoom * r.dpr / GLOW_DOWN, lw = Math.ceil((x1 - x0) * k) + 1, lh = Math.ceil((y1 - y0) * k) + 1;
+  const L = r.glowLayer || (r.glowLayer = document.createElement('canvas'));
+  if (L.width < lw || L.height < lh) { L.width = Math.max(L.width, lw); L.height = Math.max(L.height, lh); }
+  const g = L.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, lw, lh);
+  g.globalCompositeOperation = 'lighter'; g.setTransform(k, 0, 0, k, -x0 * k, -y0 * k);
+  for (const e of ls) {
+    const R = e.r;
+    if (e.x + R < x0 || e.x - R > x1 || e.y + R < y0 || e.y - R > y1) continue;
+    const sp = r.glowSprite(`bg-${R}-${a}`, R, p => {
+      const grd = p.createRadialGradient(0, 0, 0, 0, 0, R);
+      grd.addColorStop(0, `rgba(191, 248, 255, ${a})`);
+      grd.addColorStop(0.6, `rgba(191, 248, 255, ${a * 0.45})`);
+      grd.addColorStop(1, 'rgba(191, 248, 255, 0)');
+      p.fillStyle = grd; p.beginPath(); p.arc(0, 0, R, 0, Math.PI * 2); p.fill();
+    });
+    g.drawImage(sp.canvas, e.x - R, e.y - R, R * 2, R * 2);
+  }
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.drawImage(L, 0, 0, lw, lh, x0, y0, lw / k, lh / k);
+  ctx.restore();
+}
