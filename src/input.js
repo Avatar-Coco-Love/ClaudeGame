@@ -1,3 +1,5 @@
+import { defaultKeys, eventCode } from './keys.js';
+
 // Input -> intent. Produces device-agnostic intent each frame:
 //   move: {x,y} in [-1,1] (analog), aim: {x,y} unit vector or null, fire: bool, plus one-shot actions.
 export class Input {
@@ -10,22 +12,25 @@ export class Input {
     // A phone gets touch hints before its first touch (B-002); a mouse move or touch flips it later.
     this.usingTouch = !!globalThis.matchMedia?.('(pointer: coarse)').matches;
 
+    // S-39 (D-106): bindings are physical codes (KeyW is Z on AZERTY), action -> code; main.js shares settings.keys here.
+    this.bindings = defaultKeys();
+    this.capture = null; // Settings "press a key": takes the next keydown's code instead of the game
     addEventListener('keydown', e => {
       if (e.target instanceof HTMLInputElement) return;
-      const k = e.key.toLowerCase();
-      if (!this.keys.has(k)) {
+      const code = eventCode(e);
+      if (this.capture) { e.preventDefault(); e.stopImmediatePropagation(); const f = this.capture; this.capture = null; f(code); return; }
+      if (!this.keys.has(code)) {
+        const act = Object.keys(this.bindings).find(a => this.bindings[a] === code);
         // Enter on a focused button is that button's click, not a Core Matrix toggle (B-003).
-        if (k === 'e' || (k === 'enter' && !(e.target instanceof HTMLButtonElement))) this.pressed.add('matrix');
-        if (k === 'escape') this.pressed.add('escape');
-        if (k === 'm') this.pressed.add('mute');
-        if (k === 'f') this.pressed.add('scan'); // S-11 Scanner ping (the game ignores it until unlocked)
-        if (k === 'q') this.pressed.add('beamMode'); // S-13 next beam mode (ignored until a second mode is unlocked)
-        if (k === 'b') this.pressed.add('place'); // S-16 place a Beacon (refused with a toast when there is none or no room)
+        if (act === 'matrix' || ((code === 'Enter' || code === 'NumpadEnter') && !(e.target instanceof HTMLButtonElement))) this.pressed.add('matrix');
+        if (code === 'Escape') this.pressed.add('escape');
+        // mute; scan (S-11, ignored until unlocked); beamMode (S-13); place (S-16, refused with a toast when there is none)
+        if (act === 'mute' || act === 'scan' || act === 'beamMode' || act === 'place') this.pressed.add(act);
       }
-      this.keys.add(k);
-      if ([' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) e.preventDefault();
+      this.keys.add(code);
+      if (code === this.bindings.mine || code === 'Space' || code.startsWith('Arrow')) e.preventDefault();
     });
-    addEventListener('keyup', e => this.keys.delete(e.key.toLowerCase()));
+    addEventListener('keyup', e => this.keys.delete(eventCode(e)));
     // Leaving the page drops every held input, touch sticks included: a phone may never send touchend while hidden.
     addEventListener('blur', () => this.release());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.release(); });
@@ -103,10 +108,11 @@ export class Input {
   /** screenPlayer: the core's screen position (for mouse aim). */
   read(screenPlayer) {
     let mx = 0, my = 0;
-    if (this.keys.has('a') || this.keys.has('arrowleft')) mx -= 1;
-    if (this.keys.has('d') || this.keys.has('arrowright')) mx += 1;
-    if (this.keys.has('w') || this.keys.has('arrowup')) my -= 1;
-    if (this.keys.has('s') || this.keys.has('arrowdown')) my += 1;
+    const b = this.bindings, held = (a, arrow) => this.keys.has(b[a]) || this.keys.has(arrow);
+    if (held('left', 'ArrowLeft')) mx -= 1;
+    if (held('right', 'ArrowRight')) mx += 1;
+    if (held('up', 'ArrowUp')) my -= 1;
+    if (held('down', 'ArrowDown')) my += 1;
     const mv = this.stickVector(this.sticks.move);
     if (mv.mag > 0.12) { mx = mv.x; my = mv.y; }
     const mlen = Math.hypot(mx, my);
@@ -124,7 +130,7 @@ export class Input {
       if (l > 1) aim = { x: dx / l, y: dy / l };
       fire = this.mouse.down;
     }
-    if (this.keys.has(' ')) fire = true;
+    if (this.keys.has(b.mine)) fire = true;
     const cancel = !!this.dropped; this.dropped = false;
     return { move: { x: mx, y: my }, aim, fire, cancel };
   }

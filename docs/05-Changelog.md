@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.15 — 2026-11-24 (#81)
+- **Keys that fit your keyboard:** controls now follow key positions, so on AZERTY the move keys are Z Q S D where W A S D
+  sit. Settings → Keys lets you rebind move, mine, Core Matrix, Scanner, beam mode, place and mute: tap a row, press a
+  key (Esc cancels; taking a key another action uses swaps them). Badges, hints and the title line show your keys.
+
 ## v1.2.14 — 2026-11-24 (#80)
 - **Fixes from a health check:** the installed app now opens offline even if you only ever visited through a shared
   link; an Anomaly beside a Relay no longer hands you a buff that the deposit you are making ends a moment later;

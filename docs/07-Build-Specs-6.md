@@ -20,7 +20,7 @@ controlled, read and drawn. **Save:** no world-save change (`SAVE_FORMAT` stays 
   load, wait for `navigator.serviceWorker.ready`, `context.setOffline(true)`, reload → title screen renders, New World
   starts, no page errors; the cache name carries `VERSION`. One screenshot (offline title). Prove it fails without sw.
 
-## S-39 — Keys by position, then remappable (M8) (D-103)
+## S-39 — Keys by position, then remappable (M8) (D-103) — ✅ built #81 (D-106)
 - Measured: `input.js` reads `e.key`, so WASD is ZQSD-blind on AZERTY (Z/Q/S/D send z/q/s/d; Q is also beam mode).
   Read `e.code` (KeyW, KeyA, …, Space, ArrowUp …) for every binding; show the key the layout prints
   (`navigator.keyboard.getLayoutMap()` when present, else the code's letter) in `<kbd>` badges and hint lines.

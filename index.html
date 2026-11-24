@@ -33,12 +33,12 @@
     <div class="top-right">
       <canvas id="minimap" width="140" height="140"></canvas>
       <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
-      <button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd>F</kbd></button>
-      <button id="mode-btn" class="hidden" title="Beam mode (Q)" aria-label="Switch beam mode">⟂<span class="mode-name" id="mode-name">Focus</span> <kbd>Q</kbd></button>
-      <button id="beacon-btn" class="hidden" title="Place a Beacon (B)" aria-label="Place a Beacon"><span id="place-glyph">✦</span><span id="beacon-count">0</span> <kbd>B</kbd></button>
+      <button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd data-key="scan">F</kbd></button>
+      <button id="mode-btn" class="hidden" title="Beam mode (Q)" aria-label="Switch beam mode">⟂<span class="mode-name" id="mode-name">Focus</span> <kbd data-key="beamMode">Q</kbd></button>
+      <button id="beacon-btn" class="hidden" title="Place a Beacon (B)" aria-label="Place a Beacon"><span id="place-glyph">✦</span><span id="beacon-count">0</span> <kbd data-key="place">B</kbd></button>
     </div>
     <div id="hint" class="hidden"></div>
-    <button id="matrix-btn" class="hidden">Core Matrix <kbd>E</kbd></button>
+    <button id="matrix-btn" class="hidden">Core Matrix <kbd data-key="matrix">E</kbd></button>
     <div id="toast"></div>
   </div>
 
@@ -78,7 +78,7 @@
       </div>
       <button id="new-world" class="big">New World</button>
       <button id="settings-btn" class="big secondary">Settings</button>
-      <p class="controls">Desktop: WASD move · mouse aim · click/Space mine · E Core Matrix<br>Touch: left thumb move · right thumb aim + mine</p>
+      <p class="controls">Desktop: <span data-key="move">WASD</span> move · mouse aim · click/<span data-key="mine">Space</span> mine · <span data-key="matrix">E</span> Core Matrix<br>Touch: left thumb move · right thumb aim + mine</p>
       <p class="foot">Designed &amp; built by Claude. You can switch modes any time at the Nexus. <span id="version"></span></p>
     </div>
   </div>
@@ -87,9 +87,14 @@
     <div class="sheet">
       <header><h2 id="settings-title">Settings</h2><button id="settings-close" aria-label="Close">✕</button></header>
       <label class="set-row"><span>Volume</span><input id="set-volume" type="range" min="0" max="100" step="5"><output id="set-volume-val"></output></label>
-      <div class="set-row"><span>Mute <kbd>M</kbd></span><button data-setting="muted" role="switch"></button></div>
+      <div class="set-row"><span>Mute <kbd data-key="mute">M</kbd></span><button data-setting="muted" role="switch"></button></div>
       <div class="set-row"><span>Screen shake</span><button data-setting="shake" role="switch"></button></div>
       <div class="set-row"><span>Reduced motion<small>No shake, no glow pulses</small></span><button data-setting="reducedMotion" role="switch"></button></div>
+      <div class="set-row" id="keys-row"><span>Keys<small>Rebind the keyboard</small></span><button id="keys-open">Edit</button></div>
+      <div id="keys-view" class="hidden">
+        <div id="keys-list"></div>
+        <div class="keys-foot"><small>Arrows, Esc and Enter stay fixed.</small><button id="keys-reset">Reset keys</button><button id="keys-back">Back</button></div>
+      </div>
     </div>
   </div>
 

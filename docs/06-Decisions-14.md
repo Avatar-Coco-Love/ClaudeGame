@@ -53,3 +53,14 @@ Continues `06-Decisions-13.md` (same rules: supersede, never edit; list rejected
 - Rejected: restoring the global count (v1.2.14 → v1.2.80 reads as a jump to players and rewrites nothing useful);
   editing D-046 in place (decisions are superseded, never edited); refusing Relays near sites (a placement rule players
   can't see; the deposit guard covers the same case).
+
+### D-106 — S-39 keys as built; v1.2.15 (2026-11-24, session 75, Build; implements D-103)
+- Bindings are `KeyboardEvent.code` (action → code) in `settings.keys`, cleaned by `cleanKeys()` (`src/keys.js`): unknown
+  actions dropped, a bad or fixed code falls back to its default, a clash left by cleaning resets the clashing entries.
+  `input.bindings` is the same live object, so a rebind reaches the game at once. Key-only synthetic events map to codes.
+- Fixed and unbindable: arrows (second move keys), Escape, Enter / NumpadEnter, and **Tab** (keeps moving focus).
+- Settings gets one **Keys** row that swaps the sheet to a Keys view (ten rows, Reset, Back), so the main sheet still
+  fits 320×568 without scrolling (S-3 check). The row is hidden for touch players (D-050). Labels: `getLayoutMap()`
+  when present, else the code's letter; `src/keysui.js` names keys in badges, titles, hints and the title line.
+- Rejected: listing the ten rows on the main sheet (scrolls at 320×568); refusing a clash instead of swapping (spec says
+  swap); allowing Tab (a keyboard-only player could lose focus navigation in Settings).
