@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-24_
 
-**Session counter: 29** · **Version: v0.1.32** (session 29: Audit; #32–#33 fixed the deploy first, the audit fixes follow)
+**Session counter: 29** · **Version: v0.1.33** (session 29: Audit; #32–#33 deploy fixes, #34 findings; 30 % 5 == 0, so next is a Build)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); the Projects page card is live (Projects repo #14, session 29).
@@ -56,4 +56,4 @@ _Last updated: 2026-11-24_
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Finish session 29's **Audit** PR: fix the top findings logged in `09` (session 29), put the rest under "Debt" in `04`. Then the Build is S-14 Pulse beam from `07` (D-042), then Q-011 probes with `MODE=pulse`.
+Session 30: fix the **"Fix first"** list in `08-Audit-29-Findings.md` (5 bugs, re-verify each, one failing-first test each). Then its touch list, then S-14 Pulse beam (`07`, D-042).
