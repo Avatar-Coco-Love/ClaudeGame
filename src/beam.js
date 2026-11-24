@@ -118,7 +118,7 @@ function pulseFoe(game, ox, oy, dx, dy, range) {
 /** S-21: would a burst now hit something, a live Glitch on the ray or a breakable cell, within the Pulse reach?
  *  Bedrock, a Spire core or facet (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting
  *  (B-036). A primed Spire's facet does count: a burst toggles it (S-28), once per aim (B-043: not the latched facet). */
-export function pulseInReach(game) {
+function pulseInReach(game) {
   const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
   if (pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range)) return true;
   const h = w.raycast(p.x, p.y, dx, dy, range + NOSE);

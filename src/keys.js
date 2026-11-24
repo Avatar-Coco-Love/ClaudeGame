@@ -6,7 +6,7 @@ export const KEY_ACTIONS = [
   ['mine', 'Mine', 'Space'], ['matrix', 'Core Matrix', 'KeyE'], ['scan', 'Scanner ping', 'KeyF'],
   ['beamMode', 'Beam mode', 'KeyQ'], ['place', 'Place / pick up', 'KeyB'], ['mute', 'Mute', 'KeyM'],
 ];
-export const FIXED_CODES = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Enter', 'NumpadEnter', 'Tab']; // Tab keeps moving focus
+const FIXED_CODES = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Enter', 'NumpadEnter', 'Tab']; // Tab keeps moving focus
 const CODE_RE = /^[A-Za-z][A-Za-z0-9]{1,23}$/;
 
 export function defaultKeys() { return Object.fromEntries(KEY_ACTIONS.map(([a, , c]) => [a, c])); }

@@ -176,7 +176,7 @@ export const FACET_RING = [[2, -4], [4, -2], [4, 2], [2, 4], [-2, 4], [-4, 2], [
 export const SPIRE_INTERIOR = 3; // the 7×7 interior: |dx|, |dy| ≤ 3 cells from the centre
 
 /** D-069: broken when the saved `keep` list holds a core or facet cell (the stamp left it as generated). Derived, not saved. */
-export function isBroken(s, w = WORLD_W) {
+function isBroken(s, w = WORLD_W) {
   return (s.keep || []).some(c => { const t = spireTypeAt(c % w - s.x, Math.floor(c / w) - s.y); return t === T.SPIRE || t === T.FACET; });
 }
 
@@ -222,7 +222,7 @@ export function updateSpireFeed(game, dt) {
 
 /** At SPIRE_PRISMS: `mask` gets the start pattern (S-28 only reads it) and the toast "Spire primed". A broken Spire
  *  (D-069) has no puzzle and relights at once, with the same effects as a solved one (relightSpire, mode 'broken'). */
-export function primeSpire(game, s) {
+function primeSpire(game, s) {
   game.audio.depositDone(3);
   if (isBroken(s, game.world.w)) relightSpire(game, s, 'broken');
   else {
@@ -276,7 +276,7 @@ export function drawSpireFeed(r, ctx, left, top, vw, vh) {
 
 // ---------- S-28 facet puzzle + relit (D-055, D-078, D-080, D-081) ----------
 
-export const SPIRE_MODES = ['drift', 'surge', 'broken']; // D-081: how a lit Spire was relit (saved as `mode`)
+const SPIRE_MODES = ['drift', 'surge', 'broken']; // D-081: how a lit Spire was relit (saved as `mode`)
 
 /** The light a relit Spire adds to the Renderer's light sets (S-26): a 260 px hole + violet-white floor glow. */
 export const spireLight = s => ({ x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL, r: SPIRE_LIGHT, glow: SPIRE_LIT_RGB });

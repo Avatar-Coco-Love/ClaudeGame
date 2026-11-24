@@ -60,7 +60,7 @@ export function buffMul(game, id) {
 }
 
 export const siteCharged = (game, i) => !(i in game.anomaly.taken) && !game.anomaly.sites[i].void;
-export const siteOpen = (game, s) => game.world.cells[s.y * game.world.w + s.x] === T.EMPTY;
+const siteOpen = (game, s) => game.world.cells[s.y * game.world.w + s.x] === T.EMPTY;
 
 /** Recharge, then take: the core's centre within ANOMALY_TAKE cells of an open, charged site whose kind isn't active. */
 export function updateAnomalies(game, dt) {

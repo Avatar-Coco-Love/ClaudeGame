@@ -38,7 +38,7 @@ function makeNoise(seed) {
 }
 
 // S-9 vault templates (7×7): '#' shell (T.VAULT), '.' hollow, 'C' cache (T.CACHE), ' ' leave the generated cell alone.
-export const VAULT_TEMPLATES = [
+const VAULT_TEMPLATES = [
   ['   #   ', '  #.#  ', ' #...# ', '#..C..#', ' #...# ', '  #.#  ', '   #   '], // diamond
   ['  ###  ', ' #...# ', '#.....#', '#..C..#', '#.....#', ' #...# ', '  ###  '], // hexagon
   ['  ###  ', '  #.#  ', '###.###', '#..C..#', '###.###', '  #.#  ', '  ###  '], // cross

@@ -3,10 +3,10 @@
 import { CELL, T, ORE_KIND, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
 import { anomalyScanMarks, siteCharged } from './anomaly.js';
 
-export const SCAN_TYPES = new Set([...Object.keys(ORE_KIND).map(Number), T.CACHE]); // S-12 (D-035): vault caches show like ore
+const SCAN_TYPES = new Set([...Object.keys(ORE_KIND).map(Number), T.CACHE]); // S-12 (D-035): vault caches show like ore
 
 /** Ore + unopened vault-cache cells whose centre lies within SCAN_RADIUS cells of (px, py). Pure: tests reuse it. */
-export function scanWithin(world, px, py, radius = SCAN_RADIUS) {
+function scanWithin(world, px, py, radius = SCAN_RADIUS) {
   const out = [], R = radius * CELL;
   const x0 = Math.max(0, Math.floor((px - R) / CELL)), x1 = Math.min(world.w - 1, Math.floor((px + R) / CELL));
   const y0 = Math.max(0, Math.floor((py - R) / CELL)), y1 = Math.min(world.h - 1, Math.floor((py + R) / CELL));
@@ -19,7 +19,7 @@ export function scanWithin(world, px, py, radius = SCAN_RADIUS) {
   return out;
 }
 
-export function researchNode(id) { return RESEARCH.find(r => r.id === id); }
+function researchNode(id) { return RESEARCH.find(r => r.id === id); }
 export function canResearch(game, id) {
   const r = researchNode(id);
   return !!r && !game.research[id] && game.bank.lumen >= r.cost;

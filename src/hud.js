@@ -67,7 +67,7 @@ const ARROW_R = 12, LABEL = { back: 22, hw: 22, hh: 8 }; // arrow radius; "NEXUS
 
 /** Where the pointer goes for a Nexus at screen point (nx, ny) on a w×h screen: on the 40 px inset edge along the heading,
  *  slid inward along the same ray until neither the arrow nor its "NEXUS" label touches a HUD box. Null when on screen. */
-export function nexusPointerSpot(w, h, nx, ny, rects) {
+function nexusPointerSpot(w, h, nx, ny, rects) {
   const m = 40;
   if (nx > m && nx < w - m && ny > m && ny < h - m) return null;
   const cx = w / 2, cy = h / 2, a = Math.atan2(ny - cy, nx - cx), c = Math.cos(a), s = Math.sin(a);

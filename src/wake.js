@@ -16,7 +16,7 @@ export const WAKE_RING_CELLS = 2.2; // the charge ring's radius round the core (
 
 /** Clear the four lanes past Spire s's gaps: SPIRE_LANE.len rows, 2·half + 1 wide, each row cleared whole or the lane
  *  stops there. Ore drops its yield as floor loot. Returns [{ len, x, y }] per gap, (x, y) = the lane end's centre in px. */
-export function clearLanes(game, s) {
+function clearLanes(game, s) {
   const w = game.world, { len: L, half } = SPIRE_LANE;
   // B-050: an old save can keep generated rock in a Spire's gaps or floor (`keep`); the Wake opens them first, or its
   // Glitches would stall on the rock, fade, and the Wake would hold itself.
@@ -37,7 +37,7 @@ export function clearLanes(game, s) {
   });
 }
 
-export function startWake(game, s) {
+function startWake(game, s) {
   const core = { x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL };
   game.wake = { s, t: 0, lit: 0, charge: SPIRE_CHARGE, lanes: clearLanes(game, s), turn: 0, spawnT: SPIRE_WAVE_S / 2, core,
     tier: Math.max(0, glitchTier(Math.hypot(core.x - game.nexus.x, core.y - game.nexus.y)) - SPIRE_WAKE_TIER_DROP) }; // S-31
