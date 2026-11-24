@@ -12,3 +12,11 @@ Continues `09-Implementation-Log-8.md` (part 8 hit the 8 KB cap at session 71). 
   Pickups 36 %); idle real-time rAF at 1280×800 ≈ 20 ms mean in headless.
 - Wrote `07-Build-Specs-6.md` (S-38 PWA, S-39 keys, S-40 text + colour check, S-41 adaptive graphics), D-103, Q-021
   (does M8 ship without the owner's audio pack). No gameplay code. No bugs found.
+
+## Session 73 — Build: S-38 PWA (v1.2.13, #79)
+- Added manifest, 3 icons (viewed the 192: three neon hexagons + white heart on #03040c), `sw.js`, `src/pwa.js`,
+  deploy list, `tests/pwa.cjs` (5 checks: manifest, icon sizes, deploy ships them, cache `lumen-<VERSION>` warmed with
+  `/`, `/src/main.js`, `/style.css`; offline reload → title → New World, no errors). Offline title screenshot viewed.
+- Proved the test fails without registration (ready never resolves → cache empty; offline reload =
+  ERR_INTERNET_DISCONNECTED). First attempt hung on `serviceWorker.ready`; the test now races it with a 5 s timeout.
+- Observed: 27 same-origin files warmed on the first visit. No bugs found.

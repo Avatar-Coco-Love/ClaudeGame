@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.13 — 2026-11-24 (#79)
+- **Install it, play it offline:** Lumen Core can be added to your home screen or installed as an app, with its own
+  glowing Nexus icon. After one visit online it also opens and plays with no connection; online, you always get the
+  newest version.
+
 ## v1.2.12 — 2026-11-24 (#78)
 - **Behind the scenes:** a design pass. Anomalies were play-tested in both modes and on phones (no changes needed),
   and the last milestone is planned: play offline as an installed app, keys that work on any keyboard layout and can be
