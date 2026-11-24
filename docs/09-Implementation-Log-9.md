@@ -48,3 +48,15 @@ Continues `09-Implementation-Log-8.md` (part 8 hit the 8 KB cap at session 71). 
 - **B-064** (smoke S-3 check): "controls ≥ 40 px" measured hidden buttons too (0 px); it now counts shown controls only,
   and `keys.cjs` checks the Keys view's own buttons ≥ 40 px. (A first full run also went red because VERSION was bumped mid-run.)
 - Screenshot 1280×800 of the Keys view (Scanner on G) viewed: ten rows + Reset/Back fit without scrolling.
+
+## Session 76 — Build: S-40 readable text + colour check (v1.2.16, #82)
+- `style.css`: all font sizes through `--ts`; 11 px → 12 px except the title footer. Settings → Large text (`largeText`).
+- `tests/textsize.cjs` (6 browser checks): HUD texts ≥ 12 px at 1280×800 both sizes (29 texts; smallest 12 / 14.4), Large
+  ×1.2, the switch saves / reloads / damaged loads Normal, footer 11 px, Large fits 320×568 (a world's supply, B-039) and
+  568×320 (8888 ×3, B-034). Proved: with the old `style.css` 3 checks fail.
+- `tests/colours.cjs` (node): lows normal 74, deut 45, prot 39, trit 29 (colour-only pairs; match Design 72).
+  Shard/Prism deut 18 passes by shape. Proved: without the shape rule the deuteranopia check fails.
+- Observed: at Normal, 8888 ×3 in portrait 320 already pushes the panel 13 px into the minimap; unreachable (a world
+  holds 2750 / 1470 / 141), so not a bug. Large wraps "Core Matrix" to two lines at 320 px (fits, checked).
+- Screenshots viewed: Large at 568×320 (before the fit fix: panel under ◎) and 320×568 (fits).
+

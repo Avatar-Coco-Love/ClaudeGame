@@ -9,7 +9,7 @@ const LEGACY_MUTED = 'lumencore.muted'; // pre-S-3 mute pref, folded in on first
 function defaults() {
   let reduced = false;
   try { reduced = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* no matchMedia */ }
-  return { volume: DEFAULT_VOLUME, muted: false, shake: true, reducedMotion: reduced, keys: defaultKeys() };
+  return { volume: DEFAULT_VOLUME, muted: false, shake: true, reducedMotion: reduced, largeText: false, keys: defaultKeys() };
 }
 
 // Keep only known keys with the right types, so a damaged or hand-edited entry can't break the game.
@@ -22,6 +22,7 @@ function clean(s) {
     muted: typeof s.muted === 'boolean' ? s.muted : d.muted,
     shake: typeof s.shake === 'boolean' ? s.shake : d.shake,
     reducedMotion: typeof s.reducedMotion === 'boolean' ? s.reducedMotion : d.reducedMotion,
+    largeText: typeof s.largeText === 'boolean' ? s.largeText : d.largeText, // S-40: text ×1.2 (style.css --ts)
     keys: cleanKeys(s.keys), // S-39: action -> KeyboardEvent.code; a bad entry falls back to its default
   };
 }

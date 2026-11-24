@@ -50,6 +50,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   pwa.nodeChecks(check);
   for (const r of require('./tuning.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./comments.cjs').run()) check(r.name, r.ok, r.detail);
+  for (const r of require('./colours.cjs').run()) check(r.name, r.ok, r.detail);
   await require('./world.cjs').nodeChecks(check);
   await require('./saveformat.cjs').nodeChecks(check).catch(e => check('save-format checks ran', false, e.message));
   await require('./audit49.cjs').nodeChecks(check).catch(e => check('audit 49 checks ran', false, e.message));
@@ -353,6 +354,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./anomalyfound.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-37 anomaly-found browser checks ran', false, e.message));
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
+    await require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----
