@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 58** · **Version: v0.4.62** (session 58: build; rotation: 59 Audit, 60 Build, 61 Build, 62 Design).
+_Last updated: 2026-11-24_ · **Session counter: 59** · **Version: v0.4.63** (session 59: audit; rotation: 60 Build, 61 Build, 62 Design, 64 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -23,12 +23,12 @@ _Last updated: 2026-11-24_ · **Session counter: 58** · **Version: v0.4.62** (s
   within 64 px banks like the Nexus (`game.atDeposit()`), no heal; ⊕ glyph, 100 px light, minimap ring. B places `craft.last`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
-  (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
+  (`{x, y, seen, fed, mask, lit, mode, keep}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
   Feed (S-20, D-078): in the 7×7 interior ▲ flows in 8/s, cargo then bank (D-070), arc fed / 80; at 80 `mask` = S-28's
   start pattern (`startMask`, `FACET_RING`; lit facets glow) + "Spire primed"; a broken Spire (D-069) relights instead. Wake lanes D-071.
   Facets (S-28, D-080, D-083): 0.35 s of the aim ray (or one Pulse burst) flips a primed facet + neighbours; all 8 →
   relit: 260 px light (`game.spireLights` = `R.lightSets[2]`), chime, filled hexagon, `mode` saved; primed hint. Drift only (S-23).
-  Wake (S-23, D-086, `wake.js`): Surge, enter primed → 4 lanes cleared, Glitches go for the core (charge 100, −10), 40 s → relit 'surge'; fail → step out/in. S-31: tier −1, Wake Glitches don't despawn, orange clock (D-088).
+  Wake (S-23, D-086, `wake.js`): Surge, enter primed → 4 lanes cleared, Glitches go for the core (charge 100, −10), 40 s → relit 'surge'; fail → step out/in. S-31: tier −1, no despawn, orange clock (D-088); camera frames the core (D-089).
   One toggle per aim for every beam (D-084: Pulse `beam.facetLatch`; a Glitch on the ray pauses the dwell latch).
 - Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073; phones: below the core / under the bank panel, tap answers first, D-084), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -47,6 +47,5 @@ _Last updated: 2026-11-24_ · **Session counter: 58** · **Version: v0.4.62** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 59 (Audit): parallel subagents (correctness incl. the new `wake.js`, perf, mobile/touch, code health, docs drift);
-fix the top issues in one PR, log the rest in `04-Roadmap-2.md` Debt; archive `09` parts older than audit 54 (`09-…-5`);
-re-check every D-xxx in `06`. Then S-24 (ending), S-29 (New Cycle → v1.0). Read only this file to start.
+Session 60 (Build): **S-24 Ending** (`07-Build-Specs-4.md`; D-045): sequence + summary card + `ended` save. Then S-29 (New
+Cycle → v1.0.0). Q-018 (Relay reclaim, player request) goes to Design 62. Audit 59 Debt in `04-Roadmap-2.md`. Read only this file to start.

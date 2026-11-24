@@ -4,19 +4,26 @@
 // relit, mode 'surge'. Charge 0, a core death or leaving Surge fails it (fed kept); stepping out and back in retries.
 // A Wake is never saved: a reload mid-Wake is a failed Wake. Drift keeps the facet puzzle (spire.js).
 import { CELL, T, SPIRE_WAKE_S, SPIRE_WAVE_S, SPIRE_WAKE_ALIVE, SPIRE_LANE, SPIRE_CHARGE, SPIRE_CHARGE_HIT, SPIRE_MARK_COLOR,
-  SPIRE_WAKE_RGB, SPIRE_WAKE_TIER_DROP } from './config.js';
-import { spireHere, relightSpire, SPIRE_HALF, FACET_RING } from './spire.js';
-import { makeGlitch, glitchTier } from './glitch.js';
+  SPIRE_WAKE_RGB, SPIRE_WAKE_TIER_DROP, SPIRE_CORE_CONTACT_PX } from './config.js';
+import { spireHere, relightSpire, spireTypeAt, SPIRE_HALF, SPIRE_CORE, FACET_RING } from './spire.js';
+import { makeGlitch, glitchTier, glitchPop } from './glitch.js';
 
-const GAPS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+const GAPS = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // N E S W; spawns take turns in this order
 /** Cells a lane can't clear (D-071): bedrock, vaults, any Spire cell. */
 const STOPS = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE_SHELL, T.SPIRE, T.FACET]);
-const CORE_HALF = 1.5; // the 3×3 core, in cells from the centre
+export const WAKE_RING_CELLS = 2.2; // the charge ring's radius round the core (cosmetic; tests/wake.cjs samples it)
+// Cyclic with spire.js and glitch.js: use their imports only inside functions, never at module top level.
 
 /** Clear the four lanes past Spire s's gaps: SPIRE_LANE.len rows, 2·half + 1 wide, each row cleared whole or the lane
  *  stops there. Ore drops its yield as floor loot. Returns [{ len, x, y }] per gap, (x, y) = the lane end's centre in px. */
 export function clearLanes(game, s) {
   const w = game.world, { len: L, half } = SPIRE_LANE;
+  // B-050: an old save can keep generated rock in a Spire's gaps or floor (`keep`); the Wake opens them first, or its
+  // Glitches would stall on the rock, fade, and the Wake would hold itself.
+  for (let j = -SPIRE_HALF; j <= SPIRE_HALF; j++) for (let i = -SPIRE_HALF; i <= SPIRE_HALF; i++) {
+    const x = s.x + i, y = s.y + j, t = w.get(x, y);
+    if (spireTypeAt(i, j) === T.EMPTY && t !== T.EMPTY && !STOPS.has(t)) { w.destroy(x, y); game.dropYield(x, y, t); }
+  }
   return GAPS.map(([dx, dy]) => {
     let len = 0;
     for (let k = 1; k <= L; k++) {
@@ -87,10 +94,9 @@ export function updateWake(game, dt) {
 
 /** A Wake Glitch at distance `gd` from the core: touching it costs SPIRE_CHARGE_HIT and bursts the Glitch, lootless. */
 export function wakeContact(game, e, gd) {
-  if (gd > CORE_HALF * CELL + e.r + 2) return false;
+  if (gd > (SPIRE_CORE + 0.5) * CELL + e.r + SPIRE_CORE_CONTACT_PX) return false; // the core's half-width (3×3 block, spire.js)
   game.wake.charge = Math.max(0, game.wake.charge - SPIRE_CHARGE_HIT);
-  game.burst(e.x, e.y, 22, '#ff7a3d', 220);
-  game.audio.enemyDie();
+  glitchPop(game, e);
   game.addShake(3);
   return true;
 }
@@ -105,8 +111,8 @@ export function drawWake(ctx, game) {
   const f = k.charge / SPIRE_CHARGE, a0 = -Math.PI / 2, col = `rgb(${SPIRE_WAKE_RGB})`;
   ctx.save();
   ctx.strokeStyle = col; ctx.shadowColor = col; ctx.lineWidth = 4;
-  ctx.globalAlpha = 0.25; ctx.beginPath(); ctx.arc(k.core.x, k.core.y, 2.2 * CELL, 0, Math.PI * 2); ctx.stroke();
+  ctx.shadowBlur = 0; ctx.globalAlpha = 0.25; ctx.beginPath(); // audit 59: no blur left over from the last facet drawn ctx.arc(k.core.x, k.core.y, WAKE_RING_CELLS * CELL, 0, Math.PI * 2); ctx.stroke();
   ctx.globalAlpha = 0.95; ctx.shadowBlur = 12;
-  if (f > 0) { ctx.beginPath(); ctx.arc(k.core.x, k.core.y, 2.2 * CELL, a0, a0 + Math.PI * 2 * f); ctx.stroke(); }
+  if (f > 0) { ctx.beginPath(); ctx.arc(k.core.x, k.core.y, WAKE_RING_CELLS * CELL, a0, a0 + Math.PI * 2 * f); ctx.stroke(); }
   ctx.restore();
 }

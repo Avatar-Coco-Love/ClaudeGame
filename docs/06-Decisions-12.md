@@ -18,3 +18,15 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
 - The Wake's facets (lit and unlit) draw in `SPIRE_WAKE_RGB` while it runs; after it they return to the violet-white.
 - Rejected: failing the Wake as soon as the core leaves the interior (stepping out to meet a Glitch in a lane is good
   play); a separate clock dial (the facets already are one, D-055).
+
+### D-089 — Audit 59: the Wake on phones, give-up rule, supersede links (2026-11-24, session 59, Audit; amends D-086)
+- **Ends D-055's interim:** since S-23 (D-086) only Drift toggles facets; this supersedes D-083's Surge bullet and D-081's
+  "Surge too until S-23". A puzzle solve always records `'drift'` (`toggleFacet`).
+- **Give-up (D-017) for Wake Glitches** counts progress toward what they chase (Spire core, or the player core within 3
+  cells); switching target restarts the 6 s clock. A faded Wake Glitch costs no charge and drops nothing.
+- **Camera:** while a Wake runs and the core is within 6 cells (`WAKE_FRAME_PX`), the camera frames the Spire core instead
+  of the aim look-ahead, so all four lanes show (phones hid the east lane under ⟂/✦ and the north one off-screen).
+  Rejected: fading the HUD (the buttons are needed mid-fight); zooming out (changes every size test); off-screen arrows (more UI).
+- **Toasts:** a Surge prime with a Wake on the same frame shows only "Spire waking — hold 40 s" (NOW tier); copy cut to one
+  line at 568×320. Lane order stays N E S W: south-first let a standing core hold on its third try (the tune depends on it).
+- Kept: the "Circle the core" hint (touch audit thought standing still works; `wakeprobe` `still` fails 100 %).

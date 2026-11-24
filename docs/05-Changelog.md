@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.63 — 2026-11-24 (#64)
+- **Fixes from a health check:** during a Wake the camera now frames the Spire, so Glitches coming down every lane are in
+  view on phones (they could hide under the buttons or start off-screen). "Spire waking — hold 40 s" shows at once instead
+  of after the "Spire primed" message, and the messages fit one line on phones. Reloading while still feeding a Spire no
+  longer stops its Wake from starting; an old save with rock left in a Spire's doorways no longer gets a free relight;
+  standing in a second Spire while another wakes now says so.
+
 ## v0.4.62 — 2026-11-24 (#63)
 - **Wake fixes:** walking away from a waking Spire no longer makes its Glitches vanish. Leave it and they wear the core
   down. The Wake's Glitches are one step weaker than the Deep's usual ones, so circling the core and beaming them works

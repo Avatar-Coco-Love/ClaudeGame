@@ -1,11 +1,11 @@
-// Surge Glitches (S-18 split out of game.js; behaviour unchanged): spawn, chase or wander, give up (S-6, D-017),
-// die and drop loot (D-018), hit the core. Tuning lives in config.js as GLITCH_*. Spawns, wander and loot draw from
+// Surge Glitches (S-18 split out of game.js): spawn, chase or wander, give up (S-6, D-017), die and drop loot (D-018),
+// hit the core. S-23 Wake Glitches (`e.wake`) chase the Spire core instead and never despawn (wake.js, D-086, D-088). Tuning lives in config.js as GLITCH_*. Spawns, wander and loot draw from
 // their own seeded streams (D-025).
 import {
   NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, GLITCH_R, GLITCH_CAP, GLITCH_CAP_BASE,
   GLITCH_CAP_STEP_PX, GLITCH_SPAWN_S, GLITCH_SPAWN_RING, GLITCH_SPAWN_CLEAR, GLITCH_AGGRO_PX, GLITCH_DESPAWN_PX, GLITCH_TIER_PX,
   GLITCH_TIER_MAX, GLITCH_TIER, GLITCH_LOOT_SHARDS, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK, GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL,
-  GLITCH_NEXUS_BURN, CELL, SPIRE_GUARD_CELLS,
+  GLITCH_NEXUS_BURN, GLITCH_COLORS, CELL, SPIRE_GUARD_CELLS,
 } from './config.js';
 import { wakeContact } from './wake.js';
 import { collides, moveBody } from './body.js';
@@ -36,10 +36,9 @@ export function updateGlitches(game, dt) {
     }
     if (e.hp <= 0) { // B-023: before the give-up and contact checks, so a Glitch the beam just killed neither hits nor fades lootless
       game.stats.glitches++;
-      game.burst(e.x, e.y, 22, '#ff7a3d', 220);
+      glitchPop(game, e);
       if (game.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) game.spawnPickup(e.x, e.y, 'prism'); // D-018
       for (let j = 0; j < GLITCH_LOOT_SHARDS + e.tier; j++) game.spawnPickup(e.x, e.y, 'shard');
-      game.audio.enemyDie();
       game.addShake(4);
       game.enemies.splice(i, 1);
       continue;
@@ -87,6 +86,12 @@ function trySpawnGlitch(game, distFromNexus) {
     game.enemies.push(makeGlitch(x, y, glitchTier(distFromNexus), a));
     return;
   }
+}
+
+/** A Glitch's death burst + sound (a beam kill, or a Wake Glitch bursting on the Spire core). */
+export function glitchPop(game, e) {
+  game.burst(e.x, e.y, 22, GLITCH_COLORS[0], 220);
+  game.audio.enemyDie();
 }
 
 /** Tier by distance from the Nexus in px (deeper = tougher). */

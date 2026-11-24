@@ -1,7 +1,7 @@
 // World drawing (terrain chunk cache, entities, beam, Scanner). Screen-space HUD drawing (minimap, Nexus pointer, touch
 // sticks) is in hud.js; darkness, light holes and floor glow in light.js; painting one terrain chunk in terrain.js (S-26).
 // Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW } from './config.js';
+import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
@@ -101,7 +101,9 @@ export class Renderer {
     const game = this.game, ctx = this.ctx, p = game.player;
     this.time += dt;
     // Camera: follow with slight look-ahead in the aim direction.
-    const lookX = Math.cos(p.angle) * 36, lookY = Math.sin(p.angle) * 36;
+    // S-23 (audit 59 T1/T2): during a Wake, with the core near the Spire, frame the Spire's core so all four lanes show.
+    const wk = game.wake, onSpire = wk && Math.hypot(p.x - wk.core.x, p.y - wk.core.y) < WAKE_FRAME_PX;
+    const lookX = onSpire ? wk.core.x - p.x : Math.cos(p.angle) * 36, lookY = onSpire ? wk.core.y - p.y : Math.sin(p.angle) * 36;
     const k = Math.min(1, dt * 6);
     this.cam.x += (p.x + lookX - this.cam.x) * k;
     this.cam.y += (p.y + lookY - this.cam.y) * k;

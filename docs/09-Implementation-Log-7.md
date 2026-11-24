@@ -47,3 +47,20 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
   hold, by D-087; 469 retries in 30 min), mid 25 % (4 of 16: the bot retreats to heal at 35 % and the Wake drains),
   max 8 %; primed → relit 0.7/1.2 min. The tune check (`wakeprobe` 4 + 2 seeds) also passes on the old tune: a guard, not proof.
 - Orange clock + hint; viewed `wake-1280x800.png` (lit facet 0 orange-filled, the rest orange outlines). Smoke 256/256.
+
+## Session 59 — Audit: the Wake on phones, B-049…B-052 (v0.4.63, #64)
+- Five subagents (correctness, perf, touch, code health, docs drift); each finding re-run here first.
+- **B-049 → fixed:** a load inside any Spire set `wakeBlock`, so a reload mid-feed meant no Wake at 80; now only a primed one.
+- **B-050 → fixed:** an old save's `keep` rock in a Spire's gaps/floor stalled the Wake Glitches (21 faded) and the Wake
+  held itself; `clearLanes` now opens the footprint's floor first.
+- **B-051 → fixed:** in a second primed Spire while another wakes, the hint said "Circle the core"; now "Another Spire is waking".
+- **B-052 → fixed:** "The Spire wakes" waited 3.2–6.4 s behind "Spire primed" (2 Glitches already out). Now NOW tier, primed skipped.
+- Touch: camera frames the core during a Wake (east lane hid under ⟂/✦ at 320/360, north lane off-screen in landscape);
+  toasts one line. Viewed `wake-320x568.png`: whole Spire and all 4 gaps on screen.
+- Health: guard helpers in one place (`surgebot` `nearestToCore`/`guardSpot`/`steer`), `glitchPop`, `SPIRE_CORE`,
+  `SPIRE_CORE_CONTACT_PX`, `WAKE_RING_CELLS`, drawWake blur reset, stale comments. A top-level `SPIRE_CORE` use in wake.js
+  threw a TDZ error through the spire↔wake cycle: kept inside the function, with a header warning.
+- Perf (×4 throttle): Wake draw on vs off within noise; `perf.cjs` home 51/67, base 44/50, loot 97/117 (audit 39: 74/117,
+  58/83, 133/200). Docs drift: no false numbers; supersede links + give-up rule added (D-089).
+- New checks failed on the old code first (B-049, B-050 node; B-052 + camera browser). `09-…-5` + sessions 51–53 archived
+  word for word. All D-001…D-088 re-checked by the drift agent and here: match. Smoke 258/258.

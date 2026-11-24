@@ -9,6 +9,15 @@ import { Game } from '../src/game.js';
 import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS } from '../src/config.js';
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
 
+/** S-23 guard helpers (one copy for surgebot, wakeprobe and tests/wake.cjs, audit 59): the live Glitch nearest the
+ *  Spire core, the spot between the core and a target 3.2 cells out (clamped inside the interior), and the move toward it. */
+export function nearestToCore(g, c) { let e = null, bd = Infinity;
+  for (const q of g.enemies) { const d = Math.hypot(q.x - c.x, q.y - c.y); if (q.fade === undefined && d < bd) { bd = d; e = q; } } return e; }
+export function guardSpot(c, q) { const lim = (SPIRE_HALF - 1.4) * CELL, k = 3.2 * CELL / (Math.hypot(q.x - c.x, q.y - c.y) || 1);
+  return { x: c.x + Math.max(-lim, Math.min(lim, (q.x - c.x) * k)), y: c.y + Math.max(-lim, Math.min(lim, (q.y - c.y) * k)) }; }
+export function steer(p, to) { const m = Math.hypot(to.x - p.x, to.y - p.y);
+  return m < 3 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (to.x - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (to.y - p.y) / m * 2)) }; }
+
 export const LEVELS = { start: {}, mid: { beam: 4, range: 3, thrust: 3, cargo: 4, magnet: 2, hull: 2 }, max: null };
 const WALL = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE, T.FACET]); // the bot never digs these (spec: walls)
 const ORE = new Set([T.CRYSTAL, T.PRISM, T.LUMEN]);
@@ -125,13 +134,9 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     const note = g.notify.bind(g); g.notify = ev => { if (ev === 'wake-start') wakes++; if (ev === 'wake-failed') wakeFails++; note(ev); };
     /** S-23 guard: stand between the core and the Glitch nearest it (inside the interior), beam that Glitch. */
     const guard = () => {
-      const p = g.player, c = g.wake.core; let e = null, bd = Infinity;
-      for (const q of g.enemies) { const d = Math.hypot(q.x - c.x, q.y - c.y); if (q.fade === undefined && d < bd) { bd = d; e = q; } }
+      const p = g.player, e = nearestToCore(g, g.wake.core);
       if (!e) { tick(p); return; }
-      const lim = (SPIRE_HALF - 1.4) * CELL, k = 3.2 * CELL / bd;
-      const to = { x: c.x + Math.max(-lim, Math.min(lim, (e.x - c.x) * k)), y: c.y + Math.max(-lim, Math.min(lim, (e.y - c.y) * k)) };
-      const m = Math.hypot(to.x - p.x, to.y - p.y), move = m < 3 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (to.x - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (to.y - p.y) / m * 2)) };
-      g.update(dt, { move, fire: true, aim: { x: e.x - p.x, y: e.y - p.y } }); t += dt;
+      g.update(dt, { move: steer(p, guardSpot(g.wake.core, e)), fire: true, aim: { x: e.x - p.x, y: e.y - p.y } }); t += dt;
     };
     while (s && t < capT) {
       if (retreat()) continue;

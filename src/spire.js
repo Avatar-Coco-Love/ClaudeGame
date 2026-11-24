@@ -7,6 +7,7 @@ import { seededStream, vaultSites, unpackBits } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
+export const SPIRE_CORE = 1;  // the core is (2·1 + 1)² = 3×3 cells
 
 /** Offset (i, j) from the centre -> the cell type the Spire writes there. Edge ring: shell, with a 1-cell gap at the
  *  middle of each side and facets at (±2, ±4), (±4, ±2); inside: open floor around a 3×3 core. */
@@ -17,7 +18,7 @@ export function spireTypeAt(i, j) {
     if ((ai === 2 && aj === 4) || (ai === 4 && aj === 2)) return T.FACET;
     return T.SPIRE_SHELL;
   }
-  return ai <= 1 && aj <= 1 ? T.SPIRE : T.EMPTY;
+  return ai <= SPIRE_CORE && aj <= SPIRE_CORE ? T.SPIRE : T.EMPTY;
 }
 
 /** Cell indices of a 9×9 footprint centred on (x, y). */
@@ -290,13 +291,13 @@ export function facetAt(game, x, y) {
   return null;
 }
 
-/** Toggle facet k (and its two ring neighbours); all 8 lit relights the Spire in the mode the game is in (D-055 interim). */
+/** Toggle facet k (and its two ring neighbours); all 8 lit relights the Spire. Only Drift toggles since S-23 (D-086). */
 export function toggleFacet(game, s, k) {
   s.mask = toggleMask(s.mask, k);
   const [i, j] = FACET_RING[k], on = (s.mask >> k) & 1;
   game.burst((s.x + i + 0.5) * CELL, (s.y + j + 0.5) * CELL, 10, SPIRE_MARK_COLOR, 120);
   game.audio.facet(!!on);
-  if (s.mask === 255) relightSpire(game, s, game.mode);
+  if (s.mask === 255) relightSpire(game, s, 'drift');
 }
 
 /** D-080: only the aim (centre) ray's cell counts. `SPIRE_TAP_S` of unbroken contact with one facet toggles it once;
