@@ -40,6 +40,7 @@ async function nodeChecks(check) {
   // B-026: a ping with no ore in range still sweeps its ring (the sim advances it).
   const z = new Game({ seed: 77, mode: 'drift', audio });
   z.research.scanner = true; z.world.cells.fill(T.EMPTY);
+  z.anomaly.sites.forEach((_, i) => { z.anomaly.taken[i] = 1e9; }); // S-37: charged Anomaly sites are marked too; none here
   tryScan(z);
   for (let i = 0; i < 30; i++) z.update(1 / 60, idle);
   check('an empty Scanner ping still sweeps its ring (B-026)', z.scan.marks.length === 0 && z.scan.ring && z.scan.age > 0.4 && z.scan.end > 0,

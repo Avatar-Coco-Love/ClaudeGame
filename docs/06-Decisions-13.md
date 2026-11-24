@@ -77,3 +77,5 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
   All in bounds (alone ≤ 1.20, all ≤ 1.30): the spec multipliers stay (1.5; 2 + 1.5; 1.5).
 - Rejected: Ballast ×2 (tried: mine 0.93 / 0.96, deep Drift ÷ Surge 0.85: longer trips cost the bot more than they
   carry); counting only banked haul (an end-of-run artefact); a stronger kind to make buffs "felt" (budget is a cap).
+
+Continued in `06-Decisions-14.md` (D-102 on).

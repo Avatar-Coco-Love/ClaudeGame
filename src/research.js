@@ -1,6 +1,7 @@
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen: the Scanner ping (here) and Wide Beam (`beam.js`).
 // The ping is intent -> realized like movement: `intent.scan` asks, `tryScan` realizes it only if unlocked and off cooldown.
 import { CELL, T, ORE_KIND, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
+import { anomalyScanMarks, siteCharged } from './anomaly.js';
 
 export const SCAN_TYPES = new Set([...Object.keys(ORE_KIND).map(Number), T.CACHE]); // S-12 (D-035): vault caches show like ore
 
@@ -37,7 +38,7 @@ export function buyResearch(game, id) {
 export function tryScan(game) {
   if (!game.research.scanner || game.scan.cooldown > 0) return false;
   const p = game.player, instant = !game.motionOn(); // reduced motion: no ring, every glyph at once
-  const marks = scanWithin(game.world, p.x, p.y).map(m => ({ ...m, at: instant ? 0 : m.d / SCAN_SPEED }));
+  const marks = [...scanWithin(game.world, p.x, p.y), ...anomalyScanMarks(game, p.x, p.y, SCAN_RADIUS)].map(m => ({ ...m, at: instant ? 0 : m.d / SCAN_SPEED }));
   game.scan = { cooldown: SCAN_COOLDOWN_S, age: 0, x: p.x, y: p.y, ring: !instant, marks,
     end: Math.max(0, ...marks.map(m => m.at)) + SCAN_SHOW_S };
   game.audio.scan();
@@ -55,10 +56,11 @@ export function updateScan(game, dt) {
   if (s.age >= s.end) s.marks = [];
 }
 
-/** 0..1 visibility of a mark now (0 before the ring reaches it, fading to 0 over SCAN_SHOW_S); 0 once the cell is mined. */
+/** 0..1 visibility of a mark now (0 before the ring reaches it, fading to 0 over SCAN_SHOW_S); 0 once the cell is mined
+ *  (S-37: an Anomaly mark, once its site is taken). */
 export function markAlpha(game, m) {
   const s = game.scan, t = s.age - m.at;
-  if (t < 0 || game.world.cells[m.y * game.world.w + m.x] !== m.type) return 0;
+  if (t < 0 || (m.type === 'anomaly' ? !siteCharged(game, m.site) : game.world.cells[m.y * game.world.w + m.x] !== m.type)) return 0;
   return Math.max(0, 1 - t / SCAN_SHOW_S);
 }
 

@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24, S-29 built; v1.0.0; S-34 built) M6: S-32 (#71, D-096), S-33 (#72, D-097) built: M6 ✅. Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24, S-29 built; v1.0.0; S-34 built) M6: S-32 (#71, D-096), S-33 (#72, D-097) built: M6 ✅. M7: S-35–S-37 built: M7 ✅ (v1.2). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -19,9 +19,9 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 ## M6 — Surge depth (without making Drift second-class) ✅ (v1.1, D-097)
 - ✅ **S-32 Spitter** (ranged Glitch, Deep; #71, D-096). ✅ **S-33 Weather** (storm / aurora; #72, D-097).
 
-## M7 — Temporary upgrades
-- ✅ **S-35** Anomalies v1 (#74, D-099). ✅ **S-36** Lodestone + Ballast, bot-tuned (#76, D-101). Specced (D-098,
-  `07-…-5`): **S-37** map, ping, sound, touch → v1.2.
+## M7 — Temporary upgrades ✅ (v1.2, D-102)
+- ✅ **S-35** Anomalies v1 (#74, D-099). ✅ **S-36** Lodestone + Ballast, bot-tuned (#76, D-101). ✅ **S-37** map,
+  ping, sound, hint, phone chips (#77, D-102).
 
 ## M8 — Polish & platform
 - **Recorded audio v1a: audition** (D-037, *waiting on the owner's CC0 pack in `docs/inbox/`*): measure every file, shortlist 2–3

@@ -1,9 +1,10 @@
 // Screen-space HUD drawing (S-18 split out of render.js; behaviour unchanged): the explored-only minimap, the Nexus pointer,
 // and the touch sticks. Each takes the Renderer `r` (its canvases, camera, time and game).
-import { CELL, T, RINGS, RESOURCE, ORE_KIND } from './config.js';
+import { CELL, T, RINGS, RESOURCE, ORE_KIND, ANOMALY_KINDS } from './config.js';
 import { markAlpha } from './research.js';
 import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
+import { drawAnomalyMarks } from './anomaly.js';
 
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44],
@@ -41,8 +42,8 @@ export function drawMinimap(r) {
   for (const q of g.scan.marks) { // S-11 ping blips, same lifetime as the glyphs
     const a = markAlpha(g, q);
     if (a <= 0) continue;
-    const rr = q.type === T.CACHE ? 2.25 : 1.5; // S-12: a cache blip is white and 1.5x an ore blip
-    m.globalAlpha = a; m.fillStyle = q.type === T.CACHE ? '#ffffff' : RESOURCE[ORE_KIND[q.type]].color;
+    const rr = q.type === T.CACHE || q.kind ? 2.25 : 1.5; // S-12: a cache blip is white and 1.5x an ore blip (S-37: an Anomaly's, its colour)
+    m.globalAlpha = a; m.fillStyle = q.kind ? `rgb(${ANOMALY_KINDS[q.kind].rgb})` : q.type === T.CACHE ? '#ffffff' : RESOURCE[ORE_KIND[q.type]].color;
     m.fillRect((q.x + 0.5) * CELL * sc - rr, (q.y + 0.5) * CELL * sc - rr, rr * 2, rr * 2);
   }
   m.globalAlpha = 1;
@@ -50,6 +51,7 @@ export function drawMinimap(r) {
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
   m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown
   for (const q of g.relays) { m.beginPath(); m.arc(q.x * sc, q.y * sc, 3.5, 0, Math.PI * 2); m.stroke(); }
+  drawAnomalyMarks(m, g, sc); // S-37: seen sites, filled when charged, hollow while recharging
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();

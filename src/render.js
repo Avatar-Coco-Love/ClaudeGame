@@ -1,7 +1,7 @@
 // World drawing (terrain chunk cache, entities, beam, Scanner). Screen-space HUD drawing (minimap, Nexus pointer, touch
 // sticks) is in hud.js; darkness, light holes and floor glow in light.js; painting one terrain chunk in terrain.js (S-26).
 // Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX } from './config.js';
+import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
@@ -278,6 +278,15 @@ export class Renderer {
   scanSprite(type) {
     return this.glowSprite('s-' + type, 14 + 16 / (this.zoom * this.dpr), g => {
       g.shadowBlur = 10;
+      if (typeof type === 'string') { // S-37: 'a-<kind>', an Anomaly site: its hexagram, upright, in its kind's colour
+        g.strokeStyle = g.shadowColor = `rgb(${ANOMALY_KINDS[type.slice(2)].rgb})`; g.lineWidth = 2.5; g.lineJoin = 'round';
+        for (const off of [0, Math.PI]) {
+          g.beginPath();
+          for (let j = 0; j < 3; j++) { const a = off - Math.PI / 2 + j * Math.PI * 2 / 3; g[j ? 'lineTo' : 'moveTo'](Math.cos(a) * 12, Math.sin(a) * 12); }
+          g.closePath(); g.stroke();
+        }
+        return;
+      }
       if (type === T.CACHE) { // S-12: the cache glyph (square in square, upright), white, 1.3x the ore glyph
         g.strokeStyle = g.fillStyle = g.shadowColor = '#ffffff'; g.lineWidth = 2.5;
         g.strokeRect(-12, -12, 24, 24); g.fillRect(-5, -5, 10, 10);
@@ -471,7 +480,7 @@ export class Renderer {
     for (const m of sc.marks) { // B-027: glyphs are glow sprites (scanSprite), not shadowBlur text
       const a = markAlpha(this.game, m);
       if (a <= 0) continue;
-      const sp = this.scanSprite(m.type), cx = (m.x + 0.5) * CELL, cy = (m.y + 0.5) * CELL;
+      const sp = this.scanSprite(m.kind ? 'a-' + m.kind : m.type), cx = (m.x + 0.5) * CELL, cy = (m.y + 0.5) * CELL;
       ctx.globalAlpha = a;
       ctx.drawImage(sp.canvas, cx - sp.half, cy - sp.half, sp.half * 2, sp.half * 2);
     }

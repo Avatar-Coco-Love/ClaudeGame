@@ -72,6 +72,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./spitter.cjs').nodeChecks(check).catch(e => check('S-32 spitter checks ran', false, e.message));
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
+  await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -345,6 +346,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./reclaim.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./audit54.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 54 browser checks ran', false, e.message));
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
+    await require('./anomalyfound.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-37 anomaly-found browser checks ran', false, e.message));
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 

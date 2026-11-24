@@ -20,6 +20,8 @@ async function nodeChecks(check) {
     if (![T.CRYSTAL, T.PRISM, T.LUMEN].includes(w.cells[i])) continue;
     if (Math.hypot(((i % w.w) + 0.5) * CELL - p.x, (Math.floor(i / w.w) + 0.5) * CELL - p.y) <= SCAN_RADIUS * CELL) expect++;
   }
+  // S-37: plus each charged Anomaly site (an entity, not a cell) within the same 12 cells.
+  for (const q of g.anomaly.sites) if (!q.void && Math.hypot((q.x + 0.5) * CELL - p.x, (q.y + 0.5) * CELL - p.y) <= SCAN_RADIUS * CELL) expect++;
   g.update(1 / 60, idle(true));
   const locked = { marks: g.scan.marks.length, cd: g.scan.cooldown };
   g.bank.lumen = 9; const poor = buyResearch(g, 'scanner');
@@ -31,7 +33,7 @@ async function nodeChecks(check) {
   const first = { marks: g.scan.marks.length, cd: g.scan.cooldown, explored: g.world.explored.reduce((a, b) => a + b, 0) - ex0 };
   for (let i = 0; i < 60; i++) g.update(1 / 60, idle(i === 30));
   const second = { age: +g.scan.age.toFixed(2), cd: +g.scan.cooldown.toFixed(2) };
-  check('ping marks exactly the node-side ore count within 12 cells, starts a 20 s cooldown, explores nothing (S-11)',
+  check('ping marks exactly the node-side ore (+ charged Anomaly, S-37) count within 12 cells, starts a 20 s cooldown, explores nothing (S-11)',
     expect > 0 && first.marks === expect && first.cd === SCAN_COOLDOWN_S && first.explored === 0, JSON.stringify({ expect, ...first }));
   check('a second ping inside the cooldown does nothing (S-11)', second.age > 0.9 && Math.abs(second.cd - (SCAN_COOLDOWN_S - 1)) < 0.05, JSON.stringify(second));
   for (let i = 0; i < 60 * (SCAN_SHOW_S + 1); i++) g.update(1 / 60, idle());

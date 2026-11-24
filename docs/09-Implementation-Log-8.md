@@ -70,3 +70,13 @@ Continues `09-Implementation-Log.md` (sessions 59–63 archived in audit 69: `ar
   10 min mine ratio: 1.072 / 1.079, ~8 s). The S-35 browser chip check now pins its site's kind (kinds vary by seed).
   Screenshot viewed: three hexagram colours in a room, three chips, cargo 0/30 with Ballast.
 - Seen: the S-35 tests assumed every site was Overclock; 3 node + 1 browser check failed until pinned (no bug).
+
+## Session 71 — Build: S-37 Anomalies found; M7 ✅ (v1.2.11, #77)
+- Minimap dots (seen = explored bit; filled charged, hollow recharging), Scanner marks for charged sites (hexagram
+  glyph), `anomalyEnd()` tone, hint line near a charged site until the first take (D-102). Phone chips: already in the
+  bank panel; measured clear of ◎ ⟂ ♪ ≡ + minimap at 568×320 and 320×568, glyph-only. Reduced motion: already still (S-35).
+- Tests: new `anomalyfound.cjs` (3 node + 3 browser, seeds pinned), audio +1 (take + end bounds). Proved the node file
+  fails on the old code. `research.cjs` expected count now adds charged sites in range; `audit29` B-026 empty ping takes
+  every site first (both were ore-only by accident of the old code).
+- Seen: the hint as a KEEP toast displaced the "Spire primed" toast in `spirefeed.cjs` (moved to the hint line). Screenshot
+  viewed: teal hexagram ping glyph, 16 kind-coloured minimap dots, one hollow.

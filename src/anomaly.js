@@ -41,7 +41,7 @@ export function anomalySites(world) {
 export function makeAnomalies(world, spires) {
   const sites = anomalySites(world);
   for (const s of sites) s.void = spires.some(q => Math.max(Math.abs(q.x - s.x), Math.abs(q.y - s.y)) <= SPIRE_HALF);
-  return { sites, taken: {}, flash: 0 };
+  return { sites, taken: {}, flash: 0, near: false, taught: false };
 }
 
 /** A save's `anomalies` / `buffs`, cleaned (B-037: never trust a save). */
@@ -73,11 +73,14 @@ export function updateAnomalies(game, dt) {
     a.taken[i] = now + ANOMALY_RECHARGE_S;
     game.buffs.push(s.kind);
     game.lastBuff = s.kind;
+    a.taught = true; // S-37: no more hint this session
     game.audio.anomaly();
     game.burst((s.x + 0.5) * CELL, (s.y + 0.5) * CELL, 36, `rgb(${ANOMALY_KINDS[s.kind].rgb})`, 240);
     game.anomalyRing = { x: (s.x + 0.5) * CELL, y: (s.y + 0.5) * CELL, t: 1, rgb: ANOMALY_KINDS[s.kind].rgb };
     game.notify('anomaly');
   });
+  // S-37: the hint line teaches it while a charged site shows (inside the core's light), until the first take this session.
+  a.near = !a.taught && a.sites.some((s, i) => siteCharged(game, i) && Math.hypot(p.x - (s.x + 0.5) * CELL, p.y - (s.y + 0.5) * CELL) <= LIGHT_RADIUS);
   if (game.anomalyRing) { game.anomalyRing.t -= dt * 1.6; if (game.anomalyRing.t <= 0) game.anomalyRing = null; }
 }
 
@@ -86,7 +89,39 @@ export function endBuffs(game) {
   if (!game.buffs.length) return;
   game.endedBuffs = game.buffs;
   game.buffs = [];
+  game.audio.anomalyEnd(); // S-37
   game.notify('buffs-end');
+}
+
+/** S-37 minimap state of site i: null until its cell was ever lit (explored) or for a void site; 'charged' or 'recharging'. */
+export function siteMapState(game, i) {
+  const s = game.anomaly.sites[i], w = game.world;
+  if (s.void || !w.explored[s.y * w.w + s.x]) return null;
+  return siteCharged(game, i) ? 'charged' : 'recharging';
+}
+
+/** S-37: a seen site is a small dot in its kind's colour on the minimap; a recharging one is hollow. */
+export function drawAnomalyMarks(m, g, sc) {
+  m.save(); m.lineWidth = 1.25;
+  g.anomaly.sites.forEach((s, i) => {
+    const st = siteMapState(g, i);
+    if (!st) return;
+    const col = `rgb(${ANOMALY_KINDS[s.kind].rgb})`;
+    m.beginPath(); m.arc((s.x + 0.5) * CELL * sc, (s.y + 0.5) * CELL * sc, 2.25, 0, Math.PI * 2);
+    if (st === 'charged') { m.fillStyle = col; m.fill(); } else { m.strokeStyle = col; m.stroke(); }
+  });
+  m.restore();
+}
+
+/** S-37: Scanner marks for the charged sites within `radius` cells of (px, py), like vault caches (it reveals, unlocks nothing). */
+export function anomalyScanMarks(game, px, py, radius) {
+  const R = radius * CELL, out = [];
+  game.anomaly.sites.forEach((s, i) => {
+    if (!siteCharged(game, i)) return;
+    const d = Math.hypot((s.x + 0.5) * CELL - px, (s.y + 0.5) * CELL - py);
+    if (d <= R) out.push({ x: s.x, y: s.y, type: 'anomaly', kind: s.kind, site: i, d });
+  });
+  return out;
 }
 
 /** Hollow hexagrams (world transform): faint through rock inside the core's light, full once its cell is open. A taken
