@@ -17,7 +17,18 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 
 ## Progression layers (keep them distinct — never unlock the same thing twice)
 - **Core Matrix** *(built)*: permanent stat upgrades to the core.
-- **Nexus Development** *(planned)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
-- **Research** *(planned)*: unlocks new *kinds* of things (new beam modes, new materials).
+- **Nexus Development** *(built: Radiance)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
+- **Research** *(built: Scanner, Wide beam)*: unlocks new *kinds* of things (new beam modes, new materials).
 - **Crafting** *(planned)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
 - **Temporary Upgrades** *(planned)*: run-scoped buffs found in the world.
+
+## Scope and end state (D-045)
+- **v1.0 = M5 ships:** M1–M5 in `04`, ending with Spires, an ending sequence and **New Cycle**. The win: relight every dormant
+  Spire in the Deep (Q-003). Each relight is a delivery plus a challenge in the mode you are in: a Drift puzzle or a Surge
+  defence, equally valid. The Surge Spire defence is the only boss-like fight; there are no standalone bosses.
+- **After 1.0:** M6–M8 are depth and polish on the same loop (Surge variety + a Drift twin, temporary upgrades, audio, PWA,
+  accessibility, perf). When M8 is done the game is **finished**: sessions only fix bugs, audit, and tune.
+- **Out of scope:** multiplayer/co-op (a design spike at most, Q-004), telemetry or analytics, a standalone puzzle mode,
+  accounts or cloud saves, monetisation, story text or characters.
+- **No new milestones:** an item outside M1–M8 needs a design-session D-xxx that names the pillar it serves and what it replaces.
+  Nothing joins M1–M5 unless it closes a loop already in them.

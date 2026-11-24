@@ -1,6 +1,7 @@
 # 04 — Roadmap
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
+**v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
 Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
@@ -12,16 +13,15 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining, plus 20 beacon holes. Budget p95 16.7 ms.
-- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`deeprun`, `vaultfind`, `surgefarm`, `parity`); `deeprun` fixed for Lumen cells (B-019).
+- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (pulse silently runs Focus until S-14 adds `BEAM_MODES.pulse`) (`deeprun`, `vaultfind`, `surgefarm`, `parity`); `deeprun` fixed for Lumen cells (B-019).
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
-## M2 — A world worth exploring
+## M2 — A world worth exploring ✅ (v0.2, D-046)
 - ✅ (#14) Design session 12: S-4 feel play-tested, M2 measured, specs S-8…S-10, Q-002 decided (D-022…D-024).
 - ✅ (#19) Design session 17: rings play-tested, Q-008 measured and settled (D-029), Research v1 specced as S-11 (D-030).
 - ✅ (#18) **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap (D-028).
 - ✅ (#20) **S-9 Vaults:** 6 sealed 7×7 rooms at d 50–72 with a cache (20◆ + 6▲); old saves skip vaults they already saw (D-031).
 - ✅ (#22) **S-10 Lumen ore:** gold ● cells at d ≥ 55 (~141 per world), banked like Shards; nothing spends it yet (D-033).
-- Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022).
 ## M3 — Research (new *kinds* of things)
 - ✅ (#23) **S-11 Research v1:** a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal, 20 s cooldown) (D-034).
 - ✅ (#24) Design session 22: Lumen → Scanner play-tested, Q-010 measured and settled (D-035), beam modes specced (D-036).
@@ -35,11 +35,11 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **Relays:** a remote deposit point linked to the Nexus. Expensive, and they change how routes work.
 - Build mode UX on both desktop and touch.
 
-## M5 — The arc (a reason to go deep)
+## M5 — The arc (a reason to go deep) — ships v1.0
 - Dormant Spires in the far ring. Relighting each one takes a delivery plus a short challenge (a Drift puzzle-ish variant and a Surge defence variant, equally valid).
 - Relighting all Spires leads to an ending sequence, then **New Cycle** (a new seed, carrying a small permanent bonus).
 
-## M6 — Surge depth (without making Drift second-class)
+## M6 — Surge depth (without making Drift second-class) — post-1.0
 - Glitch variety: Spitter (ranged), Swarm (tiny, many), Burrower (moves through rock).
 - Surge events: periodic "static storms". Drift gets an equivalent calm event (aurora: bonus ore glows).
 
@@ -58,11 +58,11 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - ✅ **Projects page card** (D-044, Projects repo #14, session 29): live between Foldwork and Animal Mail Route.
 
 ## Later / research spikes (design only until proven)
-- Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
+- Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment; out of 1.0 (D-045).
+- Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022; moved out of M2 by D-046).
 
 ## Debt
-- ✅ **B-016** (#25): the beam hum was a loud sawtooth drone with a 13 Hz wobble (owner play-test); now a soft bed (D-038).
-- ✅ **B-017, B-018** (#26, audit 24): a full-hold deposit beeped for 4.4 s; hurt and Glitch death were buzzy square waves (D-039).
+- Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
@@ -70,10 +70,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
   hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.
 - **Bedrock edge (watch, session 17):** a core pushed into the world border in the Deep sits on a near-black band and its beam shows no
   hit. Reads like a dead end, which it is, but silently. If it confuses play-tests, give bedrock hits a dull spark.
-- ✅ **B-012** (#17): smoke's "beam mines terrain" was seed-dependent; the seed is now pinned.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. A player (or bot) who leaves mid-stream gets no chime. Keep unless a play-test log says it feels broken.
-- ✅ **B-005, B-010, B-011** (#16): cargo kept past the pickup cap; "Upgrade ready" hint; floor pickups saved (D-026).
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21). Particles are still drawn uncull'd (short-lived, local). Each on-screen pickup keeps its `shadowBlur`; measure on the throttled perf check (Tooling) before changing that.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
-- ✅ **Test trap** (sessions 4, 5): planting a save then reloading let `pagehide` overwrite it. Now a smoke helper, `plantSaveAndReload()`.

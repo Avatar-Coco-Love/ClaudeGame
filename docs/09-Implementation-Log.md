@@ -18,3 +18,13 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   `MODE=pulse` probes silently run Focus; `01` calls built layers "planned"; README controls incomplete. Perf audit stopped
   unreported: redo it next audit. All 43 D-xxx match the code (docs-drift agent).
 - `09` entries for sessions 24–28 archived word for word (`archive/2026-11-24-09-sessions-24-28.md`).
+
+## 2026-11-24 — Session 30 (v0.2.34): Inbox — v1.0 scope and end state
+- Owner request (relayed from chat, archived as `archive/2026-11-24-owner-scope-request.md`): a finish line for overnight runs.
+- Adopted: `01` "Scope and end state"; D-045 (v1.0 = M5; M6–M8 post-1.0, then finished; out of scope: co-op beyond a spike,
+  telemetry, standalone puzzle mode, accounts, monetisation, story; bosses only as the Surge Spire defence). Q-003, Q-004 settled.
+- D-046: VERSION minor = milestones shipped; M2's conditional "larger world" moved to Later, so M2 is done → v0.2.34. CLAUDE.md,
+  `05` header and the `config.js` comment updated. Rejected (in D-045/046): v1.0 = M4 or M8, standalone bosses, a separate scope doc.
+- `04` hit 8268 B: its five ✅ Debt items moved word for word to `archive/2026-11-24-04-debt-done.md`. Decisions continue in `06-Decisions-5.md`.
+- Docs drift from `08` folded in: `01` "(planned)" for built layers, `03` Q-007 Glitch loot wording, `04` `MODE=pulse` runs Focus.
+  No gameplay code changed; no bugs found.
