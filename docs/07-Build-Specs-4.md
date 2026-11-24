@@ -1,9 +1,26 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42.
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (S-30 added, D-081/D-082).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
 
-## Surge bot runner (Tooling, before S-23) — spec in `04` Tooling. Add a `spire` route: hold a primed Spire's interior.
+## S-30 — Surge bot runner (Tooling, before S-23) (D-019, D-082) — no sink, no game code
+- `tools/surgebot.mjs`, headless like the other tools (`Game` + a no-op audio Proxy), deterministic: no `Math.random` in
+  the bot; same seed + args → same report. Args: route, build (`start|mid|max`, the `spirerun` levels), mode
+  (`drift|surge`), seeds, minutes. Start from `tools/spireloop.mjs` (Design 52's greedy route bot).
+- **Pathing:** A* over the known grid, cost = 1 per open cell + the cell's hp / beam dps (seconds to dig) per solid
+  cell; bedrock, vault shell, Spire core and facets are walls. Re-plan when the next cell changes or every 2 s.
+  Stuck (< 8 px moved in 5 s) → re-plan once, then skip that goal; report stuck counts apart from deaths.
+- **Fighting (Surge):** a Glitch within 160 px takes the aim (nearest first); integrity < 35 % → path to the Nexus
+  (the only heal), bank on the way only if a Relay lies on the path. A death counts, then the route restarts.
+- **Routes:** `mine` (nearest ore by path cost, bank at the nearest Nexus/Relay when full: ◆ ▲ per minute, deaths/min);
+  `rim` and `hug` (degenerate loops: farm Glitches at the Nexus rim; hug the Nexus edge: haul/min, should not beat
+  `mine`); `spire` (with B▲ banked: nearest Spire by path, enter by its cheapest gap, feed, mine prism cells by path cost
+  within 24 cells and carry them in until primed; then **hold** the interior for `--hold` s, default 40: minutes to
+  primed, deaths, deaths during the hold, % of holds survived; S-23 adds "Wake held / failed" to the same route).
+- **Output:** one line per (route, build, mode): medians + p90 over seeds, stuck and capped counts. Both modes always.
+- **Smoke:** `tests/surgebot.cjs` runs `spire` and `mine` for 2 seeds × 1 game-minute (< 5 s wall): numbers are finite,
+  same seed twice → identical output, and the bot gets stuck on 0 of 2 seeds. Log the full table (12 seeds × 3 builds ×
+  2 modes × `mine`/`spire`) in `09` and update Q-007 with it.
 
 ## S-23 — Spire Wake: the Surge defence (M5) (D-055; starting values for the bot to tune)
 - In Surge, a primed Spire starts a **Wake** when the core enters its interior: `SPIRE_WAKE_S` 40 s. The Spire clears a
@@ -12,19 +29,22 @@ None of these adds a sink: the Wake and the ending spend nothing; New Cycle rese
 - Glitches spawn at the usable lane ends in turn every `SPIRE_WAVE_S` 1.6 s, ≤ 6 alive, tier by depth (2 at d 64–74). They chase
   the Spire core (charge 100; contact −10, the Glitch bursts lootless) unless the player core is within 3 cells. Kills drop
   loot as usual. One facet lights every 5 s as the Wake's clock.
-- Charge 0 or a core death fails the Wake (fed Prisms kept; retry after leaving and re-entering). 40 s held → relit (S-28's reward).
+- Charge 0 or a core death fails the Wake (fed Prisms kept; retry after leaving and re-entering). 40 s held → relit (S-28's
+  reward; `mode: 'surge'`, D-081). A Wake is never saved: a reload mid-Wake is a failed Wake. Once S-23 ships, Surge
+  facets stop toggling (D-055); Drift keeps the puzzle.
 - **Smoke:** a scripted god-mode hold relights in 40 s; charge 0 fails and keeps `fed`; Drift never starts a Wake; lanes
   clear only rock/ore and drop ore loot; Glitches spawn only at usable lane
   ends; a planted Spire against bedrock (one short lane) still runs. Bot at 3 upgrade strengths: fail rate ≤ 30 % at mid upgrades,
-  median time near the Drift puzzle's (45–90 s). If the first tune misses, ship the mechanic and roadmap a tuning PR.
+  median time near the Drift puzzle's (45–90 s), measured with S-30's `spire` route. If the first tune misses, ship the
+  mechanic and roadmap a tuning PR.
 
 ## S-24 — Ending: the sequence and the summary (M5) (D-045)
 - All Spires relit (N/N, N = `game.spires.length`; any mix of modes and broken ones, D-069): an 8 s sequence (each Spire draws a line to the Nexus in turn, the darkness alpha eases
   0.93 → 0.5), skippable by any key/tap; reduced motion: a 1 s fade instead of lines. Then a summary card: time, cells
-  mined, Spires relit in Drift / Surge, Glitches cleared, with **Continue** (keep playing this world, lifted dark stays).
+  mined, Spires relit in Drift / Surge (and "restored" for broken ones), Glitches cleared, with **Continue** (keep playing this world, lifted dark stays).
   **New Cycle** shows on the card but is disabled ("Next update") until S-29.
-- **Save:** `ended: true` + per-Spire `mode` (which path relit it; S-28/S-23 record it). Next `SAVE_FORMAT`; old saves
-  load with `ended: false`. A reload after the ending skips the sequence; the card is reachable from the Matrix stats line.
+- **Save:** `ended: true` (per-Spire `mode` is already saved by S-28/S-23, D-081; the card counts `'broken'` on its
+  own "restored" line). Next `SAVE_FORMAT`; old saves load with `ended: false`. A reload after the ending skips the sequence; the card is reachable from the Matrix stats line.
 - **Smoke:** `dev` relights all 5 → sequence runs, skip works, card fields match stats; reload keeps `ended` and the lifted
   dark; reduced motion has no lines; screenshots of the sequence mid-way and the card at 1280×800 and 320×568 (view).
 

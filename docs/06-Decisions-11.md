@@ -1,0 +1,31 @@
+# 06 — Decisions log, part 11
+
+Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected alternatives). D-079 on.
+
+### D-079 — Q-016 closed: the feed is 8 ▲/s whatever the source (2026-11-24, session 52, Design; keeps D-070)
+- Measured (`tools/spireloop.mjs`, 20 seeds, mid build, nearest Spire): the route to primed takes a median 4.5 min with
+  20▲ banked, 2.0–2.5 with 50▲, 5.3–5.5 with none, in both modes; the feed itself is 10 s of it. 33–82 % of the 80 came
+  from cargo, so a trip still delivers; Prism cells near a Spire hold ~30–45▲ within 18 cells, so the bank is needed.
+- Rejected: cargo ▲ feeding faster (saves seconds on a minutes-long route; a second rate to learn); cargo-only feeding
+  (D-070's reason stands: on-site ▲ is under 80 for most Spires).
+
+### D-080 — S-28: only the aim ray flips a facet; the primed hint names the rule (2026-11-24, session 52, Design)
+- `tools/facetprobe.mjs` (2000 seeds × 5): every start pattern needs exactly `SPIRE_TAPS[i]` taps (3: 4000, 4: 4000,
+  5: 2000), never already solved, 56–70 distinct patterns per Spire; all 256 masks reachable; `FACET_RING` matches
+  `spireTypeAt`; a start-build Focus ray (96 px) reaches all 8 facets from the interior. But Wide's 3 rays had two facets
+  as first hits in 4.6 % of aims, so one beam would flip two facets (and their neighbours) at once and read as a bug.
+- So a facet toggles only from the aim (centre) ray, or once from a Pulse burst that stops on it; side rays spark.
+  While the core stands in a primed Spire, the hint line says "Beam a facet: it flips with its two neighbours. Light all 8."
+- Rejected: every ray toggles (accidental doubles); refusing Wide inside a Spire (a mode switch for one puzzle); no hint
+  (play-test: the lit/unlit pattern reads, the neighbour rule does not).
+
+### D-081 — Relit Spires record their path in S-28, not S-24 (2026-11-24, session 52, Design; amends S-24's save)
+- S-28 adds `mode` to a Spire's record when it relights (`'drift' | 'surge' | 'broken'`) and bumps `SAVE_FORMAT` with an
+  upgrade step: a lit Spire without `mode` gets `'broken'` (before S-28 only broken Spires could relight). The puzzle
+  writes the game mode it was solved in (Surge too until S-23, D-055); S-23's Wake writes `'surge'`. S-24's save then adds only `ended`. Each PR owns the field it fills.
+- Rejected: one bump in S-24 (S-28 and S-23 would relight Spires with no record of how, and S-24 would have to guess).
+
+### D-082 — The Surge bot (S-30) and its `spire` route (2026-11-24, session 52, Design; applies D-019, D-055)
+- `tools/spireloop.mjs` (this session) is the seed: a straight-line greedy bot stuck on 25 % of seeds (dense corners,
+  unbreakable cells), and with Glitches ignored it died ~5 times per Surge run. S-30 plans paths (dig cost) and fights.
+- Rejected: tuning S-23 by hand in the browser (not repeatable; Q-007 needs both modes measured the same way).

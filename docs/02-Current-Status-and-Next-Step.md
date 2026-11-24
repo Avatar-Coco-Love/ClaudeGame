@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 51** · **Version: v0.4.55** (session 51: build; rotation: 52 Design, 53 Build, 54 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 52** · **Version: v0.4.56** (session 52: design; rotation: 53 Build, 54 Audit, 55 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -33,8 +33,8 @@ _Last updated: 2026-11-24_ · **Session counter: 51** · **Version: v0.4.55** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-6`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
-- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Specs (`07-…-3/4`, 1 PR each, D-063; refreshed Design 52, D-079…D-082): S-28 facets, S-30 Surge bot, S-23, S-24, S-29. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49); each lives on in the smoke suite.
@@ -43,5 +43,5 @@ _Last updated: 2026-11-24_ · **Session counter: 51** · **Version: v0.4.55** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 52 (Design): play-test feeding + priming in both modes (`tests/spirefeed.cjs` scenes), re-check S-28's spec against
-the shipped `mask` / `FACET_RING` / `toggleMask` (D-078), spec the Surge bot's `spire` route; then S-28 is the next build.
+Session 53 (Build): S-28 facet puzzle + relit (`07-Build-Specs-3.md`): aim-ray toggles, the primed hint, relit light +
+tone, per-Spire `mode` with a `SAVE_FORMAT` bump (D-080, D-081). Then S-30 Surge bot, S-23, S-24, S-29.

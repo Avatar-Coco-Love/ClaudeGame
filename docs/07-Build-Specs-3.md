@@ -32,17 +32,20 @@ player who maxes the Matrix first buys Relays from Surge drops (~9◆/min, Q-007
   0▲ anywhere nothing happens; Surge feeds too; fed survives reload; feeding stops when the core leaves; a planted broken
   Spire (keep over its core) relights at 80; screenshot of a half-fed and a primed Spire (view).
 
-## S-28 — Spire relight v1b: the facet puzzle + relit (M5) (D-055) — no sink
-- **Facets** (S-19's 8 `T.FACET` cells, in ring order): a facet **toggles** after `SPIRE_TAP_S` 0.35 s of any ray's contact,
-  then latches until no ray touches it; a Pulse burst on a facet toggles it once (and stops there). A toggle flips that
-  facet and its two ring neighbours. All 8 lit → relit. Only on a primed Spire.
-- Broken Spires (D-069) have no puzzle: S-20 relights them.
-- **Start pattern:** all lit, then `SPIRE_TAPS[i]` distinct facets (by Spire index i: 3, 3, 4, 4, 5) toggled from
-  `seededStream(seed, 'facets' + i)`. The 8-ring with self + 2 neighbours is invertible over GF(2) (Design 37 brute force:
-  all 256 states reachable, each by one tap set), so the minimum is exactly that many taps.
+## S-28 — Spire relight v1b: the facet puzzle + relit (M5) (D-055, D-078, D-080, D-081) — no sink. Refreshed in Design 52.
+- **Facets** (`FACET_RING` order, bit k of `mask`, rule `toggleMask`: all shipped in S-20): on a **primed** Spire (mask set,
+  not lit) a facet **toggles** after `SPIRE_TAP_S` 0.35 s of the **aim (centre) ray's** contact, then latches until that ray
+  leaves it; Wide's side rays only spark (D-080). A Pulse burst that hits a facet toggles it once and stops there. All 8
+  lit (`mask` 255) → relit. Broken Spires never reach the puzzle (S-20 relit them). New code in `spire.js` (259 lines now).
+- **Hint** (`hint()` in `main.js`, state-derived like the others): while the core is in a primed, unlit Spire's interior,
+  "Beam a facet: it flips with its two neighbours. Light all 8." (both input kinds; ranks below "Cargo full").
 - **Relit:** core bright and still, `SPIRE_LIGHT` 260 px hole + violet-white floor glow (lit Spires join `R.lightSets`),
-  minimap hexagon filled, toast "Spire relit (n/5)", "Spires n/5 lit" in the stats, one rising 3-note tone (`audio.cjs` ceilings).
+  minimap hexagon filled, toast "Spire relit (n/N)", "Spires n/N lit" in the stats, one rising 3-note tone (`audio.cjs`
+  ceilings). S-20's broken-relight path gets the same effects.
+- **Save (D-081):** the record gains `mode` on relight (the game mode now; `'broken'` from S-20's path). Next
+  `SAVE_FORMAT` + upgrade step: lit without `mode` → `'broken'`; `loadSpires` drops an unknown `mode` (B-037).
 - **Interim (D-055):** until S-23 ships, facets work in Surge too (Glitches still come).
-- **Smoke:** on 40 seeds every start needs exactly `SPIRE_TAPS[i]` taps (brute force); beaming those facets relights
-  (node-side); a 0.2 s brush doesn't toggle; a held beam toggles once; a Pulse burst once; mask + lit survive reload;
-  screenshots of a primed and a relit Spire at DSF 1 (view).
+- **Smoke:** solving each start's tap set relights (node-side, 40 seeds × 5; the 2000-seed proof is `tools/facetprobe.mjs`);
+  a 0.2 s brush doesn't toggle; a held beam toggles once; a Wide beam whose side ray rests on a facet doesn't toggle it; a
+  Pulse burst toggles once; a dormant (unprimed) Spire's facets never toggle; mask, lit and `mode` survive reload; an old
+  save's lit broken Spire loads `'broken'`; the hint fits at 320×568; screenshots of a primed and a relit Spire at DSF 1 (view).

@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20 built) S-28, Surge bot, S-23, S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20 built) S-28, S-30 Surge bot, S-23, S-24, S-29 (D-063). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -13,8 +13,9 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#38) **S-17 Touch pass:** landscape title + ◎⟂♪≡ row, 44 px targets, hint wrap, ⟂ label, 2nd finger, tools reject unknown `MODE` (D-050).
 - ✅ (#41) **S-18 Code split:** `glitch.js`, `hud.js`, `body.js`, `GLITCH_*` in `config.js`, dead code out, 600-line check (D-053).
 - ✅ (#42) **Standoff probe** `tools/standoff.mjs`: Glitches walk in from 420 px, all beam modes, `KITE=1` (D-054).
-- **Surge bot runner** (after S-28, before S-23: it tunes the Wake; add a `spire` route) (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
-  and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
+- **S-30 Surge bot runner** (after S-28, before S-23: it tunes the Wake): `tools/surgebot.mjs`, A* by dig cost, fights in Surge, routes `mine` / `rim` / `hug` / `spire`,
+  3 builds × both modes (answers Q-007). Spec in `07-Build-Specs-4.md` (D-082); seed bot `tools/spireloop.mjs` (Design 52), probes `surgefarm`, `parity` (D-019).
+- ✅ (#57) Design session 52: Spire route play-tested in both modes, facet puzzle proven on 2000 seeds (`tools/facetprobe.mjs`), Q-016 closed (D-079…D-082).
 - ✅ (#43) **S-15 Perf check:** `tools/perf.cjs` (×4 CPU throttle, Wide + 300 pickups, 20 holes) + `tests/drawcost.cjs` in smoke (counts, ratios; D-057).
 - ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`pulse` exits 1 until S-14 adds it, #38); B-019.
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
@@ -47,7 +48,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#52) Design session 47: Spire trip + supply measured (`tools/spirerun.mjs`), Q-015 settled (D-069), feed from cargo then bank (D-070), Wake lanes (D-071).
 - ✅ (#53) **S-27 Spires found:** breath, minimap hexagon, "A dormant Spire (n/N)" toast + tone, stats line; B-039 fixed (D-072).
 - ✅ (#56) **S-20 Spire feed:** 80▲ (cargo, then bank) primes a Spire; a broken one relights (D-055, D-069, D-070, D-078).
-- **S-28 Facet puzzle + relit:** 8 facets, 3–5 taps, 260 px light (Drift; Surge too until S-23) (D-055).
+- **S-28 Facet puzzle + relit:** 8 facets, 3–5 taps, aim ray only, 260 px light, saves `mode` (Drift; Surge too until S-23) (D-055, D-080, D-081).
 - **S-23 Spire Wake:** Surge's path, hold the Spire 40 s down 4 lanes; tuned by the Surge bot (D-055).
 - **S-24 Ending:** 5/5 relit → 8 s sequence → summary card, Continue (D-045).
 - **S-29 New Cycle:** new seed, carries cycle + records + Nexus hue only (Q-013, D-062). Ships 1.0.0.
