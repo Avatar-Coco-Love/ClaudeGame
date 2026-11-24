@@ -96,7 +96,7 @@ export function drawNexusPointer(r, ctx) {
   const full = g.cargoRoom() <= 0;
   if (full) {
     ctx.save();
-    ctx.fillStyle = '#ffd23d'; ctx.font = `600 ${document.documentElement.classList.contains('text-large') ? 14 : 12}px system-ui, sans-serif`; // S-40: 12 px floor ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffd23d'; ctx.font = `600 ${document.documentElement.classList.contains('text-large') ? 14 : 12}px system-ui, sans-serif`; ctx.textAlign = 'center'; // S-40: 12 px floor
     ctx.fillText('NEXUS', p.lx, p.ly + 4);
     ctx.restore();
   }
