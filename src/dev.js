@@ -2,6 +2,7 @@
 // smoke checks and the panel share one entry point. The panel exists only with `?dev` in the URL or after the backtick key.
 // Nothing here enters the save except what the actions themselves change (bank, upgrades, mode, carved cells).
 import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH } from './config.js';
+import { UNBREAKABLE } from './world.js';
 
 const ROOM = 1; // carve (2*ROOM+1)² cells: a 3×3 room around the teleport target
 
@@ -19,7 +20,7 @@ export function createDev(ui) {
       const cy = Math.floor(game.nexus.y / CELL) + Math.round(Math.sin(angle) * cells);
       // The room stays off the 2-cell bedrock border (B-013: the old clamp let it carve the inner bedrock ring).
       const x = Math.max(2 + ROOM, Math.min(w.w - 3 - ROOM, cx)), y = Math.max(2 + ROOM, Math.min(w.h - 3 - ROOM, cy));
-      for (let yy = y - ROOM; yy <= y + ROOM; yy++) for (let xx = x - ROOM; xx <= x + ROOM; xx++) if (w.solid(xx, yy)) w.destroy(xx, yy);
+      for (let yy = y - ROOM; yy <= y + ROOM; yy++) for (let xx = x - ROOM; xx <= x + ROOM; xx++) if (w.solid(xx, yy) && !UNBREAKABLE.has(w.get(xx, yy))) w.destroy(xx, yy);
       const p = game.player;
       p.x = (x + 0.5) * CELL; p.y = (y + 0.5) * CELL; p.vx = p.vy = 0;
       game.pickups.length = 0; // pickups chasing the old position would fly across the map

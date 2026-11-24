@@ -37,6 +37,7 @@ const audit39 = require('./audit39.cjs');
 const craft = require('./craft.cjs');
 const glow = require('./glow.cjs');
 const audit44 = require('./audit44.cjs');
+const spire = require('./spire.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -210,6 +211,7 @@ async function rngChecks() {
   await audit39.nodeChecks(check).catch(e => check('audit 39 checks ran', false, e.message));
   await craft.nodeChecks(check).catch(e => check('S-16 craft checks ran', false, e.message));
   await audit44.nodeChecks(check).catch(e => check('audit 44 checks ran', false, e.message));
+  await spire.nodeChecks(check).catch(e => check('S-19 spire checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -464,6 +466,7 @@ async function rngChecks() {
     await audit39.browserChecks(browser, url, check, errors);
     await craft.browserChecks(browser, url, check, errors, plantSaveAndReload);
     await glow.browserChecks(browser, url, check, errors);
+    await spire.browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----

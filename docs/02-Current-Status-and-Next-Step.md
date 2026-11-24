@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 45** · **Version: v0.2.49** (session 45: build; rotation: 46 Build, 47 Design, 49 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 46** · **Version: v0.2.50** (session 46: build; rotation: 47 Design, 48 Build, 49 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -20,27 +20,26 @@ _Last updated: 2026-11-24_ · **Session counter: 45** · **Version: v0.2.49** (s
 - Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
   ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
+- Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
+  (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Static, no toast/minimap mark yet (S-27).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons) every 10 s, on deposit, and on page hide. Saves carry a format number (now 9); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-3`).
+- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons) every 10 s, on deposit, and on page hide. Saves carry a format number (now 10); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037).
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-4`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-19/S-27 Spires, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-27 Spires found, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
+- Older per-session checks (shake, hitstop, Surge determinism, teleport: sessions 10–15) live in `09` and the smoke suite.
 - Mining from the Nexus collects Shards; deposit banks all cargo; Beam Power costs 8◆. Surge Glitches spawn away, die to the beam.
 - Reloading restores the mode, upgrades, bank, and mined terrain. Touch sticks move the core and mine. No page errors.
 - Dying among several Glitches near the Nexus no longer freezes the game (B-007, session 7).
 - A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
 - The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
-- Shake off stays 0; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
-- Hitstop only on yield cells, rate-limited (32 breaks → 32 in 60 s); reduced motion drops it + ring (sessions 11–12).
-- Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
-- `dev.teleport(60)` lands 1936 px out in an open room; no panel without `?dev`; god mode is never saved (session 15).
 - Deep rock takes 2× Hearth's beam time; seed 77's layout + types are unchanged by rings; Veil–Deep border reads at DSF 1 (session 16).
 - A Deep Prism field reads at DSF 1; the Deep's ×2 rock adds only ~2 s to the first-Lumen trip, kept (D-029, session 17).
 - 6 vaults on 40/40 seeds; a cache gives 20◆ + 6▲ and stays open; a format-3 save keeps its tunnels and skips seen vaults (session 18).
@@ -56,4 +55,4 @@ _Last updated: 2026-11-24_ · **Session counter: 45** · **Version: v0.2.49** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 46 (Build): S-19 — Spires v1a: 5 sites, `T.SPIRE_SHELL`/`T.SPIRE`/`T.FACET` cells (draw in `terrain.js`), `SAVE_FORMAT` 10 (spec in `07-…-2`).
+Session 47 (Design): play-test the Spires in the Deep (DSF 1 + 320×568), decide Q-015, re-check S-27 / S-22 specs against D-068; then 48 Build S-27.

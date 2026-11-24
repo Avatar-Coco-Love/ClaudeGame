@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.50 — 2026-11-24 (#51)
+- Five dormant Spires now stand in the Deep, one in each direction, 64–74 cells out: a 9×9 shell of pale violet stone
+  with an opening on every side, small hexagon facets set in the walls, and a dim hexagon core at the centre. The shell
+  can be cut like a vault wall; the core and facets can't be broken. Nothing wakes them yet — that comes next.
+- Existing worlds get their Spires only in ground you haven't seen yet, so your tunnels and explored map stay as they were.
+
 ## v0.2.49 — 2026-11-24 (#50)
 - Behind the scenes: the darkness and light-pool drawing moved into its own module, ready for Relays and Spires to cast
   light the same way Beacons do. The picture is the same; each light pool is now stamped from a ready-made template

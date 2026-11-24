@@ -4,6 +4,32 @@ import { CELL, CHUNK, T, MATERIAL, ORE_KIND } from './config.js';
 
 const CHUNK_PX = CHUNK * CELL;
 
+function hexPath(g, x, y, r) {
+  g.beginPath();
+  for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; g[k ? 'lineTo' : 'moveTo'](x + Math.cos(a) * r, y + Math.sin(a) * r); }
+  g.closePath();
+}
+
+/** S-19: a Spire's glyphs, drawn over pass 1. The core's hexagon spans its 3×3 cells, so cores centred up to one cell
+ *  outside this chunk are drawn too (the canvas clips them) and the hexagon never breaks at a chunk edge. */
+function paintSpires(g, w, x0, y0) {
+  const S = MATERIAL[T.SPIRE], F = MATERIAL[T.FACET];
+  g.shadowBlur = 8;
+  for (let y = -1; y <= CHUNK; y++) for (let x = -1; x <= CHUNK; x++) {
+    const gx = x0 + x, gy = y0 + y, t = w.get(gx, gy), px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
+    if (t === T.FACET && x >= 0 && y >= 0 && x < CHUNK && y < CHUNK) { // a small dim hexagon in its shell cell
+      g.shadowColor = F.edge; g.strokeStyle = F.edge; g.lineWidth = 1.5; g.globalAlpha = 0.55;
+      hexPath(g, px, py, 7); g.stroke(); g.globalAlpha = 1;
+    } else if (t === T.SPIRE && w.get(gx - 1, gy) === T.SPIRE && w.get(gx + 1, gy) === T.SPIRE
+      && w.get(gx, gy - 1) === T.SPIRE && w.get(gx, gy + 1) === T.SPIRE) { // the core's centre cell
+      g.shadowColor = S.edge; g.strokeStyle = S.edge; g.lineWidth = 2; g.globalAlpha = 0.6;
+      hexPath(g, px, py, CELL * 1.35); g.stroke();
+      g.globalAlpha = 0.3; hexPath(g, px, py, CELL * 0.7); g.stroke(); g.globalAlpha = 1;
+    }
+  }
+  g.shadowBlur = 0;
+}
+
 export function paintChunk(w, c, cx, cy) {
   const g = c.getContext('2d');
   g.clearRect(0, 0, CHUNK_PX, CHUNK_PX);
@@ -21,6 +47,7 @@ export function paintChunk(w, c, cx, cy) {
       g.globalAlpha = 1;
     }
   }
+  paintSpires(g, w, x0, y0);
   // Pass 2: ore gems (glowing).
   g.shadowBlur = 10;
   for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {

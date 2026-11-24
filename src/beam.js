@@ -3,6 +3,7 @@
 // and older checks keep working. Every mode scales from the Core Matrix Beam Power and Range stats; none adds a stat.
 import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
   PULSE_FLASH_S, BEAM_GLITCH_MUL } from './config.js';
+import { UNBREAKABLE } from './world.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -96,12 +97,12 @@ function pulseFoe(game, ox, oy, dx, dy, range) {
 }
 
 /** S-21: would a burst now hit something, a live Glitch on the ray or a breakable cell, within the Pulse reach?
- *  Bedrock (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting (B-036). */
+ *  Bedrock, a Spire core or facet (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting (B-036). */
 export function pulseInReach(game) {
   const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
   if (pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range)) return true;
   const h = w.raycast(p.x, p.y, dx, dy, range + NOSE);
-  return !!h && w.get(h.x, h.y) !== T.BEDROCK;
+  return !!h && !UNBREAKABLE.has(w.get(h.x, h.y));
 }
 
 /** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */

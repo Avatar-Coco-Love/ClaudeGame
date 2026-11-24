@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.49';
+export const VERSION = '0.2.50';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -60,7 +60,7 @@ export const DEPOSIT_TICK_S = 0.035; // one cargo item banked per tick inside th
 export const HURT_INVULN_S = 0.5, HURT_KNOCKBACK = 320; // after a hit: grace seconds, push speed (px/s)
 export const RESPAWN_INVULN_S = 2, RESPAWN_CLEAR_PX = 900; // after a death: grace seconds; Glitches within this of the Nexus vanish
 
-export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8 };
+export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8, SPIRE_SHELL: 9, SPIRE: 10, FACET: 11 };
 
 export const MATERIAL = {
   [T.ROCK]:    { hp: 0.55, yield: null }, // ROCK/DENSE colours come from their depth ring (RINGS, world.look)
@@ -71,6 +71,9 @@ export const MATERIAL = {
   [T.VAULT]:   { hp: 6,    fill: '#142a3a', edge: '#d8fbff', yield: null }, // S-9 vault shell: tough, no yield
   [T.CACHE]:   { hp: 3,    fill: '#1d1440', edge: '#ffffff', yield: null }, // S-9 vault centre: bursts VAULT_LOOT
   [T.LUMEN]:   { hp: 3.5,  fill: '#3a2a0a', edge: '#ffc94f', yield: { kind: 'lumen', min: 1, max: 1 } }, // S-10, Deep only
+  [T.SPIRE_SHELL]: { hp: 6, fill: '#1a1a3e', edge: '#c9c2ff', yield: null }, // S-19 Spire shell: tough like a vault shell, no yield
+  [T.SPIRE]:   { hp: Infinity, fill: '#120c2a', edge: '#8f80d8', yield: null }, // S-19 Spire core: unmineable (D-049)
+  [T.FACET]:   { hp: Infinity, fill: '#18123a', edge: '#a89cf0', yield: null }, // S-19 facet in the shell: unmineable (S-28 toggles it)
 };
 
 // S-10 Lumen (D-033): re-types ROCK/DENSE at d >= LUMEN_D cells where its own noise (seed ^ LUMEN_SALT, at x/5, y/5) > LUMEN_CUT.
@@ -85,6 +88,13 @@ export const VAULT_D = [50, 72];     // centre distance from the Nexus, in cells
 export const VAULT_GAP = 20;         // min cells between vault centres
 export const VAULT_TRIES = 200;
 export const VAULT_LOOT = { shard: 20, prism: 6 };
+
+// S-19 Spires (D-049, D-068): 5 dormant 9×9 sites, one per 72° sector from a seeded start angle; chosen once, then saved.
+export const SPIRE_COUNT = 5;
+export const SPIRE_D = [64, 74];     // centre distance from the Nexus, in cells
+export const SPIRE_TRIES = 40;       // candidates per sector (seed-only, like vaultSites)
+export const SPIRE_VAULT_GAP = 12;   // min cells from a Spire centre to every vault centre
+export const SPIRE_GAP = 12;         // min cells between Spire centres (two sectors meet at a line)
 
 // S-8 depth rings (D-022). d = cells from the Nexus centre; a cell belongs to the last ring whose r0 ≤ d (the corners are Deep).
 // Each ring recolours ROCK/DENSE and multiplies only their hp; ore, bedrock and the cell layout are the same everywhere.

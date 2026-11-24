@@ -60,6 +60,9 @@ export function vaultSites(seed, w = WORLD_W, h = WORLD_H) {
   return sites;
 }
 
+// Cells the beam can never break (it sparks, no crack): the border, and a Spire's core + facets (S-19, D-049).
+export const UNBREAKABLE = new Set([T.BEDROCK, T.SPIRE, T.FACET]);
+
 export class World {
   /** `vaultSkip`: indices into vaultSites(seed) never stamped (D-023: an old save had already seen that ground). */
   constructor(seed, vaultSkip = []) {
@@ -160,7 +163,7 @@ export class World {
   /** Apply beam damage. Returns {broken:true, type} when the cell is destroyed. */
   hit(x, y, amount) {
     const type = this.get(x, y);
-    if (type === T.EMPTY || type === T.BEDROCK) return null;
+    if (type === T.EMPTY || UNBREAKABLE.has(type)) return null;
     const i = this.idx(x, y);
     this.damage[i] += amount;
     const hp = this.hpAt(x, y, type);
@@ -182,7 +185,7 @@ export class World {
 
   damageFrac(x, y) {
     const type = this.get(x, y);
-    if (type === T.EMPTY || type === T.BEDROCK) return 0;
+    if (type === T.EMPTY || UNBREAKABLE.has(type)) return 0;
     return this.damage[this.idx(x, y)] / this.hpAt(x, y, type);
   }
 
