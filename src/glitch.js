@@ -5,8 +5,9 @@ import {
   NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, GLITCH_R, GLITCH_CAP, GLITCH_CAP_BASE,
   GLITCH_CAP_STEP_PX, GLITCH_SPAWN_S, GLITCH_SPAWN_RING, GLITCH_SPAWN_CLEAR, GLITCH_AGGRO_PX, GLITCH_DESPAWN_PX, GLITCH_TIER_PX,
   GLITCH_TIER_MAX, GLITCH_TIER, GLITCH_LOOT_SHARDS, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK, GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL,
-  GLITCH_NEXUS_BURN, GLITCH_COLORS, CELL, SPIRE_GUARD_CELLS,
+  GLITCH_NEXUS_BURN, GLITCH_COLORS, CELL, SPIRE_GUARD_CELLS, SPITTER_TIER, SPITTER_CHANCE, SPITTER_HOLD_PX,
 } from './config.js';
+import { makeSpitter, spitterStep, updateBolts } from './spitter.js';
 import { wakeContact } from './wake.js';
 import { collides, moveBody } from './body.js';
 
@@ -48,7 +49,13 @@ export function updateGlitches(game, dt) {
       const gx = goal.x - e.x, gy = goal.y - e.y, gd = Math.hypot(gx, gy) || 1;
       if (wakeContact(game, e, gd)) { list.splice(i, 1); continue; }
       tx = gx / gd; ty = gy / gd; e.alert = true;
-    } else if (d < GLITCH_AGGRO_PX || e.wake) { tx = dx / d; ty = dy / d; e.alert = true; }
+    } else if (d < GLITCH_AGGRO_PX || e.wake) {
+      tx = dx / d; ty = dy / d; e.alert = true;
+      if (e.spitter) { // S-32: eases to a hold and fires; holding near its distance counts as progress (D-017)
+        const k = spitterStep(game, e, d, dt); tx *= k; ty *= k;
+        if (k < 1 && d < SPITTER_HOLD_PX + GLITCH_PROGRESS_PX) { e.best = d; e.stall = 0; }
+      }
+    }
     else { e.wander += (game.rng['glitch-wander']() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
     const nd = Math.hypot(e.x - game.nexus.x, e.y - game.nexus.y);
     if (nd < NEXUS_RADIUS + GLITCH_NEXUS_MARGIN) { // the nexus repels glitches
@@ -74,16 +81,19 @@ export function updateGlitches(game, dt) {
     }
     if (d > GLITCH_DESPAWN_PX && !e.wake) game.enemies.splice(i, 1); // B-048: a Wake's Glitches stay when the core walks off
   }
+  updateBolts(game, dt); // S-32
 }
 
-function trySpawnGlitch(game, distFromNexus) {
+export function trySpawnGlitch(game, distFromNexus) {
   const p = game.player;
   for (let tries = 0; tries < 12; tries++) {
     const rs = game.rng['glitch-spawn'], a = rs() * Math.PI * 2, r = GLITCH_SPAWN_RING[0] + rs() * GLITCH_SPAWN_RING[1];
     const x = p.x + Math.cos(a) * r, y = p.y + Math.sin(a) * r;
     if (Math.hypot(x - game.nexus.x, y - game.nexus.y) < NEXUS_RADIUS * GLITCH_SPAWN_CLEAR) continue;
     if (collides(game.world, x, y, GLITCH_R)) continue;
-    game.enemies.push(makeGlitch(x, y, glitchTier(distFromNexus), a));
+    const tier = glitchTier(distFromNexus), e = makeGlitch(x, y, tier, a);
+    if (tier >= SPITTER_TIER && rs() < SPITTER_CHANCE) makeSpitter(e); // S-32 (D-087): same stream, Deep only
+    game.enemies.push(e);
     return;
   }
 }

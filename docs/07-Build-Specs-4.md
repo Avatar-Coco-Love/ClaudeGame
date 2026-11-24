@@ -1,6 +1,6 @@
 # 07 — Build Specs, part 4
 
-Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). S-24 built (#65, D-090), S-29 built (#66, D-091): v1.0.0. Design 62 added S-34 (built #68, D-093). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32, S-33, D-087).
+Continues `07-Build-Specs-3.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 42; refreshed in Design 52 (D-081/D-082). S-30 built (#60, D-085), S-23 built (#61, D-086). S-24 built (#65, D-090), S-29 built (#66, D-091): v1.0.0. Design 62 added S-34 (built #68, D-093). Design 57 added S-31 (built #63, D-088) and the first M6 specs (S-32 built #71, D-096; S-33, D-087).
 None of these adds a sink: the Wake and the ending spend nothing; New Cycle resets the world's supply with the world (D-062).
 
 ## S-32 — Spitter: the first Glitch variant (M6, after v1.0) (D-087)

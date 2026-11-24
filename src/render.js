@@ -9,6 +9,7 @@ import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { endingView, drawOverview } from './ending.js';
 import { paintChunk } from './terrain.js';
+import { spitterSprite, drawSpitterTells } from './spitter.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -154,6 +155,7 @@ export class Renderer {
     ctx.save();
     ctx.translate(this.w / 2 + shx, this.h / 2 + shy); ctx.scale(s, s); ctx.translate(-this.cam.x, -this.cam.y);
     this.drawEnemies(ctx, true);
+    drawSpitterTells(this, ctx); // S-32: the shot tell and bolts read through the dark
     this.drawScan(ctx);
     ctx.restore();
 
@@ -338,7 +340,7 @@ export class Renderer {
         ctx.drawImage(sp.canvas, e.x - sp.half, e.y - sp.half, sp.half * 2, sp.half * 2);
         ctx.globalAlpha = 1; continue;
       }
-      const sp = this.glitchSprite(e.tier, e.flash > 0), k = (fade < 1 ? 0.4 + 0.6 * fade : 1) * e.r / GLITCH_R;
+      const sp = e.spitter ? spitterSprite(this, e.flash > 0) : this.glitchSprite(e.tier, e.flash > 0), k = (fade < 1 ? 0.4 + 0.6 * fade : 1) * e.r / GLITCH_R;
       ctx.save();
       ctx.translate(e.x, e.y); ctx.rotate(e.spin); ctx.scale(k, k); ctx.globalAlpha = fade;
       ctx.drawImage(sp.canvas, -sp.half, -sp.half, sp.half * 2, sp.half * 2);
