@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.1.31 — 2026-11-24 (#32)
+- Links to Lumen Core now show the game's picture: the share image was never actually published to the site, so link
+  previews and the Projects page card showed a broken image. Lumen Core's card is now on the Projects page.
+
 ## v0.1.30 — 2026-11-24 (#31)
 - Sharing a link to Lumen Core now shows a real frame of the game (the Nexus, a fresh tunnel, the beam) and a one-line summary.
   A Lumen Core card for the owner's Projects page is ready to add there.

@@ -55,8 +55,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - PWA: installable and works offline.
 - Accessibility: remappable keys, colour-blind-safe ore shapes (they're already shape-coded; audit this), and readable text sizes.
 - Performance pass on low-end mobile.
-- **Projects page card: apply** (D-044, *blocked: session 28 could not reach the Projects repo*): paste `docs/projects-card.html`
-  into `avatar-coco-love.github.io` `index.html`, update its meta + README, screenshot at 320 px and desktop. Any session that can reach it.
+- ✅ **Projects page card** (D-044, Projects repo #14, session 29): live between Foldwork and Animal Mail Route.
 
 ## Later / research spikes (design only until proven)
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment.
