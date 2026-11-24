@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.41 — 2026-11-24 (#42)
+- No gameplay change. Design pass: the Pulse beam gets a plan to hold a full charge until a Glitch or wall is in reach,
+  so it becomes the beam for picking off tough Glitches at range. Relighting a Spire is decided (feed it 80 Prisms, then
+  a light puzzle in Drift or a 40 s defence in Surge), and Relays (remote deposit points) are planned.
+
 ## v0.2.40 — 2026-11-24 (#41)
 - No gameplay change. Behind the scenes the game's code is tidied into smaller pieces (Glitches, the minimap and HUD each have
   their own file) to make room for Beacons and Spires. A recorded Surge run and a test scene look and play exactly the same.
