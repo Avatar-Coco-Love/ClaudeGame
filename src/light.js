@@ -1,7 +1,7 @@
 // Light (S-26, split out of render.js): the darkness layer with its light holes, and the S-25 floor glow under light pools.
 // The Renderer keeps `r.lightSets`, a list of arrays of world-space lights `{x, y, r}` (+ optional `glow`, an "R, G, B"
-// string for the floor glow; default beacon cyan). It holds `game.beacons` (S-16) and `game.relays` (S-22); S-28 adds the
-// lit Spires. Both passes iterate the sets in place: no per-frame concat or allocation.
+// string for the floor glow; default beacon cyan). It holds `game.beacons` (S-16), `game.relays` (S-22) and the lit
+// Spires (`game.spireLights`, S-28). Both passes iterate the sets in place: no per-frame concat or allocation.
 import { LIGHT_RADIUS, BEACON_RGB } from './config.js';
 
 const GLOW_RGB = BEACON_RGB;

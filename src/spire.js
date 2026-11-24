@@ -84,6 +84,7 @@ export function loadSpires(raw, w = WORLD_W, h = WORLD_H) {
   return raw.map(s => {
     const rec = { x: s.x, y: s.y, seen: s.seen === true, fed: Math.max(0, Math.floor(Number(s.fed)) || 0),
       mask: Number.isInteger(s.mask) && s.mask >= 0 && s.mask <= 255 ? s.mask : null, lit: s.lit === true };
+    if (rec.lit) rec.mask = 255; // B-045: a lit Spire has all 8 facets lit, whatever a malformed save says
     rec.fed = Math.min(SPIRE_PRISMS, rec.fed); // S-20: a fed count past the cap is a malformed save (B-037)
     if (rec.lit && SPIRE_MODES.includes(s.mode)) rec.mode = s.mode; // S-28 (D-081): an unknown mode is dropped (B-037)
     if (s.keep) rec.keep = [...s.keep];
@@ -294,8 +295,10 @@ export function toggleFacet(game, s, k) {
 }
 
 /** D-080: only the aim (centre) ray's cell counts. `SPIRE_TAP_S` of unbroken contact with one facet toggles it once;
- *  it then stays latched until the ray leaves that facet. `target` is the centre ray's cell this frame (null = none). */
-export function updateFacetAim(game, dt, target) {
+ *  it then stays latched until the ray leaves that facet. `target` is the centre ray's cell this frame (null = none);
+ *  `blocked`: a Glitch stands on the centre ray, so the aim hasn't left the facet; the latch (and dwell) hold (B-044). */
+export function updateFacetAim(game, dt, target, blocked = false) {
+  if (!target && blocked) return;
   const f = target && facetAt(game, target.x, target.y);
   if (!f) { game.facetAim = null; return; }
   let a = game.facetAim;

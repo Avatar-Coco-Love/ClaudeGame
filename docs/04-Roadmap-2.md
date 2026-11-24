@@ -23,7 +23,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   per-item save/rotate/drawImage), holes 145 / 200 (light 70 %). Batch pickups without per-item save/restore if loot matters.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
-- **Audit 39 leftovers (code health):** (`light.js` split ✅ #50) unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`, `VAULT_TEMPLATES`, `WIDE_OFFSET` (low; audit 44 again).
+- **Audit 39 leftovers (code health):** (`light.js` split ✅ #50) unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`, `VAULT_TEMPLATES` (low; audit 44 again; `WIDE_OFFSET` now used by `tests/facet.cjs`, audit 54).
 - **Audit 44 leftovers:** one buy helper for `canAfford`/`buy`, `canAffordNexus`/`buyNexus`, research and `craftBeacon`, and one
   `buyRow` for the 3 repeated panel click handlers in `main.js`; (`tests/smoke.cjs` split ✅ #54: 545 → 392 lines); `craft.js` `placeRefusal`/`tryPlace` both compute the core cell; (380 px blocks
   merged ✅ #53); `tools/perf.cjs` leaves beacon glow, beacon glyphs and chunk blits untimed (~31 %
@@ -31,7 +31,12 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - ✅ (#53) **B-039:** 320 px bank vs minimap: `.bank` gap 8 px at ≤ 380 px (D-072); a 4-digit ● (not reachable, ~141 per world) would touch.
 - **Audit 49 leftovers:** (smoke split, SAVE_FORMAT pin guard, Nexus pointer, toast queue + width, B-041, B-042, beacon RGB ✅ #54)
   T2 minimap Spire hexagon ~5 CSS px / 0.86 px line on the 96 px phone minimap (blobs into violet cells; make it bigger/brighter);
-  T1b the pointer now slides inward, so its NEXUS label can cross a toast at top 30 % (568×320, seen); T4 `tools/perf.cjs`
+  T1b the pointer now slides inward, so its NEXUS label can cross a toast at top 30 % (568×320, seen; phone toasts moved in audit 54, B-047: re-check); T4 `tools/perf.cjs`
   leaves `drawLightGlow` / `drawSpireBreath` untimed; H2 hexagon path in `spire.js` ×2 + `terrain.js` `hexPath` → one export;
   H3 "inside the bedrock border" in `spire.js` ×2, `world.js`, `dev.js` → one `insideBorder`; H6 unused exports `SPIRE_HALF`,
-  `spireTypeAt`, `makeBeacon`, `pulseInReach` (plus audit 39's list).
+  `makeBeacon`, `makeRelay`, `pulseInReach` (plus audit 39's list; `spireTypeAt` now used by tools, audit 54).
+- **Audit 54 leftovers:** (C1–C3, T1, T2 ✅ #59: B-043…B-047) H1 `craft.js`: `loadRelays` ≈ `loadBeacons` → one `loadPlaced(list, max, make)`;
+  `drawRelays` ≈ `drawBeacons` (cull + setup); `placeRefusal`/`tryPlace` core cell → one helper. H2 `spire.js` `updateSpireFeed` copies
+  `game.js` `updateDeposit`'s tick loop → shared `tickTransfer`; `main.js` `craftRow` is a 4th near-copy of the panel click handler
+  (folds into `buyRow`). H4 draw literals (`spire.js` facet hex 9, dwell ring 15, feed arc 24, burst 10/120; `craft.js` `drawRelays`
+  10, 14, 0.22) → config or mark layout-only. T3 the Relay's dashed bank ring is faint at DSF 1 (alpha ~1.5× the dark around it).

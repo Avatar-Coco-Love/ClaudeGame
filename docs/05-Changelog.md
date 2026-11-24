@@ -3,6 +3,14 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.58 — 2026-11-24 (#59)
+- **Fixes from a health check:** holding a charged Pulse on a Spire facet now flips it once, not back and forth every
+  second and a half; a Glitch drifting across your beam no longer makes a facet you already flipped flip again; a
+  relit Spire from a damaged save always shows all eight facets lit.
+- **Phones:** messages now appear below the core (portrait) or under the resource panel (landscape) instead of over the
+  ◎ ⟂ ✦ buttons and the minimap, and the answer to a tap (like "No Beacons — craft at the Nexus") shows at once
+  instead of waiting behind a longer message, which then returns.
+
 ## v0.4.57 — 2026-11-24 (#58)
 - **Relight a Spire:** once a Spire is primed, hold your beam on one of its eight facets for a moment and it flips,
   along with its two neighbours (a small ring fills round the facet you are aiming at). Light all eight and the Spire

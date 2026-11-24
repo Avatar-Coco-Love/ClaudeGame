@@ -1,6 +1,6 @@
 # 09 — Implementation Log, part 5
 
-Continues `09-Implementation-Log-4.md` (split at the 8 KB cap, session 49). Newest at the bottom; read the tail only.
+Continues `09-Implementation-Log.md` (split at the 8 KB cap, session 49; parts 3–4 were archived in audit 54). Newest at the bottom; read the tail only.
 
 ## Session 49 — Audit: tests split, SAVE_FORMAT guard, Nexus pointer, toast queue, B-041, B-042 (v0.2.53, #54)
 - Sweeps (code health + docs drift, correctness, mobile/touch + perf) ran in parallel; each finding re-run here first.

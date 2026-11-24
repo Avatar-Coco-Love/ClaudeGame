@@ -87,6 +87,7 @@ function persist() { if (game && !game.demo) store.write(game.toSave()); }
 
 // C3 (audit 49): one toast slot, but nothing is lost. A toast shows for at least TOAST_MIN unless the new one answers a key
 // or tap (`now`); a milestone (`keep`) holds its whole time. Anything arriving meanwhile waits in a short queue.
+// T2 (audit 54): a `now` answer shows at once even over a milestone, which goes back to the queue's front for its rest (≥ 1.5 s).
 const TOAST_MIN = 0.8, toastQ = [], KEEP = 'keep', NOW = 'now';
 let toastShown = 0, toastKeep = false;
 function toast(msg, ms = 2600, tier = '') {
@@ -94,7 +95,10 @@ function toast(msg, ms = 2600, tier = '') {
   if (!msg) return;
   const t = $('toast');
   if (toastTimer > 0 && t.textContent === msg) { toastTimer = Math.max(toastTimer, ms / 1000); return; }
-  if (toastTimer > 0 && (toastKeep || (toastShown < TOAST_MIN && tier !== NOW))) {
+  if (toastTimer > 0 && toastKeep && tier === NOW) {
+    toastQ.unshift({ msg: t.textContent, ms: Math.max(1500, toastTimer * 1000), tier: KEEP });
+    if (toastQ.length > 3) toastQ.pop();
+  } else if (toastTimer > 0 && (toastKeep || (toastShown < TOAST_MIN && tier !== NOW))) {
     if (!toastQ.some(q => q.msg === msg) && toastQ.length < 3) toastQ.push({ msg, ms, tier });
     return;
   }

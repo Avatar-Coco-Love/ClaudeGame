@@ -40,3 +40,13 @@ Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected
 - Surge (D-055 interim): the same puzzle, Glitches still spawn, `mode` 'surge'; nobody is stuck before S-23.
 - Rejected: a toggle on beam start (a sweep across facets flips them); aim snapping to facets (windows already wide);
   letting a full Pulse wait at a primed facet as at bedrock (the burst does something there, B-036's reason is gone).
+
+### D-084 — Audit 54: one toggle per aim, phone toast band, tap answers first (2026-11-24, session 54, Audit; amends D-083, D-073)
+- D-083's "one toggle" holds per aim for every beam: a Pulse burst that toggles a facet latches it (`beam.facetLatch`);
+  while the held aim rests on it a full charge waits, and a charge let go there is dropped unfired. Letting go and
+  pressing again is a new aim. A Glitch on the centre ray pauses Focus/Wide's dwell latch instead of clearing it.
+  Rejected: a Pulse cooldown per facet (time-based, not aim-based); never counting facets in `pulseInReach` (B-036 again).
+- Phone toasts (D-073): portrait just below the core (50 % + 40 px), landscape under the bank panel, left of the core;
+  desktop keeps top 30 %. Rejected: a narrower centred toast (≤ 124 px at 320 wide); placing it by JS measurement.
+- A `now` toast (answer to a key/tap) shows at once even over a `keep` milestone, which returns for its rest (≥ 1.5 s).
+- All D-001…D-083 re-checked against the code in audit 54: they match.

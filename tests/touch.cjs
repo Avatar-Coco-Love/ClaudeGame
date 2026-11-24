@@ -211,6 +211,38 @@ async function browserChecks(browser, url, check, errors, shots) {
       mini.l - panel.r >= 6 && /2750/.test(bank) && /141\b/.test(bank), JSON.stringify({ panelR: panel.r, miniL: mini.l, bank }));
     await ctx.close();
   }
+  // ---- B-047 (audit 54 T1): a long toast (the death line, the longest mode line) never covers a HUD control, the bank panel,
+  // the hint or the core, portrait or landscape. Old CSS (top 30% everywhere): at 320×568 the death toast covered ◎ (230–308 × 164–208).
+  for (const vp of [{ width: 320, height: 568 }, { width: 375, height: 667 }, { width: 412, height: 915 }, { width: 568, height: 320 }, { width: 915, height: 412 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push('touch toast: ' + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    // Surge: the integrity row makes the bank panel its tallest. Wait for the camera to settle on the core first.
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; });
+    await pg.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 2; }, null, { timeout: 5000 }).catch(() => {});
+    await pg.evaluate(() => { document.getElementById('integrity-row').classList.remove('hidden'); window.__lumen.game.notify('destabilized'); }); // the row main.js shows in Surge
+    await pg.waitForTimeout(450);
+    const measure = () => pg.evaluate(() => {
+      const box = el => { const r = el.getBoundingClientRect(); return { id: el.id || el.className, l: r.left, t: r.top, r: r.right, b: r.bottom }; };
+      const vis = el => !el.classList.contains('hidden') && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().width > 0;
+      const t = box(document.getElementById('toast')), L = window.__lumen;
+      const hud = ['.top-left', '#minimap', '#mute-btn', '#menu-btn', '#scan-btn', '#mode-btn', '#beacon-btn', '#matrix-btn', '#hint']
+        .map(s => document.querySelector(s)).filter(vis).map(box);
+      // The core sits up to 36 world px (render.js look-ahead) from the screen centre, any direction, + its own 16 px.
+      const o = L.renderer.worldToScreen(L.renderer.cam.x, L.renderer.cam.y), k = L.renderer.worldToScreen(L.renderer.cam.x + 52, 0).x - o.x;
+      hud.push({ id: 'core', l: o.x - k, t: o.y - k, r: o.x + k, b: o.y + k });
+      const hits = hud.filter(h => t.l < h.r && h.l < t.r && t.t < h.b && h.t < t.b).map(h => h.id);
+      return { text: document.getElementById('toast').textContent, t: [t.l, t.t, t.r, t.b].map(Math.round), core: hud[hud.length - 1], hits, buttons: hud.length };
+    });
+    const death = await measure();
+    if (shots) await pg.screenshot({ path: `${shots}/toast-${vp.width}x${vp.height}.png` });
+    await pg.evaluate(() => { document.getElementById('toast').textContent = 'Drift mode — Calm. No hostiles. Mine, explore, build at your own pace.'; });
+    const mode = await measure();
+    check(`${vp.width}×${vp.height}: a long toast covers no HUD control, panel, hint or the core (B-047)`,
+      /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length, JSON.stringify({ death, mode }));
+    await ctx.close();
+  }
 }
 
 module.exports = { browserChecks };
