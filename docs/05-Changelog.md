@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.4.55 — 2026-11-24 (#56)
+- **Feed a Spire:** stand inside a dormant Spire's walls and your Prisms flow into it, eight a second — the ones you
+  carry first, then the ones in your bank. A violet ring round the core fills toward 80. At 80 the Spire is **primed**:
+  some of its eight facets light up bright, the pattern you'll solve next. Shards and Lumen are never taken, leaving stops
+  the flow, and the count is kept. Same in Drift and Surge. A Spire whose core an old save had already dug relights at once.
+
 ## v0.4.54 — 2026-11-24 (#55)
 - **Relays** (Craft tab, 40◆ + 12▲, up to 3 in a world): carry one out, press B / tap ⊕ on open floor at least 24 cells
   from the Nexus, and from then on cargo you bring within its dashed ring banks right there, with the same ticks and chime

@@ -10,7 +10,7 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
-import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen } from './spire.js';
+import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed } from './spire.js';
 
 
 export class Game {
@@ -52,6 +52,7 @@ export class Game {
     this.shake = 0;
     this.settings = settings; // live Settings object (S-3); null = all effects on (tools, demo)
     this.depositTimer = 0;
+    this.feedTimer = 0;      // S-20: time toward the next ▲ fed to a Spire (spire.js)
     this.spawnTimer = GLITCH_FIRST_SPAWN_S;
     this.depositCount = 0;
     this.depositKinds = new Set(); // kinds moved this Nexus visit -> arpeggio length (S-4)
@@ -176,6 +177,7 @@ export class Game {
     this.updateBeam(dt, intent);
     this.updatePickups(dt);
     this.updateDeposit(dt);
+    updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
     if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length) this.enemies = [];
     this.updateParticles(dt);
 

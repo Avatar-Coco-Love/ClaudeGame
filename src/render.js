@@ -5,7 +5,7 @@ import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
-import { drawSpireBreath } from './spire.js';
+import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { paintChunk } from './terrain.js';
 
@@ -138,6 +138,7 @@ export class Renderer {
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
     this.drawBeam(ctx);
+    drawSpireFeed(this, ctx, left, top, vw, vh); // S-20: primed facets + the fed / 80 arc
     this.drawPlayer(ctx);
     this.drawParticles(ctx);
     ctx.restore();

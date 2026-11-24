@@ -2,7 +2,7 @@
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
 import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
-  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR } from './config.js';
+  SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 
 export const SPIRE_HALF = 4; // the footprint is (2·4 + 1)² = 9×9 cells
@@ -83,7 +83,8 @@ export function loadSpires(raw, w = WORLD_W, h = WORLD_H) {
   if (!ok) return null;
   return raw.map(s => {
     const rec = { x: s.x, y: s.y, seen: s.seen === true, fed: Math.max(0, Math.floor(Number(s.fed)) || 0),
-      mask: Number.isInteger(s.mask) ? s.mask : null, lit: s.lit === true };
+      mask: Number.isInteger(s.mask) && s.mask >= 0 && s.mask <= 255 ? s.mask : null, lit: s.lit === true };
+    rec.fed = Math.min(SPIRE_PRISMS, rec.fed); // S-20: a fed count past the cap is a malformed save (B-037)
     if (s.keep) rec.keep = [...s.keep];
     return rec;
   });
@@ -157,4 +158,102 @@ export function drawSpireMarks(m, g, sc) {
     m.closePath(); m.stroke();
   }
   m.restore();
+}
+
+// ---------- S-20 feed (D-055, D-069, D-070) ----------
+
+/** The 8 facets in ring order (clockwise from the top right), as offsets from the centre. Bit k of `mask` = facet k lit. */
+export const FACET_RING = [[2, -4], [4, -2], [4, 2], [2, 4], [-2, 4], [-4, 2], [-4, -2], [-2, -4]];
+export const SPIRE_INTERIOR = 3; // the 7×7 interior: |dx|, |dy| ≤ 3 cells from the centre
+
+/** D-069: broken when the saved `keep` list holds a core or facet cell (the stamp left it as generated). Derived, not saved. */
+export function isBroken(s, w = WORLD_W) {
+  return (s.keep || []).some(c => { const t = spireTypeAt(c % w - s.x, Math.floor(c / w) - s.y); return t === T.SPIRE || t === T.FACET; });
+}
+
+/** Toggling facet k flips it and its two ring neighbours (S-28's rule). */
+export const toggleMask = (mask, k) => mask ^ (1 << k) ^ (1 << ((k + 1) % 8)) ^ (1 << ((k + 7) % 8));
+
+/** S-28's start pattern for Spire i: all lit, then SPIRE_TAPS[i] distinct facets toggled, drawn from its own salt. */
+export function startMask(seed, i) {
+  const rand = seededStream(seed, 'facets' + i), pool = [0, 1, 2, 3, 4, 5, 6, 7], n = SPIRE_TAPS[Math.min(i, SPIRE_TAPS.length - 1)];
+  let mask = 255;
+  for (let k = 0; k < n; k++) {
+    const j = k + Math.floor(rand() * (8 - k));
+    [pool[k], pool[j]] = [pool[j], pool[k]];
+    mask = toggleMask(mask, pool[k]);
+  }
+  return mask;
+}
+
+/** The Spire whose 7×7 interior holds the core's cell (judged by position from the record's centre, D-069), or null. */
+export function spireHere(game) {
+  const cx = Math.floor(game.player.x / CELL), cy = Math.floor(game.player.y / CELL);
+  return game.spires.find(s => Math.abs(cx - s.x) <= SPIRE_INTERIOR && Math.abs(cy - s.y) <= SPIRE_INTERIOR) || null;
+}
+
+/** Feed: inside a dormant Spire's interior, ▲ moves in at SPIRE_FEED_RATE, cargo first, then the bank (D-070), up to
+ *  SPIRE_PRISMS. ◆ and ● stay put. Same in Drift and Surge. At the cap the Spire is primed (or, if broken, relit). */
+export function updateSpireFeed(game, dt) {
+  const s = spireHere(game);
+  if (s && !s.lit && s.fed >= SPIRE_PRISMS && s.mask === null) primeSpire(game, s); // a save cut off mid-prime heals here
+  if (!s || s.lit || s.fed >= SPIRE_PRISMS || game.cargo.prism + game.bank.prism === 0) { game.feedTimer = 0; return; }
+  game.feedTimer += dt;
+  const step = 1 / SPIRE_FEED_RATE, p = game.player, tx = (s.x + 0.5) * CELL, ty = (s.y + 0.5) * CELL;
+  while (game.feedTimer >= step && s.fed < SPIRE_PRISMS) {
+    const from = game.cargo.prism > 0 ? game.cargo : game.bank.prism > 0 ? game.bank : null;
+    if (!from) { game.feedTimer = 0; return; }
+    game.feedTimer -= step;
+    from.prism--; s.fed++;
+    game.audio.deposit(game.depositCount++);
+    game.particles.push({ type: 'streak', x: p.x, y: p.y, tx, ty, life: 0.4, max: 0.4, color: RESOURCE.prism.color, size: 3 });
+    if (s.fed >= SPIRE_PRISMS) primeSpire(game, s);
+  }
+}
+
+/** At SPIRE_PRISMS: `mask` gets the start pattern (S-28 only reads it) and the toast "Spire primed". A broken Spire
+ *  (D-069) has no puzzle and relights at once: `lit`, all facets set, toast "Spire relit (n/N)" (S-28 adds its effects). */
+export function primeSpire(game, s) {
+  game.audio.depositDone(3);
+  if (isBroken(s, game.world.w)) {
+    s.mask = 255; s.lit = true;
+    game.spireLitCount = spiresLit(game);
+    game.notify('spire-relit');
+  } else {
+    s.mask = startMask(game.world.seed, game.spires.indexOf(s));
+    game.notify('spire-primed');
+  }
+}
+
+/** The fed / 80 arc around the core while it stands in an unlit Spire's interior, and a primed Spire's facets: lit ones
+ *  bright (filled, glowing), unlit ones a clear outline, so the start pattern reads (world transform, before the light). */
+export function drawSpireFeed(r, ctx, left, top, vw, vh) {
+  const g = r.game, w = g.world;
+  ctx.save();
+  ctx.strokeStyle = SPIRE_MARK_COLOR; ctx.fillStyle = SPIRE_MARK_COLOR; ctx.shadowColor = SPIRE_MARK_COLOR;
+  for (const s of g.spires) {
+    if (s.lit || s.mask === null) continue;
+    const cx = (s.x + 0.5) * CELL, cy = (s.y + 0.5) * CELL, m = CELL * 5;
+    if (cx + m < left || cx - m > left + vw || cy + m < top || cy - m > top + vh) continue;
+    FACET_RING.forEach(([i, j], k) => {
+      if (w.get(s.x + i, s.y + j) !== T.FACET) return;
+      const on = (s.mask >> k) & 1, x = cx + i * CELL, y = cy + j * CELL;
+      ctx.beginPath();
+      for (let n = 0; n < 6; n++) { const t = Math.PI / 6 + n * Math.PI / 3; ctx[n ? 'lineTo' : 'moveTo'](x + Math.cos(t) * 9, y + Math.sin(t) * 9); }
+      ctx.closePath();
+      ctx.shadowBlur = on ? 14 : 0; ctx.lineWidth = on ? 2.5 : 1.5; ctx.globalAlpha = on ? 1 : 0.6; ctx.stroke();
+      if (on) { ctx.globalAlpha = 0.45; ctx.fill(); }
+    });
+  }
+  const s = spireHere(g);
+  if (s && !s.lit) {
+    const p = g.player, f = Math.min(1, s.fed / SPIRE_PRISMS), a0 = -Math.PI / 2;
+    ctx.shadowBlur = 0; ctx.lineWidth = 3; ctx.globalAlpha = 0.22;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 24, 0, Math.PI * 2); ctx.stroke();
+    if (f > 0) {
+      ctx.globalAlpha = 0.95; ctx.shadowBlur = 10;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 24, a0, a0 + Math.PI * 2 * f); ctx.stroke();
+    }
+  }
+  ctx.restore();
 }
