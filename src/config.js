@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.51';
+export const VERSION = '0.2.52';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -95,6 +95,9 @@ export const SPIRE_D = [64, 74];     // centre distance from the Nexus, in cells
 export const SPIRE_TRIES = 40;       // candidates per sector (seed-only, like vaultSites)
 export const SPIRE_VAULT_GAP = 12;   // min cells from a Spire centre to every vault centre
 export const SPIRE_GAP = 12;         // min cells between Spire centres (two sectors meet at a line)
+export const SPIRE_BREATH_S = 6;              // S-27: the core hexagon's breath period (static under reduced motion)
+export const SPIRE_BREATH_ALPHA = [0.35, 0.6]; // S-27: its alpha range (0.6 = the S-19 look, held under reduced motion)
+export const SPIRE_MARK_COLOR = '#e4dcff';    // S-27: the minimap hexagon at a found Spire (violet-white)
 
 // S-8 depth rings (D-022). d = cells from the Nexus centre; a cell belongs to the last ring whose r0 ≤ d (the corners are Deep).
 // Each ring recolours ROCK/DENSE and multiplies only their hp; ore, bedrock and the cell layout are the same everywhere.

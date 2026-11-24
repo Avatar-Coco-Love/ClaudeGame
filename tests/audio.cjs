@@ -69,7 +69,7 @@ async function renderSfx([script, secs]) {
   return { peakDb: r1(20 * Math.log10(peak || 1e-50)), loudS: loud / 20, above4k: r1(100 * hi / (tot || 1)), above2k: r1(100 * hi2 / (tot || 1)) };
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
-  'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'full()'];
+  'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'full()', 'spire()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -95,6 +95,10 @@ async function browserChecks(browser, url, check, errors) {
   const pul = shots['pulse(1)'], fiz = shots['pulseFizzle()'];
   check('Pulse release thump + fizzle: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.3 s (S-14)',
     [pul, fiz].every(v => v.peakDb <= -28 && v.above2k < 1 && v.loudS <= 0.3), JSON.stringify({ pul, fiz }));
+  // S-27: a dormant Spire found: one soft low tone, held to S-14's ceilings (it plays once per Spire, in either mode).
+  const sp = shots['spire()'];
+  check('Spire found tone: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-27)', sp.peakDb <= -28 && sp.above2k < 1 && sp.loudS <= 0.5,
+    JSON.stringify(sp));
   // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
   const dep = await pg.evaluate(renderSfx, ['for (let i = 0; i < 140; i++) at(i * 0.035, () => a.deposit(i)); at(4.9, () => a.depositDone(2))', 6]);
   check('a 140-item deposit is not a 5 s beep chain: loud ≤ 1 s (B-017)', dep.loudS <= 1, JSON.stringify(dep));

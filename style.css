@@ -123,14 +123,14 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 #dev-panel button.on { border-color: var(--amber); color: var(--amber); }
 /* S-11: three currencies + "Research" must share one header line at 320 px (glyphs used to wrap above their numbers). */
 #matrix-bank span { white-space: nowrap; }
+/* S-17 touch pass: under 380 px the hint wraps to at most 2 lines instead of an ellipsis. B-039 (S-27): an 8 px bank gap
+   keeps a whole world's supply (2750◆ 1470▲ 141●) clear of the minimap at 320 px. (Audit 44: the two 380 px blocks merged.) */
 @media (max-width: 380px) {
+  .bank { gap: 8px; }
   .sheet h2 { font-size: 15px; letter-spacing: .06em; }
   #matrix-bank { gap: 8px; font-size: 14px; }
   .sheet header { gap: 8px; }
   .tabs { gap: 4px; } .tabs button { padding: 0 4px; font-size: 12px; letter-spacing: .02em; } /* S-16: four tabs share 256 px */
-}
-/* S-17 touch pass. Hint: under 380 px it wraps to at most 2 lines instead of an ellipsis. */
-@media (max-width: 380px) {
   #hint { white-space: normal; width: max-content; text-align: center; border-radius: 14px; line-height: 1.35; }
   #matrix-btn { bottom: max(84px, calc(env(safe-area-inset-bottom) + 62px)); } /* clears a 2-line hint */
 }

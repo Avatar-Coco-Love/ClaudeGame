@@ -31,3 +31,16 @@ Continues `09-Implementation-Log-3.md` (split at the 8 KB cap, session 46). Newe
 - B-039 measured (320×568, DSF 2, Surge): 2750◆ 1470▲ 141● → panel right 215 vs minimap 212 (3 px over); 4-digit ● 225;
   999/999/141 touches (212). Scheduled as an S-27 rider (`.bank` gap 10 px at ≤ 380 px).
 - Changelog v0.2.34–v0.2.38 archived word for word (`archive/changelog-v0.2.34-v0.2.38.md`) for the 8 KB cap.
+
+## Session 48 — Build: S-27 Spires found + B-039 (v0.2.52, #53)
+- `spire.js`: `markSpiresSeen` (newly revealed cells; full scan on load, silent), breath + minimap mark drawers; the outer
+  core hexagon moved from `terrain.js` to a per-frame stroke. Toast "A dormant Spire (n/N)" persists the save at once.
+- Measured: breath at the near vertex in the core's light 347 (peak) → 265–271 (trough), fill 68; in the dark 7 cells out
+  only 39 → 35 (the 0.93 darkness). Minimap mark pixel 697–703 vs shell 510, unseen box 20. Tone peak −35.3 dBFS, 0.1 s loud.
+- B-039 (fixed): old CSS at 320×568 DSF 2 gave panel right 219 (spec said 215), 10 px gap 207 (5 px clear, fails ≥ 6),
+  so 8 px → 203 (D-072). Check proven failing on the old CSS first. Pixel 7 DSF gives the same widths.
+- Viewed (DSF 1): 1280×800 the toast over the Spire, breathing core, minimap ring; 320×568 Surge the toast wraps to 2
+  lines and fits; the minimap ring at 96 px is small but reads as hollow.
+- Test fix: `spire.cjs` waited 5 s for the camera to reach the core exactly, but it eases to a 36 px look-ahead (always
+  timed out); now snaps to the look-ahead target.
+

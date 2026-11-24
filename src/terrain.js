@@ -10,8 +10,8 @@ function hexPath(g, x, y, r) {
   g.closePath();
 }
 
-/** S-19: a Spire's glyphs, drawn over pass 1. The core's hexagon spans its 3×3 cells, so cores centred up to one cell
- *  outside this chunk are drawn too (the canvas clips them) and the hexagon never breaks at a chunk edge. */
+/** S-19: a Spire's glyphs, drawn over pass 1: facets and the core's inner hexagon (cores centred up to one cell outside
+ *  this chunk are drawn too; the canvas clips them). The outer hexagon is drawn per frame (S-27 breath, spire.js). */
 function paintSpires(g, w, x0, y0) {
   const S = MATERIAL[T.SPIRE], F = MATERIAL[T.FACET];
   g.shadowBlur = 8;
@@ -22,8 +22,7 @@ function paintSpires(g, w, x0, y0) {
       hexPath(g, px, py, 7); g.stroke(); g.globalAlpha = 1;
     } else if (t === T.SPIRE && w.get(gx - 1, gy) === T.SPIRE && w.get(gx + 1, gy) === T.SPIRE
       && w.get(gx, gy - 1) === T.SPIRE && w.get(gx, gy + 1) === T.SPIRE) { // the core's centre cell
-      g.shadowColor = S.edge; g.strokeStyle = S.edge; g.lineWidth = 2; g.globalAlpha = 0.6;
-      hexPath(g, px, py, CELL * 1.35); g.stroke();
+      g.shadowColor = S.edge; g.strokeStyle = S.edge; g.lineWidth = 2; // the outer hexagon breathes: spire.js drawSpireBreath (S-27)
       g.globalAlpha = 0.3; hexPath(g, px, py, CELL * 0.7); g.stroke(); g.globalAlpha = 1;
     }
   }

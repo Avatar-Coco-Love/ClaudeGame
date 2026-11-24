@@ -47,3 +47,14 @@ Continues `06-Decisions-8.md` (same rules: supersede, never edit; list rejected 
 - **Rule:** a lane clears ROCK/DENSE/ore up to the first cell it can't (bedrock, vault, Spire, `UNBREAKABLE`); ore drops its
   normal yield as floor loot (no supply lost). A lane shorter than 3 cells gets no spawns; waves rotate over the rest.
 - Rejected: stopping lanes at ore (Glitches would stall at a crystal); skipping a Wake for edge Spires (Surge unequal).
+
+### D-072 — S-27 Spires found, as built (2026-11-24, session 48, Build; refines S-27, B-039)
+- The core's **outer** hexagon left the chunk cache: `spire.js` `drawSpireBreath` draws it per frame (on-screen Spires
+  with a whole core only, D-069), alpha 0.35–0.6 over 6 s, **held at 0.6** (the S-19 look) under reduced motion. The
+  inner hexagon and facets stay in the chunk. `seen` is set from the frame's newly revealed cells (load: a full footprint
+  scan, silent); the toast persists the save at once so a reload never repeats it.
+- B-039: `.bank { gap: 8px }` at ≤ 380 px, not the spec's 10 px: measured 320×568 DSF 2 here, old 219 vs minimap 212,
+  10 px → 207 (5 px clear, under the spec's 6), 8 px → 203 (9 px). The two 380 px blocks are merged.
+- Tone: sine G3 (196 Hz, 0.45 s) + a quieter D4, peak −35 dBFS, 0 % > 2 kHz (`tests/audio.cjs`).
+- Rejected: repainting chunks each frame for the breath (cost); breathing a broken core from the record (nothing to
+  draw on); 10 px gap + a smaller bank font (a second change for 1 px); a toast per Spire on an old save's load (spam).

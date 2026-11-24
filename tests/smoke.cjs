@@ -212,6 +212,7 @@ async function rngChecks() {
   await craft.nodeChecks(check).catch(e => check('S-16 craft checks ran', false, e.message));
   await audit44.nodeChecks(check).catch(e => check('audit 44 checks ran', false, e.message));
   await spire.nodeChecks(check).catch(e => check('S-19 spire checks ran', false, e.message));
+  await spire.foundChecks(check).catch(e => check('S-27 spire found checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

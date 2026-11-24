@@ -5,6 +5,7 @@ import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons } from './craft.js';
+import { drawSpireBreath } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { paintChunk } from './terrain.js';
 
@@ -129,6 +130,7 @@ export class Renderer {
       ctx.drawImage(this.getChunk(cx, cy), cx * CHUNK_PX, cy * CHUNK_PX);
     }
 
+    drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16
     this.drawCrack(ctx);

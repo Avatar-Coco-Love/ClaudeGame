@@ -192,6 +192,25 @@ async function browserChecks(browser, url, check, errors, shots) {
       JSON.stringify({ adopted, fresh, scan: sb }));
     await ctx.close();
   }
+
+  // ---- B-039 (S-27 rider): 320×568 portrait, Surge, a world's whole supply (2750◆ 1470▲ 141●): the bank panel
+  // ends ≥ 6 px left of the minimap. Old CSS (gap 16 px): panel right 219 vs minimap left 212 (7 px under it); 10 px gap 207 (5 px clear); 8 px 203.
+  {
+    const ctx = await browser.newContext({ isMobile, hasTouch, deviceScaleFactor: 2, userAgent, viewport: { width: 320, height: 568 } });
+    const pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push('touch bank: ' + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9;
+      Object.assign(g.bank, { shard: 2750, prism: 1470, lumen: 141 }); g.stats.lumen = 1; });
+    await pg.waitForTimeout(250);
+    if (shots) await pg.screenshot({ path: `${shots}/bank-320x568.png` });
+    const panel = await rect(pg, '.top-left'), mini = await rect(pg, '#minimap');
+    const bank = await pg.evaluate(() => document.querySelector('.bank').textContent.replace(/\s+/g, ' ').trim());
+    check('320×568 Surge, 2750◆ 1470▲ 141●: the bank panel ends ≥ 6 px left of the minimap (B-039)',
+      mini.l - panel.r >= 6 && /2750/.test(bank) && /141\b/.test(bank), JSON.stringify({ panelR: panel.r, miniL: mini.l, bank }));
+    await ctx.close();
+  }
 }
 
 module.exports = { browserChecks };

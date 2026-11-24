@@ -3,6 +3,7 @@ import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, 
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon } from './craft.js';
+import { spiresSeen, spiresLit } from './spire.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
 import { Renderer } from './render.js';
@@ -138,6 +139,7 @@ function updateHud() {
     if (ev === 'deposited') { toast('Deposited'); persist(); if (panelOpen) renderPanel(); } // B-025: buy buttons follow the new bank
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
     if (ev === 'cache') toast('Vault cache opened');
+    if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200); persist(); } // S-27
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200);
     if (ev === 'beacon') { toast(BEACON_TOAST[g.placeResult] || '', 1400); if (g.placeResult === 'placed') persist(); } // S-16
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
@@ -251,7 +253,8 @@ function renderPanel() {
     }
   }
   document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));
-  $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m`;
+  const spires = spiresSeen(g) ? ` · Spires ${spiresLit(g)}/${g.spires.length} lit` : ''; // S-27: once one is found
+  $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m${spires}`;
 }
 $('matrix-btn').addEventListener('click', openPanel);
 $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));

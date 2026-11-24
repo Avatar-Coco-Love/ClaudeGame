@@ -10,7 +10,7 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { tryPlace, loadBeacons } from './craft.js';
-import { chooseSpires, loadSpires, stampSpires } from './spire.js';
+import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen } from './spire.js';
 
 
 export class Game {
@@ -60,7 +60,7 @@ export class Game {
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
-    if (save) this.load(save);
+    if (save) { this.load(save); markSpiresSeen(this); } // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, CORE_REVEAL);
@@ -184,6 +184,7 @@ export class Game {
     this.coreRing = Math.max(0, this.coreRing - dt / CORE_RING_S);
     const newly = this.world.reveal(p.x, p.y, CORE_REVEAL);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
+    if (newly.length && markSpiresSeen(this, newly)) this.spireFound(); // S-27: first sight of a Spire (either mode)
     return newly;
   }
 
@@ -341,6 +342,13 @@ export class Game {
       if (q.life <= 0) { this.particles.splice(i, 1); continue; }
       if (q.type === 'dot') { q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= 0.92; q.vy *= 0.92; }
     }
+  }
+
+  /** S-27: toast "A dormant Spire (n/N)" (main.js reads `spireCount`) + one soft low tone. */
+  spireFound() {
+    this.spireCount = spiresSeen(this);
+    this.audio.spire();
+    this.notify('spire');
   }
 
   notify(kind) {
