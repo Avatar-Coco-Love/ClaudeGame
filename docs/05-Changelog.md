@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.36 — 2026-11-24 (#37)
+- No gameplay change. Design pass: the next six builds are planned (phone layout fixes, Pulse beam, Beacons, and the first
+  dormant Spires, the goal of v1.0). The README now lists every key and touch button.
+
 ## v0.2.35 — 2026-11-24 (#36)
 - Fixes: mining always drops ore again, even on a floor crowded with scattered cargo (old loot fades first; your own cargo never does).
   A Glitch your beam has just destroyed can no longer hit you, and one destroyed as it gives up still drops its loot.

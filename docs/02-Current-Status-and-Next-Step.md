@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (session 31: audit 29 fixes; rotation: 32 Design, 33 Build, 34 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 32** · **Version: v0.2.36** (session 32: design, specs S-17…S-19; rotation: 33 Build, 34 Audit, 35–36 Build, 37 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -13,7 +13,7 @@ _Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (s
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch that gains no ground on the core for 6 s fades out and frees its slot (D-017); kills drop a Prism half the time (D-018).
 - Settings on the title (S-3): volume, mute, screen shake, reduced motion; stored in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
-- Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on crystal/prism breaks, beam start sweep (D-021).
+- Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
   Wide Beam (25●, S-13, D-041): Q / ⟂ cycles Focus ↔ Wide (3 parallel rays, 0.45× each, 0.75× reach; `src/beam.js`).
@@ -25,7 +25,7 @@ _Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (s
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs live in `07`: S-14 Pulse beam (retuned, D-042), S-15 perf check, S-16 Beacons (first Crafting item, D-043). Q-011 probes take `MODE=focus|wide`.
+- Build specs (`07`, `07-…-2`), order D-048: S-17 touch pass, S-14 Pulse, S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -38,7 +38,7 @@ _Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (s
 - A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
 - The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
 - Shake off stays 0 through a Glitch kill and a hit; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
-- Hitstop only on crystal/prism, rate-limited (32 breaks → 32 in 60 s); reduced motion drops it + ring (sessions 11–12).
+- Hitstop only on yield cells, rate-limited (32 breaks → 32 in 60 s); reduced motion drops it + ring (sessions 11–12).
 - Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
 - `dev.teleport(60)` lands 1936 px out in an open room; no panel without `?dev`; god mode is never saved (session 15).
@@ -56,4 +56,4 @@ _Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 32 (Design): play-test (Playwright + screenshots), then spec `08`'s touch list + S-14 Pulse beam (D-042) etc. in `07` for 33 (Build).
+Session 33 (Build): **S-17 Touch pass** (`07-Build-Specs.md`): landscape title + ◎/⟂ row, 44 px targets, hint wrap, ⟂ label, 2nd finger.

@@ -41,3 +41,15 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
   (buy buttons) redraw once the deposit ends, so a row isn't rebuilt under a pressed pointer.
 - **B-026 → fixed:** an empty ping drew no ring (scan ran on marks); it now runs on `age < end`. Screenshot viewed.
 - `beam.cjs` pinned `SAVE_FORMAT === 7`; now `up.v === SAVE_FORMAT` (same intent). Smoke 103/103.
+
+## 2026-11-24 — Session 32 (v0.2.36): Design — play-test, `08` folded into specs, Spires v1a
+- Play-test (Playwright, viewed): desktop 1280×800 (new world, mining, Max all + Ring 60 + Wide + scan, Surge, Matrix), Pixel 7
+  at 844×390 and 320×568. v0.2.35 fixes seen working: an empty ping draws its ring; no page errors in any run.
+- Reproduced audit-29 touch items: at 844×390 the title h1 starts above the screen and the version line is cut; ◎/⟂ at
+  x 754–832, y 200–294 (right thumb); `#hint` 295 px in 286 at 320 px ("mine" cut). → S-17.
+- Bedrock: the beam sparks on the border (no crack); `04` Debt reworded. Hitstop fires on any yield cell (D-048 wording note).
+- Measured (40 seeds, d ≥ 64): ~648 prism / 588 crystal / 110 Lumen cells, 5580 open of 11440; 5 Spire sectors always fit
+  ≥ 12 cells from vaults. → D-049, S-19. Q-012 opened (relight cost + challenge).
+- Specs: S-17 touch, S-18 code split (new); S-16 retargeted to `SAVE_FORMAT` 9 (8 went to B-022); S-19 Spires v1a (new).
+  `07` split into `07-Build-Specs-2.md`. Order D-048. `08` deleted: touch → S-17, code health → S-18 + `04` Debt, drift fixed
+  (README controls) or in S-17 (tools reject unknown modes). Build mode UX cut as an item (D-048). No bugs found.

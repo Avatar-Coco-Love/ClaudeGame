@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; build order S-17, S-14, S-18, S-15, S-16, S-19 (D-048). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -10,10 +10,12 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 
 ## Tooling (groundwork from Gloamdeep lessons; slot one in before the feature that needs it)
 - ✅ (#17) **S-7 Dev panel** (`?dev` or backtick, `__lumen.dev.*`, D-027). Save/load test spots were left out (not in the spec); add when a bot needs them.
-- **Surge bot runner** (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
+- **S-17 Touch pass** (audit 29 list, now in `07`): landscape title + buttons, 44 px targets, hint wrap, ⟂ label, 2nd finger, README/tools drift.
+- **S-18 Code split:** `src/glitch.js`, `src/hud.js`, Glitch tuning to `config.js`, dead code out; no behaviour change.
+- **Surge bot runner** (after S-19, before the Surge Spire defence: it tunes that wave) (`tools/surgebot.cjs`; `tools/surgefarm.mjs` is a parked-only probe, `tools/parity.mjs` a greedy miner in both modes, D-019): headless, plans each step from what it sees, plays at 3 upgrade strengths, and reports death rate
   and haul per minute **in both modes** (answers Q-007). It also tries degenerate loops (e.g. hugging the Nexus edge, farming Glitches at the Nexus rim). Needed before M6 balance work.
 - **S-15 Throttled perf check:** frame time with CDP CPU throttling ×4 during heavy (Wide) mining, plus 20 beacon holes. Budget p95 16.7 ms.
-- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (pulse silently runs Focus until S-14 adds `BEAM_MODES.pulse`) (`deeprun`, `vaultfind`, `surgefarm`, `parity`); `deeprun` fixed for Lumen cells (B-019).
+- ✅ (#29) Q-011 probes take `MODE=focus|wide|pulse` (`pulse` runs Focus until S-14; S-17 makes unknown modes fail); B-019.
 - ✅ (#15) **S-5 Deterministic gameplay RNG:** one seeded stream per draw (`game.rng.*`, D-025).
 
 ## M2 — A world worth exploring ✅ (v0.2, D-046)
@@ -31,12 +33,12 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells; ~0.8× Focus sustained (D-042). Then re-run Q-011 probes.
 
 ## M4 — Crafting & building
-- **S-16 Beacons v1** (5▲, Craft tab, D-043): placeable light that permanently lights 140 px and shows on the minimap. After S-15.
-- **Relays:** a remote deposit point linked to the Nexus. Expensive, and they change how routes work.
-- Build mode UX on both desktop and touch.
+- **S-16 Beacons v1** (5▲, Craft tab, D-043, `SAVE_FORMAT` 9): placeable light, 140 px, on the minimap. After S-15. Its B / ✦ placement is the build-mode UX (D-048).
+- **Relays:** a remote deposit point linked to the Nexus; reuses S-16 placement. Spec in Design 37.
 
 ## M5 — The arc (a reason to go deep) — ships v1.0
-- Dormant Spires in the far ring. Relighting each one takes a delivery plus a short challenge (a Drift puzzle-ish variant and a Surge defence variant, equally valid).
+- **S-19 Spires v1a:** 5 dormant Spires at d 64–74, one per sector, found, saved, on the minimap; no relight yet (D-049).
+- Spire relight (Design 37 specs it, Q-012): relighting each one takes a delivery plus a short challenge (a Drift puzzle-ish variant and a Surge defence variant, equally valid).
 - Relighting all Spires leads to an ending sequence, then **New Cycle** (a new seed, carrying a small permanent bonus).
 
 ## M6 — Surge depth (without making Drift second-class) — post-1.0
@@ -68,9 +70,9 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md`. Every new s
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
 - **Glitch inside a vault (watch, session 18):** spawning only checks for open cells, so a Glitch can appear in a sealed vault's
   hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.
-- **Bedrock edge (watch, session 17):** a core pushed into the world border in the Deep sits on a near-black band and its beam shows no
-  hit. Reads like a dead end, which it is, but silently. If it confuses play-tests, give bedrock hits a dull spark.
-- **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. A player (or bot) who leaves mid-stream gets no chime. Keep unless a play-test log says it feels broken.
+- **Bedrock edge (watch):** the border reads near-black; session 32 saw the beam spark on it (no crack). Fine unless play-tests mind.
+- **Audit 29 leftovers:** buy-logic dedupe (`game.js` ≈121-163), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
+- **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21). Particles are still drawn uncull'd (short-lived, local). Each on-screen pickup keeps its `shadowBlur`; measure on the throttled perf check (Tooling) before changing that.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
