@@ -181,6 +181,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
   .pair { display: contents; } /* landscape: ◎ and ◇ join the row */
   #scan-btn { order: 1; } #mode-btn { order: 2; } #echo-btn { order: 3; } .top-right .buttons { order: 4; } #minimap { order: 5; width: 112px; height: 112px; }
   #beacon-btn { position: absolute; top: 52px; right: 120px; } /* S-16: under the row, beside the minimap: the row stays as wide as before */
+  .chip:not(.echo) .chip-name { display: none; } /* audit 84 (B-078): named chips at 701–932 px pushed the bank panel under ◎ ⟂ */
 }
 /* S-25 / B-034 (D-064): short, narrow landscape phones (568–700 px wide): ◎ and ⟂ glyph-only (a switch already toasts the
    mode name), the bank row compact like portrait, the minimap 100 px, so the row clears the bank panel by ≥ 8 px. */
@@ -201,6 +202,10 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
   #toast { top: calc(max(12px, env(safe-area-inset-top)) + 110px); left: max(16px, env(safe-area-inset-left)); max-width: calc(50% - 64px);
     transform: translate(0, -10px); text-align: left; padding-left: 4px; }
   #toast.show { transform: translate(0, 0); }
+  .text-large #toast { top: calc(max(12px, env(safe-area-inset-top)) + 126px); } /* audit 84 (B-079): Large Surge panel ends at 130 (123 ≤ 700 px) */
+}
+@media (max-height: 480px) and (max-width: 700px) and (pointer: coarse) {
+  .text-large #toast { top: calc(max(12px, env(safe-area-inset-top)) + 114px); padding-top: 2px; padding-bottom: 2px; line-height: 1.2; } /* B-079: 3 lines here; tighter so it ends above ⊕ (568×320) */
 }
 /* S-24 ending card */
 #ending { z-index: 5; }

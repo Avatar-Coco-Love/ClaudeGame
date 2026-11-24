@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 83** · **Version: v1.4.23** (session 83: Build; rotation: 84 Audit, 85 Build, 86 Build, 87 Design, 88 Build).
+_Last updated: 2026-11-24_ · **Session counter: 84** · **Version: v1.4.24** (session 84: Audit; rotation: 85 Build, 86 Build, 87 Design, 88 Build, 89 Audit).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), all ✅ as of v1.4.23 (M8 last). VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -46,7 +46,7 @@ _Last updated: 2026-11-24_ · **Session counter: 83** · **Version: v1.4.23** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-11`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 (#87), S-43 (#88), S-44 (#90) built: M1–M9 ✅, every spec built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 (#87), S-43 (#88), S-44 (#90) built: M1–M9 ✅, every spec built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-24_ · **Session counter: 83** · **Version: v1.4.23** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 84 (Audit): parallel sweeps (bugs, perf, touch, code health, docs drift) incl. `music.js`; fix the top issues,
-log the rest in `04-…-2` Debt; archive `09` parts older than audit 79; check D-xxx vs code. Top perf debt: chunk-blit pre-scale.
+Session 85 (Build): every spec is built; take the top of `04-…-2` "Audit 84 leftovers": the weather event that resumes
+after a reload (skip an event that started before the load; a check that fails on the old code), plus the tuning numbers to config.

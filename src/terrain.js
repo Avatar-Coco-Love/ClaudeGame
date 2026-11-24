@@ -2,7 +2,7 @@
 // The Renderer's chunk cache (render.js `getChunk`) calls this when a chunk is first seen or was mined (dirty).
 import { CELL, CHUNK, T, MATERIAL, ORE_KIND } from './config.js';
 
-const CHUNK_PX = CHUNK * CELL;
+let blur = 1; // shadowBlur ignores the transform: × the chunk's scale
 
 function hexPath(g, x, y, r) {
   g.beginPath();
@@ -14,7 +14,7 @@ function hexPath(g, x, y, r) {
  *  this chunk are drawn too; the canvas clips them). The outer hexagon is drawn per frame (S-27 breath, spire.js). */
 function paintSpires(g, w, x0, y0) {
   const S = MATERIAL[T.SPIRE], F = MATERIAL[T.FACET];
-  g.shadowBlur = 8;
+  g.shadowBlur = 8 * blur;
   for (let y = -1; y <= CHUNK; y++) for (let x = -1; x <= CHUNK; x++) {
     const gx = x0 + x, gy = y0 + y, t = w.get(gx, gy), px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
     if (t === T.FACET && x >= 0 && y >= 0 && x < CHUNK && y < CHUNK) { // a small dim hexagon in its shell cell
@@ -29,9 +29,13 @@ function paintSpires(g, w, x0, y0) {
   g.shadowBlur = 0;
 }
 
-export function paintChunk(w, c, cx, cy) {
+/** `k` (audit 84): the canvas is pre-scaled by zoom·dpr, so draw through k and scale the (transform-free) shadow blurs. */
+export function paintChunk(w, c, cx, cy, k = 1) {
   const g = c.getContext('2d');
-  g.clearRect(0, 0, CHUNK_PX, CHUNK_PX);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, c.width, c.height);
+  g.setTransform(k, 0, 0, k, 0, 0);
+  blur = k;
   const x0 = cx * CHUNK, y0 = cy * CHUNK;
   // Pass 1: fills + subtle bevel.
   for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
@@ -48,7 +52,7 @@ export function paintChunk(w, c, cx, cy) {
   }
   paintSpires(g, w, x0, y0);
   // Pass 2: ore gems (glowing).
-  g.shadowBlur = 10;
+  g.shadowBlur = 10 * blur;
   for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
     const t = w.get(x0 + x, y0 + y);
     if (!(t in ORE_KIND) && t !== T.CACHE) continue;
@@ -76,7 +80,7 @@ export function paintChunk(w, c, cx, cy) {
     g.restore();
   }
   // Pass 3: neon edges wherever solid meets open space.
-  g.lineWidth = 2; g.lineCap = 'round'; g.shadowBlur = 8;
+  g.lineWidth = 2; g.lineCap = 'round'; g.shadowBlur = 8 * blur;
   for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
     const gx = x0 + x, gy = y0 + y, t = w.get(gx, gy);
     if (t === T.EMPTY) continue;

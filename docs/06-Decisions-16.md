@@ -55,3 +55,11 @@ Continues `06-Decisions-15.md` (same rules: supersede, never edit; list rejected
 - Rejected: one persistent 3-voice pad gliding between chords (a smooth bed but no "chord every 10–14 s" breath and
   nodes that never end); scheduling on the frame clock (jitter, catch-up bursts after a hidden tab); measuring equal
   weight on the mix only (hides a 10 dB layer imbalance).
+
+## D-116 — Terrain chunks pre-scaled to the screen (audit 84)
+- Chunk canvases are painted at `zoom·dpr` (`paintChunk(…, k)`, shadow blurs × k) and blitted with an identity
+  transform at whole pixels; size `ceil(CHUNK_PX·k) + 1` (the +1 covers rounding seams); a k change clears the cache;
+  cap `max(view + 4, 16, ⌊48 / k²⌋)` chunks (≈ 105 MB worst case at k 2.5, was 315 MB if left at 48).
+- Measured (12 chunks, 4× CPU): 25.3 → 3.1 ms; whole frame 1280×800 headless 11.2 → 7.3 ms (DPR 1), 41 → 30.5 (DPR 2).
+- Rejected: `imageSmoothingEnabled = false` on the scaled blit (5.7 ms, blockier); painting at 1× then rescaling
+  (an extra 5.6 ms pass per chunk); capping k at 1.5 (blurry on DPR 2 phones).

@@ -5,13 +5,16 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 
 ## Debt
 - **B-074 flaky beacon minimap dot** (`craft.cjs`, session 80): one full-smoke failure, then 5 passes; cause not yet found (the pixel is read 2 rAFs after a teleport).
-- **Audit 79 leftovers** (5 sweeps; fixed in #86: B-065…B-073, 16 file-local exports). Perf (×4, 1280×800, loot, flushed
-  55 ms): **chunk blits 15 ms** (bilinear under the zoom; pre-scale chunk canvases to `CHUNK_PX·zoom·dpr`, blit at whole
-  px: measured 15 → 2 ms; cap cached chunks by pixels, ~16–20 at DPR 2), `drawLight` 15 (L2 covers), pickups 15 with 300.
-  `drawGrid` re-measured 3–4 ms, `paintChunk` 4 ms (Wide 8–12 spikes), not the audit-74 figures. GC ~6 MB/s, short-lived
-  (`pickupSprite` key strings, per-pickup `cargoRoom`/`buffMul`, `castBeam` Map/Set). Touch: 568×320 Matrix shows ~1.5
-  rows under its header (sticky tabs?), Settings hides 2 rows below the fold. Code: quality numbers 1000 ms / 0.98 / 0.9
-  and `VAULT_HALF` (anomaly.js, `- 3` in world.js) belong in config.
+- **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bugs: a weather event a Wake
+  cancelled resumes after a reload (`weather.js` `cancel` unsaved; skip an event that started before the load). Perf:
+  `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,
+  `castBeam` Map/Set); Echo field rebuilds on any break anywhere (≤ 0.3 ms ×4). Touch: 568×320 Matrix shows ~1.5 rows
+  under its header, Settings hides 3 rows below the fold; Keys-view buttons 40 px on a coarse pointer (hidden on touch).
+  Code: numbers to config: `VAULT_HALF` (anomaly.js + world.js `3`/`7`), bedrock border `2` (world/spire/anomaly),
+  `craft.js` `- 4` (= `SPIRE_HALF`), quality 1000 / 0.98 / 0.9, Glitch steer 3 / 0.4 / 0.9 / 12 tries, "moving > 20"
+  ×3, autosave 10 s, DPR max 2, beam hit pad 4, music ramp/resync constants; `echo.js` repeats the core's steer step
+  (`game.js` 173–190: a shared helper); `makeEcho`/`fieldAt` exported but file-local; `spitter.js` `GLITCH_R as
+  GLITCH_SIZE`. Docs: D-107 says every font size scales; the title `clamp` and phone `.bank` 15 px don't.
 - **Audit 74 leftovers** (5 sweeps; fixed in #80: SW `?query` offline launch, Anomaly take during a Relay deposit,
   pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` unsmoothed blit done at L2 (S-41, #85); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
   repaints a whole chunk per broken cell (~10 ms; Wide → 20–30 ms spikes: repaint a 3×3 clip); `touch.cjs` 65 s, ~25 s

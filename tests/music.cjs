@@ -51,6 +51,7 @@ async function renderMusic([states, secs, { music = 50, volume = 70, seed = 4242
   // Sustained level: the RMS after the 3 s fade-in. Last loud moment: end of the last 50 ms window above -80 dBFS.
   let lastSound = 0; win.forEach((d, i) => { if (d > -80) lastSound = (i + 1) / 20; });
   return { rmsDb: r1(db(rms(3 * sr, n))), peakDb: r1(db(peak)), maxWinDb: r1(Math.max(...win)), above2k: Math.round(10000 * hi / (tot || 1)) / 100,
+    layerTo: m.layers ? { bell: m.layers.bell.gain._ramp?.to, pulse: m.layers.pulse.gain._ramp?.to } : null,
     maxVoices, built, scheduled, endedBy, live: m.live.size, ended: scheduled - m.live.size, lastSound,
     log: m.log.slice(0, 20), win: win.map(r1) };
 }
@@ -108,6 +109,11 @@ async function browserChecks(browser, url, check, errors) {
   const back = await pg.evaluate(renderMusic, [[[0, st(0, 'drift')], [8, st(0, 'drift', false, true)], [14, st(0, 'drift')]], 24]);
   check('music: back from the Ending card fades in again (S-44)', back.win.slice(14 * 20 - 40, 14 * 20).every(d => d < -80) && Math.max(...back.win.slice(18 * 20)) > -70,
     `silent before 14 s: ${back.win.slice(240, 280).every(d => d < -80)}, max after 18 s ${Math.max(...back.win.slice(360))}`);
+  // Audit 84 (B-076): mute → unmute mid-chord must not stack a second chord on the ringing one, and a mode switched while
+  // muted crossfades the old layer down instead of leaving its gain at 1.
+  const mu = await pg.evaluate(renderMusic, [[[0, st(0, 'drift')], [5, null], [5.3, st(0, 'surge')]], 30]);
+  check('music: mute → unmute mid-chord stays ≤ 6 voices and fades the old layer out (B-076)',
+    mu.maxVoices <= 6 && mu.layerTo && mu.layerTo.bell === 0 && mu.layerTo.pulse === 1, JSON.stringify({ v: mu.maxVoices, l: mu.layerTo }));
   // In the game: old settings (no `music`) load 50; nothing plays on the title; a world plays; the slider saves 0 and stops it.
   await pg.evaluate(() => { localStorage.clear(); localStorage.setItem('lumencore.settings.v1', JSON.stringify({ volume: 70, muted: false })); });
   await pg.reload(); await pg.waitForTimeout(300);
