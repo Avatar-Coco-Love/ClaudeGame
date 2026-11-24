@@ -2,9 +2,9 @@
 // The Renderer keeps `r.lightSets`, a list of arrays of world-space lights `{x, y, r}` (+ optional `glow`, an "R, G, B"
 // string for the floor glow; default beacon cyan). Today it holds `game.beacons` (S-16); S-22 adds `game.relays`, S-28 the
 // lit Spires. Both passes iterate the sets in place: no per-frame concat or allocation.
-import { LIGHT_RADIUS } from './config.js';
+import { LIGHT_RADIUS, BEACON_RGB } from './config.js';
 
-const GLOW_RGB = '191, 248, 255'; // BEACON_COLOR #bff8ff as "R, G, B"
+const GLOW_RGB = BEACON_RGB;
 const GLOW_DOWN = 4; // floor-glow layer pixels per screen pixel, per axis
 
 /** One cached soft-hole sprite per radius in light-canvas pixels (audit 44 T3, D-067): a full-strength gradient disc, drawn

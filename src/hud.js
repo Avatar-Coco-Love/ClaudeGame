@@ -53,18 +53,38 @@ export function drawMinimap(r) {
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
 }
 
+// T1 (audit 49): the HUD boxes the pointer must stay clear of, read from the DOM at most twice a second (a layout read
+// every frame would force a reflow after each HUD text update).
+const HUD_BOXES = '#hud .panel, #hud .top-right > *, #hud > button, #hint';
+export function hudRects() {
+  return [...document.querySelectorAll(HUD_BOXES)].map(e => e.getBoundingClientRect()).filter(b => b.width > 0 && b.height > 0);
+}
+const ARROW_R = 12, LABEL = { back: 22, hw: 22, hh: 8 }; // arrow radius; "NEXUS" sits 22 px inward, ~44×16 px
+
+/** Where the pointer goes for a Nexus at screen point (nx, ny) on a w×h screen: on the 40 px inset edge along the heading,
+ *  slid inward along the same ray until neither the arrow nor its "NEXUS" label touches a HUD box. Null when on screen. */
+export function nexusPointerSpot(w, h, nx, ny, rects) {
+  const m = 40;
+  if (nx > m && nx < w - m && ny > m && ny < h - m) return null;
+  const cx = w / 2, cy = h / 2, a = Math.atan2(ny - cy, nx - cx), c = Math.cos(a), s = Math.sin(a);
+  const t0 = Math.min((w / 2 - m) / Math.abs(c || 1e-6), (h / 2 - m) / Math.abs(s || 1e-6));
+  const hits = (x, y, hw, hh) => rects.some(b => x + hw > b.left && x - hw < b.right && y + hh > b.top && y - hh < b.bottom);
+  for (let t = t0; t > 40; t -= 4) {
+    const x = cx + c * t, y = cy + s * t, lx = x - c * LABEL.back, ly = y - s * LABEL.back;
+    if (!hits(x, y, ARROW_R, ARROW_R) && !hits(lx, ly, LABEL.hw, LABEL.hh)) return { x, y, a, lx, ly };
+  }
+  const x = cx + c * t0, y = cy + s * t0;
+  return { x, y, a, lx: x - c * LABEL.back, ly: y - s * LABEL.back };
+}
+
 /** An arrow on the screen edge toward an off-screen Nexus; "NEXUS" beside it when cargo is full. */
 export function drawNexusPointer(r, ctx) {
   const g = r.game, n = r.worldToScreen(g.nexus.x, g.nexus.y);
-  const m = 40;
-  if (n.x > m && n.x < r.w - m && n.y > m && n.y < r.h - m) return;
-  const cx = r.w / 2, cy = r.h / 2;
-  const a = Math.atan2(n.y - cy, n.x - cx);
-  const rx = r.w / 2 - m, ry = r.h / 2 - m;
-  const t = Math.min(rx / Math.abs(Math.cos(a) || 1e-6), ry / Math.abs(Math.sin(a) || 1e-6));
-  const x = cx + Math.cos(a) * t, y = cy + Math.sin(a) * t;
+  if (!r.hudRects || r.time - r.hudRectsAt > 0.5 || r.time < r.hudRectsAt) { r.hudRects = hudRects(); r.hudRectsAt = r.time; }
+  const p = r.pointer = nexusPointerSpot(r.w, r.h, n.x, n.y, r.hudRects);
+  if (!p) return;
   ctx.save();
-  ctx.translate(x, y); ctx.rotate(a);
+  ctx.translate(p.x, p.y); ctx.rotate(p.a);
   ctx.strokeStyle = '#2ef2ff'; ctx.shadowColor = '#2ef2ff'; ctx.shadowBlur = 10; ctx.lineWidth = 2;
   ctx.globalAlpha = 0.6 + Math.sin(r.time * 4) * 0.25;
   ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-6, -8); ctx.lineTo(-2, 0); ctx.lineTo(-6, 8); ctx.closePath(); ctx.stroke();
@@ -73,7 +93,7 @@ export function drawNexusPointer(r, ctx) {
   if (full) {
     ctx.save();
     ctx.fillStyle = '#ffd23d'; ctx.font = '600 11px system-ui, sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('NEXUS', x - Math.cos(a) * 22, y - Math.sin(a) * 22 + 4);
+    ctx.fillText('NEXUS', p.lx, p.ly + 4);
     ctx.restore();
   }
 }

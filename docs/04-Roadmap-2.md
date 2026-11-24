@@ -13,7 +13,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - **Bedrock edge (watch):** the border reads near-black; session 32 saw the beam spark on it (no crack). Fine unless play-tests mind.
 - **Cargo-full toast (watch, audit 34):** with a full hold, sitting on loot re-fires the toast every frame, so it stays up until
   you move off. Reads as a reminder; change only if a play-test minds. (Audit 39: no longer fires inside the Nexus, B-033.)
-- **Audit 29 leftovers:** buy-logic dedupe (`game.js` `canAfford`/`buy` vs `canAffordNexus`/`buyNexus`), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
+- **Audit 29 leftovers:** buy-logic dedupe (`game.js` `canAfford`/`buy` vs `canAffordNexus`/`buyNexus`), silent-audio stub ×9, (Node-only smoke checks → `tests/world.cjs` ✅ #54); re-run the perf audit.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21) and drawn as glow sprites, as are Scanner glyphs (B-027, D-051, #39).
   Particles are still drawn uncull'd (short-lived, local). ✅ Nexus glow culled + clipped (S-15, D-057, #43). Left (flushed, no
@@ -25,8 +25,13 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
 - **Audit 39 leftovers (code health):** (`light.js` split ✅ #50) unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`, `VAULT_TEMPLATES`, `WIDE_OFFSET` (low; audit 44 again).
 - **Audit 44 leftovers:** one buy helper for `canAfford`/`buy`, `canAffordNexus`/`buyNexus`, research and `craftBeacon`, and one
-  `buyRow` for the 3 repeated panel click handlers in `main.js`; split `tests/smoke.cjs` (≈ 540 lines) before 600, e.g. the
-  node-only checks → `tests/world.cjs`; `craft.js` `placeRefusal`/`tryPlace` both compute the core cell; (380 px blocks
+  `buyRow` for the 3 repeated panel click handlers in `main.js`; (`tests/smoke.cjs` split ✅ #54: 545 → 392 lines); `craft.js` `placeRefusal`/`tryPlace` both compute the core cell; (380 px blocks
   merged ✅ #53); `tools/perf.cjs` leaves beacon glow, beacon glyphs and chunk blits untimed (~31 %
   of the holes run) (light-hole gradient cache ✅ #50, D-067).
 - ✅ (#53) **B-039:** 320 px bank vs minimap: `.bank` gap 8 px at ≤ 380 px (D-072); a 4-digit ● (not reachable, ~141 per world) would touch.
+- **Audit 49 leftovers:** (smoke split, SAVE_FORMAT pin guard, Nexus pointer, toast queue + width, B-041, B-042, beacon RGB ✅ #54)
+  T2 minimap Spire hexagon ~5 CSS px / 0.86 px line on the 96 px phone minimap (blobs into violet cells; make it bigger/brighter);
+  T1b the pointer now slides inward, so its NEXUS label can cross a toast at top 30 % (568×320, seen); T4 `tools/perf.cjs`
+  leaves `drawLightGlow` / `drawSpireBreath` untimed; H2 hexagon path in `spire.js` ×2 + `terrain.js` `hexPath` → one export;
+  H3 "inside the bedrock border" in `spire.js` ×2, `world.js`, `dev.js` → one `insideBorder`; H6 unused exports `SPIRE_HALF`,
+  `spireTypeAt`, `makeBeacon`, `pulseInReach` (plus audit 39's list).

@@ -58,7 +58,8 @@ export function castBeam(game, dt) {
     const target = { x: hit.x, y: hit.y, frac: res && !res.broken ? res.frac : 0 };
     for (const r of rays) r.target = target;
     if (Math.random() < dt * 45) {
-      const col = game.world.look(hit.x, hit.y, res ? res.type : T.ROCK).edge, r = rays[0];
+      const ty = res ? res.type : game.world.get(hit.x, hit.y); // C2: an unbreakable cell (Spire core, facet) sparks its own colour
+      const col = game.world.look(hit.x, hit.y, ty === T.EMPTY ? T.ROCK : ty).edge, r = rays[0];
       game.particle(r.ex, r.ey, (-dx + (Math.random() - 0.5) * 1.6) * 110, (-dy + (Math.random() - 0.5) * 1.6) * 110, 0.35, col, 2);
     }
     if (res && res.broken) game.onCellBroken(hit.x, hit.y, res.type);

@@ -1,6 +1,6 @@
 # 07 — Build Specs
 
-Specs ready to build, in **build order (D-063): S-25, S-26, S-19, S-27 (`07-Build-Specs-2.md`), S-22, S-20, S-28 (`-3.md`), Surge bot, S-23, S-24, S-29 (`-4.md`)**. Written by Design sessions; Design 47 re-checked S-27…S-29 against the built Spires (D-068) → D-069…D-071. A Build session takes the top spec, builds it, deletes it here,
+Specs ready to build, in **build order (D-063): S-22, S-20, S-28 (`07-Build-Specs-3.md`), Surge bot, S-23, S-24, S-29 (`-4.md`)**; `-2.md` keeps the Deep basis and lists the built S-25, S-26, S-19, S-27. Written by Design sessions; Design 47 re-checked S-27…S-29 against the built Spires (D-068) → D-069…D-071. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 **Header rule:** every spec that adds a sink names its currency and compares it with the world's supply below; one spec = one PR.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.

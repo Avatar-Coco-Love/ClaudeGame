@@ -37,7 +37,7 @@ export class Renderer {
 
   resize() {
     this.dpr = Math.min(2, window.devicePixelRatio || 1);
-    this.w = innerWidth; this.h = innerHeight;
+    this.w = innerWidth; this.h = innerHeight; this.hudRects = null; // T1: re-read the HUD boxes
     this.canvas.width = Math.round(this.w * this.dpr);
     this.canvas.height = Math.round(this.h * this.dpr);
     this.light.width = Math.round(this.w / 2); this.light.height = Math.round(this.h / 2);

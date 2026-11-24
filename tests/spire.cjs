@@ -49,7 +49,7 @@ async function nodeChecks(check) {
   const up = upgradeSave(JSON.parse(JSON.stringify(old))), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   const t0 = up.spires[0], idx0 = cand[0].findIndex(q => q.x === t0.x && q.y === t0.y);
   check('a format-9 save with a tunnel through candidate 1 gets a later one and keeps its tunnel (S-19, D-024)', up.v === SAVE_FORMAT
-    && SAVE_FORMAT === 10 && up.spires.length === 5 && idx0 >= 1 && tunnel.every(k => o.world.cells[k] === T.EMPTY)
+    && up.spires.length === 5 && idx0 >= 1 && tunnel.every(k => o.world.cells[k] === T.EMPTY)
     && up.spires.slice(1).every((s, k) => s.x === a.spires[k + 1].x && s.y === a.spires[k + 1].y)
     && JSON.stringify(Object.keys(t0)) === '["x","y","seen","fed","mask","lit"]', `sector 0 took candidate ${idx0 + 1}`);
 
@@ -122,6 +122,9 @@ async function nearSpire(page, k) {
     cam.x = p.x + Math.cos(p.angle) * 36; cam.y = p.y + Math.sin(p.angle) * 36;
     return { at, d: Math.hypot(tx, ty) };
   }, k);
+  // Audit 49 (C3): the "Entering the Deep" milestone toast now holds its 2.6 s, so the Spire toast shows after it.
+  await page.waitForFunction(() => { const t = document.getElementById('toast'); return t.classList.contains('show') && /Spire/.test(t.textContent); },
+    null, { timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(250);
   return info;
 }
@@ -129,6 +132,7 @@ async function nearSpire(page, k) {
 /** Beside a Deep Spire (DSF 1): hexagon pixel + breath, the found toast, the minimap mark, the stats line; 320×568 too.
  *  `shots` (env SPIRE_SHOT, a directory) saves spire-1280x800.png and spire-320x568.png (viewed in sessions 46 and 48). */
 async function browserChecks(browser, url, check, errors, shots) {
+  const { T } = await import('../src/config.js');
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(url + '?dev'); await page.waitForTimeout(200);
@@ -153,7 +157,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   await page.evaluate(() => { const g = window.__lumen.game, s = g.spires[0]; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; });
   await page.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 40; }, null, { timeout: 5000 }).catch(() => {});
   const hi = await sample(0, 1, 1), low = await sample(3, 1, 1); // a 3×3 box: the cell bevel 4 px off the vertex is static
-  check('beside a Deep Spire the core hexagon draws ≥ 1.8× its fill at the breath peak (S-19, DSF 1)', peak.core === 10
+  check('beside a Deep Spire the core hexagon draws ≥ 1.8× its fill at the breath peak (S-19, DSF 1)', peak.core === T.SPIRE
     && peak.line >= 1.8 * peak.fill && peak.line > 30, JSON.stringify({ ...peak, at: info.at, d: info.d.toFixed(1) }));
   check('the core hexagon breathes: dimmer at the trough than at the peak, still above its fill (S-27)',
     low.line < 0.9 * hi.line && low.line > low.fill, JSON.stringify({ peak: hi.line, low: low.line, fill: low.fill }));

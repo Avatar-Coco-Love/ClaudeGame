@@ -1,6 +1,6 @@
 # 09 — Implementation Log, part 4
 
-Continues `09-Implementation-Log-3.md` (split at the 8 KB cap, session 46). Newest at the bottom; read the tail only.
+Continues `09-Implementation-Log-3.md` (split at the 8 KB cap, session 46). Newest at the bottom; read the tail only. Continued in `09-Implementation-Log-5.md` (session 49 on).
 
 ## Session 46 — Build: S-19 Spires v1a, sites + cells + save (v0.2.50, #51)
 - `src/spire.js`; `T.SPIRE_SHELL` / `T.SPIRE` / `T.FACET` (config), drawn in `terrain.js` (core hexagon spans 3×3 and is

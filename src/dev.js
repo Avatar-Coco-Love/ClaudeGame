@@ -19,7 +19,14 @@ export function createDev(ui) {
       const cx = Math.floor(game.nexus.x / CELL) + Math.round(Math.cos(angle) * cells);
       const cy = Math.floor(game.nexus.y / CELL) + Math.round(Math.sin(angle) * cells);
       // The room stays off the 2-cell bedrock border (B-013: the old clamp let it carve the inner bedrock ring).
-      const x = Math.max(2 + ROOM, Math.min(w.w - 3 - ROOM, cx)), y = Math.max(2 + ROOM, Math.min(w.h - 3 - ROOM, cy));
+      const tx = Math.max(2 + ROOM, Math.min(w.w - 3 - ROOM, cx)), ty = Math.max(2 + ROOM, Math.min(w.h - 3 - ROOM, cy));
+      // C1 (audit 49): the room never overlaps an unbreakable cell (a Spire core or facet); else the core landed inside one.
+      const clear = (x, y) => x >= 2 + ROOM && x <= w.w - 3 - ROOM && y >= 2 + ROOM && y <= w.h - 3 - ROOM
+        && [...Array((2 * ROOM + 1) ** 2).keys()].every(k => !UNBREAKABLE.has(w.get(x - ROOM + k % (2 * ROOM + 1), y - ROOM + Math.floor(k / (2 * ROOM + 1)))));
+      let x = tx, y = ty, best = clear(tx, ty) ? 0 : Infinity;
+      for (let dy = -12; dy <= 12 && best; dy++) for (let dx = -12; dx <= 12; dx++) {
+        const d = dx * dx + dy * dy; if (d < best && clear(tx + dx, ty + dy)) { best = d; x = tx + dx; y = ty + dy; }
+      }
       for (let yy = y - ROOM; yy <= y + ROOM; yy++) for (let xx = x - ROOM; xx <= x + ROOM; xx++) if (w.solid(xx, yy) && !UNBREAKABLE.has(w.get(xx, yy))) w.destroy(xx, yy);
       const p = game.player;
       p.x = (x + 0.5) * CELL; p.y = (y + 0.5) * CELL; p.vx = p.vy = 0;
