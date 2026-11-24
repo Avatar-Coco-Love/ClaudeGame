@@ -9,11 +9,12 @@ import { seededStream, vaultSites } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 
 const VAULT_HALF = 3; // vault footprints are 7×7
+const KIND_IDS = Object.keys(ANOMALY_KINDS); // overclock, lodestone, ballast
 
 /** Sites for a freshly generated World (call before Spires are stamped or a save is applied): [{ x, y, ring, kind }] in
  *  draw order (Hearth, Veil, Deep). Depends on the seed alone: the generated terrain, vaultSites and the save-less Spire choice. */
 export function anomalySites(world) {
-  const { w, h, seed } = world, rand = seededStream(seed, 'anomaly'), cx = w / 2, cy = h / 2;
+  const { w, h, seed } = world, rand = seededStream(seed, 'anomaly'), kindRand = seededStream(seed, 'anomaly-kind'), cx = w / 2, cy = h / 2;
   const blocks = [...vaultSites(seed, w, h).map(v => ({ x: v.x, y: v.y, r: VAULT_HALF + ANOMALY_CLEAR })),
     ...chooseSpires(seed, null, null, w, h).map(s => ({ x: s.x, y: s.y, r: SPIRE_HALF + ANOMALY_CLEAR }))];
   const out = [];
@@ -29,7 +30,7 @@ export function anomalySites(world) {
       if (c !== T.ROCK && c !== T.DENSE) continue;
       if (blocks.some(b => Math.max(Math.abs(b.x - x), Math.abs(b.y - y)) <= b.r)) continue;
       if (out.some(s => Math.hypot(s.x - x, s.y - y) < ANOMALY_GAP)) continue;
-      out.push({ x, y, ring, kind: 'overclock' }); n++;
+      out.push({ x, y, ring, kind: KIND_IDS[Math.floor(kindRand() * KIND_IDS.length)] }); n++; // S-36: own salt, 1/3 each
     }
   });
   return out;
@@ -51,10 +52,10 @@ export function loadAnomalies(game, taken, buffs) {
   game.buffs = Array.isArray(buffs) ? [...new Set(buffs.filter(id => ANOMALY_KINDS[id]))] : [];
 }
 
-/** Multiplier on Matrix stat `id` from the active buffs. */
+/** Multiplier on Matrix stat `id` (or 'pull', the Attractor's pull) from the active buffs; different kinds stack. */
 export function buffMul(game, id) {
   let m = 1;
-  for (const b of game.buffs || []) if (ANOMALY_KINDS[b].stat === id) m *= ANOMALY_KINDS[b].mul;
+  for (const b of game.buffs || []) m *= ANOMALY_KINDS[b].fx[id] || 1;
   return m;
 }
 

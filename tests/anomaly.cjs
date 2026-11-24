@@ -2,6 +2,7 @@
 // ring counts, spacing and exclusions over 20 seeds; a site in solid rock can't be taken; take -> beam ×1.5 (mining dps
 // follows); Nexus and Relay deposits end it, a deposit of 0 items, a death and a mode switch don't; a second one of the
 // same kind can't be taken; recharge at 300 s; a v14 save loads with none taken; a reload keeps the buff + taken sites.
+// S-36: kinds seed-only and ~1/3 each; Lodestone reach + pull, Ballast cargo (rounded down); stacking; Ballast's over-limit deposit.
 // Usage: node tests/anomaly.cjs
 const quiet = new Proxy({}, { get: () => () => {} });
 
@@ -49,7 +50,7 @@ async function nodeChecks(check) {
   }
   // Solid cell: no take. Open: take -> buff, toast event, taken + recharge time; beam stat and mining dps × 1.5.
   {
-    const g = make(), s = g.anomaly.sites[0], b0 = g.stat('beam');
+    const g = make(), s = g.anomaly.sites[0], b0 = g.stat('beam'); s.kind = 'overclock';
     g.player.x = (s.x + 0.5) * CELL; g.player.y = (s.y + 0.5) * CELL; updateAnomalies(g, 0.01);
     const solidTook = g.buffs.length > 0;
     open(g, 0); g.stats.time = 50; updateAnomalies(g, 0.01);
@@ -65,7 +66,8 @@ async function nodeChecks(check) {
   }
   // A second site of the same kind can't be taken while one is active (it stays charged).
   {
-    const g = make(); open(g, 0); updateAnomalies(g, 0.01); open(g, 1); updateAnomalies(g, 0.01);
+    const g = make(); g.anomaly.sites[0].kind = g.anomaly.sites[1].kind = 'overclock';
+    open(g, 0); updateAnomalies(g, 0.01); open(g, 1); updateAnomalies(g, 0.01);
     check('S-35: a second Overclock can\'t be taken while one is active; that site stays charged',
       g.buffs.length === 1 && siteCharged(g, 1), `buffs ${g.buffs}, site 1 charged ${siteCharged(g, 1)}`);
   }
@@ -99,9 +101,60 @@ async function nodeChecks(check) {
     const back = make(4242, 'drift', JSON.parse(JSON.stringify(g.toSave())));
     const junk = make(4242, 'drift', { ...g.toSave(), anomalies: [1, 2], buffs: ['nope', 'overclock', 'overclock'] });
     check('S-35 saves: v14 loads with none taken and no buff; a reload keeps the buff and taken sites; junk is cleaned',
-      Object.keys(old.anomaly.taken).length === 0 && old.buffs.length === 0 && back.buffs.join() === 'overclock' && back.anomaly.taken[3] === 20 + ANOMALY_RECHARGE_S &&
+      Object.keys(old.anomaly.taken).length === 0 && old.buffs.length === 0 && back.buffs.join() === g.anomaly.sites[3].kind && back.anomaly.taken[3] === 20 + ANOMALY_RECHARGE_S &&
       !siteCharged(back, 3) && Object.keys(junk.anomaly.taken).length === 0 && junk.buffs.join() === 'overclock',
       `old ${JSON.stringify(old.anomaly.taken)}/${old.buffs}, back ${back.buffs}/${JSON.stringify(back.anomaly.taken)}, junk ${junk.buffs}`);
+  }
+  // ---- S-36: Lodestone and Ballast ----
+  const { ANOMALY_KINDS, ANOMALY_MAGNET_MUL, ANOMALY_PULL_MUL, ANOMALY_CARGO_MUL } = C;
+  // Kinds: seed-only (same seed, same kinds; own salt, so placement is unchanged), about 1/3 each over 20 seeds.
+  {
+    const n = { overclock: 0, lodestone: 0, ballast: 0 }; let same = true;
+    for (let k = 1; k <= 20; k++) { const a = anomalySites(new World(k * 104729)), b = anomalySites(new World(k * 104729));
+      a.forEach((q, i) => { n[q.kind]++; if (b[i].kind !== q.kind) same = false; }); }
+    check('S-36 kinds: the same seed gives the same kinds; over 20 seeds (320 sites) each kind is 1/3 ± 6 %',
+      same && Object.keys(n).length === 3 && Object.values(n).every(c => Math.abs(c / 320 - 1 / 3) < 0.06), JSON.stringify(n));
+  }
+  // Effects: Lodestone → magnet reach ×2 and a faster pull; Ballast → cargo ×1.5 rounded down. Different kinds stack.
+  {
+    const g = make(); g.upgrades.cargo = 1; const m0 = g.stat('magnet'), c0 = g.stat('cargo'), b0 = g.stat('beam');
+    g.buffs = ['lodestone']; const m1 = g.stat('magnet');
+    g.buffs = ['ballast']; const c1 = g.stat('cargo');
+    g.buffs = ['overclock', 'lodestone', 'ballast'];
+    const all = Math.abs(g.stat('beam') / b0 - ANOMALY_BEAM_MUL) < 1e-9 && g.stat('magnet') === m1 && g.stat('cargo') === c1;
+    // Pull: a pickup at 1.5× the base reach is pulled only with Lodestone, and with it moves faster than the base pull.
+    const pulled = (buffs, dist) => { const h = make(); h.buffs = buffs; const p = h.player;
+      h.pickups = [{ x: p.x + dist, y: p.y, vx: 0, vy: 0, kind: 'shard', age: 5, r: 4 }];
+      for (let k = 0; k < 6; k++) h.updatePickups(1 / 60); return h.pickups[0] ? p.x + dist - h.pickups[0].x : dist; };
+    const far0 = pulled([], m0 * 1.5), far1 = pulled(['lodestone'], m0 * 1.5);
+    check('S-36 effects: Lodestone reach ×2 + pull (far pickup moves only with it), Ballast cargo ×1.5 rounded down; all three stack',
+      m1 === m0 * ANOMALY_MAGNET_MUL && c1 === Math.floor(c0 * ANOMALY_CARGO_MUL) && c1 !== c0 * ANOMALY_CARGO_MUL && all &&
+      far0 === 0 && far1 > 0,
+      `magnet ${m0} → ${m1}, cargo ${c0} → ${c1}, stack ${all}, pickup moved ${far0.toFixed(2)} / ${far1.toFixed(2)} px`);
+  }
+  // Pull ×1.5: at the same fraction of reach, one frame of pull adds 1.5× the speed.
+  {
+    const v = buffs => { const h = make(); h.buffs = buffs; const p = h.player, d = h.stat('magnet') * 0.5;
+      h.pickups = [{ x: p.x + d, y: p.y, vx: 0, vy: 0, kind: 'shard', age: 5, r: 4 }]; h.updatePickups(1 / 60); return -h.pickups[0].vx; };
+    const v0 = v([]), v1 = v(['lodestone']);
+    check('S-36 Lodestone pull: ×1.5 at the same fraction of its reach', Math.abs(v1 / v0 - ANOMALY_PULL_MUL) < 1e-9, `${v0.toFixed(2)} → ${v1.toFixed(2)}`);
+  }
+  // Stacking by touch: an open Lodestone site is taken while Overclock runs; a second Lodestone isn't.
+  {
+    const g = make(); g.anomaly.sites[0].kind = 'overclock'; g.anomaly.sites[1].kind = g.anomaly.sites[2].kind = 'lodestone';
+    open(g, 0); updateAnomalies(g, 0.01); open(g, 1); updateAnomalies(g, 0.01); open(g, 2); updateAnomalies(g, 0.01);
+    check('S-36 stacking: different kinds stack; the same kind can\'t be taken twice', g.buffs.join() === 'overclock,lodestone' && siteCharged(g, 2), `buffs ${g.buffs}`);
+  }
+  // Ballast: a Nexus deposit banks all the over-limit cargo, then the limit drops; a Surge death scatters it and keeps the buff.
+  {
+    const g = make(); g.buffs = ['ballast']; const base = Math.floor(g.stat('cargo') / ANOMALY_CARGO_MUL); g.cargo.shard = base + 6;
+    g.player.x = g.nexus.x; g.player.y = g.nexus.y + CELL; step(g, Math.ceil((base + 8) * DEPOSIT_TICK_S * 60) + 10);
+    const dead = make(4242, 'surge'); dead.buffs = ['ballast']; dead.cargo.shard = base + 4; dead.player.integrity = 1; dead.player.invuln = 0;
+    dead.hurtPlayer(5, 0, 1); step(dead, 2);
+    check('S-36 Ballast: a deposit banks all the over-limit cargo, then ends it; a death scatters cargo and keeps the raised limit',
+      g.bank.shard === base + 6 && g.cargoTotal() === 0 && g.buffs.length === 0 && g.stat('cargo') === base &&
+      dead.buffs.join() === 'ballast' && dead.cargoTotal() === 0 && dead.pickups.length >= base + 4,
+      `bank ${g.bank.shard}/${base + 6}, buffs ${g.buffs}, limit ${g.stat('cargo')}; death buffs ${dead.buffs}, floor ${dead.pickups.length}`);
   }
 }
 module.exports = { nodeChecks };

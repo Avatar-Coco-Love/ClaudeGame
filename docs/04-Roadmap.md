@@ -20,8 +20,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ **S-32 Spitter** (ranged Glitch, Deep; #71, D-096). ✅ **S-33 Weather** (storm / aurora; #72, D-097).
 
 ## M7 — Temporary upgrades
-- ✅ **S-35** Anomalies v1 (#74, D-099). Specced (D-098, `07-…-5`): **S-36** Lodestone + Ballast, **S-37** map,
-  ping, sound → v1.2.
+- ✅ **S-35** Anomalies v1 (#74, D-099). ✅ **S-36** Lodestone + Ballast, bot-tuned (#76, D-101). Specced (D-098,
+  `07-…-5`): **S-37** map, ping, sound, touch → v1.2.
 
 ## M8 — Polish & platform
 - **Recorded audio v1a: audition** (D-037, *waiting on the owner's CC0 pack in `docs/inbox/`*): measure every file, shortlist 2–3
