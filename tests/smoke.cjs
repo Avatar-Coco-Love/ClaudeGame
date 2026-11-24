@@ -28,6 +28,7 @@ async function plantSaveAndReload(page, edit) {
 
 const research = require('./research.cjs');
 const beam = require('./beam.cjs');
+const audit29 = require('./audit29.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -194,6 +195,7 @@ async function rngChecks() {
   await lootChecks().catch(e => check('audit 14 loot checks ran', false, e.message));
   await research.nodeChecks(check).catch(e => check('S-11 research checks ran', false, e.message));
   await beam.nodeChecks(check).catch(e => check('S-13 beam checks ran', false, e.message));
+  await audit29.nodeChecks(check).catch(e => check('audit 29 checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -437,6 +439,7 @@ async function rngChecks() {
 
     await research.browserChecks(browser, url, check, errors, plantSaveAndReload);
     await beam.browserChecks(browser, url, check, errors);
+    await audit29.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----

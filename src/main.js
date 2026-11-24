@@ -111,6 +111,7 @@ function updateHud() {
     $('bank-shard').textContent = g.bank.shard;
     $('bank-prism').textContent = g.bank.prism;
     $('bank-lumen').textContent = g.bank.lumen;
+    if (panelOpen) renderBank(); // B-025: a deposit streams for up to ~5 s while the sheet is open
     $('bank-lumen').parentElement.classList.toggle('hidden', !lumenSeen);
     $('cargo-text').textContent = `${total}/${cap}`;
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
@@ -130,7 +131,7 @@ function updateHud() {
   }
   for (const ev of g.events) {
     if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
-    if (ev === 'deposited') { toast('Deposited'); persist(); }
+    if (ev === 'deposited') { toast('Deposited'); persist(); if (panelOpen) renderPanel(); } // B-025: buy buttons follow the new bank
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
     if (ev === 'cache') toast('Vault cache opened');
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200);
@@ -189,6 +190,12 @@ function upgradeRow(u, lvl, cost, affordable, onBuy) {
   });
   return row;
 }
+// The sheet's bank line alone: cheap enough to redo on every deposit tick without rebuilding the rows under the pointer (B-025).
+function renderBank() {
+  const g = game;
+  $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>` +
+    (g.stats.lumen > 0 || g.bank.lumen > 0 ? `<span class="lumen">${RESOURCE.lumen.glyph} ${g.bank.lumen}</span>` : '');
+}
 function renderPanel() {
   const g = game;
   $('matrix-title').textContent = { nexus: 'Nexus', research: 'Research' }[panelTab] || 'Core Matrix';
@@ -196,8 +203,7 @@ function renderPanel() {
     const on = b.dataset.tab === panelTab;
     b.classList.toggle('selected', on); b.setAttribute('aria-selected', on);
   });
-  $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>` +
-    (g.stats.lumen > 0 || g.bank.lumen > 0 ? `<span class="lumen">${RESOURCE.lumen.glyph} ${g.bank.lumen}</span>` : '');
+  renderBank();
   const list = $('upgrade-list');
   list.innerHTML = '';
   if (panelTab === 'research') {
@@ -274,8 +280,9 @@ function frame(now) {
     if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (panelOpen) closePanel(); }
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
-    const scan = input.consume('scan'); // S-11: a press made while paused or under the Matrix is dropped, never queued
-    const beamMode = input.consume('beamMode'); // S-13: same rule as F
+    // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
+    const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
+    const scan = take('scan'), beamMode = take('beamMode');
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : { ...input.read(sp), scan, beamMode };
     if (!paused) {
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames

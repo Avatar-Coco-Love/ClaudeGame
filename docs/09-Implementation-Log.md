@@ -28,3 +28,16 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - `04` hit 8268 B: its five ✅ Debt items moved word for word to `archive/2026-11-24-04-debt-done.md`. Decisions continue in `06-Decisions-5.md`.
 - Docs drift from `08` folded in: `01` "(planned)" for built layers, `03` Q-007 Glitch loot wording, `04` `MODE=pulse` runs Focus.
   No gameplay code changed; no bugs found.
+
+## 2026-11-24 — Session 31 (v0.2.35): Build — audit 29 "Fix first"
+- All five re-verified by `tests/audit29.cjs` (new, called by smoke); each check failed on the old code, passes now:
+- **B-022 → fixed:** 400 forced pickups made every crystal yield nothing. Forced pickups are now tagged `kept`, never count
+  toward the cap, never evicted; at 400 loose ones the oldest loose one makes room. Save format 8 stores the tag;
+  7 → 8 marks an old floor all kept (it may hold scattered cargo). D-047.
+- **B-023 → fixed:** a Glitch at hp 0 dealt 14 dmg on contact, and one at its give-up frame faded with no kill/loot.
+  The death check now runs right after the fade block. (A Glitch already fading stays lootless, S-6.)
+- **B-024 → fixed:** F during a 0.15 s hitstop was consumed and lost; F/Q now wait for the sim (paused/Matrix still drop).
+- **B-025 → fixed:** the open sheet showed ◆ 0 while 40 shards streamed in. The bank line redraws on each tick; the rows
+  (buy buttons) redraw once the deposit ends, so a row isn't rebuilt under a pressed pointer.
+- **B-026 → fixed:** an empty ping drew no ring (scan ran on marks); it now runs on `age < end`. Screenshot viewed.
+- `beam.cjs` pinned `SAVE_FORMAT === 7`; now `up.v === SAVE_FORMAT` (same intent). Smoke 103/103.

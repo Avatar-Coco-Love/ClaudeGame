@@ -25,3 +25,10 @@ are not milestones. A conditional roadmap item ("only if…") doesn't hold a mil
 M2's last item (larger world, only if rings feel short, D-022) moved to Later, so M2 is done: v0.1.33 → **v0.2.34**.
 - Rejected: keeping minor = 1 forever (it was never bumped past M1, so it meant nothing); minor = the milestone being worked on
   (several are open at once: M3 S-14 and M4 Beacons); resetting the PR count per minor (breaks the one-entry-per-PR history in `05`).
+
+### D-047 — Floor pickups: `kept` loot is uncapped, loose loot evicts its oldest (2026-11-24, session 31, B-022; refines B-005/B-014)
+Pickups spawned with `force` (death scatter, vault caches) are tagged `kept`: never counted toward `PICKUP_CAP` (400), never
+evicted. At 400 loose pickups a new one evicts the oldest loose one, so a break always yields. Saves store the tag (format 8);
+a format-7 floor loads all kept, since its scattered cargo can't be told apart.
+- Rejected: refusing new loose loot at the cap (the bug: a stuck floor in the save); evicting the oldest of any pickup (eats
+  the player's own cargo, B-005); counting only untagged without eviction (a 400-ore floor still blocks yields).

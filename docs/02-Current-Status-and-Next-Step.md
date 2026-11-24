@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 30** · **Version: v0.2.34** (session 30: inbox, v1.0 scope; rotation: 31 Build, 32 Design, 33 Build, 34 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 31** · **Version: v0.2.35** (session 31: audit 29 fixes; rotation: 32 Design, 33 Build, 34 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -21,7 +21,7 @@ _Last updated: 2026-11-24_ · **Session counter: 30** · **Version: v0.2.34** (s
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
-- Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups + beam mode) every 10 s, on deposit, and on page hide. Saves carry a format number (now 7); old formats are upgraded on load (`src/save.js`).
+- Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups + beam mode) every 10 s, on deposit, and on page hide. Saves carry a format number (now 8); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
@@ -49,10 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 30** · **Version: v0.2.34** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
+- Audit 29 fixes (session 31, `tests/audit29.cjs`): kept pickups don't block yields; dead Glitches don't hit; F/Q survive hitstop.
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 31 (Build): fix the **"Fix first"** list in `08-Audit-29-Findings.md` (5 bugs, re-verify each, one failing-first test each). Then its touch list, then S-14 Pulse beam (`07`, D-042).
+Session 32 (Design): play-test (Playwright + screenshots), then spec `08`'s touch list + S-14 Pulse beam (D-042) etc. in `07` for 33 (Build).
