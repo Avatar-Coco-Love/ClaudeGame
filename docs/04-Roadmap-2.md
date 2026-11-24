@@ -4,6 +4,10 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 64 leftovers:** a reload mid-ending never shows the card by itself (reachable from the Matrix; needs a saved
+  "seen" flag → save bump); the overview lines' `shadowBlur 18` drives its p95 (draw twice instead, D-051); the ⊕↑ "↑"
+  renders small (a `.lift` size); tests pin 255-scaled dark values (ending.cjs) and CELL as 32 (reclaim.cjs); B-055's
+  check can't fire a trusted key repeat; "Best of N cycles" counts unfinished cycles.
 - **Audit 59 leftovers:** touch: a full-HUD overlap check for the Wake toasts/hint (`touch.cjs` covers death + mode lines
   only); `tools/parity.mjs` prints "prism ratio NaN" on runs with no Prisms (guard the 0/0); unused-outside exports
   (`pulseInReach`, `makeBeacon`, `makeRelay`, `nexusPointerSpot`, `isBroken`, `primeSpire`, `SPIRE_MODES`, `clearLanes`,

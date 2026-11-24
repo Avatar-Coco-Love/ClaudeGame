@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.0.2';
+export const VERSION = '1.0.3';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -91,6 +91,7 @@ export const VAULT_LOOT = { shard: 20, prism: 6 };
 
 // S-19 Spires (D-049, D-068): 5 dormant 9×9 sites, one per 72° sector from a seeded start angle; chosen once, then saved.
 export const SPIRE_COUNT = 5;
+export const PLACE_BURST = { n: 24, speed: 160 }; // S-16/S-22/S-34: the particle burst when a Beacon or Relay is placed or lifted
 export const SPIRE_D = [64, 74];     // centre distance from the Nexus, in cells
 export const SPIRE_TRIES = 40;       // candidates per sector (seed-only, like vaultSites)
 export const SPIRE_VAULT_GAP = 12;   // min cells from a Spire centre to every vault centre
@@ -114,10 +115,11 @@ export const SPIRE_CORE_CONTACT_PX = 2; // how close (past touching) a Wake Glit
 export const SPIRE_WAKE_TIER_DROP = 1; // S-31 (D-087): Wake Glitches spawn this many tiers below the Spire's depth tier
 // S-24 Ending (D-045, D-090): the sequence's length (reduced motion: a short fade) and the darkness before -> after.
 export const ENDING_S = 8, ENDING_FADE_S = 1;
+export const ENDING_LINE_SHARE = 0.8, ENDING_MARGIN_CELLS = 6; // lines draw in the first 80 %; the overview's margin past the farthest Spire
 export const DARK_ALPHA = [0.93, 0.5];
 // S-29 New Cycle (D-062, D-091): the Nexus's hue per cycle, NEXUS_HUES[cycle % 5] (cosmetic; cycle 0 = the original cyan).
 export const NEXUS_HUES = ['46, 242, 255', '90, 255, 150', '255, 201, 79', '190, 130, 255', '255, 110, 170'];
-export const WAKE_FRAME_PX = 6 * 32; // the camera frames a waking Spire's core while the player core is within this (audit 59)
+export const WAKE_FRAME_PX = 6 * CELL; // the camera frames a waking Spire's core while the player core is within this (audit 59)
 export const SPIRE_GUARD_CELLS = 3;    // a Wake Glitch chases the player core instead when it is this close
 export const SPIRE_WAKE_RGB = '255, 122, 61'; // the charge ring + clock facets while a Wake runs (Glitch orange, D-088)
 

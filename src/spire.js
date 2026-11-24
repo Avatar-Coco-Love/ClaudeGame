@@ -317,6 +317,7 @@ export function updateFacetAim(game, dt, target, blocked = false) {
 /** Relit (S-28): lit, all facets set, `mode` recorded (D-081), its light joins the light sets, a rising tone, the toast
  *  "Spire relit (n/N)" (main.js reads `spireLitCount`). Used by the puzzle and by S-20's broken path. */
 export function relightSpire(game, s, mode) {
+  if (s.lit) return; // audit 64 (B-059): never twice (dev relight-all during a Wake relit it again at 40 s)
   s.mask = 255; s.lit = true; s.mode = mode;
   game.spireLitCount = spiresLit(game);
   game.spireLights.push(spireLight(s));

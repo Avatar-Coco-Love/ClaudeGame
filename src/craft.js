@@ -4,7 +4,7 @@
 // A placed beacon is { i, x, y, r }: its cell index plus a world-space light the Renderer draws in light.js (S-26):
 // `attach` puts `game.beacons` itself in `renderer.lightSets`. World drawing of the beacon glyph is here too.
 import { CELL, T, NEXUS_RADIUS, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_GAP, BEACON_LIGHT, BEACON_REVEAL, BEACON_RGB,
-  RELAY_COST, RELAY_STOCK, RELAY_MAX, RELAY_MIN_D, RELAY_GAP, RELAY_R, RELAY_LIGHT, RELAY_RGB } from './config.js';
+  RELAY_COST, RELAY_STOCK, RELAY_MAX, RELAY_MIN_D, RELAY_GAP, RELAY_R, RELAY_LIGHT, RELAY_RGB, PLACE_BURST } from './config.js';
 
 export const BEACON_COLOR = `rgb(${BEACON_RGB})`; // white-cyan, on the map and in the world
 export const RELAY_COLOR = `rgb(${RELAY_RGB})`;   // S-22: cyan-white
@@ -88,13 +88,13 @@ export function tryPlace(game) {
   if (kind === 'relay') {
     const r = makeRelay(w, i);
     game.relays.push(r);
-    if (game.motionOn()) game.burst(r.x, r.y, 24, RELAY_COLOR, 160);
+    if (game.motionOn()) game.burst(r.x, r.y, PLACE_BURST.n, RELAY_COLOR, PLACE_BURST.speed);
     return true;
   }
   const b = makeBeacon(w, i);
   game.beacons.push(b);
   game.revealQueue.push(...w.reveal(b.x, b.y, BEACON_REVEAL * CELL));
-  if (game.motionOn()) game.burst(b.x, b.y, 24, BEACON_COLOR, 160);
+  if (game.motionOn()) game.burst(b.x, b.y, PLACE_BURST.n, BEACON_COLOR, PLACE_BURST.speed);
   return true;
 }
 
@@ -107,7 +107,7 @@ export function pickUpRelay(game, r) {
   game.craft.relay++; game.craft.last = 'relay';
   game.placeResult = 'picked';
   game.audio.beacon();
-  if (game.motionOn()) game.burst(r.x, r.y, 24, RELAY_COLOR, 160);
+  if (game.motionOn()) game.burst(r.x, r.y, PLACE_BURST.n, RELAY_COLOR, PLACE_BURST.speed);
   game.notify('beacon');
   return true;
 }

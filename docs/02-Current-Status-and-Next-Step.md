@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 63** · **Version: v1.0.2** (session 63: build; v1.0 shipped in 61; rotation: 64 Audit, 65 Build, 66 Build, 67 Design).
+_Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.3** (session 64: audit; v1.0 shipped in 61; rotation: 65 Build, 66 Build, 67 Design, 69 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -49,6 +49,5 @@ _Last updated: 2026-11-24_ · **Session counter: 63** · **Version: v1.0.2** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 64 (Audit): parallel subagents over the v1.0 code (ending.js, New Cycle, Relay reclaim, wake.js), perf of the
-ending overview on a throttled CPU, mobile, docs drift; fix the top issues, log the rest; archive `09` parts older than
-audit 59 (`09-…-6`); re-check D-xxx. Then M6: S-32 Spitter, S-33 weather → v1.1. Read only this file to start.
+Session 65 (Build): **S-32 Spitter** (`07-Build-Specs-4.md`; M6 → v1.1; D-087), then S-33 weather. Audit 64 Debt in
+`04-Roadmap-2.md` (card after a reload mid-ending is the top one). Read only this file to start.

@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.3 — 2026-11-24 (#69)
+- **Fixes from a health check:** the key you press to skip the ending no longer also presses a button you clicked
+  earlier (it could toggle mute), and holding it can't dismiss the summary before you see it. The hint no longer
+  shows under the summary card, and the card fits a landscape phone without scrolling. The Wake's charge dial has its
+  faint full ring back. A damaged save can no longer freeze the game at the ending or show a strange best time, and a
+  world you finished just before 1.0 keeps its time as your first record.
+
 ## v1.0.2 — 2026-11-24 (#68)
 - **Move your Relays** (you asked for this): stand in a Relay's ring and press B, or tap the ⊕↑ button that appears
   there on phones, to pick it back up for free, then place it further out. You can carry one at a time, and the
@@ -55,38 +62,4 @@ One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D
 - **Behind the scenes:** a test pilot now plays the game by itself in both Drift and Surge (digging the cheapest way,
   fighting Glitches, going home to heal) so the coming Spire defence can be tuned with real numbers. Nothing changes on screen.
 
-## v0.4.58 — 2026-11-24 (#59)
-- **Fixes from a health check:** holding a charged Pulse on a Spire facet now flips it once, not back and forth every
-  second and a half; a Glitch drifting across your beam no longer makes a facet you already flipped flip again; a
-  relit Spire from a damaged save always shows all eight facets lit.
-- **Phones:** messages now appear below the core (portrait) or under the resource panel (landscape) instead of over the
-  ◎ ⟂ ✦ buttons and the minimap, and the answer to a tap (like "No Beacons — craft at the Nexus") shows at once
-  instead of waiting behind a longer message, which then returns.
-
-## v0.4.57 — 2026-11-24 (#58)
-- **Relight a Spire:** once a Spire is primed, hold your beam on one of its eight facets for a moment and it flips,
-  along with its two neighbours (a small ring fills round the facet you are aiming at). Light all eight and the Spire
-  wakes: its core shines, a wide violet-white light opens round it, the map marks it filled, and a rising chime plays.
-  A hint inside a primed Spire tells you the rule. Works with every beam (Wide flips only with its centre ray; a Pulse
-  burst flips one facet), with a mouse or the aim stick, and in Surge too until Surge gets its own Spire challenge.
-  The game remembers how each Spire was relit; older saves load as before.
-
-## v0.4.56 — 2026-11-24 (#57)
-- **Design pass, no gameplay change:** the whole route to a primed Spire was play-tested in Drift and Surge, with a Relay on the way.
-  The next updates are planned from it: the facet puzzle (only the beam's centre ray flips a facet, with a hint telling you the rule),
-  then a Surge test bot, the Surge Spire defence, the ending and New Cycle.
-
-## v0.4.55 — 2026-11-24 (#56)
-- **Feed a Spire:** stand inside a dormant Spire's walls and your Prisms flow into it, eight a second — the ones you
-  carry first, then the ones in your bank. A violet ring round the core fills toward 80. At 80 the Spire is **primed**:
-  some of its eight facets light up bright, the pattern you'll solve next. Shards and Lumen are never taken, leaving stops
-  the flow, and the count is kept. Same in Drift and Surge. A Spire whose core an old save had already dug relights at once.
-
-## v0.4.54 — 2026-11-24 (#55)
-- **Relays** (Craft tab, 40◆ + 12▲, up to 3 in a world): carry one out, press B / tap ⊕ on open floor at least 24 cells
-  from the Nexus, and from then on cargo you bring within its dashed ring banks right there, with the same ticks and chime
-  as the Nexus. It never heals you and Glitches don't mind it: the Nexus is still the only safe place. A Relay is a cyan
-  ⊕ with its own soft light and a ring on the minimap. B places whatever you crafted last that you still carry.
-- Crafting and building is complete, so the version moves to 0.4 (Research was already complete).
-
-Older entries: v0.2.48–v0.2.53 in `archive/changelog-v0.2.48-v0.2.53.md`, v0.2.43–v0.2.47 in `archive/changelog-v0.2.43-v0.2.47.md`, v0.2.39–v0.2.42 in `archive/changelog-v0.2.39-v0.2.42.md`, v0.2.34–v0.2.38 in `archive/changelog-v0.2.34-v0.2.38.md`, v0.1.27–v0.1.33 in `archive/changelog-v0.1.27-v0.1.33.md`, v0.1.22–v0.1.26 in `archive/changelog-v0.1.22-v0.1.26.md`, v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.
+Older entries: v0.4.54–v0.4.58 in `archive/changelog-v0.4.54-v0.4.58.md`, v0.2.48–v0.2.53 in `archive/changelog-v0.2.48-v0.2.53.md`, v0.2.43–v0.2.47 in `archive/changelog-v0.2.43-v0.2.47.md`, v0.2.39–v0.2.42 in `archive/changelog-v0.2.39-v0.2.42.md`, v0.2.34–v0.2.38 in `archive/changelog-v0.2.34-v0.2.38.md`, v0.1.27–v0.1.33 in `archive/changelog-v0.1.27-v0.1.33.md`, v0.1.22–v0.1.26 in `archive/changelog-v0.1.22-v0.1.26.md`, v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.

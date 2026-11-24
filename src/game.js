@@ -10,10 +10,20 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
-import { checkEnding } from './ending.js';
+import { checkEnding, recordCycle } from './ending.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
+
+/** S-29 records from a save or a carried cycle: an object with `best` only if a finite number ≥ 0, `cycles` only if an
+ *  object (B-057: junk crashed the ending; a negative or text best showed on the title). */
+export function cleanRecords(r) {
+  const out = {};
+  if (!r || typeof r !== 'object' || Array.isArray(r)) return out;
+  if (Number.isFinite(r.best) && r.best >= 0) out.best = r.best;
+  if (r.cycles && typeof r.cycles === 'object' && !Array.isArray(r.cycles)) out.cycles = { ...r.cycles };
+  return out;
+}
 
 export class Game {
   constructor({ seed, mode, save, audio, settings = null }) {
@@ -80,6 +90,7 @@ export class Game {
     this.nexusPulse = 0; // 1 -> 0 after a Nexus Development purchase (ring burst in render.js)
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
     if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
+    if (this.ended && Number.isFinite(this.endedAt) && !(this.records.cycles && this.records.cycles[this.cycle])) recordCycle(this); // B-058: ended before records existed
   }
 
   /** S-29: the Nexus's hue this cycle ('r, g, b'). */
@@ -407,7 +418,7 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
-    this.records = s.records && typeof s.records === 'object' ? s.records : {};
+    this.records = cleanRecords(s.records); // B-057: a save is never trusted
     this.ended = s.ended === true; this.endedAt = Number.isFinite(s.endedAt) ? s.endedAt : null; // S-24 (B-037: never trust a save)
     Object.assign(this.research, s.research || {});
     this.craft.beacon = Math.min(BEACON_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.beacon)) || 0)); // S-16; B-038 clamp

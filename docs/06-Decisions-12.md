@@ -67,3 +67,10 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
   shows ⊕↑ (label "Pick up this Relay") whatever is carried; the hint names it: "Tap ⊕↑ to pick up this Relay"
   (desktop: "B: pick up this Relay"). Hint only with empty cargo (after banking), so it doesn't sit over every deposit.
 - Rejected: a separate pick-up button (one more HUD box on 320 px phones, D-050); long-press ✦ (undiscoverable).
+
+### D-094 — Audit 64: skip keys, records hygiene, the comment check (2026-11-24, session 64, Audit; amends D-090, D-091)
+- Supersedes D-090's "New Cycle disabled" bullet (D-091 enabled it). During the sequence a key is preventDefault'ed
+  (it only skips) and focus is dropped when it starts; on the card a repeat keydown does nothing. Records are cleaned
+  on load and carry (`cleanRecords`); a world that ended before records existed gets its record on load. A Spire relights once.
+- **A rule broken twice gets a check:** an inline `//` comment swallowed code 4 times (sessions 59–64, incl. the Wake
+  ring); `tests/comments.cjs` flags comment text that ends like code. Rejected: a full linter (no build step, D-001).

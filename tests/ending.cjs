@@ -50,7 +50,7 @@ async function nodeChecks(check) {
 }
 
 async function browserChecks(browser, url, check, errors, shots) {
-  for (const [vw, vh] of [[1280, 800], [320, 568]]) {
+  for (const [vw, vh] of [[1280, 800], [320, 568], [568, 320]]) {
     const touch = vw < 400;
     const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: 1, ...(touch ? { isMobile: true, hasTouch: true } : {}) });
     const page = await ctx.newPage();
@@ -73,10 +73,11 @@ async function browserChecks(browser, url, check, errors, shots) {
     const card = await page.evaluate(() => { const L = window.__lumen, g = L.game, c = document.querySelector('#ending .sheet').getBoundingClientRect();
       return { seq: !!g.endSeq, open: !document.getElementById('ending').classList.contains('hidden'), matrix: !document.getElementById('matrix').classList.contains('hidden'),
         text: document.getElementById('ending-stats').textContent, l: c.left, r: c.right, t: c.top, b: c.bottom, ov: !!L.renderer.game.endSeq,
-        cycle: document.getElementById('ending-cycle').disabled, time0: g.stats.time }; });
+        cycle: document.getElementById('ending-cycle').disabled, time0: g.stats.time,
+        hint: !document.getElementById('hint').classList.contains('hidden'), scroll: document.querySelector('#ending .sheet').scrollHeight - document.querySelector('#ending .sheet').clientHeight }; });
     if (shots) await page.screenshot({ path: `${shots}/ending-card-${vw}x${vh}.png` });
-    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches), New Cycle is live (S-24, S-29)`,
-      !card.seq && card.open && !card.matrix && card.l >= 0 && card.r <= vw && card.t >= 0 && card.b <= vh && !card.ov && !card.cycle
+    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches), New Cycle is live, no hint under it, no scroll (S-24, S-29, B-054)`,
+      !card.seq && card.open && !card.matrix && card.l >= 0 && card.r <= vw && card.t >= 0 && card.b <= vh && !card.ov && !card.cycle && !card.hint /* B-054 */ && card.scroll <= 0
       && /Spires relit in Drift5/.test(card.text) && /Cells mined50/.test(card.text) && /Glitches cleared3/.test(card.text), JSON.stringify(card));
     if (touch) await page.tap('#ending-continue'); else await page.click('#ending-continue');
     await page.waitForTimeout(500);
@@ -96,6 +97,26 @@ async function browserChecks(browser, url, check, errors, shots) {
     check(`${vw}×${vh}: Continue resumes play; a reload keeps the ending (no sequence, dark lifted) and the Matrix reopens the card (S-24)`,
       !after.open && after.moved && back.ended && !back.seq && Math.abs(back.dark - 0.5 * 255) < 8 && btn && reopened, JSON.stringify({ after, back, btn, reopened }));
     await ctx.close();
+  }
+  // Audit 64: B-056 the skip key never presses a focused HUD button (♪ clicked first); B-055 a held Enter keeps the card open.
+  {
+    const pg = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    pg.on('pageerror', e => errors.push('ending keys: ' + e.message));
+    await pg.goto(url + '?dev'); await pg.waitForTimeout(200);
+    await pg.evaluate(() => { try { localStorage.clear(); } catch {} });
+    await pg.reload(); await pg.waitForTimeout(200);
+    await pg.click('#new-world'); await pg.waitForTimeout(300);
+    await pg.click('#mute-btn'); const m0 = await pg.evaluate(() => window.__lumen.settings.muted);
+    await pg.evaluate(() => { window.__lumen.dev.relightAll(); document.getElementById('mute-btn').focus(); });
+    await pg.waitForTimeout(300);
+    await pg.keyboard.down('Enter'); await pg.waitForTimeout(250);
+    await pg.evaluate(() => dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, bubbles: true })));
+    await pg.evaluate(() => document.activeElement && document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, bubbles: true })));
+    await pg.keyboard.up('Enter'); await pg.waitForTimeout(200);
+    const k = await pg.evaluate(() => ({ muted: window.__lumen.settings.muted, card: !document.getElementById('ending').classList.contains('hidden') }));
+    await pg.evaluate(m => { window.__lumen.settings.muted = m; }, false);
+    check('a skip key presses no focused button (B-056) and a held Enter leaves the card open (B-055)', k.muted === m0 && k.card, JSON.stringify({ m0, k }));
+    await pg.close();
   }
   // Reduced motion: no pull-out, a 1 s fade, then the card.
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
