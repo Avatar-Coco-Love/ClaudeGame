@@ -19,7 +19,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 ## Progression layers (keep them distinct — never unlock the same thing twice)
 - **Core Matrix** *(built)*: permanent stat upgrades to the core.
 - **Nexus Development** *(built: Radiance)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
-- **Research** *(built: Scanner, Wide beam, Pulse beam)*: unlocks new *kinds* of things (new beam modes, new materials).
+- **Research** *(built: Scanner, Wide beam, Pulse beam; M9: the Echo ally, D-108)*: unlocks new *kinds* of things (new beam modes, new materials).
 - **Crafting** *(built: Beacons S-16, Relays S-22)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
 - **Temporary Upgrades** *(built: Anomalies, D-098, M7 ✅)*: buffs found in the world that scale a Matrix stat until your next deposit.
 
@@ -28,7 +28,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
   Spire in the Deep (Q-003). Each relight is a delivery plus a challenge in the mode you are in: a Drift puzzle or a Surge
   defence, equally valid. The Surge Spire defence is the only boss-like fight; there are no standalone bosses.
 - **After 1.0:** M6–M8 are depth and polish on the same loop (Surge variety + a Drift twin, temporary upgrades, audio, PWA,
-  accessibility, perf). When M8 is done the game is **finished**: sessions only fix bugs, audit, and tune.
+  accessibility, perf); M9 adds one ally, the **Echo** (owner's ask, D-108). When M9 is done the game is **finished**: sessions only fix bugs, audit, and tune.
 - **Out of scope:** multiplayer/co-op (a design spike at most, Q-004), telemetry or analytics, a standalone puzzle mode,
   accounts or cloud saves, monetisation, story text or characters.
 - **No new milestones:** an item outside M1–M8 needs a design-session D-xxx that names the pillar it serves and what it replaces.

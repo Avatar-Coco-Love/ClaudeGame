@@ -60,3 +60,13 @@ Continues `09-Implementation-Log-8.md` (part 8 hit the 8 KB cap at session 71). 
   holds 2750 / 1470 / 141), so not a bug. Large wraps "Core Matrix" to two lines at 320 px (fits, checked).
 - Screenshots viewed: Large at 568×320 (before the fit fix: panel under ◎) and 320×568 (fits).
 
+## Session 77 — Design/inbox: owner's AI ally idea + audio pack note (v1.2.17, #84)
+- Inbox `2026-11-24-owner-allies-and-audio.md` processed, moved to `archive/`. **Adopted:** the ally as M9 **Echo**
+  (D-108, supersedes D-045's end state; VERSION M9 → 1.4 in CLAUDE.md): one geometric lesser core, Research 30 ●,
+  BFS follow + blink catch-up, two orders (Gather / Guard), one cycling key + ◇ button. Specs S-42, S-43 (`07-…-7`).
+  **Rejected (D-108):** parking it, an Attack order, 3–4 buttons, a squad, a killable ally, Gather mining rock,
+  a first-Spire grant. Q-022 opened (third order / second Echo, leaning no). Q-021: pack confirmed coming, v1.3 waits.
+- Measured: a 4-neighbour BFS over a fully open 160×160 world (24,964 cells) costs 0.55 ms in Node, unthrottled;
+  S-42 bounds it to 24 cells. Lumen budget: Research 75 → 105 ● of ~141 per world.
+- The planned Design work (M8 play-test, ambient-music spec) moves to Design 82 (it becomes S-44; S-42/S-43 are the Echo).
+- No code or visual change, so no screenshot.

@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.17 — 2026-11-24 (#84)
+- Planning only, nothing changes in play yet: a companion is coming. After this polish milestone the **Echo**, a small
+  diamond that follows your core through the tunnels and takes one of two orders (gather ore or guard you), will be
+  unlocked with Lumen in Research.
+
 ## v1.2.16 — 2026-11-24 (#82)
 - **Easier to read:** no text during play is smaller than 12 px now (cargo and integrity numbers, labels, buff chips,
   key badges). Settings → **Large text** makes every word 20 % bigger and still fits on the smallest phones.

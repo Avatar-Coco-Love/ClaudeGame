@@ -2,7 +2,7 @@
 
 Continues `06-Decisions-4.md` (same rules: supersede, never edit; list rejected alternatives). D-045 on.
 
-### D-045 — v1.0 scope: M1–M5 is the game, M6–M8 is polish, then it is finished (2026-11-24, session 30, inbox; settles Q-003, Q-004)
+### D-045 — v1.0 scope: M1–M5 is the game, M6–M8 is polish, then it is finished (2026-11-24, session 30, inbox; settles Q-003, Q-004) — end state superseded by D-108 (M9)
 The owner asked for a finish line so long unattended runs don't drift into feature creep. `01` "Scope and end state" holds it:
 - **v1.0 ships when M5 ships:** Spires, an ending sequence, New Cycle. The win (Q-003) is relighting every dormant Spire in the
   Deep; each relight is a delivery plus a challenge in the current mode (Drift puzzle or Surge defence, equal, D-002). How many
