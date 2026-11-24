@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 77** · **Version: v1.2.17** (session 77: Design/inbox; rotation: 78 Build, 79 Audit, 80 Build, 81 Build, 82 Design).
+_Last updated: 2026-11-24_ · **Session counter: 78** · **Version: v1.2.18** (session 78: Build; rotation: 79 Audit, 80 Build, 81 Build, 82 Design, 83 Build).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -28,16 +28,18 @@ _Last updated: 2026-11-24_ · **Session counter: 77** · **Version: v1.2.17** (s
 - Crafting (S-16): Beacons (light, S-25 glow) and Relays (remote deposit, S-22; reclaim S-34), `craft.js`. Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light overlay, minimap, Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
+- Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
+  steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
 - Keys (S-39, D-106, `keys.js`/`keysui.js`): read by position (`e.code`, AZERTY-safe); Settings → Keys rebinds ten
   actions (clash swaps, Esc cancels, Reset) into `settings.keys`; arrows/Esc/Enter/Tab fixed; labels follow the bindings.
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 15); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-9`), `08` per-system detail.
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-10`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-40 built. M9 Echo (owner's ally ask, D-108): S-42, S-43 in `07-Build-Specs-7.md`. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42, S-43 in `07-Build-Specs-7.md`. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -46,5 +48,6 @@ _Last updated: 2026-11-24_ · **Session counter: 77** · **Version: v1.2.17** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 78 (Build): S-41 adaptive graphics (`07-Build-Specs-6.md`). Then M9 S-42, S-43 (D-108); Design 82 play-tests M8 and
-specs ambient music (S-44). Recorded audio waits for the owner's pack (confirmed coming, Q-021). Audit 74 leftovers (perf grid/chunk repaint, unused exports, chip labels) wait in `04-…-2` Debt.
+Session 79 (Audit): parallel subagent sweeps per CLAUDE.md (bugs, perf incl. S-41 on a throttled CPU, mobile, code health,
+docs drift); fix the top issues, log the rest in `04-…-2` Debt, archive `09` entries older than audit 74, check D-xxx vs code.
+Then M9 S-42, S-43 (D-108); Design 82 play-tests M8 and specs ambient music (S-44). Recorded audio waits for the owner's pack (Q-021).

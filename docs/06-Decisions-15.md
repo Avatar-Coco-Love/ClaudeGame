@@ -32,3 +32,14 @@ Continues `06-Decisions-14.md` (same rules: supersede, never edit; list rejected
   world for the player, pillar 3); **straight-line follow + teleport only** (it would blink through every bend: reads as
   broken); granting it from the **first Spire** (ties a Drift/Surge-neutral tool to a late milestone); **replacing
   recorded audio** with it (the owner says the pack is coming).
+
+### D-109 — S-41 adaptive graphics: sample the frame gap, step-up bar 18 ms, bounce backoff (2026-11-24, session 78, Build)
+- Built S-41 (`quality.js`, `settings.graphics` Auto/High/Low, levels L0 DPR ≤ 2 · L1 DPR 1 · L2 + half the particles
+  drawn (fixed per particle, no flicker) + pickups without glow + unsmoothed light blit, the audit 74 Debt item).
+- **Sampled value:** the real gap between played frames (`now − last`, unclamped), not JS work time. Measured headless:
+  JS work ~1 ms on a frame whose gap p90 was 33 ms (canvas raster is deferred, so work time misses it).
+- **Step-up bar 18 ms, not the spec's 14:** vsync holds a 60 Hz gap at 16.7 ms, so p90 < 14 can never happen there.
+- **Bounce backoff:** a step down right after a step up doubles the wait to step up (10 → 20 … ≤ 160 s), so a device on
+  the edge settles instead of cycling every 13 s. Paused / title / ending frames and stalls > 1 s reset the window.
+- Rejected: JS work time (misses raster); a 14 ms bar (unreachable at 60 Hz); a fixed step-up wait (oscillates);
+  skipping every other particle by index (flickers as particles die); a no-glow pickup with the glow sprite's size.

@@ -48,7 +48,10 @@ export function drawLight(r, ctx) {
     for (const b of rs) hole(b.ex, b.ey, rs.length > 1 ? 48 : 80, 0.7);
   }
   if (g.beam.flash > 0 && g.beam.flashLine) hole(g.beam.flashLine.ex, g.beam.flashLine.ey, 80, 0.7 * g.beam.flash / g.beam.flashMax); // S-14
+  const crisp = r.quality >= 2; // S-41 L2 (audit 74): an unsmoothed 2× blit of the half-res layer, 63 → 45 ms at 4× CPU
+  if (crisp) ctx.imageSmoothingEnabled = false;
   ctx.drawImage(r.light, 0, 0, r.w, r.h);
+  if (crisp) ctx.imageSmoothingEnabled = true;
 }
 
 /** S-25 (D-061): a faint additive disc on the floor of every light pool in `r.lightSets`, drawn right after the grid so

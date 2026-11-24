@@ -5,8 +5,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 
 ## Debt
 - **Audit 74 leftovers** (5 sweeps; fixed in #80: SW `?query` offline launch, Anomaly take during a Relay deposit,
-  pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` smoothed 2× blit 63 → 45 ms with
-  smoothing off (fold into S-41); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
+  pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` unsmoothed blit done at L2 (S-41, #85); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
   repaints a whole chunk per broken cell (~10 ms; Wide → 20–30 ms spikes: repaint a 3×3 clip); `touch.cjs` 65 s, ~25 s
   of `waitForTimeout` (wait on conditions). Touch: chips ≤ 700 px are glyph-only, name only in `title` (short label or
   tap to re-toast); overlays ignore side insets. Code: H2/H3 below still open; `VAULT_HALF` hard-coded 3 in `world.js`.

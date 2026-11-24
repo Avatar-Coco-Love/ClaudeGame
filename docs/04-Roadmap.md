@@ -32,7 +32,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - **S-38** PWA: installable and plays offline (network-first service worker, no file list; D-103). ✅ built (#79, D-104).
 - **S-39** Keys by position (`e.code`, AZERTY-safe), then remappable in Settings. ✅ built (#81, D-106).
 - **S-40** Readable text (12 px floor in play, Large text setting) + colour-blind check (ΔE ≥ 25, 3 simulations). ✅ built (#82, D-107).
-- **S-41** Low-end frame budget: Auto / High / Low graphics (adaptive DPR, fewer particles; simulation unchanged).
+- **S-41** Low-end frame budget: Auto / High / Low graphics (adaptive DPR, fewer particles; simulation unchanged). ✅ built (#85, D-109).
 - ✅ **Projects page card** (D-044, Projects repo #14, session 29): live between Foldwork and Animal Mail Route.
 
 ## M9 — Echo: one ally that keeps up (owner's ask, D-108; → v1.4, after M8)
