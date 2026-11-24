@@ -72,3 +72,5 @@ Continues `06-Decisions-14.md` (same rules: supersede, never edit; list rejected
 - Rejected: a world break listener (overwritten by the renderer); euclidean-only progress (blinked at every bend in a
   test lab); a seeded stream for blink spots (nothing random to draw); mining while the core mines a cell (doubles a
   single dig instead of gathering around it).
+
+Continued in `06-Decisions-16.md` (D-113 on).

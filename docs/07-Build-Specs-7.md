@@ -26,7 +26,7 @@ for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43. Ambi
   12 seeds × 10 min of `surgebot mine` routes: strand rate (> 10 cells for > 3 s) 0, median lag ≤ 3 cells, blinks per
   min recorded in `09`, ◆/min with vs without Echo in both modes (Drift ÷ Surge gain within 10 %).
 
-## S-43 — Echo orders: Guard + the order button (M9) (D-108)
+## S-43 — Echo orders: Guard + the order button (M9) (D-108) — ✅ built (#88, D-113)
 - Orders: **Gather** (S-42) and **Guard**. Guard: hold 1.5–3 cells from the core and fire a short bolt every 0.8 s at the
   nearest Glitch or Spitter bolt within 140 px of the core with a clear line (`clearShot`), 6 dmg (a tier-1 Glitch in
   3 hits); bolts are popped like the beam pops them. In Drift, Guard has nothing to shoot; the chip says "Guard (idle)".

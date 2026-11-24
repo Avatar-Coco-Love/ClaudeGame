@@ -52,3 +52,17 @@ Continues `09-Implementation-Log-9.md` (part 9 neared the 8 KB cap at session 77
 - **B-074** (flaky, not fixed): the S-16 beacon minimap-dot checks failed once in a full smoke (pixel `219,222,195`,
   not `191,248,255`) and passed 4/4 alone and on the next full run; the Echo is not in that test. Logged as Debt.
 - Smoke: 392/392 (two full runs green; one run had B-074).
+
+## Session 81 — Build: S-43 Echo orders (v1.2.21, #88)
+- `echo.js`: `cycleEchoOrder`, `validOrder`, `orderLabel`, `guard()` (shot dash drawn 0.12 s); `game.echoOrder` saved,
+  `SAVE_FORMAT` 16 (15 → 16 adds 'gather'). Key `echoOrder` = R (S-39 list, 11 actions); ◇ `#echo-btn`; `#echo-chip`
+  in a `.chips` row with `#buffs`; toast "Echo: Guard". Layout and Wake numbers: D-113.
+- `tests/echoorder.cjs` (node 6 + browser 1, in smoke): cycle by intent (none before Research); Guard kills a held
+  tier-1 Glitch in 3 shots (1.62 s), Gather leaves it at full hp; rock blocks the shot; a bolt popped, no damage;
+  chip labels; save round-trip, format-15 upgrade and a bad value → Gather; browser R / ◇ / chip / toast.
+  `touch.cjs` B-034 row and toast checks now include ◇ (4 landscape sizes); `hud.cjs` pointer boxes include ◇.
+- Found by `hud.cjs`: ◇ first sat left of ⟂ and the Nexus pointer had no clear spot at 320×568 (20/180 headings);
+  moved beside ◎ and `hud.js` now reads `.pair` children. Screenshots viewed: 568×320, 320×568, Guard dash (desktop).
+- **B-075** (fixed): `echo.cjs` browser check waited a fixed 700 ms for a 0.5 s blink; failed 1 in 6 on the old code
+  too (alpha 0.27 mid fade-in). Now waits for the settled state, ≤ 2 s (the spec's blink bound).
+- Smoke: 399/399 (one earlier full run hit B-075 before the fix).

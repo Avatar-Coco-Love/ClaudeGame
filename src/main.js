@@ -1,6 +1,7 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
 import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
+import { orderLabel } from './echo.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, relayAt, PLACE_GLYPH } from './craft.js';
@@ -158,7 +159,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near].join('|'); // S-28: the primed hint
+  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g)].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -170,6 +171,10 @@ function updateHud() {
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
     $('cargo-fill').classList.toggle('full', total >= cap);
     renderBuffs(g); // S-35
+    const echo = !!g.research.echo, ol = orderLabel(g); // S-43: the order chip and ◇ show once the Echo is researched
+    $('echo-chip').classList.toggle('hidden', !echo); $('echo-btn').classList.toggle('hidden', !echo);
+    $('echo-name').textContent = ' ' + ol; $('echo-chip').title = `Echo order: ${ol} (${keys.K('echoOrder')} to switch)`;
+    $('echo-btn').title = `Echo order: ${ol} (${keys.K('echoOrder')})`;
     const hull = g.stat('hull');
     $('integrity-fill').style.width = `${Math.max(0, g.player.integrity / hull * 100)}%`;
     $('integrity-text').textContent = `${Math.max(0, Math.ceil(g.player.integrity))}/${hull}`;
@@ -203,6 +208,7 @@ function updateHud() {
     if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
+    if (ev === 'echo-order') { toast(`Echo: ${orderLabel(g)}`, 1400, NOW); persist(); } // S-43
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
     if (ev === 'weather-end') toast(g.weather.was === 'storm' ? 'The storm passes' : 'The aurora fades', 2600, KEEP);
@@ -274,6 +280,7 @@ function researchRow(r) {
     renderPanel(); persist();
     $('upgrade-list').querySelector(`[data-id="${r.id}"]`)?.classList.add('flash');
     if (r.id === 'wide') toast(input.usingTouch ? 'Wide Beam online — tap ⟂ to switch' : `Wide Beam online — press ${keys.K('beamMode')} to switch`, 3200);
+    if (r.id === 'echo') toast(input.usingTouch ? 'Echo online — tap ◇ to switch Gather / Guard' : `Echo online — press ${keys.K('echoOrder')} for Gather / Guard`, 3200); // S-43
     if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : `Scanner online — press ${keys.K('scan')} to ping`, 3200);
   });
   return row;
@@ -343,6 +350,7 @@ $('matrix-btn').addEventListener('click', openPanel);
 $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
 $('mode-btn').addEventListener('click', () => input.pressed.add('beamMode'));
 $('beacon-btn').addEventListener('click', () => input.pressed.add('place'));
+$('echo-btn').addEventListener('click', () => input.pressed.add('echoOrder')); // S-43
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -423,8 +431,8 @@ function frame(now) {
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
-    const scan = take('scan'), beamMode = take('beamMode'), place = take('place'); // S-16: B / ✦ follows the same rule
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place };
+    const scan = take('scan'), beamMode = take('beamMode'), place = take('place'), echoOrder = take('echoOrder'); // S-16: B / ✦ (and S-43 R / ◇) follow the same rule
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place, echoOrder };
     if (!paused && !game.endSeq && !endingOpen) { // S-24: the world holds still under the sequence and the card
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));

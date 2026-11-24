@@ -26,12 +26,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #cargo-fill { height: 100%; width: 0; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); transition: width .1s; }
 #cargo-fill.full { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
 /* S-35: one chip per active Anomaly buff under the cargo bar (glyph only ≤ 700 px wide); a short flash as a deposit ends it. */
-#buffs { display: flex; flex-wrap: wrap; gap: 4px; }
-#buffs:not(:empty) { margin-top: 5px; }
+/* S-43: the Echo order chip leads the S-35 buff chips in one wrapping row */
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+#buffs { display: contents; }
+.chips:has(> .chip:not(.hidden)), .chips:has(#buffs > *) { margin-top: 5px; }
 .chip { font-size: calc(12px * var(--ts)); padding: 1px 7px; border-radius: 9px; border: 1px solid rgb(var(--c)); color: rgb(var(--c)); box-shadow: 0 0 6px rgba(var(--c), .5); white-space: nowrap; }
 .chip.gone { animation: chip-gone .6s forwards; }
 @keyframes chip-gone { 0% { background: rgba(var(--c), .8); color: #fff; } 100% { opacity: 0; } }
-@media (max-width: 700px) { .chip .chip-name { display: none; } }
+@media (max-width: 700px) { .chip:not(.echo) .chip-name { display: none; } } /* the order chip keeps its word: ◇ alone says nothing */
 #integrity-fill { height: 100%; width: 100%; background: #ff7a3d; box-shadow: 0 0 8px #ff7a3d; }
 .top-right { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 #minimap { width: 140px; height: 140px; border: 1px solid var(--line); border-radius: 10px; image-rendering: pixelated; }
@@ -50,6 +52,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
   font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(46,242,255,.3); } /* S-13 beam mode switch */
 #beacon-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid #bff8ff; background: rgba(20, 44, 56, .85); color: #bff8ff;
   font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(191,248,255,.25); } /* S-16 place a Beacon */
+.pair { display: flex; flex-direction: row-reverse; gap: 8px; } /* S-43: ◎ keeps the column's right edge, ◇ left of it */
+.pair:not(:has(> :not(.hidden))) { display: none; } /* no stray column gap while both are hidden */
+#echo-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid #d8fbff; background: rgba(20, 40, 52, .85); color: #d8fbff;
+  font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(216,251,255,.25); } /* S-43 Echo order */
+@media (pointer: coarse) { #echo-btn { min-width: 44px; width: 44px; padding: 0; } } /* phones: glyph-only, the chip names the order */
 #beacon-count { font-size: calc(14px * var(--ts)); font-weight: 700; margin-left: 5px; font-variant-numeric: tabular-nums; }
 .research-hint { padding: 12px 0 4px; border-top: 1px solid rgba(90,120,255,.15); font-size: calc(13px * var(--ts)); color: var(--gold); text-align: center; }
 .touch kbd { display: none; }
@@ -171,16 +178,18 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
 /* Landscape phone: ◎ ⟂ ♪ ≡ in one row left of the minimap, out of the right (aim) thumb's reach. Portrait keeps the column. */
 @media (max-height: 480px) and (pointer: coarse) {
   .top-right { flex-direction: row; align-items: flex-start; gap: 8px; }
-  #scan-btn { order: 1; } #mode-btn { order: 2; } .top-right .buttons { order: 3; } #minimap { order: 4; width: 112px; height: 112px; }
+  .pair { display: contents; } /* landscape: ◎ and ◇ join the row */
+  #scan-btn { order: 1; } #mode-btn { order: 2; } #echo-btn { order: 3; } .top-right .buttons { order: 4; } #minimap { order: 5; width: 112px; height: 112px; }
   #beacon-btn { position: absolute; top: 52px; right: 120px; } /* S-16: under the row, beside the minimap: the row stays as wide as before */
 }
 /* S-25 / B-034 (D-064): short, narrow landscape phones (568–700 px wide): ◎ and ⟂ glyph-only (a switch already toasts the
    mode name), the bank row compact like portrait, the minimap 100 px, so the row clears the bank panel by ≥ 8 px. */
 @media (max-height: 480px) and (max-width: 700px) and (pointer: coarse) {
-  #scan-btn, #mode-btn { min-width: 44px; width: 44px; padding: 0; }
+  #scan-btn, #mode-btn, #echo-btn { min-width: 44px; width: 44px; padding: 0; }
   #mode-btn .mode-name { display: none; }
   #minimap { width: 100px; height: 100px; }
   #beacon-btn { right: 108px; }
+  #echo-btn { position: absolute; top: 52px; right: 194px; } /* S-43: no room in the row at 568 px: under it, left of ✦ */
   .top-left { min-width: 0; } .bank { font-size: 15px; gap: 10px; } /* S-40: not scaled by Large (already ≥ 15 px) */
 }
 /* Audit 54 (T1): on phones the toast keeps to a band no HUD control uses. At top 30% it covered ◎ ⟂ in the portrait column

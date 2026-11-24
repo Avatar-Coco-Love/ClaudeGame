@@ -12,7 +12,7 @@ async function nodeChecks(check) {
   const s = defaultKeys(); bindKey(s, 'scan', 'KeyE'); // E is the Core Matrix: the two swap
   const fixed = defaultKeys(), refused = !bindKey(fixed, 'mine', 'Escape') && !bindKey(fixed, 'up', 'ArrowUp') && fixed.mine === 'Space';
   check('S-39 bindKey: rebinds; a clash swaps (never two actions on one key); fixed keys refused',
-    k.scan === 'KeyG' && s.scan === 'KeyE' && s.matrix === 'KeyF' && new Set(Object.values(s)).size === 10 && refused, JSON.stringify(s));
+    k.scan === 'KeyG' && s.scan === 'KeyE' && s.matrix === 'KeyF' && new Set(Object.values(s)).size === Object.keys(d).length && refused, JSON.stringify(s));
   const c = cleanKeys({ scan: 42, mine: 'Escape', up: 'KeyZ', left: 'KeyQ', bogus: 'KeyX', place: '<img>' });
   const clash = cleanKeys({ scan: 'KeyE' }); // would share E with the Core Matrix
   check('S-39 cleanKeys: bad entries fall back to defaults, good ones stay, unknown actions dropped, a clash resets',
@@ -71,7 +71,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   check('S-39 Settings: binding a key another action holds swaps the two', sw.matrix === 'KeyG' && sw.scan === 'KeyE', JSON.stringify(sw));
   await page.click('#keys-reset'); await page.waitForTimeout(50);
   const reset = await page.evaluate(() => JSON.stringify(window.__lumen.settings.keys));
-  check('S-39 Reset keys restores every default', reset === JSON.stringify({ up: 'KeyW', left: 'KeyA', down: 'KeyS', right: 'KeyD', mine: 'Space', matrix: 'KeyE', scan: 'KeyF', beamMode: 'KeyQ', place: 'KeyB', mute: 'KeyM' }), reset);
+  check('S-39 Reset keys restores every default', reset === JSON.stringify({ up: 'KeyW', left: 'KeyA', down: 'KeyS', right: 'KeyD', mine: 'Space', matrix: 'KeyE', scan: 'KeyF', beamMode: 'KeyQ', place: 'KeyB', mute: 'KeyM', echoOrder: 'KeyR' }), reset); // S-43 added R
   await page.click('[data-bind="scan"]'); await page.keyboard.press('g'); await page.waitForTimeout(50);
   if (shots) await page.screenshot({ path: path.join(ROOT, 'keys-view.png') });
   await page.keyboard.press('Escape'); await page.waitForTimeout(100); // not capturing now: closes Settings

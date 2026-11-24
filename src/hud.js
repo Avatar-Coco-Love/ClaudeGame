@@ -59,7 +59,7 @@ export function drawMinimap(r) {
 
 // T1 (audit 49): the HUD boxes the pointer must stay clear of, read from the DOM at most twice a second (a layout read
 // every frame would force a reflow after each HUD text update).
-const HUD_BOXES = '#hud .panel, #hud .top-right > *, #hud > button, #hint';
+const HUD_BOXES = '#hud .panel, #hud .top-right > *:not(.pair), #hud .top-right .pair > *, #hud > button, #hint'; // S-43: ◎ ◇ in .pair
 export function hudRects() {
   return [...document.querySelectorAll(HUD_BOXES)].map(e => e.getBoundingClientRect()).filter(b => b.width > 0 && b.height > 0);
 }

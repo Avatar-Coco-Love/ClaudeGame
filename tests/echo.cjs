@@ -136,7 +136,8 @@ async function browserChecks(browser, url, check, errors, shot) {
   check('Echo: the Research tab has an Echo row that buys at 30 ● (S-42)', !!row && row.name === 'Echo' && row.can && bought.owned && bought.lumen === 0,
     JSON.stringify({ row, bought }));
   await pg.evaluate(() => { window.__lumen.dev.teleport(14); });
-  await pg.waitForTimeout(700);
+  // B-075: a fixed 700 ms wait raced the 0.5 s blink on slow frames; wait (≤ 2 s, the spec's blink bound) for it to settle
+  await pg.waitForFunction(() => { const g = window.__lumen.game, e = g.echo; return e && !e.blink && e.alpha > 0.5 && Math.hypot(e.x - g.player.x, e.y - g.player.y) < 100; }, null, { timeout: 2000 }).catch(() => {});
   const st = await pg.evaluate(() => { const g = window.__lumen.game; return { echo: !!g.echo, alpha: g.echo && g.echo.alpha,
     d: g.echo && Math.hypot(g.echo.x - g.player.x, g.echo.y - g.player.y) }; });
   check('Echo: after a teleport it blinks back and draws beside the core in the browser (S-42)', st.echo && st.alpha > 0.5 && st.d < 100, JSON.stringify(st));

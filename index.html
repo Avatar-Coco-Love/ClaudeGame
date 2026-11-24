@@ -27,13 +27,13 @@
     <div class="panel top-left">
       <div class="bank"><span class="shard">◆ <b id="bank-shard">0</b></span><span class="prism">▲ <b id="bank-prism">0</b></span><span class="lumen hidden">● <b id="bank-lumen">0</b></span></div>
       <div class="bar-row"><label>Cargo</label><div class="bar"><div id="cargo-fill"></div></div><span id="cargo-text">0/20</span></div>
-      <div id="buffs"></div>
+      <div class="chips"><span id="echo-chip" class="chip echo hidden" style="--c:216,251,255"><span class="chip-glyph">◇</span><span class="chip-name" id="echo-name"> Gather</span></span><div id="buffs"></div></div>
       <div class="bar-row hidden" id="integrity-row"><label>Integrity</label><div class="bar"><div id="integrity-fill"></div></div><span id="integrity-text">100</span></div>
     </div>
     <div class="top-right">
       <canvas id="minimap" width="140" height="140"></canvas>
       <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
-      <button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd data-key="scan">F</kbd></button>
+      <div class="pair"><button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd data-key="scan">F</kbd></button><button id="echo-btn" class="hidden" title="Echo order (R)" aria-label="Switch Echo order">◇ <kbd data-key="echoOrder">R</kbd></button></div> <!-- S-43: ◇ sits left of ◎ (portrait column) -->
       <button id="mode-btn" class="hidden" title="Beam mode (Q)" aria-label="Switch beam mode">⟂<span class="mode-name" id="mode-name">Focus</span> <kbd data-key="beamMode">Q</kbd></button>
       <button id="beacon-btn" class="hidden" title="Place a Beacon (B)" aria-label="Place a Beacon"><span id="place-glyph">✦</span><span id="beacon-count">0</span> <kbd data-key="place">B</kbd></button>
     </div>
