@@ -424,7 +424,8 @@ export class Renderer {
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
     if (b.charge > 0) {
       const dx = Math.cos(p.angle), dy = Math.sin(p.angle), reach = this.game.stat('range') * PULSE_RANGE;
-      ctx.setLineDash([3, 7]); ctx.lineWidth = 1.5 + b.charge; ctx.strokeStyle = `rgba(46,242,255,${0.2 + 0.5 * b.charge})`;
+      const full = b.charge >= 1 - 1e-9; // S-21: a full charge waiting for a target draws its reach solid at 60 % (static line)
+      ctx.setLineDash(full ? [] : [3, 7]); ctx.lineWidth = 1.5 + b.charge; ctx.strokeStyle = `rgba(46,242,255,${full ? 0.6 : 0.2 + 0.5 * b.charge})`;
       ctx.beginPath(); ctx.moveTo(p.x + dx * 14, p.y + dy * 14); ctx.lineTo(p.x + dx * (12 + reach), p.y + dy * (12 + reach)); ctx.stroke();
       ctx.setLineDash([]);
     }

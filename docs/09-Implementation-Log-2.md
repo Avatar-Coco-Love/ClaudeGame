@@ -61,3 +61,13 @@ Continues `09-Implementation-Log.md` (split at the 8 KB cap, session 36). Newest
   (arrows, Esc, ≡), D-050 note marked historical. Rest → `04-Roadmap-2` Debt (split `drawLight` before S-19, inline tuning).
 - Chores: `09` sessions 31–33 archived word for word; changelog v0.1.22–26 archived; all D-001…D-057 checked against code:
   match, except D-051's "Glitches keep shadowBlur", superseded by D-058.
+
+## 2026-11-24 — Session 40 (v0.2.44): Build — S-21 Pulse ready shot, `PULSE_GLITCH` 1.8
+- A held full charge waits until a Glitch on the ray or a solid cell is within reach (`pulseInReach`, same foe test as the
+  burst); let-go still fires into air; B-032's blur/hidden cancel unchanged (its audit 39 checks pass). The waiting reach line
+  is solid at 60 % (viewed at 1280×800: dotted while charging, solid when full, no target, 2 s held).
+- Probes before → after (all in D-059): standoff wave3 Beam 2 tier 3 Pulse 96 hp d20 → 32 hp d0 (Focus 96 d20); single
+  tier 3 64 → 0; wave5 tier 0 Pulse 64 → 45 (Focus 0). KITE=1: Pulse within 2 hp of Focus or better at Beam 2–4. deeprun MODE=pulse median 43 →
+  41 s; parity MODE=pulse Drift ▲ 13.5 → 13.1/min; Focus and Wide rows unchanged. D-054's prediction holds.
+- 2 new checks in `tests/pulse.cjs`, both failed on the old code first (open-floor charge fired at 1.2 s; tier 3 left 0.47 hp).
+  Smoke 139/139 (137 + 2). No bugs found.

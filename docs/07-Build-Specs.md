@@ -1,6 +1,6 @@
 # 07 — Build Specs
 
-Specs ready to build, in **build order: S-21, S-16, S-19 (`07-Build-Specs-2.md`), then S-22, S-20, Surge bot, S-23, S-24 (`-3.md`)** (D-056; S-18 built in #41, S-15 in #43). Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
+Specs ready to build, in **build order: S-16, S-19 (`07-Build-Specs-2.md`), then S-22, S-20, Surge bot, S-23, S-24 (`-3.md`)** (D-056; S-18 built in #41, S-15 in #43, S-21 in #45). Written by Design sessions. A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.
 Prisms in a world ≈ 1470▲; the Core Matrix takes 246▲ and Radiance 113▲. The first Prism is 32 cells out. (S-1…S-14 built in #7–#40.)

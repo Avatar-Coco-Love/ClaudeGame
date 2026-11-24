@@ -3,20 +3,6 @@
 Continues `07-Build-Specs.md` (same rules; build order is in its header, D-048). Supply numbers are in that file's header.
 Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 110 Lumen cells, 5580 open of 11440.
 
-## S-21 — Pulse ready shot + Glitch burst 1.8× (M3 tune) (D-054)
-- **Ready shot:** at full charge, held fire releases only if the burst has something within its reach: a live Glitch on the
-  ray or any solid cell (`raycast` within `range × PULSE_RANGE`). Otherwise it stays at charge 1 until a target enters the
-  ray or fire is let go (release into nothing = a full burst into air, as now). Mining is unchanged (a wall is always in reach).
-  D-052's cancels (mode switch, sheet, pause, death) still drop it. While held full, the dotted reach line turns solid at
-  60 % alpha (static under reduced motion); no new sound (D-039).
-- `PULSE_GLITCH` 1.6 → **1.8** (Beam 2 burst 2.1 × 1.2 × 1.8 = 4.54 one-shots a tier-3 Glitch, 4.5 hp). Sustained vs Glitches
-  1.44 hp/s per Beam-0 dps = 0.9× Focus (1.6); mining untouched.
-- **Checks:** update `tests/pulse.cjs`'s ×1.6 Glitch check to read `PULSE_GLITCH`; new (fail first on the old code): a full
-  charge aimed at a Glitch 1.2× reach away holds, then fires as it enters reach and kills a tier-1 at Beam 2; aimed at open
-  floor with nothing in reach it holds ≥ 2 s; the 10 s rock hold stays 0.7–0.9× Focus. Re-run `tools/standoff.mjs` (plain and
-  `KITE=1`) and `MODE=pulse` Q-011 probes; log in `09`. Expected (Design 37 prototype): wave3 Beam 2 tier 3 standing, Pulse
-  32 hp lost / 0 deaths of 20 (Focus 96 / 20); wave5 Beam 2 tier 0, Focus 0 hp, Pulse 45 (Focus keeps swarms).
-
 ## S-16 — Beacons v1 (Crafting, 5▲ each) (D-043)
 - New Matrix tab **Craft** (after Research). Item `beacon`, "Beacon", 5▲, holds up to `BEACON_STOCK` 3 unplaced; Crafting is
   its own layer: Radiance grows the Nexus light, a Beacon is light you carry out (no overlap, pillar rule).
