@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.1.6 — 2026-11-24 (#72)
+- **Weather:** every 5–7 minutes of play, the dark changes for 40 s. In Surge a violet **static storm** rolls in and
+  Glitches come faster and in greater numbers (more fights, more loot); in Drift an **aurora** makes the ore in your
+  light shimmer, and breaking it often drops one extra. Never during a Spire Wake or the ending. M6 is complete: v1.1.
+
 ## v1.0.5 — 2026-11-24 (#71)
 - **Spitters (Surge, the Deep):** about one Glitch in four out there is now a violet diamond that keeps ~200 px away,
   points at you, glows orange for a moment and fires a slow bolt. Rock stops bolts, and your beam can pop them.

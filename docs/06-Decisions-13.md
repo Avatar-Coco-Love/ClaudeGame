@@ -18,3 +18,16 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
   0.150, mid 0 → 0 (all ≤ 0.2); `mine` mid stays 0 (it never reaches the Deep). The bot now beams bolts in reach too.
 - Rejected: bolts as entries in `game.enemies` (would count against the cap, the Wake and kill stats); firing blind
   into rock (wasted tells, unreadable); a separate rng stream for the roll (the spec names `glitch-spawn`, D-087).
+
+### D-097 — S-33 Weather as built; M6 shipped → v1.1 (2026-11-24, session 66; implements D-087)
+- `weather.js`: event k starts at the sum of k + 1 gaps (300 + 120·rand s, `rng['weather']`) of `stats.time`, so a
+  reload resumes the schedule and nothing new is saved (no SAVE_FORMAT bump). The face follows the mode (storm in
+  Surge, aurora in Drift); a Wake or the ending cancels the event in progress, and one due inside them is skipped.
+- Tuned by `surgebot` (`--weather=on|off`, mid, 16 seeds × 6 min, haul/min boost while on): spec values (spawn ×0.6,
+  aurora +1 every break) gave mine aurora +46 %, deep storm +46–52 %. Built: **spawn ×0.75, cap +2; aurora +1 at 40 %**
+  (`rng['aurora']`, Shard / Prism cells only: Lumen stays a fixed world budget) → mine storm +0 % / aurora +23 %,
+  storm ÷ aurora haul 0.89; deep storm +15 % / aurora +13 % (boost ratio 1.02). Smoke: ratio 0.92 (6 seeds).
+- Darkness tints (violet / teal) are subtle: first tries washed the dark into a visible colour and showed the map.
+- M6 = S-32 + S-33 (D-087); Swarm / Burrower were "later" ideas, now in Later → M6 ✅, VERSION 1.1 (D-046).
+- Rejected: a saved event timer (save bump for a 40 s effect); +1 on every aurora break (+46 %); cap +1 (spawn rate,
+  not cap, drives the storm's haul); tinting the dark as strongly as first drawn (it lit the map).

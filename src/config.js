@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.0.5';
+export const VERSION = '1.1.6';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -228,3 +228,10 @@ export const MODES = {
   drift: { name: 'Drift', blurb: 'Calm. No hostiles. Mine, explore, build at your own pace.' },
   surge: { name: 'Surge', blurb: 'Glitches hunt in the dark. Same rewards, more heartbeat.' },
 };
+// S-33 Weather (D-087, D-097, weather.js): one event at a time, every WEATHER_EVERY_S[0] + rand × [1] s of play (start to
+// start, rng['weather'], from stats.time so a reload keeps the schedule), WEATHER_S long; never in a Wake or the ending.
+// Storm (Surge): spawn interval × STORM_SPAWN_MUL, alive cap + STORM_CAP_ADD. Aurora (Drift): a Shard or Prism cell broken
+// within LIGHT_RADIUS of the core drops AURORA_BONUS more with chance AURORA_CHANCE (rng['aurora']). Tints ease in/out over WEATHER_EASE_S (darkness colour, light.js).
+export const WEATHER_EVERY_S = [300, 120], WEATHER_S = 40, WEATHER_EASE_S = 2;
+export const STORM_SPAWN_MUL = 0.75, STORM_CAP_ADD = 2, AURORA_BONUS = 1, AURORA_CHANCE = 0.4;
+export const WEATHER_TINT = { storm: [14, 4, 26], aurora: [3, 13, 13] }; // darkness RGB at full strength (base 2, 3, 10)

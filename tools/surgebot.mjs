@@ -4,7 +4,7 @@
 // beat mine), spire (nearest Spire by path, feed the banked ▲, mine prism cells within 24 cells and carry them in until
 // primed, then hold the interior). S-23 adds "Wake held / failed" to the spire route.
 // Usage: node tools/surgebot.mjs [--route=mine,spire] [--build=start,mid,max] [--mode=drift,surge] [--seeds=12]
-//        [--minutes=20] [--bank=20] [--hold=40] [--v]   (one line per route × build × mode: medians + p90 over seeds)
+//        [--minutes=20] [--bank=20] [--hold=40] [--weather=on|off] [--v]   (one line per route × build × mode: medians + p90 over seeds)
 import { Game } from '../src/game.js';
 import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS, SPITTER_TIER, GLITCH_TIER_PX } from '../src/config.js';
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
@@ -50,8 +50,9 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
   return null;
 }
 
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40 }) {
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
+  if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[build] ? (LEVELS[build][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull');
   if (route === 'spire') g.bank.prism = bank;
@@ -213,7 +214,7 @@ if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop()
   const V = process.argv.includes('--v');
   for (const route of routes) for (const build of builds) for (const mode of modes) {
     const rows = [];
-    for (let k = 1; k <= seeds; k++) { const r = runBot({ seed: k * 7919, route, build, mode, minutes, bank, hold }); if (V) console.log(JSON.stringify(r)); rows.push(r); }
+    for (let k = 1; k <= seeds; k++) { const r = runBot({ seed: k * 7919, route, build, mode, minutes, bank, hold, weather: arg('weather', null) }); if (V) console.log(JSON.stringify(r)); rows.push(r); }
     console.log(summarize(rows));
   }
 }

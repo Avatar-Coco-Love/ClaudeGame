@@ -4,6 +4,7 @@
 // Spires (`game.spireLights`, S-28). Both passes iterate the sets in place: no per-frame concat or allocation.
 import { LIGHT_RADIUS, BEACON_RGB } from './config.js';
 import { darkAlpha } from './ending.js';
+import { darkRGB } from './weather.js';
 
 const GLOW_RGB = BEACON_RGB;
 const GLOW_DOWN = 4; // floor-glow layer pixels per screen pixel, per axis
@@ -30,7 +31,7 @@ export function drawLight(r, ctx) {
   const l = r.lctx, g = r.game, s = r.zoom / 2, cw = r.light.width, ch = r.light.height; // light canvas is half-res
   l.globalCompositeOperation = 'source-over';
   l.clearRect(0, 0, cw, ch);
-  l.fillStyle = `rgba(2, 3, 10, ${darkAlpha(g)})`; // S-24: DARK_ALPHA, lifted by the ending
+  l.fillStyle = `rgba(${darkRGB(g)}, ${darkAlpha(g)})`; // S-24: DARK_ALPHA, lifted by the ending; S-33: weather tint
   l.fillRect(0, 0, cw, ch);
   l.globalCompositeOperation = 'destination-out';
   const hole = (wx, wy, rad, strength = 1) => {

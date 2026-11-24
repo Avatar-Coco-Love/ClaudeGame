@@ -70,6 +70,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./wake.cjs').nodeChecks(check).catch(e => check('S-23 wake checks ran', false, e.message));
   await require('./surgebot.cjs').nodeChecks(check).catch(e => check('S-30 surge bot checks ran', false, e.message));
   await require('./spitter.cjs').nodeChecks(check).catch(e => check('S-32 spitter checks ran', false, e.message));
+  await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

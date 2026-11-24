@@ -6,18 +6,21 @@ import {
   GLITCH_CAP_STEP_PX, GLITCH_SPAWN_S, GLITCH_SPAWN_RING, GLITCH_SPAWN_CLEAR, GLITCH_AGGRO_PX, GLITCH_DESPAWN_PX, GLITCH_TIER_PX,
   GLITCH_TIER_MAX, GLITCH_TIER, GLITCH_LOOT_SHARDS, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK, GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL,
   GLITCH_NEXUS_BURN, GLITCH_COLORS, CELL, SPIRE_GUARD_CELLS, SPITTER_TIER, SPITTER_CHANCE, SPITTER_HOLD_PX,
+  STORM_SPAWN_MUL, STORM_CAP_ADD,
 } from './config.js';
 import { makeSpitter, spitterStep, updateBolts } from './spitter.js';
 import { wakeContact } from './wake.js';
+import { stormOn } from './weather.js';
 import { collides, moveBody } from './body.js';
 
 export function updateGlitches(game, dt) {
   const p = game.player;
   const distFromNexus = Math.hypot(p.x - game.nexus.x, p.y - game.nexus.y);
-  const maxCount = distFromNexus < NEXUS_RADIUS * 2 ? 1 : Math.min(GLITCH_CAP, GLITCH_CAP_BASE + Math.floor(distFromNexus / GLITCH_CAP_STEP_PX));
+  const storm = stormOn(game); // S-33: faster spawns and a higher cap outside the Nexus's 2-radius calm
+  const maxCount = distFromNexus < NEXUS_RADIUS * 2 ? 1 : Math.min(GLITCH_CAP, GLITCH_CAP_BASE + Math.floor(distFromNexus / GLITCH_CAP_STEP_PX)) + (storm ? STORM_CAP_ADD : 0);
   if (!game.wake) game.spawnTimer -= dt; // S-23: natural spawns pause while a Wake runs (wake.js spawns its own)
   if (game.spawnTimer <= 0) {
-    game.spawnTimer = GLITCH_SPAWN_S[0] + game.rng['glitch-spawn']() * GLITCH_SPAWN_S[1];
+    game.spawnTimer = (GLITCH_SPAWN_S[0] + game.rng['glitch-spawn']() * GLITCH_SPAWN_S[1]) * (storm ? STORM_SPAWN_MUL : 1);
     if (game.enemies.length < maxCount) trySpawnGlitch(game, distFromNexus);
   }
   const list = game.enemies;

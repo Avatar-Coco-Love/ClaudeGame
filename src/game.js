@@ -11,6 +11,7 @@ import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
+import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
@@ -79,6 +80,7 @@ export class Game {
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
+    this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); never saved
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
@@ -202,6 +204,7 @@ export class Game {
     this.updateDeposit(dt);
     updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
     updateWake(this, dt); // S-23: Surge's Spire Wake (starts, clock, waves, end)
+    updateWeather(this, dt); // S-33: after the Wake, so a Wake starting this frame cancels the event at once
     if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length || this.bolts.length) { this.enemies = []; this.bolts = []; }
     this.updateParticles(dt);
 
@@ -261,6 +264,7 @@ export class Game {
       this.notify('cache');
     } else if (MATERIAL[type].yield) {
       this.dropYield(x, y, type);
+      for (let i = auroraBonus(this, cx, cy, type); i > 0; i--) this.spawnPickup(cx, cy, MATERIAL[type].yield.kind); // S-33
       this.audio.break(MATERIAL[type].yield.kind);
       if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }
     } else {

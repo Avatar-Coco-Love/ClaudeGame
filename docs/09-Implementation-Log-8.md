@@ -39,3 +39,11 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
   blocked Spitter; the beam pops a bolt in 0.23 s; Wake Glitches plain, Drift clears bolts). D-096 has the bot table.
 - Observed: a hard stop at 200 px overshot to 150 px (velocity lerp) → ease + back-off. Screenshot: diamonds aim at
   the core, orange bolts read through the dark.
+
+## Session 66 — Build: S-33 Weather (v1.1.6, #72)
+- `src/weather.js` (schedule, storm / aurora effects, dark tint, aurora shimmer), hooks in glitch / game / light / render,
+  toasts in main.js, `surgebot --weather=on|off`, `tests/weather.cjs` (6 checks: same schedule both modes; Wake /
+  ending skip and cut; reload resumes, mode switch swaps the face; storm spawn ×0.75; aurora odds and light radius;
+  mine haul storm ÷ aurora 0.92). D-097 has the tuning table; Q-019 opened (shallow storms pay ~0).
+- Observed: spec numbers overshot the +25 % cap (aurora +46 %, deep storm ~+50 %); first tints lit the whole dark
+  teal / violet. Screenshots after toning down: dark stays dark, violet reads, ore outlines shimmer. M6 ✅ → v1.1.

@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24, S-29 built; v1.0.0; S-34 built) M6: S-32 (built #71, D-096), S-33 (D-063, D-087). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build order (S-25, S-26, S-19, S-27, S-22, S-20, S-28, S-30, S-23, S-31, S-24, S-29 built; v1.0.0; S-34 built) M6: S-32 (#71, D-096), S-33 (#72, D-097) built: M6 ✅. Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -56,9 +56,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 ## v1.0.x — player feedback
 - ✅ (#68) **S-34 Relay reclaim:** pick a placed Relay back up (B / ✦ in its ring) to move it deeper (Q-018 → D-092).
 
-## M6 — Surge depth (without making Drift second-class) — post-1.0
-- ✅ **S-32 Spitter** (ranged Glitch, Deep; #71, D-096); later Swarm (tiny, many), Burrower (moves through rock).
-- **S-33 Weather:** Surge "static storms" and Drift's equivalent calm event (aurora: bonus ore glows), one spec (D-087).
+## M6 — Surge depth (without making Drift second-class) ✅ (v1.1, D-097)
+- ✅ **S-32 Spitter** (ranged Glitch, Deep; #71, D-096). ✅ **S-33 Weather** (storm / aurora; #72, D-097).
 
 ## M7 — Temporary upgrades
 - Anomalies found in the world that give a buff until you next deposit (e.g. double magnet, beam overclock).
@@ -76,6 +75,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 
 ## Later / research spikes (design only until proven)
 - Co-op multiplayer: destructible terrain sync is the single largest technical risk. Spike only, no commitment; out of 1.0 (D-045).
+- More Glitch variants: Swarm (tiny, many), Burrower (moves through rock); unspecced, out of M6 (D-097).
 - Larger world (e.g. 256×256) with lazy chunk generation: only if rings feel too short (D-022; moved out of M2 by D-046).
 
 ## Debt
