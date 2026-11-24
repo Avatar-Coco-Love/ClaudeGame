@@ -450,7 +450,7 @@ export class Renderer {
   // S-11: the Scanner ring and the ore glyphs it reveals, drawn above the darkness (world transform).
   drawScan(ctx) {
     const sc = this.game.scan;
-    if (!sc.marks.length) return;
+    if (sc.age >= sc.end) return; // B-026: an empty ping still draws its ring
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     const r = sc.age * SCAN_SPEED, R = SCAN_RADIUS * CELL;

@@ -48,7 +48,7 @@ export function tryScan(game) {
 export function updateScan(game, dt) {
   const s = game.scan;
   s.cooldown = Math.max(0, s.cooldown - dt);
-  if (!s.marks.length) return;
+  if (s.age >= s.end) return; // B-026: runs on age, not marks, so a ping with no ore in range still sweeps its ring
   const was = s.age;
   s.age += dt;
   // S-12: one soft tone the moment the ring reaches an unopened cache (game time, so pause and hitstop hold it too).

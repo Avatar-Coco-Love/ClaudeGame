@@ -272,11 +272,16 @@ export class Game {
     }
   }
 
-  // `force` skips the cap: the player's own cargo must never vanish on a littered floor (B-005); it is bounded by the hold.
+  // `force` tags a pickup `kept`: the player's own cargo and cache loot never vanish (B-005) and never count toward the cap.
+  // At PICKUP_CAP loose pickups the oldest loose one makes room, so a fresh break always yields (B-022).
   spawnPickup(x, y, kind, force = false) {
-    if (this.pickups.length >= PICKUP_CAP && !force) return;
+    if (!force) {
+      let loose = 0;
+      for (const q of this.pickups) if (!q.kept) loose++;
+      if (loose >= PICKUP_CAP) this.pickups.splice(this.pickups.findIndex(q => !q.kept), 1);
+    }
     const r = this.rng.pickup, a = r() * Math.PI * 2, s = 40 + r() * 90;
-    this.pickups.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, kind, age: 0, r: 4 });
+    this.pickups.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, kind, age: 0, r: 4, kept: force });
   }
 
   updatePickups(dt) {
@@ -348,6 +353,16 @@ export class Game {
         if (e.fade <= 0) list.splice(i, 1);
         continue;
       }
+      if (e.hp <= 0) { // B-023: before the give-up and contact checks, so a Glitch the beam just killed neither hits nor fades lootless
+        this.stats.glitches++;
+        this.burst(e.x, e.y, 22, '#ff7a3d', 220);
+        if (this.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
+        for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
+        this.audio.enemyDie();
+        this.addShake(4);
+        this.enemies.splice(i, 1);
+        continue;
+      }
       let tx = 0, ty = 0;
       if (d < 560) { tx = dx / d; ty = dy / d; e.alert = true; }
       else { e.wander += (this.rng['glitch-wander']() - 0.5) * dt * 3; tx = Math.cos(e.wander) * 0.4; ty = Math.sin(e.wander) * 0.4; }
@@ -370,16 +385,6 @@ export class Game {
         e.vx = -dx / d * 260; e.vy = -dy / d * 260;
         if (p.invuln <= 0) this.hurtPlayer(e.dmg, dx / d, dy / d);
         if (this.enemies !== list) return; // destabilize() replaced the list mid-loop (B-007: indexing on froze the game)
-      }
-      if (e.hp <= 0) {
-        this.stats.glitches++;
-        this.burst(e.x, e.y, 22, '#ff7a3d', 220);
-        if (this.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) this.spawnPickup(e.x, e.y, 'prism'); // D-018
-        for (let j = 0; j < 2 + e.tier; j++) this.spawnPickup(e.x, e.y, 'shard');
-        this.audio.enemyDie();
-        this.addShake(4);
-        this.enemies.splice(i, 1);
-        continue;
       }
       if (d > 1500) this.enemies.splice(i, 1);
     }
@@ -458,7 +463,7 @@ export class Game {
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
-      pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y)]), // B-011: loot on the floor survives reload
+      pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
   load(s) {
@@ -474,6 +479,6 @@ export class Game {
     Object.assign(this.research, s.research || {});
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
-    for (const [k, x, y] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4 });
+    for (const [k, x, y, kp] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });
   }
 }

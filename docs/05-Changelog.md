@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.35 — 2026-11-24 (#36)
+- Fixes: mining always drops ore again, even on a floor crowded with scattered cargo (old loot fades first; your own cargo never does).
+  A Glitch your beam has just destroyed can no longer hit you, and one destroyed as it gives up still drops its loot.
+  F and Q are no longer swallowed by the tiny pause on a crystal break. The Matrix sheet's bank counts up as you deposit.
+  A Scanner ping with nothing in range still sweeps its ring, so you can see it fired.
+
 ## v0.2.34 — 2026-11-24 (#35)
 - No gameplay change. The game now has a finish line: version 1.0 arrives with the Spires, the ending and New Cycle.
   The middle version number now counts finished milestones, so this is 0.2 (the depth rings, vaults and Lumen are done).
