@@ -28,3 +28,17 @@ Continues `09-Implementation-Log.md` (split at the 8 KB cap, session 36). Newest
   reachable, each by exactly one tap set, so `SPIRE_TAPS` 3–5 is the true minimum); Surge = a 40 s Wake (S-23, bot-tuned).
   S-19's spec gains the 8 facet cells so S-20 needs no reshaping. Relays specced (S-22, D-056). New Q-013 (New Cycle carry-over).
 - Docs only + one tool; no gameplay change. Smoke green.
+
+## 2026-11-24 — Session 38 (v0.2.42): Build — S-15 perf check
+- **`tools/perf.cjs`** (spec runs + `home`; `SKIP`, `FLUSH`, `RATE`, `ONLY`). ×4 throttle, 20 s each, mean / p95 ms, old → new:
+  home 117 / 133 → 65 / 83; base (30 out, idle) 106 / 150 → 52 / 83; loot (Wide mining, 300 pickups) 171 / 250 → 125 / 167;
+  holes (+20) 137 / 200. Far over 16.7 ms: software raster, so ratios only (D-057). A real phone run is still owed.
+- **Finding:** audit 34's "drawLight 67 %" was deferred raster landing on its `drawImage`. Flushed per step (no throttle):
+  Nexus glow 10.3 ms off screen, 13.6 on; `drawLight` 4.0 (upscale 3.6, holes ~0.3); a full frame 20 away / 24 home.
+- **B-029 → fixed (D-057):** the Nexus glow's unclipped shadowBlur cost ~10 ms a frame even off screen. Cull + clip it; skip
+  off-canvas light holes. Flushed frame 20 → 9.5 ms away, 24 → 11 at home.
+  Fixed-frame pixel compare old vs new (camera, time, pulse pinned): away 0 bytes differ; home 62 (≤ 7/255); viewed.
+- **`tests/drawcost.cjs`** (+5 smoke checks): off-screen Nexus 0 draws; off-canvas holes 0 fills; 300 pickups ≤ 4× an empty
+  draw (2.1×); 20 holes ≤ 2× (1.3×); Nexus glow ≤ 35 % of a home frame (16 %). Proved failing: old shadowBlur pickups → 112×;
+  old Nexus/holes code → 5/5 draws, 23/23 fills, 57 %. `R.extraLights` = world-space holes (perf tool now, beacons next).
+- Smoke 128/128 (123 + 5).

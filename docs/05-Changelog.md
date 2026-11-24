@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.42 — 2026-11-24 (#43)
+- Smoother frames: the Nexus's glowing rings are now drawn only where they can be seen, and much more cheaply when they are.
+  It looks the same; in a slowed-down test browser a frame away from the Nexus takes half as long (106 → 52 ms), at home 117 → 65 ms.
+
 ## v0.2.41 — 2026-11-24 (#42)
 - No gameplay change. Design pass: the Pulse beam gets a plan to hold a full charge until a Glitch or wall is in reach,
   so it becomes the beam for picking off tough Glitches at range. Relighting a Spire is decided (feed it 80 Prisms, then

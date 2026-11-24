@@ -60,3 +60,17 @@ Continues `06-Decisions-5.md` (same rules: supersede, never edit; list rejected 
   repels or sells, so the Nexus stays the one safe zone and Surge gets no perk. Placement reuses S-16's B / ✦ (`craft.last`).
 - Order: S-15, S-21, S-16, S-19, S-22 (M4 done, v0.3), S-20, Surge bot runner, S-23, S-24 (v1.0). Design 42 settles Q-013.
 - Rejected: Relays that heal (a second Nexus, a Surge perk); a Relay cost in Lumen (too scarce); a separate key per item.
+
+### D-057 — How draw cost is checked, and the Nexus glow clip (2026-11-24, session 38, S-15)
+- **Smoke gates are exact or relative, never absolute.** Headless Chromium rasterises the canvas in software (×4 throttle:
+  106 ms/frame idle), so the spec's p95 ≤ 16.7 ms lives only in `tools/perf.cjs`. `tests/drawcost.cjs` counts draw calls, or
+  compares the median of 9 interleaved, flushed (1-px `getImageData`) draws of two scenes in one page, with ≥ 2× margin.
+  Each check failed once on the regression it guards (09). JS-only split shares mislead: the raster lands on the next read.
+- **Nexus glow:** skipped when its box (ring or Radiance sweep + 48 px) is off view; the 3 shadowBlur rings clip to ±112 px.
+  An unclipped shadow blurs a clip-sized layer even off screen: 10.3 ms off / 13.6 ms on → 0 / 1.5 ms. Pixels: away frame
+  byte-identical; home 62 of 4.1 M bytes differ by ≤ 7/255, Radiance sweep ≤ 2/255 (blur rounding); viewed side by side.
+- **Light holes** off the light canvas are skipped (exact). `drawLight` is otherwise unchanged (see Debt, `04-Roadmap-2`).
+- **S-16 price:** 20 on-screen holes = 1.3× an empty draw, +10 % frame time at ×4; off-screen beacons cost nothing. No cap change.
+- Rejected: an absolute frame budget in smoke (software raster, flaky); Nexus glow sprites (the pulse would scale line width;
+  the clip got the same win with the same code); light upscale without smoothing (0.7 vs 3.6 ms, but 2-px steps in the dark's
+  edge); a full-res light canvas (4.4 ms, no gain).
