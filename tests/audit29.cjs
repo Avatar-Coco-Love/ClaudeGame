@@ -5,23 +5,23 @@ const idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
-  const { T } = await import('../src/config.js');
+  const { T, PICKUP_CAP: CAP } = await import('../src/config.js');
   const { tryScan } = await import('../src/research.js');
 
   // B-022: kept pickups (death scatter, caches) never count toward the cap; at the cap the oldest loose pickup makes room.
   const g = new Game({ seed: 77, mode: 'surge', audio });
-  for (let i = 0; i < 400; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard', true);
+  for (let i = 0; i < CAP; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard', true);
   g.onCellBroken(1, 1, T.CRYSTAL); const afterKept = g.pickups.length;
-  for (let i = 0; i < 420; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'prism');
+  for (let i = 0; i < CAP + 20; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'prism');
   const loose = g.pickups.filter(q => !q.kept).length, kept = g.pickups.filter(q => q.kept).length;
   g.onCellBroken(1, 1, T.CRYSTAL); const newest = g.pickups[g.pickups.length - 1].kind;
   check('a floor of 400 kept pickups still lets a crystal yield; loose loot caps at 400 by evicting the oldest (B-022)',
-    afterKept > 400 && loose === 400 && kept === 400 && newest === 'shard' && g.pickups.filter(q => q.kept).length === 400,
+    afterKept > CAP && loose === CAP && kept === CAP && newest === 'shard' && g.pickups.filter(q => q.kept).length === CAP,
     JSON.stringify({ afterKept, loose, kept, newest }));
   const s = JSON.parse(JSON.stringify(g.toSave())), h = new Game({ seed: 77, mode: 'surge', audio, save: upgradeSave(s) });
   const old = upgradeSave({ ...JSON.parse(JSON.stringify(g.toSave())), v: 7, pickups: [[0, 10, 10], [1, 20, 20]] });
   check('kept tags survive save + load; a format-7 save keeps its whole floor as kept (B-022)', SAVE_FORMAT === 8
-    && h.pickups.filter(q => q.kept).length === 400 && old.v === 8 && old.pickups.every(q => q[3] === 1),
+    && h.pickups.filter(q => q.kept).length === CAP && old.v === 8 && old.pickups.every(q => q[3] === 1),
     JSON.stringify({ kept: h.pickups.filter(q => q.kept).length, old: old.pickups }));
 
   // B-023: a Glitch the beam killed this frame neither hits the core nor fades lootless.

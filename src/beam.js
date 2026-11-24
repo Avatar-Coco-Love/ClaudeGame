@@ -2,7 +2,7 @@
 // frame ({ ox, oy, ex, ey, target, enemy }). `beam.ex/ey/target/enemy` stay the centre ray's, so the darkness, crack overlay
 // and older checks keep working. Every mode scales from the Core Matrix Beam Power and Range stats; none adds a stat.
 import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
-  PULSE_FLASH_S } from './config.js';
+  PULSE_FLASH_S, BEAM_GLITCH_MUL } from './config.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -46,7 +46,7 @@ export function castBeam(game, dt) {
   });
   // Damage is applied once per Glitch and once per cell per frame, however many rays touch it.
   for (const e of foes) {
-    e.hp -= dps * dt * 1.6; e.flash = 0.08;
+    e.hp -= dps * dt * BEAM_GLITCH_MUL; e.flash = 0.08;
     if (Math.random() < dt * 40) {
       const r = b.rays.find(q => q.enemy === e);
       game.particle(r.ex, r.ey, (Math.random() - 0.5) * 160, (Math.random() - 0.5) * 160, 0.3, '#ff7a3d', 2);

@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.42';
+export const VERSION = '0.2.43';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -30,6 +30,7 @@ export const GLITCH_PRISM_CHANCE = 0.5;
 // else min(GLITCH_CAP, GLITCH_CAP_BASE + floor(core distance / GLITCH_CAP_STEP_PX)). Spawns every GLITCH_SPAWN_S[0] + rand × [1] s,
 // GLITCH_SPAWN_RING[0] + rand × [1] px from the core, never within GLITCH_SPAWN_CLEAR Nexus radii of the Nexus.
 export const GLITCH_R = 11;
+export const GLITCH_COLORS = ['#ff7a3d', '#ff4a4a', '#ff2e7a', '#ffd23d']; // body colour by tier (render.js glitchSprite)
 export const GLITCH_CAP = 9, GLITCH_CAP_BASE = 2, GLITCH_CAP_STEP_PX = 520;
 export const GLITCH_FIRST_SPAWN_S = 3, GLITCH_SPAWN_S = [2.2, 1.8], GLITCH_SPAWN_RING = [480, 260], GLITCH_SPAWN_CLEAR = 2.2;
 export const GLITCH_AGGRO_PX = 560, GLITCH_DESPAWN_PX = 1500; // chase inside aggro, wander outside; dropped past despawn
@@ -43,7 +44,8 @@ export const GLITCH_NEXUS_MARGIN = 40, GLITCH_NEXUS_REPEL = 1.5, GLITCH_NEXUS_BU
 export const NEXUS_HEAL = 45; // integrity per second inside the Nexus ring (Surge)
 
 // S-4 Feel pass (D-021). Reduced motion turns off hitstop and the upgrade ring (shake already off); sounds stay.
-export const HITSTOP_S = 0.035;     // sim freeze on a crystal/prism break
+export const PICKUP_CAP = 400;      // loose floor pickups; kept ones (death scatter, caches) never count (B-022)
+export const HITSTOP_S = 0.035;     // sim freeze on a yield-cell break (crystal, prism, Lumen); a vault cache gets 2×
 export const HITSTOP_GAP_S = 0.15;  // at most one hitstop per this much game time
 export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core Matrix purchase
 
@@ -148,6 +150,7 @@ export const BEAM_MODES = {
 // beam dps × PULSE_CHARGE_S × charge × PULSE_MUL along range × PULSE_RANGE, carrying what a broken cell doesn't use on to
 // the next, up to PULSE_PIERCE cells. A Glitch on the ray takes the rest × PULSE_GLITCH and stops it. Then PULSE_RECOVER_S
 // before charging again: ~0.8× Focus sustained. PULSE_FLASH_S = the release line (half under reduced motion).
+export const BEAM_GLITCH_MUL = 1.6; // Focus/Wide beam damage to a Glitch × this (beam.js castBeam)
 export const PULSE_CHARGE_S = 1.2, PULSE_RANGE = 1.5, PULSE_MIN = 0.2, PULSE_MUL = 1.0, PULSE_PIERCE = 3, PULSE_GLITCH = 1.6;
 export const PULSE_RECOVER_S = 0.3, PULSE_FLASH_S = 0.12;
 

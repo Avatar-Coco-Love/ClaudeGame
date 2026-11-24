@@ -12,12 +12,18 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.
 - **Bedrock edge (watch):** the border reads near-black; session 32 saw the beam spark on it (no crack). Fine unless play-tests mind.
 - **Cargo-full toast (watch, audit 34):** with a full hold, sitting on loot re-fires the toast every frame, so it stays up until
-  you move off. Reads as a reminder; change only if a play-test minds.
+  you move off. Reads as a reminder; change only if a play-test minds. (Audit 39: no longer fires inside the Nexus, B-033.)
 - **Audit 29 leftovers:** buy-logic dedupe (`game.js` `canAfford`/`buy` vs `canAffordNexus`/`buyNexus`), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21) and drawn as glow sprites, as are Scanner glyphs (B-027, D-051, #39).
   Particles are still drawn uncull'd (short-lived, local). ✅ Nexus glow culled + clipped (S-15, D-057, #43). Left (flushed, no
   throttle, 1280×800): `drawLight` 4.0 of 9.5 ms, 3.6 of it the smoothed 2× upscale (no same-pixel fix found); 300 pickups +11 ms
   (rotated `lighter` sprites); the un-timed rest (chunks, minimap, HUD) ~4 ms. Next: measure on a real phone (`tools/perf.cjs`).
+  ✅ Glitches culled + sprites (audit 39, D-058). Audit 39 at ×4: home 74 / 117 p95, base 58 / 83, loot 133 / 200 (pickups 35 %:
+  per-item save/rotate/drawImage), holes 145 / 200 (light 70 %). Batch pickups without per-item save/restore if loot matters.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
+- **Audit 39 leftovers (code health):** **split `drawLight` (+ light holes) out of `render.js` (540 lines) before S-19** adds Spire
+  drawing; `game.js` inline tuning → `config.js` (reveal 230, deposit tick 0.035, attractor 900/250 + age 0.25, hurt invuln 0.5 +
+  knockback 320, death clear 900 px, respawn +40, `PLAYER_R`, `ACCEL`); unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`,
+  `VAULT_TEMPLATES`, `WIDE_OFFSET` (low).

@@ -73,6 +73,7 @@ export class Input {
       const other = this.sticks[side === 'move' ? 'aim' : 'move'];
       for (const t of e.touches || []) {
         if (other && other.id === t.identifier) continue;
+        if (t.target !== this.canvas) continue; // B-030: a finger on a HUD button lifts there; the canvas never hears it
         if ((t.clientX < innerWidth / 2 ? 'move' : 'aim') !== side) continue;
         this.sticks[side] = { id: t.identifier, ox: t.clientX, oy: t.clientY, x: t.clientX, y: t.clientY };
         break;
@@ -80,7 +81,8 @@ export class Input {
     }
   }
 
-  release() { this.keys.clear(); this.mouse.down = false; this.sticks.move = this.sticks.aim = null; }
+  // B-032: a release is a cancel, not a let-go: the next read() says so, so a Pulse charge drops unfired (D-042).
+  release() { this.keys.clear(); this.mouse.down = false; this.sticks.move = this.sticks.aim = null; this.dropped = true; }
 
   static STICK_RADIUS = 56;
 
@@ -122,7 +124,8 @@ export class Input {
       fire = this.mouse.down;
     }
     if (this.keys.has(' ')) fire = true;
-    return { move: { x: mx, y: my }, aim, fire };
+    const cancel = !!this.dropped; this.dropped = false;
+    return { move: { x: mx, y: my }, aim, fire, cancel };
   }
 
   consume(action) {

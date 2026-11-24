@@ -1,6 +1,6 @@
 // World drawing (terrain chunk cache, entities, beam, light, Scanner). Screen-space HUD drawing (minimap, Nexus pointer,
 // touch sticks) is in hud.js. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 
@@ -342,33 +342,48 @@ export class Renderer {
     ctx.restore();
   }
 
+  // T3 (audit 39, D-051): a Glitch body or eye is a glow sprite (one drawImage, no per-frame shadowBlur), and Glitches off
+  // screen are skipped. Called twice a frame (bodies under the light, eyes over it), so the cull pays double.
+  glitchSprite(tier, white) {
+    const col = white ? '#ffffff' : GLITCH_COLORS[tier];
+    return this.glowSprite(`g-${tier}-${white ? 1 : 0}`, GLITCH_R * 1.15 + 2 + 18 / (this.zoom * this.dpr), g => {
+      const spikes = 3 + tier;
+      g.strokeStyle = g.fillStyle = g.shadowColor = col; g.shadowBlur = 14; g.lineWidth = 2;
+      g.beginPath();
+      for (let i = 0; i <= spikes * 2; i++) {
+        const a = i / (spikes * 2) * Math.PI * 2, r = i % 2 ? GLITCH_R * 0.45 : GLITCH_R * 1.15;
+        i ? g.lineTo(Math.cos(a) * r, Math.sin(a) * r) : g.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      g.stroke();
+      g.globalAlpha = 0.25; g.fill();
+    });
+  }
+  eyeSprite(tier) {
+    return this.glowSprite('e-' + tier, 2.5 + tier * 0.6 + 12 / (this.zoom * this.dpr), g => {
+      g.fillStyle = g.shadowColor = '#ff5a2e'; g.shadowBlur = 12;
+      g.beginPath(); g.arc(0, 0, 2.5 + tier * 0.6, 0, Math.PI * 2); g.fill();
+    });
+  }
+
   drawEnemies(ctx, eyesOnly) {
-    const p = this.game.player;
+    const p = this.game.player, vw = this.w / this.zoom, vh = this.h / this.zoom, m = GLITCH_R * 2 + 24;
+    const x0 = this.cam.x - vw / 2 - m, x1 = this.cam.x + vw / 2 + m, y0 = this.cam.y - vh / 2 - m, y1 = this.cam.y + vh / 2 + m;
     for (const e of this.game.enemies) {
+      if (e.x < x0 || e.x > x1 || e.y < y0 || e.y > y1) continue;
       const fade = e.fade !== undefined ? Math.max(0, e.fade / GLITCH_FADE_S) : 1; // S-6 give-up: fade and shrink
-      ctx.save();
-      ctx.translate(e.x, e.y);
       if (eyesOnly) {
         const d = Math.hypot(e.x - p.x, e.y - p.y);
         const a = Math.max(0, Math.min(0.9, (d - LIGHT_RADIUS * 0.6) / 200));
-        if (a <= 0) { ctx.restore(); continue; }
+        if (a <= 0) continue;
+        const sp = this.eyeSprite(e.tier);
         ctx.globalAlpha = fade * a * (0.6 + Math.sin(this.time * 6 + e.wander) * 0.3);
-        ctx.fillStyle = '#ff5a2e'; ctx.shadowColor = '#ff5a2e'; ctx.shadowBlur = 12;
-        ctx.beginPath(); ctx.arc(0, 0, 2.5 + e.tier * 0.6, 0, Math.PI * 2); ctx.fill();
-        ctx.restore(); continue;
+        ctx.drawImage(sp.canvas, e.x - sp.half, e.y - sp.half, sp.half * 2, sp.half * 2);
+        ctx.globalAlpha = 1; continue;
       }
-      const col = e.flash > 0 ? '#ffffff' : ['#ff7a3d', '#ff4a4a', '#ff2e7a', '#ffd23d'][e.tier];
-      ctx.strokeStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.lineWidth = 2;
-      ctx.rotate(e.spin);
-      if (fade < 1) { ctx.globalAlpha = fade; ctx.scale(0.4 + 0.6 * fade, 0.4 + 0.6 * fade); }
-      const spikes = 3 + e.tier;
-      ctx.beginPath();
-      for (let i = 0; i <= spikes * 2; i++) {
-        const a = i / (spikes * 2) * Math.PI * 2, r = i % 2 ? e.r * 0.45 : e.r * 1.15;
-        i ? ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r) : ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
-      }
-      ctx.stroke();
-      ctx.fillStyle = col; ctx.globalAlpha = 0.25 * fade; ctx.fill();
+      const sp = this.glitchSprite(e.tier, e.flash > 0), k = (fade < 1 ? 0.4 + 0.6 * fade : 1) * e.r / GLITCH_R;
+      ctx.save();
+      ctx.translate(e.x, e.y); ctx.rotate(e.spin); ctx.scale(k, k); ctx.globalAlpha = fade;
+      ctx.drawImage(sp.canvas, -sp.half, -sp.half, sp.half * 2, sp.half * 2);
       ctx.restore();
       if (e.hp < e.maxHp && fade === 1) {
         ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(e.x - 12, e.y - 20, 24, 3);

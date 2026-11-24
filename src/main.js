@@ -286,7 +286,7 @@ function frame(now) {
     const scan = take('scan'), beamMode = take('beamMode');
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode };
     if (!paused) {
-      if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames
+      if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));
       updateHud();
       saveTimer += dt;

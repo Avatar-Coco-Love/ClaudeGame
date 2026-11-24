@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 38** · **Version: v0.2.42** (session 38: build, S-15 perf check; rotation: 39 Audit, 42 Design, 44 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 39** · **Version: v0.2.43** (session 39: audit; rotation: 40 Build, 42 Design, 44 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -20,7 +20,7 @@ _Last updated: 2026-11-24_ · **Session counter: 38** · **Version: v0.2.42** (s
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
-- Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Phones: touch hints, no key badges, 44 px buttons, landscape ◎⟂♪≡ top row (S-17, D-050).
+- Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058).
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups + beam mode) every 10 s, on deposit, and on page hide. Saves carry a format number (now 8); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log (tail: `09-…-2`). The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
@@ -31,13 +31,12 @@ _Last updated: 2026-11-24_ · **Session counter: 38** · **Version: v0.2.42** (s
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
 - Mining down from the Nexus tunnels and collects Shards; deposit banks all cargo; Beam Power costs 8◆. Surge Glitches spawn away, die to the beam.
 - Reloading restores the mode, upgrades, bank, and mined terrain. Touch sticks move the core and mine. No page errors.
-- Title-screen hotkeys can't open the Core Matrix; New World asks before replacing an unreadable save (audit, session 4).
-- Radiance spends only Prisms, grows the light and minimap, survives reload; Matrix tabs fit at 320 px (session 5).
+- Title hotkeys can't open the Matrix; New World asks before replacing an unreadable save (4). Radiance: Prisms only, survives reload (5).
 - Phone shows the thumb hint before the first touch; nothing in title/HUD/Matrix overflows at 320 px (session 6).
 - Dying among several Glitches near the Nexus no longer freezes the game (B-007, session 7).
 - A Glitch boxed in by dense rock fades within 8 s without kill credit; one with a clear line keeps chasing (session 8).
 - The mining check is timed by game time (B-006); leaving the page drops held touch sticks (B-009) (audit, session 9).
-- Shake off stays 0 through a Glitch kill and a hit; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
+- Shake off stays 0; volume 0 and a legacy mute survive reload; Settings fits 320×568 (session 10).
 - Hitstop only on yield cells, rate-limited (32 breaks → 32 in 60 s); reduced motion drops it + ring (sessions 11–12).
 - Two Surge runs on one seed with one script give identical pickups and Glitch spawns (session 13).
 - Banked Shards show "Upgrade ready"; a death on a full floor keeps all cargo; floor pickups survive reload (audit, session 14).
@@ -49,11 +48,12 @@ _Last updated: 2026-11-24_ · **Session counter: 38** · **Version: v0.2.42** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
-- Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36); a full Pulse fires out of reach (37); draw cost as counts + ratios (38, `drawcost.cjs`).
+- Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36); a full Pulse fires out of reach (37); draw cost as counts + ratios (38, `drawcost.cjs`);
+  blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 39 (Audit, per CLAUDE.md): archive `09` entries older than audit 34, check D-xxx vs code, phone perf; then S-21.
+Session 40 (Build): S-21 Pulse ready shot (`07-…-2`, D-054). `tests/pulse.cjs` already reads `PULSE_GLITCH` (set it to 1.8).

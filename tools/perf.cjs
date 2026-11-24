@@ -1,14 +1,15 @@
 // S-15 throttled perf probe (not in smoke: ~2 min). Headless Chromium 1280×800 DSF 1, CPU throttled 4× over CDP, seed 77,
 // dev.teleport(30), then real mining in Wide (mouse held, S held) with 300 floor pickups kept on screen. Reports frame time
 // mean / p95 / max from requestAnimationFrame deltas, plus where draw time goes (renderer steps timed in the page).
-// Runs: home (idle at the Nexus), base (idle 30 cells out, beam off, no pickups), loot (the S-15 scenario), holes (loot + 20 extra light holes = S-16's beacon budget).
+// Runs: home (idle at the Nexus), base (idle 30 cells out, beam off, no pickups), loot (the S-15 scenario), holes (loot + 20 extra light holes = S-16's beacon budget),
+// surge (base in Surge, god mode, kept at GLITCH_CAP Glitches 250–750 px out: some on screen, some off; audit 39).
 // Headless Chromium paints the canvas in software, so the absolute numbers are far above a real GPU-backed browser's
 // (audit 34: ~121 ms/frame at 4× with no loot). Read the ratios between runs and the per-step split, not the 16.7 ms budget.
 // The step split counts only the JS that records canvas commands; the software raster runs later and lands on whatever
 // reads the canvas next (drawLight's drawImage), which is why audit 34 saw drawLight at ~67 %. FLUSH=1 forces the raster
 // inside each step (a 1-pixel getImageData before and after) for an honest split, at the cost of slower frames; SKIP
 // prices a step by the frame time it frees (that step becomes a no-op).
-// Usage: [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
+// Usage: [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 
@@ -26,7 +27,7 @@ const server = http.createServer((req, res) => {
 
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];
 
-async function run(browser, url, name, { loot, holes, home }) {
+async function run(browser, url, name, { loot, holes, home, surge }) {
   const pg = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const errors = []; pg.on('pageerror', e => errors.push(e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
@@ -36,17 +37,21 @@ async function run(browser, url, name, { loot, holes, home }) {
   await pg.click('#new-world');
   await pg.evaluate(() => { Math.random = window.__rnd; });
   await pg.waitForTimeout(300);
-  await pg.evaluate(({ loot, holes, home, STEPS, SKIP, FLUSH }) => {
+  await pg.evaluate(({ loot, holes, home, surge, STEPS, SKIP, FLUSH }) => {
     const { game: g, renderer: R, dev } = window.__lumen;
     g.demo = true; dev.god(true); if (!home) dev.teleport(30);
     if (loot) { g.research.wide = true; g.beamMode = 'wide'; }
+    if (surge) g.mode = 'surge';
     // Per-step timing: wrap each renderer draw step (and the whole draw) with performance.now().
     const t = window.__perf = { frames: [], draw: [], steps: Object.fromEntries(STEPS.map(k => [k, 0])) };
     for (const k of STEPS) if (!SKIP.includes(k)) { const f = R[k]; R[k] = function (...a) { if (FLUSH) R.ctx.getImageData(0, 0, 1, 1); const s = performance.now(); const r = f.apply(this, a); if (FLUSH) R.ctx.getImageData(0, 0, 1, 1); t.steps[k] += performance.now() - s; return r; }; }
     for (const k of SKIP) R[k] = () => {};
     const draw = R.draw; R.draw = function (...a) { const s = performance.now(); draw.apply(this, a); t.draw.push(performance.now() - s); };
     // Keep 300 loot pickups on screen: top up each frame around the core (the Attractor keeps pulling some in).
+    let k = 0;
     const fill = () => {
+      while (surge && g.enemies.length < 9) { const a = k++ * 2.4, d = 250 + (k % 5) * 125; // GLITCH_CAP, tier 1, spread on and off screen
+        g.enemies.push({ x: g.player.x + Math.cos(a) * d, y: g.player.y + Math.sin(a) * d, r: 11, vx: 0, vy: 0, tier: 1, hp: 3, maxHp: 3, speed: 90, dmg: 0, spin: 0, flash: 0, hitCd: 0.5, wander: a, alert: false }); }
       if (!loot) return;
       g.cargo.shard = g.cargo.prism = 0; // never cap out, so pickups keep flowing
       while (g.pickups.length < 300) { const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 260; g.spawnPickup(g.player.x + Math.cos(a) * d, g.player.y + Math.sin(a) * d * 0.6, 'shard', true); }
@@ -57,7 +62,7 @@ async function run(browser, url, name, { loot, holes, home }) {
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
-  }, { loot, holes, home, STEPS, SKIP, FLUSH });
+  }, { loot, holes, home, surge, STEPS, SKIP, FLUSH });
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   if (loot) { await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s'); }
@@ -85,10 +90,11 @@ async function run(browser, url, name, { loot, holes, home }) {
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
   console.log(`S-15 perf: 1280×800 DSF 1, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
-  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 } };
+  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true } };
   const out = {};
   for (const [k, v] of Object.entries(runs)) if (!ONLY || ONLY === k) out[k] = await run(browser, url, k, v);
   if (out.base && out.loot) console.log(`loot / base mean frame: ${(out.loot.mean / out.base.mean).toFixed(2)}×`);
+  if (out.base && out.surge) console.log(`surge / base mean frame: ${(out.surge.mean / out.base.mean).toFixed(2)}×`);
   if (out.loot && out.holes) console.log(`holes / loot mean frame: ${(out.holes.mean / out.loot.mean).toFixed(2)}×`);
   await browser.close(); server.close();
 })();

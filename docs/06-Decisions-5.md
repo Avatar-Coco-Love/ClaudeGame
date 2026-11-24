@@ -58,6 +58,7 @@ later generator change never moves a Spire. The core is unmineable so the goal c
 Landscape phones (`max-height: 480px` + coarse pointer) put ◎ ⟂ ♪ ≡ in one row left of the minimap, all above y 90; portrait keeps
 the column. Coarse-pointer HUD/sheet buttons are ≥ 44 px. A lifted stick adopts another live touch on its half from where it is now
 (no jump). Probes exit 1 on an unknown `MODE` (`tools/mode.mjs`), so `MODE=pulse` fails until S-14 lands.
+_(Audit 39 note: historical. S-14 shipped in session 35; `MODE=pulse` runs.)_
 - Rejected: moving the buttons to the left edge (the move thumb lives there); a bottom bar (both thumbs); adopting with the old
   stick's origin (the core would lurch toward a stale offset); a separate pause sheet (cut in D-048).
 

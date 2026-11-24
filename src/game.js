@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
+import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
@@ -10,7 +10,6 @@ import { updateGlitches } from './glitch.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
-const PICKUP_CAP = 400;
 const PARTICLE_CAP = 500;
 
 export class Game {
@@ -267,7 +266,7 @@ export class Game {
           if (it.kind === 'lumen') this.stats.lumen++;
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
-        } else {
+        } else if (!this.inNexus()) { // B-033: in the Nexus the deposit makes room this frame; no "return to the Nexus"
           this.audio.full();
           this.notify('cargo-full');
         }
