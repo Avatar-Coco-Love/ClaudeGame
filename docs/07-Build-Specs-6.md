@@ -2,7 +2,7 @@
 
 Continues `07-Build-Specs-5.md` (same rules; build order in `07-Build-Specs.md`'s header, D-063). Written in Design 72
 for **M8 Polish & platform** (D-103). Build order: S-38 → S-39 → S-40 → S-41. Recorded audio (v1a/v1b) still waits on
-the owner's pack (D-037, Q-021); ambient music gets its spec in a later Design session.
+the owner's pack (D-037, Q-021); ambient music gets its spec in a later Design session. [Superseded by D-114: music shipped as S-44 (`07-Build-Specs-7.md`), recorded audio is post-M9, M8 → v1.4.]
 **Sinks:** none. **Layers (`01`):** none of these touch a progression layer; they change how the game is reached,
 controlled, read and drawn. **Save:** no world-save change (`SAVE_FORMAT` stays 15); new player choices go in
 `lumencore.settings.v1` through `clean()` (D-016), which already drops unknown or damaged fields.

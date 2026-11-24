@@ -37,7 +37,7 @@ _Last updated: 2026-11-24_ · **Session counter: 83** · **Version: v1.4.23** (s
 - Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
   D-110: a step down that doesn't beat 0.85 × its p90 is undone and Auto stops stepping down (30 Hz caps); DPR ≤ 1 skips L1.
-- Keys (S-39, D-106, `keys.js`/`keysui.js`): read by position (`e.code`, AZERTY-safe); Settings → Keys rebinds ten
+- Keys (S-39, D-106, `keys.js`/`keysui.js`): read by position (`e.code`, AZERTY-safe); Settings → Keys rebinds eleven
   actions (clash swaps, Esc cancels, Reset) into `settings.keys`; arrows/Esc/Enter/Tab fixed; labels follow the bindings.
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).

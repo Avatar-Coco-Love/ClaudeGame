@@ -28,10 +28,10 @@ for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43 (buil
 
 ## S-43 — Echo orders: Guard + the order button (M9) (D-108) — ✅ built (#88, D-113)
 - Orders: **Gather** (S-42) and **Guard**. Guard: hold 1.5–3 cells from the core and fire a short bolt every 0.8 s at the
-  nearest Glitch or Spitter bolt within 140 px of the core with a clear line (`clearShot`), 6 dmg (a tier-1 Glitch in
+  nearest Glitch or Spitter bolt within 140 px of the core with a clear line (`clearShot`), 6 dmg [as built: 0.8 hp / 0.8 s, D-113] (a tier-1 Glitch in
   3 hits); bolts are popped like the beam pops them. In Drift, Guard has nothing to shoot; the chip says "Guard (idle)".
 - Control: one action `echoOrder` in the S-39 key list (default `KeyR`, free as of S-39; E is the Matrix); phone: one
-  ≥ 44 px button ◇ in the ◎⟂♪≡ row that cycles the order (D-058 row fit at 320×568 and 568×320, glyph-only ≤ 700 px).
+  ≥ 44 px button ◇ in the ◎⟂♪≡ row [as built: below it ≤ 700 px landscape, D-113] that cycles the order (D-058 row fit at 320×568 and 568×320, glyph-only ≤ 700 px).
   The current order shows as a chip (`#buffs` row) and a toast on change. Hidden until researched.
 - Save: `echoOrder` ('gather' | 'guard') in the world save → `SAVE_FORMAT` 16, upgrade step defaults to 'gather', bad
   value loads 'gather' (B-037). Old saves load (smoke check, D-005).
