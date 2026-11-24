@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.1.9 — 2026-11-24 (#75)
+- **Behind the scenes:** a health check. A flaky test around finding your first Spire is fixed at its root (it
+  watched the clock instead of game time, and a rare world put two Spires side by side). Nothing changes in play.
+
 ## v1.1.8 — 2026-11-24 (#74)
 - **Anomalies:** 16 slowly turning orange hexagrams are buried in the rock, more of them the deeper you go. Mine one
   open and touch it: **Overclock** makes your beam 1.5× stronger (mining and fighting) until your next deposit at the

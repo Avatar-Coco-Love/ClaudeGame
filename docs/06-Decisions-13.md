@@ -56,3 +56,12 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
 - A taken (recharging) site isn't drawn; S-37 adds the hollow minimap dot. Chip glyph ✶ (one per kind, `ANOMALY_KINDS`).
 - Rejected: storing sites in the save (seed-only is enough and old saves get them free); a new cell type (D-098);
   ending on the first banked item (cargo half banked would still read as "carrying the buff").
+
+### D-100 — Browser checks wait by game time and pin generated geometry (2026-11-24, session 69, Audit; B-060)
+- B-060's two causes: `nearSpire` waited 4 s of wall clock for a toast that runs on game time (dt clamped to 0.05 s;
+  6× CPU throttle: 3 of 4 runs read "Entering the Deep"), and a random seed put a second Spire in view (0.6 % of seeds).
+- Rule: a browser check that waits for something timed by the game polls `stats.time` (B-006 was the first time); a check
+  that assumes generated geometry pins the seed (B-012's `Math.random` stub) and a node check proves the seed fits.
+  Guard: the 320 px Spire page runs with `slowFrames` (130 ms busy frames); the old wait fails it every run.
+- Rejected: retries or a longer wall-clock timeout (hides the cause, slower); a minimum Spire gap > 12 (changes worlds
+  of existing saves for a test's sake; two Spires seen at once is fine in play, the toast counts both).

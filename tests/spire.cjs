@@ -107,6 +107,10 @@ async function foundChecks(check) {
   const b = [0, 1.5, 3, 4.5].map(t => +spireBreath(t, true).toFixed(3)), still = [0, 3].map(t => spireBreath(t, false));
   check('the core hexagon breathes 0.35–0.6 over 6 s; held at 0.6 under reduced motion (S-27)',
     b[0] === 0.6 && b[2] === 0.35 && b[1] === 0.475 && still.every(v => v === 0.6), JSON.stringify({ b, still }));
+  // B-060: the browser checks' pinned seed keeps every other Spire ≥ PIN_GAP cells from Spire 0, so the approach sees one.
+  const ps = new Game({ seed: PIN_SEED, mode: 'drift', audio: au }).spires;
+  const gap = Math.min(...ps.slice(1).map(q => Math.hypot(q.x - ps[0].x, q.y - ps[0].y)));
+  check(`the Spire browser checks' pinned seed has no second Spire within ${PIN_GAP} cells of Spire 0 (B-060)`, gap >= PIN_GAP, `seed ${PIN_SEED}, gap ${gap.toFixed(1)}`);
 }
 
 // Teleport 7 cells out from Spire k's core on the side facing the Nexus (the carved 3×3 room stays clear of the 9×9
@@ -122,12 +126,31 @@ async function nearSpire(page, k) {
     cam.x = p.x + Math.cos(p.angle) * 36; cam.y = p.y + Math.sin(p.angle) * 36;
     return { at, d: Math.hypot(tx, ty) };
   }, k);
-  // Audit 49 (C3): the "Entering the Deep" milestone toast now holds its 2.6 s, so the Spire toast shows after it.
-  await page.waitForFunction(() => { const t = document.getElementById('toast'); return t.classList.contains('show') && /Spire/.test(t.textContent); },
-    null, { timeout: 4000 }).catch(() => {});
+  // Audit 49 (C3): the "Entering the Deep" milestone toast holds its 2.6 s, so the Spire toast shows after it.
+  // B-060: wait by GAME time (B-006). Toasts tick on the loop's dt, clamped to 0.05 s, so on a slow frame rate 4 s of wall
+  // clock was < 2.6 s of play and the check read "Entering the Deep". Give up after 6 s of stats.time (wall cap 60 s).
+  const t0 = await page.evaluate(() => window.__lumen.game.stats.time);
+  await page.waitForFunction(t0 => { const t = document.getElementById('toast');
+    return (t.classList.contains('show') && /Spire/.test(t.textContent)) || window.__lumen.game.stats.time >= t0 + 6; },
+    t0, { timeout: 60000, polling: 'raf' }).catch(() => {});
   await page.waitForTimeout(250);
   return info;
 }
+
+// B-060: a random New World seed put another Spire within ~18 cells of Spire 0 on ~0.6 % of seeds (two Spires sit ≥ 12
+// apart where sectors meet), so the approach saw both: "(2/5)" or a mark at the "unseen" one. Pin the seed (B-012's way);
+// `foundChecks` proves this seed keeps every other Spire far enough away.
+const PIN_R = 0.42, PIN_SEED = (PIN_R * 2 ** 31) | 0, PIN_GAP = 24; // cells: 7 (approach) + 7.2 (CORE_REVEAL) + 4 (footprint) + margin
+async function pinnedNewWorld(page, tap = false) {
+  await page.evaluate(r => { window.__rnd = Math.random; Math.random = () => r; }, PIN_R);
+  await (tap ? page.tap('#new-world') : page.click('#new-world'));
+  await page.evaluate(() => { Math.random = window.__rnd; });
+}
+
+// B-060: emulate a slow device: every frame busy-waits `ms`, so the loop's dt clamp (0.05 s) makes game time run slower
+// than the wall clock, as on a loaded CI runner. A wall-clock wait for a game-time toast fails here every time.
+const slowFrames = (page, ms) => page.addInitScript(ms => { const raf = window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame = cb => raf(t => { const end = performance.now() + ms; while (performance.now() < end); cb(t); }); }, ms);
 
 /** Beside a Deep Spire (DSF 1): hexagon pixel + breath, the found toast, the minimap mark, the stats line; 320×568 too.
  *  `shots` (env SPIRE_SHOT, a directory) saves spire-1280x800.png and spire-320x568.png (viewed in sessions 46 and 48). */
@@ -136,7 +159,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(url + '?dev'); await page.waitForTimeout(200);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await pinnedNewWorld(page); await page.waitForTimeout(300);
   const info = await nearSpire(page, 0);
   const toastText = await page.evaluate(() => { const t = document.getElementById('toast'); return t.classList.contains('show') ? t.textContent : 'hidden'; });
   // Brightest pixel in a 9×9 box: on the core hexagon's top vertex (CELL·1.35 above the centre) vs midway between the
@@ -182,15 +205,16 @@ async function browserChecks(browser, url, check, errors, shots) {
   // 320×568 portrait (DSF 1): the same scene on the narrowest phone, for the screenshot; the toast fits on screen.
   const ph = await browser.newPage({ viewport: { width: 320, height: 568 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   ph.on('pageerror', e => errors.push('spire 320: ' + e.message));
+  await slowFrames(ph, 130); // B-060: ≤ 0.05 s of play per ≥ 0.13 s of wall clock
   await ph.goto(url + '?dev'); await ph.waitForTimeout(200);
-  await ph.tap('#new-world'); await ph.waitForTimeout(300);
+  await pinnedNewWorld(ph, true); await ph.waitForTimeout(300);
   await ph.evaluate(() => { window.__lumen.game.setMode('surge'); });
   await nearSpire(ph, 0);
   if (shots) await ph.screenshot({ path: `${shots}/spire-320x568.png` });
   const t = await ph.evaluate(() => { const e = document.getElementById('toast'), r = e.getBoundingClientRect();
     return { l: Math.round(r.left), r: Math.round(r.right), text: e.classList.contains('show') ? e.textContent : 'hidden' }; });
-  check('320×568 Surge: the Spire toast shows and fits the screen (S-27)', /1\/5/.test(t.text) && t.l >= 0 && t.r <= 320, JSON.stringify(t));
+  check('320×568 Surge, slow frames: the Spire toast shows (game-time wait, B-060) and fits the screen (S-27)', /1\/5/.test(t.text) && t.l >= 0 && t.r <= 320, JSON.stringify(t));
   await ph.close();
 }
 
-module.exports = { nodeChecks, foundChecks, browserChecks, nearSpire };
+module.exports = { nodeChecks, foundChecks, browserChecks, nearSpire, PIN_SEED, PIN_GAP };

@@ -4,6 +4,9 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 69 leftovers:** the perf / touch / code-health sweeps were not re-run this audit (one agent): run them in
+  audit 74. Watch: ~6 % of seeds put another Spire < 24 cells from Spire 0 (gap ≥ 12 allowed), so one look can find two
+  ("(2/5)" first); fine in play, but any test that approaches a Spire must pin its seed (D-100).
 - **Audit 64 leftovers:** a reload mid-ending never shows the card by itself (reachable from the Matrix; needs a saved
   "seen" flag → save bump); the overview lines' `shadowBlur 18` drives its p95 (draw twice instead, D-051); the ⊕↑ "↑"
   renders small (a `.lift` size); tests pin 255-scaled dark values (ending.cjs) and CELL as 32 (reclaim.cjs); B-055's
