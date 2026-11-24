@@ -5,7 +5,7 @@ _Last updated: 2026-11-24_
 **Session counter: 28** · **Version: v0.1.30** (session 28 handled the inbox; 29 % 5 == 4, so next is an Audit)
 
 ## What's real right now
-- Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); a Projects page card waits in `docs/projects-card.html` (applying it is blocked, `04` M8).
+- Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); the Projects page card is live (Projects repo #14, session 29).
 - 160×160-cell procedurally generated world (seeded). Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, found farther out), and a bedrock border.
 - Core movement: analog intent → target velocity → acceleration → axis-separated collision → realized velocity, plus corner assist so the core slides into 1-cell tunnels.
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
