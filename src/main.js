@@ -66,6 +66,7 @@ function start(save) {
   $('title').classList.add('hidden');
   $('hud').classList.remove('hidden');
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
+  toastQ.length = 0; toastTimer = 0; $('toast').classList.remove('show'); // a world's toasts never carry into the next
   paused = false;
   persist();
 }
@@ -84,10 +85,28 @@ $('new-world').addEventListener('click', () => {
 // ---------- HUD ----------
 function persist() { if (game && !game.demo) store.write(game.toSave()); }
 
-function toast(msg, ms = 2600) {
+// C3 (audit 49): one toast slot, but nothing is lost. A toast shows for at least TOAST_MIN unless the new one answers a key
+// or tap (`now`); a milestone (`keep`) holds its whole time. Anything arriving meanwhile waits in a short queue.
+const TOAST_MIN = 0.8, toastQ = [], KEEP = 'keep', NOW = 'now';
+let toastShown = 0, toastKeep = false;
+function toast(msg, ms = 2600, tier = '') {
+  const keep = tier === KEEP;
+  if (!msg) return;
   const t = $('toast');
+  if (toastTimer > 0 && t.textContent === msg) { toastTimer = Math.max(toastTimer, ms / 1000); return; }
+  if (toastTimer > 0 && (toastKeep || (toastShown < TOAST_MIN && tier !== NOW))) {
+    if (!toastQ.some(q => q.msg === msg) && toastQ.length < 3) toastQ.push({ msg, ms, tier });
+    return;
+  }
   t.textContent = msg; t.classList.add('show');
-  toastTimer = ms / 1000;
+  toastTimer = ms / 1000; toastShown = 0; toastKeep = keep;
+}
+function tickToast(dt) {
+  if (toastTimer <= 0) return;
+  toastTimer -= dt; toastShown += dt;
+  if (toastTimer > 0) return;
+  const next = toastQ.shift();
+  if (next) toast(next.msg, next.ms, next.tier); else $('toast').classList.remove('show');
 }
 
 function hint() {
@@ -137,12 +156,12 @@ function updateHud() {
   for (const ev of g.events) {
     if (ev === 'cargo-full') toast('Cargo full — return to the Nexus');
     if (ev === 'deposited') { toast('Deposited'); persist(); if (panelOpen) renderPanel(); } // B-025: buy buttons follow the new bank
-    if (ev === 'ring') toast(`Entering the ${g.ringName()}`);
-    if (ev === 'cache') toast('Vault cache opened');
-    if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200); persist(); } // S-27
-    if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200);
-    if (ev === 'beacon') { toast(BEACON_TOAST[g.placeResult] || '', 1400); if (g.placeResult === 'placed') persist(); } // S-16
-    if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800);
+    if (ev === 'ring') toast(`Entering the ${g.ringName()}`, 2600, KEEP);
+    if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
+    if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
+    if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
+    if (ev === 'beacon') { toast(BEACON_TOAST[g.placeResult] || '', 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16
+    if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }
   g.events.length = 0;
 }
@@ -266,7 +285,7 @@ document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEvent
   game.setMode(b.dataset.mode);
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
   renderPanel(); persist();
-  toast(`${MODES[game.mode].name} mode — ${MODES[game.mode].blurb}`, 3200);
+  toast(`${MODES[game.mode].name} mode — ${MODES[game.mode].blurb}`, 3200, NOW);
 }));
 $('menu-btn').addEventListener('click', () => { persist(); closePanel(); showTitle(); });
 
@@ -324,7 +343,7 @@ function frame(now) {
     }
     renderer.draw(dt, input);
   }
-  if (toastTimer > 0) { toastTimer -= dt; if (toastTimer <= 0) $('toast').classList.remove('show'); }
+  tickToast(dt);
   requestAnimationFrame(frame);
 }
 

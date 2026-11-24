@@ -3,6 +3,14 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.53 — 2026-11-24 (#54)
+- The arrow pointing home no longer hides under the minimap, the buttons or the bank panel: it slides inward along its
+  heading until it's clear, and so does its "NEXUS" label when your hold is full.
+- Messages no longer trip over each other: placing a Beacon that reveals a Spire now shows both, a Spire or a new ring
+  stays up for its full time, and a message that arrives meanwhile waits its turn. Switching beam mode still answers at once.
+- On narrow phones a message now uses the screen's width instead of wrapping at half of it.
+- Beam sparks on a Spire's core and facets are violet like the Spire, not the colour of the rock around it.
+
 ## v0.2.52 — 2026-11-24 (#53)
 - The Spires are now found: the first time one comes into view you hear a soft low tone and see "A dormant Spire (1/5)",
   a pale hexagon marks it on the minimap from then on, and its core hexagon slowly breathes (still, with reduced motion).

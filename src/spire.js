@@ -66,7 +66,7 @@ export function chooseSpires(seed, explored, broken, w = WORLD_W, h = WORLD_H) {
       if (k < bestSeen) { best = c; bestSeen = k; }
       if (k === 0) break;
     }
-    if (!best) continue; // never seen on 400 seeds (probe: tools/spirefind.cjs); a world then has fewer Spires
+    if (!best) continue; // never seen on 400 seeds (probe: tools/spirefind.mjs); a world then has fewer Spires
     const rec = { x: best.x, y: best.y, seen: false, fed: 0, mask: null, lit: false };
     if (bestSeen > 0) rec.keep = spireFootprint(best.x, best.y, w).filter(seen);
     out.push(rec);

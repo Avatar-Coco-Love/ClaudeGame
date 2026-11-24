@@ -2,9 +2,9 @@
 // Placement is intent -> realized like the Scanner: `intent.place` asks, `tryPlace` realizes it or names why not.
 // A placed beacon is { i, x, y, r }: its cell index plus a world-space light the Renderer draws in light.js (S-26):
 // `attach` puts `game.beacons` itself in `renderer.lightSets`. World drawing of the beacon glyph is here too.
-import { CELL, T, NEXUS_RADIUS, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_GAP, BEACON_LIGHT, BEACON_REVEAL } from './config.js';
+import { CELL, T, NEXUS_RADIUS, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_GAP, BEACON_LIGHT, BEACON_REVEAL, BEACON_RGB } from './config.js';
 
-export const BEACON_COLOR = '#bff8ff'; // white-cyan, on the map and in the world
+export const BEACON_COLOR = `rgb(${BEACON_RGB})`; // white-cyan, on the map and in the world
 
 export function makeBeacon(world, i) {
   const x = i % world.w, y = Math.floor(i / world.w);
@@ -69,7 +69,7 @@ export function drawBeacons(r, ctx, left, top, vw, vh) {
   const rot = r.game.motionOn() ? r.time * 0.6 : 0;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
-  ctx.strokeStyle = BEACON_COLOR; ctx.fillStyle = 'rgba(191, 248, 255, 0.35)';
+  ctx.strokeStyle = BEACON_COLOR; ctx.fillStyle = `rgba(${BEACON_RGB}, 0.35)`;
   for (const b of bs) {
     if (b.x + 20 < left || b.x - 20 > left + vw || b.y + 20 < top || b.y - 20 > top + vh) continue;
     ctx.globalAlpha = 0.45; ctx.lineWidth = 1.5;
