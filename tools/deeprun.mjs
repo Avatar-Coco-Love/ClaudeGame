@@ -4,10 +4,11 @@
 // the seconds until it breaks, plus the share spent past the Deep border. `hpMul` overrides the Deep ring's toughness.
 // Usage: node tools/deeprun.mjs [beam level = 0] [seeds = 20] [deep hpMul = config] [other upgrades = 0]
 import { Game } from '../src/game.js';
+import { beamModeFromEnv } from './mode.mjs';
 import { CELL, T, RINGS } from '../src/config.js';
 import { mulberry32 } from '../src/world.js';
 
-const BEAM_MODE = process.env.MODE || 'focus';
+const BEAM_MODE = beamModeFromEnv();
 const audio = new Proxy({}, { get: () => () => {} });
 const [BEAM = 0, SEEDS = 20, MUL = NaN, REST = 0] = process.argv.slice(2, 6).map(Number);
 if (!Number.isNaN(MUL)) RINGS[RINGS.length - 1].hpMul = MUL;

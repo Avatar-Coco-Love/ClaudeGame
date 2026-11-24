@@ -53,3 +53,12 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - Specs: S-17 touch, S-18 code split (new); S-16 retargeted to `SAVE_FORMAT` 9 (8 went to B-022); S-19 Spires v1a (new).
   `07` split into `07-Build-Specs-2.md`. Order D-048. `08` deleted: touch → S-17, code health → S-18 + `04` Debt, drift fixed
   (README controls) or in S-17 (tools reject unknown modes). Build mode UX cut as an item (D-048). No bugs found.
+
+## 2026-11-24 — Session 33 (v0.2.37): Build — S-17 touch pass
+- CSS (`style.css`): `#title` top-aligned with auto margins + landscape h1 0.6×; landscape coarse row ◎ ⟂ ♪ ≡ + 112 px minimap;
+  44 px ♪ ≡ ✕ and mode toggles, ♪/≡ 8 px apart; `#hint` wraps under 380 px, Core Matrix lifted to clear a 2-line hint.
+- `⟂ Focus` / `⟂ Wide` from `BEAM_MODES` names (`#mode-name`). `input.js`: a lifted stick adopts another live touch on its half.
+  `tools/mode.mjs`: probes exit 1 on an unknown `MODE` (D-050).
+- Measured (Pixel 7 emulation): 844×390 h1 top −15 → 16, version line at y 349–363; row at y 12–56, x 444–712, minimap from 720;
+  667×375 h1 top −19 → 16. 320×568: hint 2 lines, 286/286 px. Screenshots viewed (title + HUD, both orientations).
+- New `tests/touch.cjs` (9 checks); each failed on the old code (stashed: title, row, label, hint, 2nd finger). Smoke 112/112. No bugs found.

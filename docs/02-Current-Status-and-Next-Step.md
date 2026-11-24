@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 32** · **Version: v0.2.36** (session 32: design, specs S-17…S-19; rotation: 33 Build, 34 Audit, 35–36 Build, 37 Design).
+_Last updated: 2026-11-24_ · **Session counter: 33** · **Version: v0.2.37** (session 33: build S-17 touch pass; rotation: 34 Audit, 35–36 Build, 37 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -20,12 +20,12 @@ _Last updated: 2026-11-24_ · **Session counter: 32** · **Version: v0.2.36** (s
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
-- Desktop (WASD + mouse) and touch (twin dynamic sticks). Phones (coarse pointer) get touch hints and no key badges from the start.
+- Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Phones: touch hints, no key badges, 44 px buttons, landscape ◎⟂♪≡ top row (S-17, D-050).
 - Autosave to localStorage (seed + mined bitset + explored bitset + economy + floor pickups + beam mode) every 10 s, on deposit, and on page hide. Saves carry a format number (now 8); old formats are upgraded on load (`src/save.js`).
 - History lives in: `05` changelog (per version), `06` decisions (D-xxx), `03` open questions (Q-xxx), `09` log. The version is shown on the title screen.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs (`07`, `07-…-2`), order D-048: S-17 touch pass, S-14 Pulse, S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
+- Build specs (`07`, `07-…-2`), order D-048: S-14 Pulse, S-18 code split, S-15 perf, S-16 Beacons (format 9), S-19 Spires v1a (D-049).
 - M2 rules (D-022…D-024): depth = 3 rings inside the 160-cell world; new generation may re-type solid cells but changes layout only where a save hasn't looked. Tools: `tools/vaultfind.mjs` (vaults seen on a Lumen run, D-035), `tools/surgefarm.mjs` (parked Surge probe), `tools/parity.mjs` (same miner bot in both modes; Surge earns 0.81–0.90× Drift's Prisms, D-019), `tools/deeprun.mjs` (time to first Lumen; Beam 2 median 29 s, D-029). Economy basis: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 32** · **Version: v0.2.36** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
-- Audit 29 fixes (session 31, `tests/audit29.cjs`): kept pickups don't block yields; dead Glitches don't hit; F/Q survive hitstop.
+- Audit 29 fixes (31, `audit29.cjs`); touch pass (33, `touch.cjs`: landscape title, ◎⟂♪≡ above y 90, 320 px hint, 2nd finger).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 33 (Build): **S-17 Touch pass** (`07-Build-Specs.md`): landscape title + ◎/⟂ row, 44 px targets, hint wrap, ⟂ label, 2nd finger.
+Session 34 (Audit): parallel subagent audit per CLAUDE.md (bugs, perf, mobile/touch, code health, docs drift); fix the top issues, log the rest in `04` Debt; archive `09` per CLAUDE.md.

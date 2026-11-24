@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.37 — 2026-11-24 (#38)
+- Phones: in landscape the title logo and version line fit, and ◎ ⟂ ♪ ≡ move into one row at the top, away from your aiming thumb.
+  ⟂ now says which beam is on (Focus / Wide). Buttons are at least 44 px; the first hint wraps instead of being cut at 320 px.
+  Lifting one aim finger while another is down hands the stick to the other finger.
+
 ## v0.2.36 — 2026-11-24 (#37)
 - No gameplay change. Design pass: the next six builds are planned (phone layout fixes, Pulse beam, Beacons, and the first
   dormant Spires, the goal of v1.0). The README now lists every key and touch button.

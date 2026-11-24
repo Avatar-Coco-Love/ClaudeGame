@@ -67,6 +67,17 @@ export class Input {
         if (this.sticks[k] && this.sticks[k].id === t.identifier) this.sticks[k] = null;
       }
     }
+    // S-17 second finger: a stick whose touch lifted adopts another live touch on its half (not the other stick's), from where it is now.
+    for (const side of ['move', 'aim']) {
+      if (this.sticks[side]) continue;
+      const other = this.sticks[side === 'move' ? 'aim' : 'move'];
+      for (const t of e.touches || []) {
+        if (other && other.id === t.identifier) continue;
+        if ((t.clientX < innerWidth / 2 ? 'move' : 'aim') !== side) continue;
+        this.sticks[side] = { id: t.identifier, ox: t.clientX, oy: t.clientY, x: t.clientX, y: t.clientY };
+        break;
+      }
+    }
   }
 
   release() { this.keys.clear(); this.mouse.down = false; this.sticks.move = this.sticks.aim = null; }
