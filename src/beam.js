@@ -95,10 +95,13 @@ function pulseFoe(game, ox, oy, dx, dy, range) {
   return foe;
 }
 
-/** S-21: would a burst now hit something, a live Glitch on the ray or a solid cell, within the Pulse reach? */
+/** S-21: would a burst now hit something, a live Glitch on the ray or a breakable cell, within the Pulse reach?
+ *  Bedrock (and the map's edge) never counts: a burst there does nothing, so a full charge keeps waiting (B-036). */
 export function pulseInReach(game) {
-  const p = game.player, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
-  return !!pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range) || !!game.world.raycast(p.x, p.y, dx, dy, range + NOSE);
+  const p = game.player, w = game.world, dx = Math.cos(p.angle), dy = Math.sin(p.angle), range = game.stat('range') * PULSE_RANGE;
+  if (pulseFoe(game, p.x + dx * NOSE, p.y + dy * NOSE, dx, dy, range)) return true;
+  const h = w.raycast(p.x, p.y, dx, dy, range + NOSE);
+  return !!h && w.get(h.x, h.y) !== T.BEDROCK;
 }
 
 /** Fire (or fizzle) the current charge. Returns what it did: { cells broken, damage dealt, enemy } or null for a fizzle. */

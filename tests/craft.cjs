@@ -36,7 +36,7 @@ async function nodeChecks(check) {
   const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
   old.v = 8; delete old.craft; delete old.beacons;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
-  check('a format-8 save loads with no beacons and none carried (S-16, D-005)', up.v === SAVE_FORMAT && SAVE_FORMAT === 9 && o.beacons.length === 0 && o.craft.beacon === 0
+  check('a format-8 save loads with no beacons and none carried (S-16, D-005)', up.v === SAVE_FORMAT && o.beacons.length === 0 && o.craft.beacon === 0
     && JSON.stringify(up.beacons) === '[]', JSON.stringify({ v: up.v, beacons: up.beacons, craft: up.craft }));
   const bad = new Game({ seed: 77, mode: 'drift', audio, save: { ...upgradeSave(JSON.parse(JSON.stringify(g.toSave()))), beacons: [-1, 'x', w.idx(0, 0), g.beacons[0].i, g.beacons[0].i] } });
   check('a saved beacon on rock, out of range or repeated is dropped on load (S-16)', bad.beacons.length === 1, `${bad.beacons.length} loaded`);

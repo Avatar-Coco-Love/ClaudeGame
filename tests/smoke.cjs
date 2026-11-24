@@ -36,6 +36,7 @@ const drawcost = require('./drawcost.cjs');
 const audit39 = require('./audit39.cjs');
 const craft = require('./craft.cjs');
 const glow = require('./glow.cjs');
+const audit44 = require('./audit44.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -196,6 +197,7 @@ async function rngChecks() {
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./share.cjs').run()) check(r.name, r.ok, r.detail);
+  for (const r of require('./tuning.cjs').run()) check(r.name, r.ok, r.detail);
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
   await ringChecks().catch(e => check('S-8 ring checks ran', false, e.message));
   await vaultChecks().catch(e => check('S-9 vault checks ran', false, e.message));
@@ -207,6 +209,7 @@ async function rngChecks() {
   await audit29.nodeChecks(check).catch(e => check('audit 29 checks ran', false, e.message));
   await audit39.nodeChecks(check).catch(e => check('audit 39 checks ran', false, e.message));
   await craft.nodeChecks(check).catch(e => check('S-16 craft checks ran', false, e.message));
+  await audit44.nodeChecks(check).catch(e => check('audit 44 checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

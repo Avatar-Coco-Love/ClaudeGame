@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.47';
+export const VERSION = '0.2.48';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -48,6 +48,17 @@ export const PICKUP_CAP = 400;      // loose floor pickups; kept ones (death sca
 export const HITSTOP_S = 0.035;     // sim freeze on a yield-cell break (crystal, prism, Lumen); a vault cache gets 2×
 export const HITSTOP_GAP_S = 0.15;  // at most one hitstop per this much game time
 export const CORE_RING_S = 0.4;     // expanding ring on the core after a Core Matrix purchase
+// Core + loot tuning (moved out of game.js unchanged, audit 44; tests/tuning.cjs flags new bare numbers in game.js).
+export const PLAYER_ACCEL = 9;      // 1/s: how quickly velocity chases its target
+export const PLAYER_R = 10;         // px: core collision radius
+export const PARTICLE_CAP = 500;
+export const CORE_REVEAL = 230;     // px: cells within this of the core become explored
+export const SPAWN_OFFSET = 40;     // px south of the Nexus centre: start + respawn point
+export const ATTRACT_PULL = [900, 250]; // px/s²: Attractor pull = [0] × (1 − d / reach) + [1]
+export const PICKUP_SETTLE_S = 0.25; // a fresh pickup can't be pulled or collected this young
+export const DEPOSIT_TICK_S = 0.035; // one cargo item banked per tick inside the Nexus ring
+export const HURT_INVULN_S = 0.5, HURT_KNOCKBACK = 320; // after a hit: grace seconds, push speed (px/s)
+export const RESPAWN_INVULN_S = 2, RESPAWN_CLEAR_PX = 900; // after a death: grace seconds; Glitches within this of the Nexus vanish
 
 export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8 };
 
