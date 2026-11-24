@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-24_
 
-**Session counter: 29** · **Version: v0.1.31** (session 29: Audit; #32 shipped a deploy fix first, the audit fixes follow)
+**Session counter: 29** · **Version: v0.1.32** (session 29: Audit; #32–#33 fixed the deploy first, the audit fixes follow)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); the Projects page card is live (Projects repo #14, session 29).
