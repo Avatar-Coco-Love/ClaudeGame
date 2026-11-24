@@ -60,3 +60,15 @@ Continues `06-Decisions-10.md` (same rules: supersede, never edit; list rejected
   seeds need it) instead of stopping. It feeds at ≥ 8▲ carried, or when full / out of targets.
 - Rejected: unit cost per open cell (spec text; mixes cells with seconds, so a 1-cell detour outweighed a 3 s dig);
   pathing over explored cells only (needs an exploration policy, out of scope); stopping when the 24-cell ring runs dry.
+
+### D-086 — S-23 Spire Wake, as built (2026-11-24, session 56, Build; implements D-055, D-071)
+- `src/wake.js`. A Wake starts when the core enters a primed Spire's interior in Surge (`game.wake`, never saved). Lanes:
+  6 rows × 3 past each gap, a row cleared whole or the lane stops (bedrock, vault, any Spire cell); ore drops its yield
+  (`game.dropYield`). Lanes ≥ 3 spawn in turn every 1.6 s, ≤ 6 alive, tier by the Spire's depth. Wake Glitches chase
+  the core (contact −10 of 100, lootless burst) unless the player core is within 3 cells; natural spawns pause.
+- Fails: charge 0, core death, leaving Surge. Then `game.wakeBlock` holds that Spire until the core steps out; a load
+  inside an interior sets it too (a reload mid-Wake = failed). 40 s → `relightSpire(…, 'surge')`. Surge facets don't toggle.
+- Feedback: facets show the clock (one per 5 s), an orange charge ring round the core, toasts start/fail, a hint.
+- Tune (bot guard, 12 seeds): fail 20 % start, 0 % mid/max; primed → relit 0.7 min. Kept as the first tune; Q-017.
+- Rejected: Wake Glitches always chasing the player (no reason to guard); a charge bar in the HUD (the ring sits on
+  the thing being guarded); restarting at once after a fail (a wipe would loop with no breath).

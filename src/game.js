@@ -9,8 +9,9 @@ import { tryScan, updateScan, emptyScan } from './research.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
+import { updateWake, failWake } from './wake.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
-import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
+import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
 
 export class Game {
@@ -23,6 +24,7 @@ export class Game {
     this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
+    this.wake = null; this.wakeBlock = null; // S-23: the running Wake (never saved) / the Spire a failed one waits to be left
     this.facetAim = null; // S-28: { s, k, t, done } while the aim ray rests on a primed facet (spire.js)
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
@@ -64,7 +66,7 @@ export class Game {
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
-    if (save) { this.load(save); markSpiresSeen(this); } // S-27: a footprint explored before v0.2.52 is seen, silently
+    if (save) { this.load(save); markSpiresSeen(this); this.wakeBlock = spireHere(this); } // S-23: a reload mid-Wake is a failed one // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, CORE_REVEAL);
@@ -180,6 +182,7 @@ export class Game {
     this.updatePickups(dt);
     this.updateDeposit(dt);
     updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
+    updateWake(this, dt); // S-23: Surge's Spire Wake (starts, clock, waves, end)
     if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length) this.enemies = [];
     this.updateParticles(dt);
 
@@ -238,14 +241,20 @@ export class Game {
       if (this.motionOn()) { this.hitstop = HITSTOP_S * 2; this.lastHitstop = this.stats.time; }
       this.notify('cache');
     } else if (MATERIAL[type].yield) {
-      const mat = MATERIAL[type];
-      const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
-      for (let i = 0; i < n; i++) this.spawnPickup(cx, cy, mat.yield.kind);
-      this.audio.break(mat.yield.kind);
+      this.dropYield(x, y, type);
+      this.audio.break(MATERIAL[type].yield.kind);
       if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }
     } else {
       this.audio.break('rock');
     }
+  }
+
+  /** An ore cell's yield as floor loot at its centre (a beam break, or an S-23 Wake lane clearing it). Non-ore: nothing. */
+  dropYield(x, y, type) {
+    const mat = MATERIAL[type];
+    if (!mat || !mat.yield) return;
+    const n = mat.yield.min + Math.floor(this.rng.yield() * (mat.yield.max - mat.yield.min + 1));
+    for (let i = 0; i < n; i++) this.spawnPickup((x + 0.5) * CELL, (y + 0.5) * CELL, mat.yield.kind);
   }
 
   // `force` tags a pickup `kept`: the player's own cargo and cache loot never vanish (B-005) and never count toward the cap.
@@ -333,6 +342,7 @@ export class Game {
     p.integrity = this.stat('hull'); p.invuln = RESPAWN_INVULN_S; this.beam.charge = 0;
     this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > RESPAWN_CLEAR_PX);
     this.notify('destabilized');
+    if (this.wake) failWake(this); // S-23: a core death fails the Wake
   }
 
   // ---------- particles ----------

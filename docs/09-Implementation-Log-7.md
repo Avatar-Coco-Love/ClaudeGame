@@ -17,3 +17,15 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
 - Bugs found while building (bot only): goal keys reused a stale predicate when widening the prism search
   (3 seeds stopped at fed 54–75); fixed by keying the far search apart.
 - Docs: changelog v0.2.48–v0.2.53 archived word for word; built S-30 text deleted from `07-…-4`; Q-007 updated.
+
+## Session 56 — Build: S-23 Spire Wake (v0.4.60, #61)
+- `src/wake.js` (D-086) + hooks: `glitch.js` (Wake target, core contact, `makeGlitch`, spawns pause), `game.js`
+  (`dropYield`, death fails, load sets `wakeBlock`), `spire.js` (Surge facets inert, clock mask, ring), `main.js` toasts + hint.
+- First probe: a god-mode core idle at (0, 3) lost every Wake in ~22 s even at max: the 3×3 core blocks the beam to the
+  far lanes. A guard that stands between the core and the nearest Glitch holds 10/10 at mid and max. Put in the bot.
+- `surgebot --route=spire` Surge (12 seeds): Wake held 12/12 at every build; fails 3 of 15 at start, 0 at mid/max;
+  primed → relit 0.7/0.9 min (spec: ≤ 30 % at mid, 45–90 s). Bot aim is perfect, so Q-017 asks Design 57 to play it.
+- Tests: `tests/wake.cjs` (5 node + 2 browser checks). Moved to Drift: facet.cjs's Surge solve (now: Surge toggles
+  nothing), B-044's check (re-proved: fails with the fix removed), spirefeed's 320 Surge facet check reads the drawn mask.
+- Viewed `wake-1280x800.png` / `wake-320x568.png`: ring, lanes, hint read well; lit clock facets are faint (same draw as
+  the puzzle). Smoke 254/254.

@@ -32,13 +32,13 @@ async function nodeChecks(check) {
 
   // B-044: Focus latched on a facet; a Glitch crosses the centre ray for 2 frames; the aim never moves: still one toggle.
   {
-    const g = make('surge'), s = prime(g), a = A[[0, 1, 2, 3, 4, 5, 6, 7].find(k => sp.toggleMask(s.mask, k) !== 255)];
+    const g = make('drift'), s = prime(g), a = A[[0, 1, 2, 3, 4, 5, 6, 7].find(k => sp.toggleMask(s.mask, k) !== 255)]; // S-23: Drift (Surge facets don't toggle)
     stand(g, s, a);
     let flips = 0, prev = s.mask;
     const step = () => { g.update(DT, intent(a)); if (s.mask !== prev) { flips++; prev = s.mask; } };
     for (let t = 0; t < 0.6; t += DT) step();
-    g.enemies = [{ x: g.player.x + Math.cos(a.angle) * 15, y: g.player.y + Math.sin(a.angle) * 15, r: 10, hp: 1e9, vx: 0, vy: 0, kind: 'drifter' }];
-    step(); step();
+    const cross = () => { g.enemies = [{ x: g.player.x + Math.cos(a.angle) * 15, y: g.player.y + Math.sin(a.angle) * 15, r: 10, hp: 1e9, vx: 0, vy: 0, kind: 'drifter' }]; step(); };
+    cross(); cross(); // Drift clears Glitches after the beam each frame, so it is placed again for the second frame
     g.enemies = [];
     for (let t = 0; t < 0.6; t += DT) step();
     check('a Glitch crossing the centre ray keeps the facet latch: one toggle while the aim is unchanged (B-044, D-080)',
