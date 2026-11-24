@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 81** · **Version: v1.2.21** (session 81: Build; rotation: 82 Design, 83 Build, 84 Audit, 85 Build).
+_Last updated: 2026-11-24_ · **Session counter: 82** · **Version: v1.2.22** (session 82: Design; rotation: 83 Build, 84 Audit, 85 Build, 86 Build, 87 Design).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -53,6 +53,5 @@ _Last updated: 2026-11-24_ · **Session counter: 81** · **Version: v1.2.21** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 82 (Design): play-test M8 + M9 (PWA, keys, text, graphics, Echo Gather / Guard) with Playwright screenshots; mark
-M8 ✅ (→ v1.3) and M9 ✅ (→ v1.4) if they hold (D-108); rule on Q-024 (Echo income); spec ambient music as S-44 (D-108,
-Q-021 audio). Top perf debt: chunk-blit pre-scale (`04-…-2`).
+Session 83 (Build): build **S-44** ambient music (`07-Build-Specs-7.md`, D-114): `src/music.js`, Music slider,
+`tests/music.cjs` + `audio.cjs` ceilings; then M8 ✅ and VERSION 1.4.23 (D-114). Top perf debt: chunk-blit pre-scale (`04-…-2`).

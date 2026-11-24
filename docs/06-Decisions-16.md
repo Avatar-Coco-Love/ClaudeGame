@@ -19,3 +19,22 @@ Continues `06-Decisions-15.md` (same rules: supersede, never edit; list rejected
 - Rejected: Guard dps scaling with Beam Power (Matrix layer already scales the beam; keep the ally's role flat); a Guard
   shot sound (no audio ceiling work this PR; the dash + Glitch flash read in the screenshot); ◇ in the portrait column
   below ⟂ (pushed ✦ into the toast band); hiding ◇ at 568 px (touch players would lose the order).
+
+### D-114 — Design 82: M9 ✅, Echo income kept, recorded audio leaves M8, S-44 music spec (2026-11-24, session 82, Design; settles Q-021, Q-024)
+- **Play-test (Playwright, 1280×800 + 568×320 touch):** Echo follows at 1.8 cells, 0 blinks, mines a Prism beside the
+  core with a thin beam; R flips the chip to "Guard"; phone row ◎ ⟂ ♪ ≡ + ◇ below fits. No page errors. M8's S-38…S-41
+  are covered by their smoke checks (`pwa`, `keys`, `textsize`, `colours`, `quality`); no new issue seen.
+- **M9 ✅.** `VERSION`'s minor stays 1.2 (D-046: milestones shipped *in a row*; M8 is still open). When S-44 ships,
+  M1–M9 are all ✅ and the minor goes 1.2 → **1.4** in one step (D-108's mapping); 1.3 is skipped, not invented.
+- **Q-024 → keep `ECHO_DMG` 0.5, `ECHO_REACH` 5.** `echobot` (8 seeds × 10 min, max build): ◆/min ×1.65 Drift, ×1.53
+  Surge (mid, session 80: ×1.45 / ×1.38). It is a late reward (30 ● after 75 ● of Research), the Matrix is mostly
+  bought by then, and the gain is shared across modes (Drift ÷ Surge gain 1.08, inside S-42's 10 %). Watch: max-build
+  blinks/min median 2.0 / p90 3.6 (faster Thrusters); re-check if a play-test calls the blink noisy.
+- **Q-021 → recorded audio v1a/v1b leave M8** (the leaning: the pack is still absent after M9 shipped). They become a
+  post-M9 item that starts when the pack lands in `docs/inbox/`; nothing waits on it. M8 = S-38…S-41 + **S-44**.
+- **S-44 ambient music** specced in `07-Build-Specs-7.md`: synthesized pad + one mode layer each (Drift bell, Surge
+  pulse, equal level), ring scales, Wake and Ending states, own seeded PRNG, a Music slider in settings (no save bump),
+  measured ceilings in `audio.cjs` (D-037).
+- Rejected: lowering `ECHO_DMG` to 0.35 (would pull mid to ~×1.3 but makes the 30 ● reward feel thin, and both modes
+  gain alike, so no pillar is at risk); recorded music loops (needs files and a licence; the pack is SFX); music that
+  differs in *amount* by mode (Surge louder) — pillar 3; minor 1.3 for M9 alone (breaks D-046's "in a row").
