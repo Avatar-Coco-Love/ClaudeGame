@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.2.17';
+export const VERSION = '1.2.18';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -253,3 +253,9 @@ export const ANOMALY_KINDS = {
   lodestone: { name: 'Lodestone', glyph: '✧', fx: { magnet: ANOMALY_MAGNET_MUL, pull: ANOMALY_PULL_MUL }, text: `pull reach ×${ANOMALY_MAGNET_MUL}`, rgb: '196, 140, 255' },
   ballast: { name: 'Ballast', glyph: '⬡', fx: { cargo: ANOMALY_CARGO_MUL }, text: `cargo +${Math.round((ANOMALY_CARGO_MUL - 1) * 100)} %`, rgb: '90, 230, 210' },
 };
+
+// S-41 (D-109): adaptive graphics. A rolling p90 of the real gap between frames over QUALITY_WINDOW_S of play: above
+// QUALITY_SLOW_MS steps one level down, below QUALITY_FAST_MS for QUALITY_UP_S steps one up (18, not the spec's 14: vsync
+// holds a 60 Hz gap at 16.7 ms). A step down right after a step up doubles the wait to step up again (≤ QUALITY_UP_MAX_S).
+// L0 DPR ≤ 2; L1 DPR 1; L2 DPR 1 + half the particles drawn + pickups without glow. Drawing only: the sim never changes.
+export const QUALITY_WINDOW_S = 3, QUALITY_SLOW_MS = 24, QUALITY_FAST_MS = 18, QUALITY_UP_S = 10, QUALITY_UP_MAX_S = 160, QUALITY_MAX = 2;

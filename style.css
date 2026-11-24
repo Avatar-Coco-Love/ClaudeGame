@@ -115,7 +115,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
 .set-row > span { flex: 1; min-width: 0; } .set-row small { display: block; font-size: calc(12px * var(--ts)); color: var(--dim); }
 .set-row input[type=range] { flex: 1.4; min-width: 0; height: 40px; accent-color: var(--cyan); }
 .set-row output { width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
-.set-row [role=switch] { min-width: 72px; min-height: 40px; border-radius: 9px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
+.set-row [role=switch], .set-row .set-cycle { min-width: 72px; min-height: 40px; border-radius: 9px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
 .set-row [role=switch][aria-checked=true] { border-color: var(--cyan); background: rgba(46,242,255,.14); color: #fff; }
 /* S-39 Keys view: replaces the main rows; rows a little shorter so ten fit on a laptop. */
 #settings .sheet.keys-view > .set-row { display: none; }
@@ -160,7 +160,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
 @media (pointer: coarse) {
   .buttons { gap: 8px; }
   .buttons button, #matrix-close, #settings-close { width: 44px; height: 44px; }
-  .mode-toggle button, .tabs button, .buy, .set-row [role=switch] { min-height: 44px; }
+  .mode-toggle button, .tabs button, .buy, .set-row [role=switch], .set-row .set-cycle { min-height: 44px; }
 }
 /* Landscape phone: ◎ ⟂ ♪ ≡ in one row left of the minimap, out of the right (aim) thumb's reach. Portrait keeps the column. */
 @media (max-height: 480px) and (pointer: coarse) {

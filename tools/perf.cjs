@@ -9,7 +9,8 @@
 // reads the canvas next (drawLight's drawImage), which is why audit 34 saw drawLight at ~67 %. FLUSH=1 forces the raster
 // inside each step (a 1-pixel getImageData before and after) for an honest split, at the cost of slower frames; SKIP
 // prices a step by the frame time it frees (that step becomes a no-op).
-// Usage: [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
+// S-41: QUALITY=0|1|2 fixes the graphics level (default 0; Auto is off so the run measures one level).
+// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 
@@ -25,6 +26,7 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(p).pipe(res);
 });
 
+const QUALITY = Math.max(0, Math.min(2, Number(process.env.QUALITY) || 0));
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];
 
 async function run(browser, url, name, { loot, holes, home, surge }) {
@@ -37,8 +39,9 @@ async function run(browser, url, name, { loot, holes, home, surge }) {
   await pg.click('#new-world');
   await pg.evaluate(() => { Math.random = window.__rnd; });
   await pg.waitForTimeout(300);
-  await pg.evaluate(({ loot, holes, home, surge, STEPS, SKIP, FLUSH }) => {
-    const { game: g, renderer: R, dev } = window.__lumen;
+  await pg.evaluate(({ loot, holes, home, surge, STEPS, SKIP, FLUSH, QUALITY }) => {
+    const { game: g, renderer: R, dev, quality } = window.__lumen;
+    quality.mode = 'fixed'; R.setQuality(QUALITY); // S-41: no Auto steps mid-run
     g.demo = true; dev.god(true); if (!home) dev.teleport(30);
     if (loot) { g.research.wide = true; g.beamMode = 'wide'; }
     if (surge) g.mode = 'surge';
@@ -64,7 +67,7 @@ async function run(browser, url, name, { loot, holes, home, surge }) {
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
-  }, { loot, holes, home, surge, STEPS, SKIP, FLUSH });
+  }, { loot, holes, home, surge, STEPS, SKIP, FLUSH, QUALITY });
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   if (loot) { await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s'); }
@@ -91,7 +94,7 @@ async function run(browser, url, name, { loot, holes, home, surge }) {
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
-  console.log(`S-15 perf: 1280×800 DSF 1, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
+  console.log(`S-15 perf: 1280×800 DSF 1, L${QUALITY}, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
   const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true } };
   const out = {};
   for (const [k, v] of Object.entries(runs)) if (!ONLY || ONLY === k) out[k] = await run(browser, url, k, v);

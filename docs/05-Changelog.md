@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.18 — 2026-11-24 (#85)
+- **Smoother on slow devices:** a new **Graphics** setting (Auto / High / Low). On Auto the game watches its own frame
+  rate while you play and, if it struggles, draws at a lower resolution, then with half the spark particles, plainer
+  pickups and a softer light edge; it steps back up once frames are quick again. High and Low hold one look. The game
+  itself plays exactly the same at every setting.
+
 ## v1.2.17 — 2026-11-24 (#84)
 - Planning only, nothing changes in play yet: a companion is coming. After this polish milestone the **Echo**, a small
   diamond that follows your core through the tunnels and takes one of two orders (gather ore or guard you), will be

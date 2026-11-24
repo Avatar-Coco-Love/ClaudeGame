@@ -31,6 +31,7 @@ export class Renderer {
     this.time = 0;
     this.beaconGlow = BEACON_GLOW; // S-25 floor-glow centre alpha (tests set 0 to compare)
     this.lightSets = [[]]; // S-26: lists of world-space lights {x, y, r} beyond the core, Nexus and beam (light.js)
+    this.quality = 0; // S-41 (D-109): 0 DPR ≤ 2; 1 DPR 1; 2 DPR 1 + half the particles + pickups without glow
     this.resize();
     addEventListener('resize', () => this.resize());
   }
@@ -39,8 +40,14 @@ export class Renderer {
   get extraLights() { return this.lightSets[0]; }
   set extraLights(v) { this.lightSets[0] = v; }
 
+  /** S-41: drawing level from quality.js. Changes only how frames are drawn, never the game. */
+  setQuality(level) {
+    if (level === this.quality) return;
+    this.quality = level; this.resize();
+  }
+
   resize() {
-    this.dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.dpr = this.quality > 0 ? 1 : Math.min(2, window.devicePixelRatio || 1);
     this.w = innerWidth; this.h = innerHeight; this.hudRects = null; // T1: re-read the HUD boxes
     this.canvas.width = Math.round(this.w * this.dpr);
     this.canvas.height = Math.round(this.h * this.dpr);
@@ -268,10 +275,11 @@ export class Renderer {
   // no save / rotate / restore (300 on screen: 137 → 94 ms at a 4× CPU throttle). Lumen ● looks the same at any angle.
   pickupSprite(kind, frame = 0) {
     if (kind === 'lumen') frame = 0;
-    return this.glowSprite('p-' + kind + '-' + frame, 5 + 16 / (this.zoom * this.dpr), g => {
+    const glow = this.quality < 2; // S-41: L2 draws the bare shape in a small sprite (far fewer pixels per pickup)
+    return this.glowSprite((glow ? 'p-' : 'pn-') + kind + '-' + frame, glow ? 5 + 16 / (this.zoom * this.dpr) : 6, g => {
       const col = RESOURCE[kind].color;
       g.rotate(frame * Math.PI * 2 / PICKUP_FRAMES);
-      g.fillStyle = col; g.shadowColor = col; g.shadowBlur = 10;
+      g.fillStyle = col; if (glow) { g.shadowColor = col; g.shadowBlur = 10; }
       g.beginPath();
       if (kind === 'shard') { g.moveTo(0, -5); g.lineTo(3, 0); g.lineTo(0, 5); g.lineTo(-3, 0); }
       else if (kind === 'lumen') g.arc(0, 0, 3.5, 0, Math.PI * 2);
@@ -449,7 +457,9 @@ export class Renderer {
   drawParticles(ctx) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
+    const half = this.quality >= 2; // S-41: L2 draws every other particle; the sim keeps all of them
     for (const q of this.game.particles) {
+      if (half) { if (q.rq === undefined) q.rq = (this.rqn = (this.rqn | 0) + 1) & 1; if (q.rq) continue; } // fixed per particle: no flicker
       const a = q.life / q.max;
       ctx.globalAlpha = a;
       ctx.fillStyle = q.color;

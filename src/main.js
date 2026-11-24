@@ -15,6 +15,7 @@ import { loadSettings, saveSettings } from './settings.js';
 import { createDev } from './dev.js';
 import { registerOffline } from './pwa.js';
 import { setupKeys } from './keysui.js';
+import { Quality, GRAPHICS } from './quality.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -39,6 +40,7 @@ let toastTimer = 0;
 let selectedMode = 'drift';
 let lastHud = ''; // updateHud's change key (S-39: cleared when a key is rebound)
 
+const quality = new Quality(); // S-41 (D-109): Settings → Graphics; Auto steps the renderer's level from frame time
 const settings = loadSettings(); // shared live object: Game reads shake/reducedMotion from it (S-3)
 $('version').textContent = 'v' + VERSION;
 applySettings();
@@ -376,6 +378,8 @@ function applySettings() {
   if (settings.reducedMotion || !settings.shake) { if (game) game.shake = 0; }
   document.body.classList.toggle('reduce-motion', settings.reducedMotion);
   document.documentElement.classList.toggle('text-large', settings.largeText); // S-40: --ts 1.2 in style.css
+  quality.setMode(settings.graphics); renderer.setQuality(quality.level); // S-41
+  $('set-graphics').textContent = { auto: 'Auto', high: 'High', low: 'Low' }[settings.graphics];
   $('mute-btn').textContent = settings.muted ? '♪̸' : '♪';
   $('set-volume').value = settings.volume;
   $('set-volume-val').textContent = settings.volume;
@@ -397,11 +401,12 @@ document.querySelectorAll('#settings [data-setting]').forEach(b => b.addEventLis
   setSetting(b.dataset.setting, !settings[b.dataset.setting]);
 }));
 $('mute-btn').addEventListener('click', () => { audio.unlock(); setSetting('muted', !settings.muted); });
+$('set-graphics').addEventListener('click', () => setSetting('graphics', GRAPHICS[(GRAPHICS.indexOf(settings.graphics) + 1) % GRAPHICS.length]));
 
 // ---------- loop ----------
 let last = performance.now();
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000);
+  const gap = now - last, dt = Math.min(0.05, gap / 1000);
   last = now;
   if (game) {
     document.body.classList.toggle('ending-seq', !!game.endSeq && !paused); // S-24: the HUD steps aside for the overview
@@ -426,15 +431,18 @@ function frame(now) {
       saveTimer += dt;
       if (saveTimer > 10) { saveTimer = 0; persist(); }
     } else {
+      quality.reset(); // S-41: paused frames never count
       audio.beam(false); game.beam.charge = 0; // S-14: pausing drops a Pulse charge unfired
     }
     renderer.draw(dt, input);
+    // S-41 (D-109): the real (unclamped) gap between played frames, which includes the browser's canvas raster
+    if (!paused && !game.endSeq && !endingOpen && quality.sample(gap)) renderer.setQuality(quality.level);
   }
   tickToast(dt);
   requestAnimationFrame(frame);
 }
 
-addEventListener('visibilitychange', () => { if (document.hidden) { persist(); audio.beam(false); } });
+addEventListener('visibilitychange', () => { quality.reset(); if (document.hidden) { persist(); audio.beam(false); } });
 addEventListener('pagehide', persist);
 
 // Render a live world behind the title screen so it isn't a blank page.
@@ -449,4 +457,4 @@ const dev = createDev({ game: () => game, persist, modeChanged() {
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
   if (panelOpen) renderPanel();
 } });
-window.__lumen = { get game() { return game; }, renderer, input, settings, audio, dev }; // debug handle for tests + bots
+window.__lumen = { get game() { return game; }, renderer, input, settings, audio, dev, quality }; // debug handle for tests + bots

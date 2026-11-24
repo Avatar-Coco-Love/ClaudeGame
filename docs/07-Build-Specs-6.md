@@ -42,7 +42,7 @@ controlled, read and drawn. **Save:** no world-save change (`SAVE_FORMAT` stays 
   Overclock/Lodestone). A pair that fails gets a shape difference, not a new colour. Ores are already shape-coded.
 - **Smoke:** computed font sizes ≥ 12 px over the play HUD at both settings; Large fits at both phone sizes; the colour file.
 
-## S-41 — Low-end frame budget: adaptive resolution (M8 → v1.3 when S-38…S-41 + audio are done) (D-103)
+## S-41 — Low-end frame budget: adaptive resolution (M8 → v1.3 when S-38…S-41 + audio are done) (D-103) — ✅ built #85 (D-109: gap, 18 ms)
 - Measured (Design 72, `tools/perf.cjs`, 4× CPU, software canvas: read ratios): base 61 ms mean, loot 137 ms (300
   pickups: Light 40 %, Pickups 36 %). DPR is capped at 2 (`render.js`); the light layer is already half resolution.
 - **Auto quality:** keep a rolling p90 of frame dt over 3 s of play (not paused, not hidden). Above 24 ms → step down
