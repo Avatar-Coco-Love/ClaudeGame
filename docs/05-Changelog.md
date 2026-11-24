@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.19 — 2026-11-24 (#86)
+- **Fixes:** a damaged save no longer stops the game from starting (it now starts fresh instead of freezing on a black
+  screen); the "NEXUS" label on the pointer is centred again; the Craft, Wide Beam and Scanner messages name the key you
+  actually bound. **Auto graphics** no longer drops to Low on a phone in battery saver, where it couldn't help.
+- **Large text on small phones:** the Core Matrix button stays on one line, the four Matrix tabs sit in two rows instead of
+  spilling off the sheet, the hint wraps; the Volume slider is a full-size touch target.
+
 ## v1.2.18 — 2026-11-24 (#85)
 - **Smoother on slow devices:** a new **Graphics** setting (Auto / High / Low). On Auto the game watches its own frame
   rate while you play and, if it struggles, draws at a lower resolution, then with half the spark particles, plainer

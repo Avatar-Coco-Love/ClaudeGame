@@ -6,10 +6,11 @@ const path = require('path');
 
 async function nodeChecks(check) {
   const { Quality } = await import(path.join(__dirname, '../src/quality.js'));
-  const feed = (q, ms, s) => { const log = []; for (let t = 0; t < s * 1000; t += ms) if (q.sample(ms)) log.push(q.level); return log; };
+  // `ms` is a frame time, or level => frame time (a renderer that really gets faster at lower levels; audit 79, B-073).
+  const feed = (q, ms, s) => { const log = []; for (let t = 0, f; t < s * 1000; t += f) { f = typeof ms === 'function' ? ms(q.level) : ms; if (q.sample(f)) log.push(q.level); } return log; };
   const q = new Quality('auto');
   check('S-41 Auto: 2.5 s of 30 ms frames is not enough to step (3 s window)', feed(q, 30, 2.5).length === 0 && q.level === 0);
-  const down = feed(q, 30, 10);
+  const down = feed(q, l => [30, 25, 10][l], 10); // each step pays (25 < 0.85 × 30)
   check('S-41 Auto: slow frames step L0 → L1 → L2 and stop there', down.join() === '1,2' && q.level === 2, down.join());
   const mid = feed(q, 18, 30);
   check('S-41 Auto: 18 ms frames (between the bars) never step', mid.length === 0 && q.level === 2, mid.join());
@@ -22,18 +23,26 @@ async function nodeChecks(check) {
   check('S-41 Auto: 10 s fast steps up one level at a time, back to L0', up2.join() === '1,0' && q.level === 0, up2.join());
   const stall = new Quality('auto'); feed(stall, 30, 2); stall.sample(5000); const s2 = feed(stall, 30, 2.5);
   check('S-41 Auto: a stall (> 1 s, tab switch) resets the window', s2.length === 0 && stall.level === 0);
-  const bq = new Quality('auto'); feed(bq, 30, 3.05); feed(bq, 16.7, 13.1); const b1 = bq.level; feed(bq, 30, 3.05); // L1 → L0 → L1
+  const bq = new Quality('auto'); feed(bq, 30, 3.05); feed(bq, 16.7, 13.1); const b1 = bq.level; feed(bq, 30, 3.05); // L1 → L0 → L1 (16.7 after 30: the step paid)
   const b2 = feed(bq, 16.7, 13.1 + 5).length, b3 = feed(bq, 16.7, 6).length;
   check('S-41 Auto: a step down right after a step up doubles the wait to step up again (10 → 20 s)', b1 === 0 && bq.upS === 20 && b2 === 0 && b3 === 1 && bq.level === 0, [b1, bq.upS, b2, b3].join());
   const hi = new Quality('high'), lo = new Quality('low');
   check('S-41 High never steps (L0) and Low is L2 fixed', !feed(hi, 60, 20).length && hi.level === 0 && !feed(lo, 5, 30).length && lo.level === 2);
+  const cap = new Quality('auto'), c1 = feed(cap, 33.3, 6.2), c2 = feed(cap, 33.3, 60); // a 30 Hz rAF cap: no level helps
+  check('Auto: a step down that buys no faster frames (30 Hz cap) is undone and Auto stops stepping down (B-073, D-110)',
+    c1.join() === '1,0' && c2.length === 0 && cap.level === 0 && cap.capped, JSON.stringify([c1, c2, cap.level]));
+  cap.setMode('auto');
+  check('Auto: choosing Auto again in Settings gives the step down another try (B-073)', !cap.capped && feed(cap, 33.3, 3.2).join() === '1');
+  const one = new Quality('auto'); one.skip1 = true; const o1 = feed(one, l => [50, 50, 10][l], 7), o2 = feed(one, 16.7, 14);
+  check('Auto on a DPR ≤ 1 screen skips L1 (it draws as L0): L0 → L2 and back (audit 79)', o1.join() === '2' && o2.join() === '0', JSON.stringify([o1, o2]));
   const bad = new Quality('ultra');
   check('S-41 an unknown graphics mode falls back to Auto', bad.mode === 'auto');
 }
 
 // Every draw busy-waits window.__slow ms (0 = normal speed): a slow renderer, adjustable mid-test (cf. spire.cjs slowFrames).
+// The wait shrinks with the level (×1 / ×0.6 / ×0.2), as a real renderer's does; a fixed wait is a frame cap (B-073).
 const slowable = page => page.evaluate(() => { window.__slow = 0; const R = window.__lumen.renderer, draw = R.draw.bind(R);
-  R.draw = (...a) => { const end = performance.now() + window.__slow; while (performance.now() < end); return draw(...a); }; });
+  R.draw = (...a) => { const end = performance.now() + window.__slow * [1, 0.6, 0.2][R.quality]; while (performance.now() < end); return draw(...a); }; });
 
 async function browserChecks(browser, url, check, errors) {
   const page = await browser.newPage({ viewport: { width: 800, height: 600 }, deviceScaleFactor: 2 });
@@ -44,12 +53,12 @@ async function browserChecks(browser, url, check, errors) {
   const st = () => page.evaluate(() => { const L = window.__lumen; return { lv: L.quality.level, r: L.renderer.quality, dpr: L.renderer.dpr, cw: L.renderer.canvas.width, mode: L.settings.graphics }; });
   const s0 = await st();
   check('S-41 a fresh start is Auto at L0 with DPR 2 on a 2× screen', s0.mode === 'auto' && s0.lv === 0 && s0.dpr === 2 && s0.cw === 1600, JSON.stringify(s0));
-  await page.evaluate(() => { window.__slow = 30; }); await page.waitForTimeout(2500);
+  await page.evaluate(() => { window.__slow = 50; }); await page.waitForTimeout(2500);
   const sT = await st();
   check('S-41 slow frames on the title (paused) never step', sT.lv === 0, JSON.stringify(sT));
   await page.evaluate(() => { window.__slow = 0; });
   await page.click('#new-world'); await page.waitForTimeout(200);
-  await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; window.__slow = 30; });
+  await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; window.__slow = 50; });
   await page.waitForFunction(() => window.__lumen.quality.level >= 1, null, { timeout: 15000 }).catch(() => {});
   const s1 = await st();
   check('S-41 Auto: a slow frame stream steps to L1 and the canvas drops to DPR 1', s1.lv === 1 && s1.r === 1 && s1.dpr === 1 && s1.cw === 800, JSON.stringify(s1));
@@ -72,7 +81,7 @@ async function browserChecks(browser, url, check, errors) {
   check('S-41 the Graphics button cycles High (L0, DPR 2) → Low (L2, DPR 1) → Auto, saved each time',
     seen.join() === 'High:0:2:high,Low:2:1:low,Auto:2:1:auto', seen.join());
   await page.click('#set-graphics'); await page.click('#settings-close'); await page.click('#continue');
-  await page.evaluate(() => { window.__lumen.game.demo = true; window.__slow = 30; }); await page.waitForTimeout(4500);
+  await page.evaluate(() => { window.__lumen.game.demo = true; window.__slow = 50; }); await page.waitForTimeout(4500);
   const sH = await st();
   check('S-41 High never steps down under slow frames', sH.mode === 'high' && sH.lv === 0 && sH.dpr === 2, JSON.stringify(sH));
   await page.evaluate(() => { window.__slow = 0; });

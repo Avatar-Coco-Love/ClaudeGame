@@ -1,15 +1,20 @@
 // S-41 (D-109): adaptive graphics quality. Fed each played frame's real gap since the last frame in ms (main.js; it counts
 // the browser's deferred canvas raster, which JS work time misses: measured ~1 ms of JS on a 33 ms frame); decides a level
 // 0..QUALITY_MAX that only the renderer reads. Never touches dt, RNG or collision, so a run plays the same at every level.
-import { QUALITY_WINDOW_S, QUALITY_SLOW_MS, QUALITY_FAST_MS, QUALITY_UP_S, QUALITY_UP_MAX_S, QUALITY_MAX } from './config.js';
+import { QUALITY_WINDOW_S, QUALITY_SLOW_MS, QUALITY_FAST_MS, QUALITY_UP_S, QUALITY_UP_MAX_S, QUALITY_MAX, QUALITY_GAIN } from './config.js';
 
 export const GRAPHICS = ['auto', 'high', 'low']; // Settings → Graphics; 'high' = L0 fixed, 'low' = L2 fixed
 
 export class Quality {
-  constructor(mode = 'auto') { this.level = 0; this.upS = QUALITY_UP_S; this.lastStep = 0; this.setMode(mode); }
+  constructor(mode = 'auto') {
+    this.level = 0; this.upS = QUALITY_UP_S; this.lastStep = 0;
+    this.skip1 = false; // set by main.js on a DPR ≤ 1 screen, where L1 (DPR 1) draws exactly like L0 (audit 79)
+    this.before = 0; this.from = 0; this.capped = false; // the step down being judged; set once a step down bought nothing
+    this.setMode(mode);
+  }
 
   setMode(mode) {
-    this.mode = GRAPHICS.includes(mode) ? mode : 'auto';
+    this.mode = GRAPHICS.includes(mode) ? mode : 'auto'; this.before = 0; this.capped = false;
     if (this.mode === 'high') this.level = 0;
     else if (this.mode === 'low') this.level = QUALITY_MAX;
     this.reset();
@@ -26,13 +31,18 @@ export class Quality {
     while (this.span - this.win[0] >= QUALITY_WINDOW_S * 1000) this.span -= this.win.shift();
     if (this.span < QUALITY_WINDOW_S * 1000 * 0.98) return false; // the window isn't full yet
     const p90 = [...this.win].sort((a, b) => a - b)[Math.floor(this.win.length * 0.9)];
-    if (p90 > QUALITY_SLOW_MS && this.level < QUALITY_MAX) {
+    if (this.before) { // B-073: the first full window after a step down judges it
+      const b = this.before; this.before = 0;
+      if (p90 > b * QUALITY_GAIN) { this.level = this.from; this.capped = true; this.lastStep = 0; this.reset(); return true; }
+    }
+    if (p90 > QUALITY_SLOW_MS && this.level < QUALITY_MAX && !this.capped) {
       if (this.lastStep < 0) this.upS = Math.min(QUALITY_UP_MAX_S, this.upS * 2); // it bounced: wait longer next time
-      this.level++; this.lastStep = 1; this.reset(); return true;
+      this.before = p90; this.from = this.level;
+      this.level = this.skip1 && this.level === 0 ? 2 : this.level + 1; this.lastStep = 1; this.reset(); return true;
     }
     if (p90 < QUALITY_FAST_MS) {
       this.fast += ms;
-      if (this.fast >= this.upS * 1000 && this.level > 0) { this.level--; this.lastStep = -1; this.reset(); return true; }
+      if (this.fast >= this.upS * 1000 && this.level > 0) { this.level = this.skip1 && this.level === 2 ? 0 : this.level - 1; this.lastStep = -1; this.reset(); return true; }
     } else this.fast = 0;
     return false;
   }

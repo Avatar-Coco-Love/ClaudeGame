@@ -41,6 +41,7 @@ let selectedMode = 'drift';
 let lastHud = ''; // updateHud's change key (S-39: cleared when a key is rebound)
 
 const quality = new Quality(); // S-41 (D-109): Settings → Graphics; Auto steps the renderer's level from frame time
+quality.skip1 = (window.devicePixelRatio || 1) <= 1; // audit 79: L1 is L0 on such a screen
 const settings = loadSettings(); // shared live object: Game reads shake/reducedMotion from it (S-3)
 $('version').textContent = 'v' + VERSION;
 applySettings();

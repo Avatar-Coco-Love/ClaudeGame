@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.2.18';
+export const VERSION = '1.2.19';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -259,3 +259,6 @@ export const ANOMALY_KINDS = {
 // holds a 60 Hz gap at 16.7 ms). A step down right after a step up doubles the wait to step up again (≤ QUALITY_UP_MAX_S).
 // L0 DPR ≤ 2; L1 DPR 1; L2 DPR 1 + half the particles drawn + pickups without glow. Drawing only: the sim never changes.
 export const QUALITY_WINDOW_S = 3, QUALITY_SLOW_MS = 24, QUALITY_FAST_MS = 18, QUALITY_UP_S = 10, QUALITY_UP_MAX_S = 160, QUALITY_MAX = 2;
+// Audit 79 (B-073, D-110): a step down must buy a p90 below QUALITY_GAIN × the p90 that caused it, or it is undone and Auto
+// stops stepping down (a 30 Hz rAF cap — iOS Low Power, battery saver — is not slow drawing; dropping quality can't help it).
+export const QUALITY_GAIN = 0.85;

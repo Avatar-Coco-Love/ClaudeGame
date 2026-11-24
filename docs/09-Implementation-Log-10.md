@@ -17,3 +17,23 @@ Continues `09-Implementation-Log-9.md` (part 9 neared the 8 KB cap at session 77
   Proved: with the sampling call removed, 3 browser checks fail.
 - Observed: particles differ in count between runs by design (Math.random, D-025), so the determinism check leaves
   them out. Screenshots viewed: High vs Low at 640×400 DSF 2 (Low pickups plainer but read as ◆ / ▲).
+
+## Session 79 — Audit: damaged-save boot, key labels, Large-text fit, Auto vs a 30 Hz cap (v1.2.19, #86)
+- Five sweeps in parallel (bugs, perf ×4, touch at 8 sizes × 2 text sizes, code health, docs drift); each finding re-checked.
+- **B-065** (hud.js): S-40 put `// S-40: 12 px floor` before `ctx.textAlign = 'center'`, so "NEXUS" drew left-aligned. 3rd
+  swallowed-code case: `comments.cjs` now also flags an assignment after `//` (failed on the old line, no false positives).
+- **B-066/B-067** (save.js `saneSave`): a save with no `bank` threw in `showTitle` before the frame loop (black, frozen);
+  a bad `explored`/`broken` made Continue throw silently. No int seed / non-base64 map → no save; bank/cargo → whole counts.
+- **B-068** (main.js): "Press B", "press Q", "press F" survived S-39; now `keys.K(…)`. `keys.cjs` greps src for any
+  `press <Letter>` (failed on main.js:252/275/276).
+- **B-069…B-072** (style.css): Large text ≤ 420 px: Matrix button nowrap (was 2 lines at 320) and raised clear of a
+  2-line hint; tabs 2 × 2 (CRAFT was 19 px outside at 320 and 381); hint wraps (overflowed at 381); Volume slider 44 px on
+  touch; its "100" box min-width. `textsize.cjs` adds 381×800 and a fit check (failed on old CSS). Screenshot 320 viewed.
+- **B-073** (quality.js, D-110): constant 33 ms frames (30 Hz cap) stepped Auto to L2 and kept it there. A step down is now
+  judged by the next window (must beat 0.85 × its p90) or undone and Auto stops stepping down; DPR ≤ 1 skips L1. Test's
+  slow renderer now shrinks its wait with the level (a fixed wait is a cap). 3 new node checks fail on the old controller.
+- Perf (×4 loot): chunk blits 15 ms is the top cost (pre-scale fix measured 15 → 2 ms by the sweep; memory risk at DPR 2),
+  logged as Debt with corrected drawGrid / paintChunk numbers. Code health: the audit-74 "dead" list was used in-file;
+  dropped `export` from 16. Docs: D-026, D-044 stale (D-111), 08 bot routes + `deep`. Q-023 (iPad keyboard rebinding).
+- D-xxx check: all 109 compared with code by the drift sweep; mismatches only as above. Archived sessions 69–73 and
+  changelog v1.0.0–v1.1.10 word for word.
