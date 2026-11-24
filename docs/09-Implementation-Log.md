@@ -52,3 +52,16 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Code health / drift:** dropped the unused `oreWithin` alias; a redundant `else if`; comments fixed (`config.js` D-017 "any
   Glitch", `research.js` names both nodes). D-001…D-050 spot-checked against `config.js`/code: numbers match; D-032's
   "no glow sprite" is superseded by D-051. `09` sessions 29–30 and changelog v0.1.17–21 archived word for word; `04` Debt → `04-Roadmap-2.md`.
+
+## 2026-11-24 — Session 35 (v0.2.39): Build — S-14 Pulse beam
+- `BEAM_MODES.pulse` + `PULSE_*` (config), node `pulse` 40●, `beam.js` `updatePulse`/`releasePulse`, render dotted aim line,
+  core glow with charge (off under reduced motion), 0.12 s release flash + light hole (half under reduced motion). D-052 rules.
+- New `tests/pulse.cjs` (7 checks): Beam 0 burst breaks 2 rock (+0.18 crack), Beam 2 exactly 3; a 0.1 s tap fizzles, then 18
+  frames of recovery; 10 s hold = 13.0 vs 18.2 cells (0.715×); Glitch stop; cycle/unlock/save; mouse + touch (CDP) in the page.
+  All fail on the old code (no `pulse` mode). `audio.cjs`: thump peak −29.7 dBFS, fizzle −41.6, < 1 % > 2 kHz. Smoke 122/122.
+- Screenshots viewed (1280×800): dotted reach line while charging; a full burst at Beam 2 shows a clean bright line that pierces 3 cells.
+  **B-028 (test only, fixed):** the mouse check aimed off by the camera's ease after a teleport; it now waits 0.9 s first.
+- **Q-011 with Pulse** (Focus / Wide / Pulse): first Lumen Beam 2 median 30 / 56 / 43 s (Beam 0: 55 / 113 / 77); 10● run 69 /
+  133 / 96 s; Surge farm 3.90 / 3.77 / 3.80 kills/min (deaths 0 / 0.33 / 0.33); crystal Lvl 0 42.9 / 48.3 / 42.9◆/min; Prism hunt
+  Lvl 2 15.2 / 9.7 / 12.4▲/min. No mode wins every route, but Pulse wins none: bots stand close, so reach never counts. For Design 37.
+

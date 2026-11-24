@@ -1,10 +1,10 @@
 // Simulation: the core (player), beam, pickups, deposit, Glitches (Surge mode), particles.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE } from './config.js';
+import { CELL, NEXUS_RADIUS, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_PRISM_CHANCE, HITSTOP_S, HITSTOP_GAP_S, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
-import { castBeam, cycleBeamMode, validMode } from './beam.js';
+import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 
 const ACCEL = 9;          // how quickly velocity chases its target (1/s)
 const PLAYER_R = 10;
@@ -83,7 +83,7 @@ export class Game {
       realizedVx: 0, realizedVy: 0, // what actually happened after collision
       angle: -Math.PI / 2, integrity: 100, invuln: 0, hurtFlash: 0,
     };
-    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [] };
+    this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null }; // S-14: Pulse state
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
@@ -231,8 +231,16 @@ export class Game {
   updateBeam(dt, intent) {
     const p = this.player, b = this.beam;
     const was = b.on;
-    b.on = !!(intent.fire && intent.aim);
+    const held = !!(intent.fire && intent.aim);
     b.target = null; b.enemy = null; b.rays = [];
+    b.flash = Math.max(0, b.flash - dt);
+    if (BEAM_MODES[this.beamMode] && BEAM_MODES[this.beamMode].pulse) { // S-14: no continuous beam, no hum; charge -> burst
+      b.on = false; this.audio.beam(false);
+      updatePulse(this, dt, held, !!intent.cancel);
+      return;
+    }
+    b.charge = 0; b.recover = 0;
+    b.on = held;
     if (b.on && !was) this.audio.beamStart();
     this.audio.beam(b.on);
     if (!b.on) return;
@@ -427,7 +435,7 @@ export class Game {
     this.cargo = { shard: 0, prism: 0, lumen: 0 };
     this.burst(p.x, p.y, 50, '#ffffff', 300);
     p.x = this.nexus.x; p.y = this.nexus.y + 40; p.vx = p.vy = 0;
-    p.integrity = this.stat('hull'); p.invuln = 2;
+    p.integrity = this.stat('hull'); p.invuln = 2; this.beam.charge = 0;
     this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > 900);
     this.notify('destabilized');
   }

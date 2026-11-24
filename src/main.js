@@ -284,7 +284,7 @@ function frame(now) {
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
     const scan = take('scan'), beamMode = take('beamMode');
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false } : { ...input.read(sp), scan, beamMode };
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode };
     if (!paused) {
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a crystal/prism break freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));
@@ -292,7 +292,7 @@ function frame(now) {
       saveTimer += dt;
       if (saveTimer > 10) { saveTimer = 0; persist(); }
     } else {
-      audio.beam(false);
+      audio.beam(false); game.beam.charge = 0; // S-14: pausing drops a Pulse charge unfired
     }
     renderer.draw(dt, input);
   }

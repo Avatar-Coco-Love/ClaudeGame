@@ -2,7 +2,7 @@
 
 Milestones are ordered. Each bullet is meant to be roughly one PR. Design sessions may reorder, split, or cut items. Mark done items with ✅ and the PR number.
 **v1.0 = M1–M5** (Spires, ending, New Cycle); M6–M8 are post-1.0; nothing outside M1–M8 without a design D-xxx (D-045). `VERSION`'s minor counts shipped milestones (D-046).
-Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; build order S-14, S-18, S-15, S-16, S-19 (D-048). Every new sink must state its currency and compare it with the world's supply (see `07` header).
+Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; build order S-18, S-15, S-16, S-19 (D-048). Every new sink must state its currency and compare it with the world's supply (see `07` header).
 
 ## M1 — Close the loop properly
 - ✅ All done (#1–#13, #16, #21): first playable, Pages deploy, smoke + docs tooling, Radiance (S-1), touch hints (S-2), Settings (S-3),
@@ -30,7 +30,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; b
 - ✅ (#27) **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells shows as a white glyph + blip, one soft tone (D-040).
 - ✅ (#28) **S-13 Beam modes v1 — Wide** (25●): 3 parallel rays, 0.45× each, 0.75× reach; Q / ⟂ switches; `SAVE_FORMAT` 7 (D-041).
 - ✅ (#29) Design session 27: Wide play-tested, Q-011 measured for Focus vs Wide (D-042), S-14 retuned, Beacons specced (S-16, D-043).
-- **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells; ~0.8× Focus sustained (D-042). Then re-run Q-011 probes.
+- ✅ (#40) **S-14 Pulse beam** (40●): charge, then a burst that pierces up to 3 cells; ~0.8× Focus sustained (D-042, D-052). Q-011 re-run → Design 37.
 
 ## M4 — Crafting & building
 - **S-16 Beacons v1** (5▲, Craft tab, D-043, `SAVE_FORMAT` 9): placeable light, 140 px, on the minimap. After S-15. Its B / ✦ placement is the build-mode UX (D-048).
