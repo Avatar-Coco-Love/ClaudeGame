@@ -62,8 +62,9 @@ export class Music {
     if (!this.playing) { // start, or back from the ending card: fade in, first chord now
       this.playing = true;
       this.ramp(this.bus.gain, this.level * MUSIC_GAIN, MUSIC_END_FADE_S);
-      this.nextChord = now; this.nextBell = now + this.between(MUSIC_BELL.gapS); this.nextPulse = now;
-      this.layer = null;
+      // B-076 (audit 84): a chord still ringing (mute → unmute, Music 0 → back) keeps its schedule, so no second chord
+      // stacks on it; the layers are kept too, so a mode changed meanwhile crossfades at the next chord.
+      if (!this.chord || now >= this.chord.t + this.chord.len) { this.nextChord = now; this.nextBell = now + this.between(MUSIC_BELL.gapS); this.nextPulse = now; }
     }
     const want = state.wake || state.mode === 'surge' ? 'pulse' : 'bell';
     if (state.wake !== this.wake && this.layer) this.setLayer(want, now); // a Wake starts/ends now, not at the next chord

@@ -36,6 +36,21 @@ async function nodeChecks(check) {
       h.research.echo === true && !!h.echo && !('echo' in g.toSave()), JSON.stringify(Object.keys(g.toSave())));
   }
 
+  // Audit 84 (B-077): a core death respawns inside the Nexus ring; a stranded Echo still blinks back (the ring only holds a
+  // nearby Echo still), instead of waiting at the death site with its tether drawn across the map.
+  {
+    const g = new Game({ seed: 4242, mode: 'surge', audio }), w = g.world, cy = Math.floor(g.player.y / CELL);
+    g.spawnTimer = 1e9; g.research.echo = true;
+    for (let x = w.cx; x < w.cx + 40; x++) for (let y = cy - 1; y <= cy + 1; y++) w.cells[w.idx(x, y)] = T.EMPTY;
+    w.breaks++;
+    for (let i = 0; i < 600; i++) g.update(1 / 60, { move: { x: 1, y: 0 }, aim: null, fire: false });
+    g.destabilize();
+    for (let i = 0; i < 120; i++) g.update(1 / 60, idle());
+    const d = Math.hypot(g.echo.x - g.player.x, g.echo.y - g.player.y);
+    check('Echo: after a core death it blinks back beside the core in the Nexus ring within 2 s (B-077)',
+      g.inNexus() && d < 3 * CELL, JSON.stringify({ inNexus: g.inNexus(), d: Math.round(d), blinks: g.echo.blinks }));
+  }
+
   // An L-bend: a corridor east 14 cells, then south 14. The core drives it at full speed; the Echo follows without a blink.
   {
     const open = [];

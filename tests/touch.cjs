@@ -214,7 +214,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   // ---- B-047 (audit 54 T1): a long toast (the death line, the longest mode line) never covers a HUD control, the bank panel,
   // the hint or the core, portrait or landscape. Old CSS (top 30% everywhere): at 320×568 the death toast covered ◎ (230–308 × 164–208).
   // Audit 74: with all three Anomaly chips showing (the panel's tallest state) — at +100 px the toast overlapped the panel by 2–4 px.
-  for (const vp of [{ width: 320, height: 568 }, { width: 375, height: 667 }, { width: 412, height: 915 }, { width: 568, height: 320 }, { width: 667, height: 375 }, { width: 915, height: 412 }]) {
+  for (const vp of [{ width: 320, height: 568 }, { width: 375, height: 667 }, { width: 412, height: 915 }, { width: 568, height: 320 }, { width: 667, height: 375 }, { width: 740, height: 360 }, { width: 844, height: 390 }, { width: 915, height: 412 }]) {
     const ctx = await phone(vp), pg = await ctx.newPage();
     pg.on('pageerror', e => errors.push('touch toast: ' + e.message));
     await pg.goto(url); await pg.waitForTimeout(300);
@@ -234,14 +234,21 @@ async function browserChecks(browser, url, check, errors, shots) {
       const o = L.renderer.worldToScreen(L.renderer.cam.x, L.renderer.cam.y), k = L.renderer.worldToScreen(L.renderer.cam.x + 52, 0).x - o.x;
       hud.push({ id: 'core', l: o.x - k, t: o.y - k, r: o.x + k, b: o.y + k });
       const hits = hud.filter(h => t.l < h.r && h.l < t.r && t.t < h.b && h.t < t.b).map(h => h.id);
+      // Audit 84 (B-078): the bank panel never runs under a row button (named chips at 701–932 px did).
+      const pan = hud.find(h => h.id === 'top-left'), under = hud.filter(h => /btn/.test(h.id) && pan && pan.l < h.r && h.l < pan.r && pan.t < h.b && h.t < pan.b).map(h => h.id);
+      hits.push(...under.map(id => 'panel×' + id));
       return { text: document.getElementById('toast').textContent, t: [t.l, t.t, t.r, t.b].map(Math.round), core: hud[hud.length - 1], hits, buttons: hud.length };
     });
     const death = await measure();
     if (shots) await pg.screenshot({ path: `${shots}/toast-${vp.width}x${vp.height}.png` });
     await pg.evaluate(() => { document.getElementById('toast').textContent = 'Drift mode — Calm. No hostiles. Mine, explore, build at your own pace.'; });
     const mode = await measure();
-    check(`${vp.width}×${vp.height}: a long toast covers no HUD control, panel, hint or the core (B-047)`,
-      /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length, JSON.stringify({ death, mode }));
+    // Audit 84 (B-079): Large text makes the Surge panel ~8 px taller; the toast moves down with it.
+    await pg.evaluate(() => { document.documentElement.classList.add('text-large'); document.getElementById('toast').textContent = 'Core destabilized — your cargo scattered where you fell'; });
+    await pg.waitForTimeout(100);
+    const large = await measure();
+    check(`${vp.width}×${vp.height}: a long toast covers no HUD control, panel, hint or the core; the panel clears the buttons, also Large (B-047, B-078, B-079)`,
+      /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length && !large.hits.length, JSON.stringify({ death: death.hits, mode: mode.hits, large: large.hits, t: large.t }));
     await ctx.close();
   }
 }

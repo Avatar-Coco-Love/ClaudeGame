@@ -3,6 +3,14 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.24 — 2026-11-24 (#91)
+- **Smoother frames:** the terrain is now drawn at screen size up front instead of being scaled every frame, which
+  cuts the biggest per-frame cost (about a third faster on slower devices). Edges look a touch crisper.
+- **Fixes:** muting and unmuting (or Music 0 → back) no longer stacks two clashing chords; after a core death the
+  Echo blinks back to you instead of waiting where you fell; on landscape phones the bank panel no longer slides under
+  ◎ and ⟂ when Anomaly chips show, and with Large text the death toast no longer touches the panel; a buff taken as
+  another ends keeps its chip.
+
 ## v1.4.23 — 2026-11-24 (#90)
 - **New: ambient music.** A quiet synthesized bed now plays under the game: soft pad chords that turn brighter in the
   Hearth, modal in the Veil and dark in the Deep, with a gentle bell in Drift or a low pulse in Surge (same loudness

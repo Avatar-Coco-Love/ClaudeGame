@@ -112,12 +112,13 @@ export function updateEcho(game, dt) {
     return;
   }
 
-  // Pauses: the Ending sequence and the Nexus ring hold it still (no mining, no blink checks).
+  // Pauses: the Ending sequence and the Nexus ring hold it still (no mining). A stranded Echo still blinks back in the
+  // ring (B-077: a core death respawns there, far from the Echo); only the Ending skips the blink check.
   e.paused = !!game.endSeq || game.inNexus();
   const d = Math.hypot(p.x - e.x, p.y - e.y), fd = fieldAt(e, Math.floor(e.x / CELL), Math.floor(e.y / CELL));
   let tx = 0, ty = 0, follow = false;
+  if (!game.endSeq && (fd < 0 || fd > ECHO_BLINK_CELLS)) { startBlink(game, e); return; }
   if (!e.paused) {
-    if (fd < 0 || fd > ECHO_BLINK_CELLS) { startBlink(game, e); return; }
     if (d > ECHO_HOLD[1] * CELL || fd > ECHO_HOLD[1] + 1) { // past the band, or around a bend
       follow = true;
       let gx = p.x, gy = p.y;

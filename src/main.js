@@ -226,8 +226,10 @@ const chipHtml = (id, cls = '') => { const k = ANOMALY_KINDS[id]; return `<span 
 function renderBuffs(g) { $('buffs').innerHTML = g.buffs.map(id => chipHtml(id)).join(''); }
 function buffFlash(ids) {
   const el = $('buffs');
-  el.innerHTML = (ids || []).map(id => chipHtml(id, ' gone')).join('');
-  setTimeout(() => { if (game && !game.buffs.length) el.innerHTML = ''; }, 600);
+  // B-080 (audit 84): a buff taken on the deposit's last frame keeps its chip beside the fading ones, and the redraw after
+  // the fade shows what is active now (it used to leave the fading chips' frame, or nothing, until the HUD key changed).
+  el.innerHTML = (game ? game.buffs : []).map(id => chipHtml(id)).join('') + (ids || []).map(id => chipHtml(id, ' gone')).join('');
+  setTimeout(() => { if (game) renderBuffs(game); }, 600);
 }
 
 // ---------- Core Matrix panel ----------

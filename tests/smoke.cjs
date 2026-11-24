@@ -341,6 +341,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await audit34.browserChecks(browser, url, check, errors);
     await drawcost.browserChecks(browser, url, check, errors);
     await audit39.browserChecks(browser, url, check, errors);
+    await require('./audit84.cjs').browserChecks(browser, url, check, errors);
     await craft.browserChecks(browser, url, check, errors, plantSaveAndReload);
     await relay.browserChecks(browser, url, check, errors, plantSaveAndReload, process.env.RELAY_SHOT);
     await glow.browserChecks(browser, url, check, errors);

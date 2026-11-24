@@ -15,7 +15,7 @@ import { drawAnomalies } from './anomaly.js';
 import { drawEcho } from './echo.js';
 
 const CHUNK_PX = CHUNK * CELL;
-const MAX_CACHED_CHUNKS = 48;
+const MAX_CACHED_CHUNKS = 48; // at k = 1; audit 84: scaled by 1/k² (chunk canvases are pre-scaled), never under what one view needs
 const NEXUS_GLOW_BOX = 112; // px half-size: outer ring 62 × 1.05 pulse + 1 line + 32 (4σ of shadowBlur 16) + margin
 
 export class Renderer {
@@ -54,6 +54,11 @@ export class Renderer {
     this.canvas.height = Math.round(this.h * this.dpr);
     this.light.width = Math.round(this.w / 2); this.light.height = Math.round(this.h / 2);
     this.zoom = Math.max(0.62, Math.min(1.25, Math.min(this.w, this.h) / 720));
+    // Audit 84: chunks are painted at zoom·dpr and blitted 1:1 at whole pixels (a scaled blit cost ~25 ms at 4× CPU).
+    const k = this.zoom * this.dpr, view = (Math.ceil(this.w / this.zoom / CHUNK_PX) + 1) * (Math.ceil(this.h / this.zoom / CHUNK_PX) + 1);
+    if (k !== this.chunkK) { this.chunkK = k; this.chunks.clear(); }
+    this.chunkPx = Math.ceil(CHUNK_PX * k) + 1; // +1: covers the ≤ 1 px rounding seam between neighbours
+    this.maxChunks = Math.max(view + 4, 16, Math.floor(MAX_CACHED_CHUNKS / (k * k)));
   }
 
   attach(game) {
@@ -88,19 +93,17 @@ export class Renderer {
     const w = this.game.world;
     const key = cy * w.chunksW + cx;
     let ch = this.chunks.get(key);
-    if (ch && w.dirtyChunks.has(key)) { paintChunk(w, ch.canvas, cx, cy); w.dirtyChunks.delete(key); }
+    if (ch && w.dirtyChunks.has(key)) { paintChunk(w, ch.canvas, cx, cy, this.chunkK); w.dirtyChunks.delete(key); }
     if (!ch) {
-      if (this.chunks.size >= MAX_CACHED_CHUNKS) {
+      while (this.chunks.size >= this.maxChunks) {
         let oldest = null;
         for (const [k, v] of this.chunks) if (!oldest || v.used < oldest[1].used) oldest = [k, v];
         this.chunks.delete(oldest[0]);
         ch = { canvas: oldest[1].canvas };
-      } else {
-        const c = document.createElement('canvas');
-        c.width = c.height = CHUNK_PX;
-        ch = { canvas: c };
       }
-      paintChunk(w, ch.canvas, cx, cy);
+      if (!ch) ch = { canvas: document.createElement('canvas') };
+      if (ch.canvas.width !== this.chunkPx) ch.canvas.width = ch.canvas.height = this.chunkPx;
+      paintChunk(w, ch.canvas, cx, cy, this.chunkK);
       w.dirtyChunks.delete(key);
       this.chunks.set(key, ch);
     }
@@ -142,9 +145,14 @@ export class Renderer {
     const cx0 = Math.max(0, Math.floor(left / CHUNK_PX)), cy0 = Math.max(0, Math.floor(top / CHUNK_PX));
     const cx1 = Math.min(w.chunksW - 1, Math.floor((left + vw) / CHUNK_PX));
     const cy1 = Math.min(w.chunksH - 1, Math.floor((top + vh) / CHUNK_PX));
+    // Audit 84: identity transform, whole-pixel blits of the pre-scaled chunk canvases (getChunk).
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const kc = this.chunkK, ox = (this.w / 2 + shx) * this.dpr - this.cam.x * kc, oy = (this.h / 2 + shy) * this.dpr - this.cam.y * kc;
     for (let cy = cy0; cy <= cy1; cy++) for (let cx = cx0; cx <= cx1; cx++) {
-      ctx.drawImage(this.getChunk(cx, cy), cx * CHUNK_PX, cy * CHUNK_PX);
+      ctx.drawImage(this.getChunk(cx, cy), Math.round(ox + cx * CHUNK_PX * kc), Math.round(oy + cy * CHUNK_PX * kc));
     }
+    ctx.restore();
 
     drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
     drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
