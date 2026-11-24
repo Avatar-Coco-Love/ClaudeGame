@@ -64,3 +64,12 @@ minimap. Glitches ignore it. It follows the throttled perf check (S-15), which p
 - Rejected: Shards as the cost (the Core Matrix already takes ~90 % of a world's ◆); beacons that repel Glitches (a Surge-only perk,
   D-002); a Nexus Development upgrade instead (Nexus upgrades grow the hub; placed items are Crafting, `01`); pick-up/move in v1 (needs
   a hold gesture on touch; cheap to add later if play-tests miss it).
+
+### D-044 — Projects page card: a real frame, served from this site, dark neon in both themes (2026-11-24, session 28, inbox)
+The share image is `og.png` (1200×630): a real frame of seed 7 (the Nexus, an east tunnel, the beam cutting), HUD hidden, no paint-over.
+It lives here and is this page's `og:image`; the Projects card links to it, so a better frame later updates both. `tests/share.cjs`
+checks the meta and the size. The card (`docs/projects-card.html`) is `.card.core`: near-black, cyan title, violet `.go`, in both page
+themes; text says what it is and that it is in progress. Session 28 could not reach the Projects repo, so applying it is in `04` (M8).
+- Rejected: a drawn or composed poster (not a real frame; the note asked for one); the Prism-field frame (busier, no Nexus to read
+  as "home"); following the page's light theme (a pale card hides neon geometry, pillar 1); a copy of the image in the Projects repo (two
+  files to keep in sync).

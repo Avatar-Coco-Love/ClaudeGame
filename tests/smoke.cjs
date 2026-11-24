@@ -186,6 +186,7 @@ async function rngChecks() {
 
 (async () => {
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
+  for (const r of require('./share.cjs').run()) check(r.name, r.ok, r.detail);
   await rngChecks().catch(e => check('S-5 RNG checks ran', false, e.message));
   await ringChecks().catch(e => check('S-8 ring checks ran', false, e.message));
   await vaultChecks().catch(e => check('S-9 vault checks ran', false, e.message));

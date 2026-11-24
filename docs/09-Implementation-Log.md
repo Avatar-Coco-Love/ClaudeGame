@@ -52,3 +52,13 @@ Older entries: v0.1 to session 2 in `archive/2026-11-23-09-sessions-0-2.md`, ses
 - **Play-test** (1280×800, DSF 1, seed 77, Beam 2, Veil): Wide's three beams read as one tool and carve a clean hall; in Surge (god)
   the side rays help aim at a Glitch but each Glitch takes one ray (D-041), so kills are slower; switching to Focus is the answer.
 - **Specs:** S-14 refined, S-15 gets the pickup spawn call, new **S-16 Beacons v1** (first Crafting item, 5▲ each). No gameplay code.
+
+## 2026-11-24 — Session 28 (v0.1.30): Inbox — Lumen Core card for the Projects page
+- **Inbox:** the owner asked for a Lumen Core card on the Projects page (archived: `docs/archive/2026-11-24-projects-page-card.md`).
+- **Blocked:** this session could not attach `avatar-coco-love.github.io` (repo access denied) or fetch the live page (proxy 403),
+  so the note's fallback ran: the finished card is `docs/projects-card.html`; applying it waits in `04` M8 (D-044).
+- **Built:** `og.png` from 4 real frames of seed 7 (Playwright 1200×630, HUD hidden); picked the Nexus + east tunnel one. `og:*` and
+  `twitter:card` meta on `index.html`. `tests/share.cjs` (3 checks, in smoke): with the old `index.html` 2 of 3 fail.
+- **Screenshots:** card preview on a stand-in grid at 320 px and 1280 px, light and dark: no overflow, title glow reads, image sharp.
+  The stand-in is not the real page's CSS, so the apply session must screenshot the real one.
+- Session type: 28 was due a Build (S-14); the inbox comes first by rule, so S-14 moves on. 29 % 5 == 4: next is an Audit.
