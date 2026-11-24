@@ -2,7 +2,7 @@
 import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S } from './config.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
-import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
+import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, relayAt, PLACE_GLYPH } from './craft.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { tickEnding, endingSummary, fmtTime } from './ending.js';
 import { upgradeSave } from './save.js';
@@ -136,6 +136,7 @@ function hint() {
   if (primedHere(g) && g.mode === 'surge') return g.wake && g.wake.s === spireHere(g) ? 'Circle the core: beam the Glitches before they reach it' // S-23; B-051: this Spire's Wake
     : g.wake ? 'Another Spire is waking — go back and guard it' : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
+  if (relayAt(g) && g.cargoTotal() === 0 && g.craft.relay < RELAY_STOCK) return touch ? `Tap ${PLACE_GLYPH.relay}↑ to pick up this Relay` : 'B: pick up this Relay'; // S-34: the button shows ⊕↑ here
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
   if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : 'Upgrade ready — press E at the Nexus'; // B-010
   if (g.stats.upgrades === 0 && g.bank.shard + g.cargo.shard >= upgradeCost(0).shard) return 'Bring shards home to the Nexus to upgrade';
@@ -149,7 +150,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock].join('|'); // S-28: the primed hint
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g)].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -170,10 +171,12 @@ function updateHud() {
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
     const pk = placeKind(g), pn = PLACE_NAME[pk]; // S-16, S-22: shown while anything is carried: the item B / ✦ places, and its count
-    $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay < 1);
-    $('place-glyph').textContent = PLACE_GLYPH[pk];
-    $('beacon-count').textContent = g.craft[pk];
-    $('beacon-btn').title = `Place a ${pn} (B)`; $('beacon-btn').setAttribute('aria-label', `Place a ${pn}`);
+    const lift = !!relayAt(g); // S-34: in a Relay's ring the same button picks it up (touch players have no B key)
+    $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay < 1 && !lift);
+    $('place-glyph').textContent = lift ? PLACE_GLYPH.relay : PLACE_GLYPH[pk];
+    $('beacon-count').textContent = lift ? '↑' : g.craft[pk];
+    const lbl = lift ? 'Pick up this Relay' : `Place a ${pn}`;
+    $('beacon-btn').title = `${lbl} (B)`; $('beacon-btn').setAttribute('aria-label', lbl);
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -191,7 +194,7 @@ function updateHud() {
     if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
-    if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16, S-22
+    if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }
   g.events.length = 0;
@@ -217,7 +220,8 @@ const PLACE_MAX = { beacon: BEACON_MAX, relay: RELAY_MAX };
 function placeToast(kind = 'beacon', why) {
   const n = PLACE_NAME[kind];
   return { placed: `${n} placed`, none: `No ${n}s — craft at the Nexus`, blocked: 'Blocked', nexus: 'Too near the Nexus',
-    near: `Too near a ${n}`, vault: 'Too near a vault', spire: 'Too near a Spire', max: `${n} limit (${PLACE_MAX[kind]})` }[why] || '';
+    near: `Too near a ${n}`, vault: 'Too near a vault', spire: 'Too near a Spire', max: `${n} limit (${PLACE_MAX[kind]})`,
+    picked: 'Relay picked up — place it further out', carrying: 'Already carrying a Relay' }[why] || ''; // S-34
 }
 // S-16, S-22: the Craft tab's rows. Stock, not levels: the value line says what is carried and placed.
 function craftRow(id, desc, stock, cost, can, craftIt) {

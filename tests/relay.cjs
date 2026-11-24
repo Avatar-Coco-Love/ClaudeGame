@@ -147,7 +147,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload, sh
     });
   });
   check('B places a Relay at d 30 (⊕ on the button); cargo beside it banks; it lights, and the minimap shows a cyan ring (S-22)',
-    /⊕1/.test(btn) && placed.r === 'placed' && /Relay placed/.test(placed.toast) && placed.n === 1 && placed.hidden && banked.cargo === 0 && banked.bank.shard === 15
+    /⊕1/.test(btn) && placed.r === 'placed' && /Relay placed/.test(placed.toast) && placed.n === 1 && !placed.hidden /* S-34: in its ring ✦ now offers pick-up */ && banked.cargo === 0 && banked.bank.shard === 15
     && banked.bank.prism === 10 && look.lights === '0,1,0' && look.at < 60 && look.off > 200 && look.ring >= 8,
     JSON.stringify({ btn, placed, banked, look }));
   await plantSaveAndReload(pg, s => s);
