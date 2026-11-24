@@ -55,13 +55,14 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
   return null;
 }
 
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on' }) {
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', echo = false, onTick = null }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
   for (const s of g.anomaly.sites) if (anomaly !== 'on' && s.kind !== anomaly) s.void = true; // S-36: off / one kind only
   if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[build] ? (LEVELS[build][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull');
   if (route === 'spire') g.bank.prism = bank;
+  if (echo) g.research.echo = true; // S-42: echobot runs the same routes with the Echo along
   const capT = minutes * 60, cellOf = (x, y) => Math.floor(y / CELL) * W + Math.floor(x / CELL);
   const cx = i => (i % W + 0.5) * CELL, cy = i => (((i / W) | 0) + 0.5) * CELL;
   let deaths = 0, stuck = 0, skipped = 0, t = 0; const die = g.destabilize.bind(g); g.destabilize = () => { deaths++; die(); };
@@ -96,6 +97,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     const aimAt = e || dig || (m >= 2 ? to : { x: p.x + Math.cos(p.angle), y: p.y + Math.sin(p.angle) });
     g.update(dt, { move, fire: !!(e || dig), aim: { x: aimAt.x - p.x, y: aimAt.y - p.y } });
     t += dt;
+    if (onTick) onTick(g, dt);
   };
   const inNexusCell = i => Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) < NEXUS_RADIUS - CELL;
   const depositCell = i => inNexusCell(i) || g.relays.some(r => Math.hypot(cx(i) - r.x, cy(i) - r.y) < r.r * 0.6);

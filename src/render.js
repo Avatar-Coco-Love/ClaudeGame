@@ -12,6 +12,7 @@ import { paintChunk } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
 import { drawAnomalies } from './anomaly.js';
+import { drawEcho } from './echo.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -156,6 +157,7 @@ export class Renderer {
     this.drawEnemies(ctx, false);
     this.drawBeam(ctx);
     drawSpireFeed(this, ctx, left, top, vw, vh); // S-20: primed facets + the fed / 80 arc
+    drawEcho(this, ctx); // S-42
     this.drawPlayer(ctx);
     this.drawParticles(ctx);
     ctx.restore();

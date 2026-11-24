@@ -77,6 +77,7 @@ export class World {
     this.chunksH = Math.ceil(this.h / CHUNK);
     this.dirtyChunks = new Set();
     this.listeners = [];
+    this.breaks = 0; // S-42: count of destroyed cells (the Echo rebuilds its field when it moves)
     this.rings = new Uint8Array(this.w * this.h); // S-8: ring index per cell, fixed by distance alone
     for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
       const d = Math.hypot(x + 0.5 - this.cx, y + 0.5 - this.cy);
@@ -179,6 +180,7 @@ export class World {
     this.cells[i] = T.EMPTY;
     this.damage[i] = 0;
     this.broken[i] = 1;
+    this.breaks++; // S-42: the Echo's field rebuilds when this changes
     this.markDirty(x, y);
     for (const fn of this.listeners) fn(x, y);
   }

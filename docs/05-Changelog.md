@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.2.20 — 2026-11-24 (#87)
+- **New: the Echo** (Research, 30 ●). A small hollow diamond, a lesser core, follows you on a faint tether, finds its
+  way round bends, and blinks back to your side if it gets stuck. While you move or aren't mining, it mines exposed
+  Shard, Prism and Lumen cells near you (never rock) at half your beam's power; the yield drops for your Attractor.
+  It rests inside the Nexus ring and stops while your cargo is full.
+
 ## v1.2.19 — 2026-11-24 (#86)
 - **Fixes:** a damaged save no longer stops the game from starting (it now starts fresh instead of freezing on a black
   screen); the "NEXUS" label on the pointer is centred again; the Craft, Wide Beam and Scanner messages name the key you

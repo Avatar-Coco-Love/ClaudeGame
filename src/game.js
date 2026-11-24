@@ -6,6 +6,7 @@ import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTO
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
+import { updateEcho } from './echo.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
@@ -64,6 +65,7 @@ export class Game {
       angle: -Math.PI / 2, invuln: 0, hurtFlash: 0, // integrity: set from the hull stat below
     };
     this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null, facetLatch: null, midEnemy: false }; // S-14: Pulse state
+    this.echo = null; // S-42: the live Echo (echo.js) once research.echo; never saved
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
@@ -203,6 +205,7 @@ export class Game {
     if (intent.beamMode && cycleBeamMode(this)) this.notify('beam-mode');
     if (intent.place) tryPlace(this); // S-16
     this.updateBeam(dt, intent);
+    updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
     this.updatePickups(dt);
     this.updateDeposit(dt);
     updateAnomalies(this, dt); // S-35: after the deposit, so a buff taken this frame is never ended by it

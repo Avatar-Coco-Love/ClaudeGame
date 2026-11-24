@@ -116,6 +116,7 @@ export class Audio {
   // S-27: a dormant Spire comes into view: one soft low tone (a sine fifth, G3 + D4, slow fade), quieter than a cache.
   spire() { this.tone(196, 0.45, { type: 'sine', vol: 0.05 }); this.tone(294, 0.4, { type: 'sine', vol: 0.025, delay: 0.05 }); }
   // S-28: a facet flips: one short soft sine, higher when it turns on. A relit Spire: a rising 3-note sine (G4 B4 D5).
+  echoBlink() { this.tone(988, 0.14, { type: 'sine', vol: 0.035, slide: -240 }); } // S-42: the Echo blinks back, soft
   facet(on) { this.tone(on ? 740 : 494, 0.12, { type: 'sine', vol: 0.06 }); }
   spireRelit() { [392, 494, 587].forEach((f, i) => this.tone(f, 0.3, { type: 'sine', vol: 0.07, delay: i * 0.1 })); }
   anomaly() { [523, 659, 784].forEach((f, i) => this.tone(f, 0.16, { type: 'sine', vol: 0.06, slide: 120, delay: i * 0.06 })); } // S-35: a rising take tone

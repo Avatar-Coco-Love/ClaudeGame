@@ -57,3 +57,18 @@ Continues `06-Decisions-14.md` (same rules: supersede, never edit; list rejected
 - D-026: a death's scatter is bounded by the hold, which is 140 normally and 210 with Ballast (D-103); still bounded.
 - D-044: `docs/projects-card.html` never existed in this repo; the card lives in the Projects repo (#14, `04`).
 - Rejected: editing the old entries' text (06 is append-only; only their headings point here).
+
+### D-112 — S-42 Echo as built: path-or-line progress, a break counter, no draws (2026-11-24, session 80, Build)
+- Built per S-42 (`src/echo.js`). Live state is never saved (owning it is `research.echo`); it spawns on the first frame.
+- **Steering:** a clear straight line to the core (sampled every 4 px at its radius) wins; else the 4-neighbour one step
+  down the field. It follows when > 3 cells away or > 4 field steps (around a bend), eases away under 1.5 cells.
+- **Stuck rule:** progress = the larger of straight-line and field-path gain over the 1.5 s window, so a bend (no
+  straight gain) is not "stuck". **Field rebuild:** `World.breaks` counts destroyed cells; any change rebuilds (bounded
+  49×49 BFS, cheap) instead of a listener (render.js replaces `world.listeners`).
+- **"Core busy"** = beam on a cell or Glitch while the core is still (realized speed ≤ 20 px/s); then Gather waits.
+- **No random draws** (blink spots in a fixed order), so it needs no salt of its own (D-025 holds trivially).
+- Measured (echobot, 12 seeds × 10 min, mine route): strands 0; lag median 2.8 cells; blinks ~1/min. ◆/min gain:
+  mid build Drift ×1.45, Surge ×1.38 (ratio 1.05); start build ×1.12 / ×1.05. Within the 10 % parity bar.
+- Rejected: a world break listener (overwritten by the renderer); euclidean-only progress (blinked at every bend in a
+  test lab); a seeded stream for blink spots (nothing random to draw); mining while the core mines a cell (doubles a
+  single dig instead of gathering around it).
