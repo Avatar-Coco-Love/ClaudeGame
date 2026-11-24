@@ -25,7 +25,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#18) **S-8 Depth rings:** Hearth / Veil / Deep by distance, own rock palette and toughness, named on entry, coloured on the minimap (D-028).
 - ✅ (#20) **S-9 Vaults:** 6 sealed 7×7 rooms at d 50–72 with a cache (20◆ + 6▲); old saves skip vaults they already saw (D-031).
 - ✅ (#22) **S-10 Lumen ore:** gold ● cells at d ≥ 55 (~141 per world), banked like Shards; nothing spends it yet (D-033).
-## M3 — Research (new *kinds* of things)
+## M3 — Research (new *kinds* of things) ✅ (closed by #45; counted in v0.4, D-077)
 - ✅ (#23) **S-11 Research v1:** a Research tab paid in Lumen; first node = Scanner ping (F / ◎, 12-cell ore reveal, 20 s cooldown) (D-034).
 - ✅ (#24) Design session 22: Lumen → Scanner play-tested, Q-010 measured and settled (D-035), beam modes specced (D-036).
 - ✅ (#27) **S-12 Scanner shows vault caches** (D-035): a cache within the ping's 12 cells shows as a white glyph + blip, one soft tone (D-040).
@@ -36,10 +36,10 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ (#45) **S-21 Pulse ready shot:** full charge waits for a target in reach; `PULSE_GLITCH` 1.8; standoff as D-054 predicted (D-059).
 - ✅ (#47) Design session 42: Beacons + Pulse play-tested, Q-013 + Q-014 settled (D-061, D-062), M5 specs cut to one PR each (D-063).
 
-## M4 — Crafting & building
+## M4 — Crafting & building ✅ (v0.4, D-077)
 - ✅ (#46) **S-16 Beacons v1** (5▲, Craft tab, `SAVE_FORMAT` 9): placed light, 140 px, minimap dot; B / ✦ is the build-mode UX (D-043, D-048, D-060).
 - ✅ (#48) **S-25 Beacon floor glow + B-034:** faint cyan floor tint in beacon pools (D-061); short-landscape ◎ ⟂ glyph-only (D-064).
-- **S-22 Relays v1** (12▲ + 40◆, ≤ 3): remote deposit, no heal; reuses S-16 placement (D-056). M4 done → v0.3.
+- ✅ (#55) **S-22 Relays v1** (12▲ + 40◆, ≤ 3, `SAVE_FORMAT` 11): remote deposit, no heal; B / ✦ places `craft.last` (D-056, D-076).
 
 ## M5 — The arc (a reason to go deep) — ships v1.0
 - ✅ (#50) **S-26 `light.js` split:** darkness + floor glow in `light.js`, chunk painting in `terrain.js`, `R.lightSets`; cached hole sprites (D-067).

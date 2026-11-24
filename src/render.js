@@ -4,7 +4,7 @@
 import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
-import { drawBeacons } from './craft.js';
+import { drawBeacons, drawRelays } from './craft.js';
 import { drawSpireBreath } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { paintChunk } from './terrain.js';
@@ -46,7 +46,7 @@ export class Renderer {
 
   attach(game) {
     this.game = game;
-    this.lightSets = [game.beacons]; // S-16: the same array, so a placed beacon lights at once (S-22 adds relays)
+    this.lightSets = [game.beacons, game.relays]; // S-16, S-22: the same arrays, so a placed item lights at once
     this.chunks.clear();
     const w = game.world;
     this.mini.width = w.w; this.mini.height = w.h;
@@ -133,6 +133,7 @@ export class Renderer {
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16
+    drawRelays(this, ctx, left, top, vw, vh); // S-22
     this.drawCrack(ctx);
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);

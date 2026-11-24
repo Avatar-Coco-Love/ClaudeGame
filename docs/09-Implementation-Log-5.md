@@ -42,3 +42,22 @@ Continues `09-Implementation-Log-4.md` (split at the 8 KB cap, session 49). Newe
 - Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36); a full Pulse fires out of reach (37); draw cost as counts + ratios (38, `drawcost.cjs`);
   blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`); full Pulse holds at open floor, one-shots tier 3 at Beam 2 (40); beacons: rules, light pixel, reload, format 8, phones ×3 (41, `craft.cjs`); pool floor 3.3 → 7.1 luma, walls same (43, `glow.cjs`); no HUD overlap at 4 landscape sizes (43); Pulse waits at bedrock, bad saves load, HUD text fits, no bare tuning in `game.js` (audit 44); S-26 split byte-same ×8 scenes (45); Spire found once, breath, minimap mark, 320 bank (48).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no square-wave buzz (audit 24).
+
+## Session 50 — Build: S-22 Relays (v0.4.54, #55)
+- **What:** Craft row Relay (40◆ + 12▲, carry 1, ≤ 3); B / ✦ places `craft.last` if carried, else the other item (the
+  button shows ⊕ or ✦ and its count). Refusals: d < 24 "Too near the Nexus", < 16 cells from a Relay / vault centre /
+  Spire footprint, rock or an occupied cell. Cargo within 64 px banks with the Nexus ticks + chime; no heal, no repel.
+  ⊕ + dashed 64 px ring in the world, 100 px light + cyan floor glow (`lightSets[1]`), minimap ring. `SAVE_FORMAT` 11
+  (`relays`, `craft.relay`, `craft.last`). M3 + M4 done → v0.4 (D-077). `05` v0.2.39–42 archived word for word (size cap).
+- **Checks** (`tests/relay.cjs`, 16): cost exact, both costs needed; each refusal + good placement; vault / Spire gaps;
+  banking ◆ ▲ ● with 9 ticks + chime and streaks toward the Nexus; Surge integrity stays 1 at a Relay; 20 px outside the
+  radius nothing banks; `placeKind` order; reload; previous-format save; malformed saves clamp; cap 3; browser: Craft tab
+  row + lock, B at d 30 places and banks, light at the Relay 1 / 237 dark 220 px off, minimap ring, reload; 320×568 tab
+  fits + ⊕ tap places. New file, so each check failed on the old code (no `craftRelay` / `relays`).
+- **Observed (screens viewed):** 1280×800 a cyan ⊕ in its own pool with a faint dashed ring; 320×568 both Craft rows fit,
+  the Relay row reads "Banks your cargo where it stands … No healing". First run: the Relay toast queued behind "Entering
+  the Veil" (D-073 working as meant); the test now marks rings seen. `game.js` bare `200` caught by audit 44's tuning check.
+- **Parity (D-002):** `tools/relayrun.mjs` 20 seeds: 10▲ from d 60 → 6.95 s home, 1.42 s with a Relay at d 50 (2 seeds
+  refused: a vault or Spire within 16 cells of d 50). Surge start build 9.64 → 1.80 s, 0 deaths either way. Equal gain
+  in both modes; in Surge it cuts the cargo-carrying exposure ~5× but never heals. No bugs found.
+

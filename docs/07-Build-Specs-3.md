@@ -7,7 +7,7 @@ not near each Spire (D-070), so the feed takes cargo then bank; the ending needs
 Shard budget: world ~2750◆, full Core Matrix 2482◆ → 268◆ spare; Relays take 120◆ (45 % of it). Tight on purpose: a
 player who maxes the Matrix first buys Relays from Surge drops (~9◆/min, Q-007) or leaves one Matrix level for later.
 
-## S-22 — Relays v1 (Crafting, M4 closes → v0.3) (D-056) — sink: 12▲ + 40◆ each, ≤ 3 (36▲ / 120◆ per world, above)
+## S-22 — ✅ BUILT (#55, v0.4.54; as built: D-076). Relays v1 (Crafting, M4 closes) (D-056) — sink: 12▲ + 40◆ each, ≤ 3 (36▲ / 120◆ per world, above)
 - Craft row `relay`, "Relay", **12▲ + 40◆**, `RELAY_STOCK` 1 unplaced, `RELAY_MAX` 3 placed. Glyph ⊕ (a ring with a cross; geometry).
 - **Place:** S-16's B / ✦ places the item crafted most recently that is still in stock (`craft.last`); the button shows
   that item's glyph and count. Refused (S-16's toasts) unless the cell is open, d ≥ `RELAY_MIN_D` 24 cells, and

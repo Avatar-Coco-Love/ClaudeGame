@@ -2,7 +2,7 @@
 // and the touch sticks. Each takes the Renderer `r` (its canvases, camera, time and game).
 import { CELL, T, RINGS, RESOURCE, ORE_KIND } from './config.js';
 import { markAlpha } from './research.js';
-import { BEACON_COLOR } from './craft.js';
+import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
 
 const MINI_COLORS = {
@@ -48,6 +48,8 @@ export function drawMinimap(r) {
   m.globalAlpha = 1;
   m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
+  m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown
+  for (const q of g.relays) { m.beginPath(); m.arc(q.x * sc, q.y * sc, 3.5, 0, Math.PI * 2); m.stroke(); }
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();

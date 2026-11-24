@@ -26,3 +26,20 @@ Continues `06-Decisions-9.md` (same rules: supersede, never edit; list rejected 
   that a bare format-1 save upgrades to SAVE_FORMAT and loads. Old saves in tests still say `{ v: 9 }`: that is their format.
 - Rejected: a comment in `save.js` only (the rule was already understood and broken twice; CLAUDE.md asks for a check).
 
+
+### D-076 — S-22 Relays as built (2026-11-24, session 50; implements D-056)
+- `game.relays` = `[{ i, x, y, r, glow }]` is `R.lightSets[1]`; `craft = { beacon, relay, last }`; `SAVE_FORMAT` 11.
+  `game.atDeposit()` (Nexus ring or a Relay's 64 px) drives banking and the cargo-full toast; heal, Matrix and Glitch
+  repel still read `inNexus()`. Streaks fly `RELAY_STREAK_PX` 200 toward the Nexus (a full trip would leave the screen).
+- **B / ✦ places `craft.last` if still carried, else the other carried item** (`placeKind`): one key, no dead press.
+- Refusals beyond S-16's: "Too near a vault" / "Too near a Spire" (own words, so the player knows what to move from);
+  a cell already holding a Beacon or Relay is "Blocked". A Relay reveals nothing on placement (it is not a light tool).
+- A faint dashed ring at 64 px shows where cargo banks. Measured (`tools/relayrun.mjs`, 20 seeds, mid build): a 10▲ haul
+  from d 60 takes 6.95 s to the Nexus, 1.42 s with a Relay at d 50 (−80 %; spec asked ≥ 30 %); Surge same (start build
+  9.64 → 1.80 s), 0 deaths either way on a cleared tunnel. Same gain in both modes; no heal, so Surge gets no perk (D-002).
+- Rejected: a separate key per item (D-056); refusing a Relay without saying why vault/Spire; a reveal like a Beacon's.
+
+### D-077 — M3 and M4 are both done: v0.4 (2026-11-24, session 50; applies D-046, corrects D-056/D-063's "v0.3")
+- M3's last item (S-21, #45) shipped before D-063 was written, but no version bump followed; D-056/D-063 still said
+  "M4 done → v0.3". D-046's rule is the highest N with M1…MN all ✅: M1–M4 → **v0.4.54**. Both headers now say ✅.
+- Rejected: v0.3 (would keep a minor that matches no rule); renumbering past versions (history in `05` stays as shipped).

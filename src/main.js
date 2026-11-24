@@ -1,8 +1,8 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX } from './config.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
-import { canCraft, craftBeacon } from './craft.js';
+import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, PLACE_GLYPH } from './craft.js';
 import { spiresSeen, spiresLit } from './spire.js';
 import { upgradeSave } from './save.js';
 import { Game } from './game.js';
@@ -126,7 +126,7 @@ function updateHud() {
   const cap = g.stat('cargo'), total = g.cargoTotal();
   const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon].join('|');
+  const key = [g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last].join('|');
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -146,8 +146,11 @@ function updateHud() {
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
-    $('beacon-btn').classList.toggle('hidden', g.craft.beacon < 1); // S-16: shown while a Beacon is carried, with the count
-    $('beacon-count').textContent = g.craft.beacon;
+    const pk = placeKind(g), pn = PLACE_NAME[pk]; // S-16, S-22: shown while anything is carried: the item B / ✦ places, and its count
+    $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay < 1);
+    $('place-glyph').textContent = PLACE_GLYPH[pk];
+    $('beacon-count').textContent = g.craft[pk];
+    $('beacon-btn').title = `Place a ${pn} (B)`; $('beacon-btn').setAttribute('aria-label', `Place a ${pn}`);
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -160,7 +163,7 @@ function updateHud() {
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
-    if (ev === 'beacon') { toast(BEACON_TOAST[g.placeResult] || '', 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16
+    if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16, S-22
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }
   g.events.length = 0;
@@ -180,21 +183,26 @@ function closePanel() {
 }
 let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1)
 const costHtml = c => ['shard', 'prism', 'lumen'].filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
-// S-16: placement outcomes, short so they read mid-run (Relays will reuse them, D-048).
-const BEACON_TOAST = { placed: 'Beacon placed', none: 'No Beacons — craft at the Nexus', blocked: 'Blocked', nexus: 'Too near the Nexus',
-  near: 'Too near a Beacon', max: `Beacon limit (${BEACON_MAX})` };
-// S-16: the Craft tab's one row. Stock, not levels: the value line says what is carried and placed.
-function craftRow() {
-  const g = game, row = document.createElement('div');
-  row.className = 'upgrade'; row.dataset.id = 'beacon';
+// S-16, S-22: placement outcomes, short so they read mid-run (D-060).
+const PLACE_NAME = { beacon: 'Beacon', relay: 'Relay' };
+const PLACE_MAX = { beacon: BEACON_MAX, relay: RELAY_MAX };
+function placeToast(kind = 'beacon', why) {
+  const n = PLACE_NAME[kind];
+  return { placed: `${n} placed`, none: `No ${n}s — craft at the Nexus`, blocked: 'Blocked', nexus: 'Too near the Nexus',
+    near: `Too near a ${n}`, vault: 'Too near a vault', spire: 'Too near a Spire', max: `${n} limit (${PLACE_MAX[kind]})` }[why] || '';
+}
+// S-16, S-22: the Craft tab's rows. Stock, not levels: the value line says what is carried and placed.
+function craftRow(id, desc, stock, cost, can, craftIt) {
+  const g = game, row = document.createElement('div'), list = id === 'relay' ? g.relays : g.beacons;
+  row.className = 'upgrade'; row.dataset.id = id;
   row.innerHTML = `
-    <div class="u-main"><div class="u-name">Beacon</div><div class="u-desc">Placed light: brightens ${BEACON_LIGHT} px for good and marks the map. ${input.usingTouch ? 'Tap ✦' : 'Press B'} out in the caves</div>
-      <div class="u-val">Carried <b>${g.craft.beacon}/${BEACON_STOCK}</b> · Placed ${g.beacons.length}/${BEACON_MAX}</div></div>
-    <button class="buy" ${canCraft(g) ? '' : 'disabled'}>${costHtml({ prism: BEACON_COST })}</button>`;
+    <div class="u-main"><div class="u-name">${PLACE_NAME[id]}</div><div class="u-desc">${desc} ${input.usingTouch ? `Tap ${PLACE_GLYPH[id]}` : 'Press B'} out in the caves</div>
+      <div class="u-val">Carried <b>${g.craft[id]}/${stock}</b> · Placed ${list.length}/${PLACE_MAX[id]}</div></div>
+    <button class="buy" ${can(g) ? '' : 'disabled'}>${costHtml(cost)}</button>`;
   row.querySelector('.buy').addEventListener('click', () => {
-    if (!craftBeacon(g)) return;
+    if (!craftIt(g)) return;
     renderPanel(); persist();
-    $('upgrade-list').querySelector('[data-id="beacon"]')?.classList.add('flash');
+    $('upgrade-list').querySelector(`[data-id="${id}"]`)?.classList.add('flash');
   });
   return row;
 }
@@ -251,7 +259,8 @@ function renderPanel() {
   const list = $('upgrade-list');
   list.innerHTML = '';
   if (panelTab === 'craft') {
-    list.appendChild(craftRow());
+    list.appendChild(craftRow('beacon', `Placed light: brightens ${BEACON_LIGHT} px for good and marks the map.`, BEACON_STOCK, { prism: BEACON_COST }, canCraft, craftBeacon));
+    list.appendChild(craftRow('relay', 'Banks your cargo where it stands, like the Nexus ring. No healing.', RELAY_STOCK, RELAY_COST, canCraftRelay, craftRelay));
   } else if (panelTab === 'research') {
     for (const r of RESEARCH) list.appendChild(researchRow(r));
     if (RESEARCH.every(r => g.research[r.id] || !canResearch(g, r.id)) && !RESEARCH.every(r => g.research[r.id])) {
