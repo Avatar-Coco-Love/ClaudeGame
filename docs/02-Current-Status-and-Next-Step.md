@@ -1,8 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_
-
-**Session counter: 29** · **Version: v0.1.33** (session 29: Audit; #32–#33 deploy fixes, #34 findings; 30 % 5 == 0, so next is a Build)
+_Last updated: 2026-11-24_ · **Session counter: 30** · **Version: v0.2.34** (session 30: inbox, v1.0 scope; rotation: 31 Build, 32 Design, 33 Build, 34 Audit).
+**Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); the Projects page card is live (Projects repo #14, session 29).
@@ -56,4 +55,4 @@ _Last updated: 2026-11-24_
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 30: fix the **"Fix first"** list in `08-Audit-29-Findings.md` (5 bugs, re-verify each, one failing-first test each). Then its touch list, then S-14 Pulse beam (`07`, D-042).
+Session 31 (Build): fix the **"Fix first"** list in `08-Audit-29-Findings.md` (5 bugs, re-verify each, one failing-first test each). Then its touch list, then S-14 Pulse beam (`07`, D-042).

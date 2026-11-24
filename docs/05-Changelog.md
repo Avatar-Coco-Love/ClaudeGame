@@ -1,7 +1,11 @@
 # 05 — Changelog
 
-One entry per merged PR, newest first. Version = `0.<milestone>.<PR count>`. `VERSION` in `src/config.js` must match the top entry
+One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
+
+## v0.2.34 — 2026-11-24 (#35)
+- No gameplay change. The game now has a finish line: version 1.0 arrives with the Spires, the ending and New Cycle.
+  The middle version number now counts finished milestones, so this is 0.2 (the depth rings, vaults and Lumen are done).
 
 ## v0.1.33 — 2026-11-24 (#34)
 - Health check, no gameplay change yet: found bugs to fix next (mining can stop dropping anything when the floor is

@@ -31,11 +31,8 @@ once every item is fixed or moved to `04` Debt. Perf audit was stopped before re
 - A second finger on a side isn't adopted when that side's stick lifts (`input.js:50-53`). Adopt it in onTouchEnd.
 
 ## Docs drift (fold into any PR)
-- `01` still calls Nexus Development and Research "(planned)"; both are built.
 - README controls miss F scan, Q beam mode, M mute, Enter Matrix.
-- `04` Tooling says probes take `MODE=pulse`, but no `BEAM_MODES.pulse` exists: it silently runs Focus. Note it, or make
-  the tools reject unknown modes.
-- `03` Q-007 says Glitch loot is "1▲ + 2–4◆"; code is 50 % ▲ and 2+tier ◆ (2–5).
+- `04` Tooling `MODE=pulse` runs Focus: noted in `04` (session 30); still make the tools reject unknown modes.
 - `02`/D-021 say hitstop is crystal/prism only; it fires on any yield cell (Lumen too). Wording only.
 - `04` Debt "Bedrock edge … beam shows no hit": the beam does spark (beam.js ≈59-62), no crack. Re-check on screen.
 

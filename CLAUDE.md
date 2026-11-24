@@ -35,7 +35,8 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - If a file passes ~600 lines, split it as part of that session's work.
 
 ## Tracking across versions
-- `src/config.js` `VERSION` = `0.<milestone>.<PR count>`, shown on the title screen. `docs/05-Changelog.md` gets one player-facing entry per PR.
+- `src/config.js` `VERSION` = `<major>.<minor>.<PR count>`, shown on the title screen (D-046): minor = milestones shipped in a row (M1…MN all ✅);
+  **1.0 = M5 shipped** (the v1.0 scope, `01` + D-045); after 1.0, M6 → 1.1, M7 → 1.2, M8 → 1.3. The PR count never resets. `docs/05-Changelog.md` gets one player-facing entry per PR.
 - `docs/06-Decisions.md` is the only place a decision is settled. Supersede, never silently edit. Bugs get B-xxx IDs in `09`.
 - `tests/docs.cjs` (run inside smoke) enforces: docs ≤ 8 KB, `02` ≤ 60 lines with one Next step, VERSION = top changelog entry, inbox empty.
 - A rule asked for or learned goes into the docs **in the same PR**. A rule broken twice gets a check (test or tool), not more words.
