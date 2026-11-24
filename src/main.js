@@ -1,5 +1,6 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S } from './config.js';
+import { weatherLeft } from './weather.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, relayAt, PLACE_GLYPH } from './craft.js';
@@ -195,6 +196,8 @@ function updateHud() {
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
+    if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
+    if (ev === 'weather-end') toast(g.weather.was === 'storm' ? 'The storm passes' : 'The aurora fades', 2600, KEEP);
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }
   g.events.length = 0;

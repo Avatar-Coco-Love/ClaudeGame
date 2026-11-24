@@ -10,6 +10,7 @@ import { drawLight, drawLightGlow } from './light.js';
 import { endingView, drawOverview } from './ending.js';
 import { paintChunk } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
+import { drawAurora } from './weather.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -136,6 +137,7 @@ export class Renderer {
       ctx.drawImage(this.getChunk(cx, cy), cx * CHUNK_PX, cy * CHUNK_PX);
     }
 
+    drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16

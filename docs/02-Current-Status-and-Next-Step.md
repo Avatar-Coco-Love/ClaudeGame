@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 65** · **Version: v1.0.5** (session 65: S-32 Spitter; v1.0 shipped in 61; rotation: 66 Build, 67 Design, 68 Build, 69 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 66** · **Version: v1.1.6** (session 66: S-33 Weather, M6 ✅; rotation: 67 Design, 68 Build, 69 Audit, 70 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -13,6 +13,8 @@ _Last updated: 2026-11-24_ · **Session counter: 65** · **Version: v1.0.5** (se
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch that gains no ground on the core for 6 s fades out and frees its slot (D-017); kills drop a Prism half the time (D-018).
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
+- Weather (S-33, D-097, `weather.js`): every 300–420 s of `stats.time` (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
+  Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending.
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -40,7 +42,7 @@ _Last updated: 2026-11-24_ · **Session counter: 65** · **Version: v1.0.5** (se
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-4`, 1 PR each, D-063): M6 S-32, S-33 (D-087). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-4`, 1 PR each, D-063): all built; M6 ✅ (v1.1). M7 (Temporary upgrades, `04`) has no spec yet. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (wakeprobe D-087; surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
@@ -50,5 +52,5 @@ _Last updated: 2026-11-24_ · **Session counter: 65** · **Version: v1.0.5** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 66 (Build): **S-33 Weather** (`07-Build-Specs-4.md`; the last M6 spec, D-087); measure haul with
-`surgebot --route=mine` (and `deep`, D-096). Audit 64 Debt in `04-Roadmap-2.md`. Read only this file to start.
+Session 67 (Design): play-test weather (storm + aurora, `surgebot --weather=on`), settle Q-019, then write build-ready
+specs (S-35…) for **M7 Temporary upgrades** in a new `07-Build-Specs-5.md`. Read only this file to start.
