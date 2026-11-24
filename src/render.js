@@ -1,9 +1,9 @@
 // World drawing (terrain chunk cache, entities, beam, light, Scanner). Screen-space HUD drawing (minimap, Nexus pointer,
 // touch sticks) is in hud.js. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE } from './config.js';
+import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
-import { drawBeacons } from './craft.js';
+import { drawBeacons, drawBeaconGlow } from './craft.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -21,6 +21,7 @@ export class Renderer {
     this.mini = document.createElement('canvas');
     this.cam = { x: 0, y: 0 };
     this.time = 0;
+    this.beaconGlow = BEACON_GLOW; // S-25 floor-glow centre alpha (tests set 0 to compare)
     this.extraLights = []; // [{x, y, r}] world-space light holes beyond the core, Nexus and beam: the game's beacons (S-16)
     this.resize();
     addEventListener('resize', () => this.resize());
@@ -174,6 +175,7 @@ export class Renderer {
     const vw = this.w / s, vh = this.h / s;
     const left = this.cam.x - vw / 2, top = this.cam.y - vh / 2;
     this.drawGrid(ctx, left, top, vw, vh);
+    drawBeaconGlow(this, ctx, left, top, vw, vh); // S-25: under the walls, dimmed by the light layer like the floor
 
     const w = game.world;
     const cx0 = Math.max(0, Math.floor(left / CHUNK_PX)), cy0 = Math.max(0, Math.floor(top / CHUNK_PX));

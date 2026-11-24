@@ -60,6 +60,28 @@ async function browserChecks(browser, url, check, errors, shots) {
     await ctx.close();
   }
 
+  // ---- B-034 (S-25): four landscape phones, Surge, ◆ ▲ ● at 4 digits, ◎ ⟂ ✦ shown: no two HUD rects overlap, ◎ starts ≥ 8 px
+  // right of the bank panel, every button ≥ 44 px. At 568×320 ◎ used to start at 168 px, inside the 12–239 px panel.
+  for (const vp of [{ width: 568, height: 320 }, { width: 640, height: 360 }, { width: 667, height: 375 }, { width: 844, height: 390 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push(`touch row ${vp.width}: ` + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    await pg.evaluate(() => { const { game: g, dev } = window.__lumen; dev.setMode('surge'); g.demo = true; g.enemies = [];
+      Object.assign(g.bank, { shard: 8888, prism: 8888, lumen: 8888 }); g.craft.beacon = 3; });
+    await pg.waitForTimeout(250);
+    if (shots && vp.width === 568) await pg.screenshot({ path: `${shots}/hud-568x320.png` });
+    const sels = ['.top-left', '#minimap', '#scan-btn', '#mode-btn', '#beacon-btn', '#mute-btn', '#menu-btn'], r = {};
+    for (const s of sels) r[s] = await rect(pg, s);
+    const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b, overlaps = [];
+    for (let i = 0; i < sels.length; i++) for (let j = i + 1; j < sels.length; j++) if (hit(r[sels[i]], r[sels[j]])) overlaps.push(sels[i] + '×' + sels[j]);
+    const small = sels.slice(2).filter(s => r[s].w < 44 || r[s].h < 44), shown = sels.every(s => r[s].w > 0), gap = r['#scan-btn'].l - r['.top-left'].r;
+    check(`${vp.width}×${vp.height} landscape, Surge, 4-digit bank, ◎ ⟂ ✦: no HUD overlap, ◎ ≥ 8 px past the bank, buttons ≥ 44 px (B-034)`,
+      shown && !overlaps.length && !small.length && gap >= 8 && Object.values(r).every(x => x.l >= 0 && x.r <= vp.width),
+      JSON.stringify({ overlaps, small, gap, panel: r['.top-left'], scan: r['#scan-btn'], mode: r['#mode-btn'], beacon: r['#beacon-btn'], mini: r['#minimap'] }));
+    await ctx.close();
+  }
+
   // ---- Portrait 320×568: the first touch hint wraps (≤ 2 lines, nothing cut); the column stays on the right.
   {
     const ctx = await phone({ width: 320, height: 568 }), pg = await ctx.newPage();

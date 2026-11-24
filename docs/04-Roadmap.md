@@ -38,7 +38,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 
 ## M4 — Crafting & building
 - ✅ (#46) **S-16 Beacons v1** (5▲, Craft tab, `SAVE_FORMAT` 9): placed light, 140 px, minimap dot; B / ✦ is the build-mode UX (D-043, D-048, D-060).
-- **S-25 Beacon floor glow + B-034:** faint cyan floor tint in beacon pools (Q-014, D-061); short-landscape ◎ ⟂ glyph-only.
+- ✅ (#48) **S-25 Beacon floor glow + B-034:** faint cyan floor tint in beacon pools (D-061); short-landscape ◎ ⟂ glyph-only (D-064).
 - **S-22 Relays v1** (12▲ + 40◆, ≤ 3): remote deposit, no heal; reuses S-16 placement (D-056). M4 done → v0.3.
 
 ## M5 — The arc (a reason to go deep) — ships v1.0

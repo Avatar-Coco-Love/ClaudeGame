@@ -33,3 +33,12 @@ Continues `06-Decisions-7.md` (same rules: supersede, never edit; list rejected 
   Deep trip (deeprun, 10 seeds) is 30 s median to first Lumen at Beam 2, 20 s at Beam 4 + 3 elsewhere.
 - Rejected: S-19 whole (world gen + save + art + audio + minimap is two PRs of checks); the `light.js` split inside S-19 (a
   refactor needs its own byte-same proof); Relays before Spires (D-056's reasons stand); one format bump per M5 slice.
+
+### D-064 — B-034 fix covers phones up to 700 px wide and compacts the bank row (2026-11-24, session 43, Build; amends S-25)
+- **Measured:** with ◆ ▲ ● at 8888 in Surge the bank panel ran 12–279 px (headless Pixel 7 fonts; session 42 saw 239). ◎ sat at
+  168 / 240 / 267 px at 568 / 640 / 667 wide: overlap at all three, so S-25's `max-width: 600px` would leave 640 and 667 broken.
+- **Built:** `(max-height: 480px) and (max-width: 700px) and (pointer: coarse)`: ◎ ⟂ 44 px glyph-only, minimap 100 px, ✦ under
+  the row at `right: 108px`, and the bank row at 15 px / 10 px gap (as portrait ≤ 480 px already does). Panel 12–233; ◎ gap
+  15 / 87 / 114 px. Above 700 px the full row fits (720 px: ◎ at 320 ≥ panel + 8).
+- Rejected: glyph-only at 600 px only (640/667 still overlap); shrinking only the buttons (568 still 39 px short); dropping ●
+  from the panel on small screens (hides a currency the player spends); a second HUD row (covers more of the play field).

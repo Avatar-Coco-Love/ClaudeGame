@@ -152,3 +152,12 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
   #scan-btn { order: 1; } #mode-btn { order: 2; } .top-right .buttons { order: 3; } #minimap { order: 4; width: 112px; height: 112px; }
   #beacon-btn { position: absolute; top: 52px; right: 120px; } /* S-16: under the row, beside the minimap: the row stays as wide as before */
 }
+/* S-25 / B-034 (D-064): short, narrow landscape phones (568–700 px wide): ◎ and ⟂ glyph-only (a switch already toasts the
+   mode name), the bank row compact like portrait, the minimap 100 px, so the row clears the bank panel by ≥ 8 px. */
+@media (max-height: 480px) and (max-width: 700px) and (pointer: coarse) {
+  #scan-btn, #mode-btn { min-width: 44px; width: 44px; padding: 0; }
+  #mode-btn .mode-name { display: none; }
+  #minimap { width: 100px; height: 100px; }
+  #beacon-btn { right: 108px; }
+  .top-left { min-width: 0; } .bank { font-size: 15px; gap: 10px; }
+}

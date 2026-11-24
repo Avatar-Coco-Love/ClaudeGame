@@ -27,3 +27,16 @@ Continues `09-Implementation-Log-2.md` (split at the 8 KB cap, session 41). Newe
 - **Decisions:** D-061 (Q-014 floor glow), D-062 (Q-013 New Cycle carries cycle, records, a Nexus hue; no power),
   D-063 (11 one-PR specs to 1.0: S-25, S-26, S-19, S-27, S-22, S-20, S-28, bot, S-23, S-24, S-29; new `07-Build-Specs-4.md`).
 - No code beyond `VERSION`. Play-test script kept out of the repo (one-off; the S-25 smoke check replaces it).
+
+## 2026-11-24 — Session 43 (v0.2.47): Build — S-25 beacon floor glow + B-034
+- **Glow (D-061):** `drawBeaconGlow` in `craft.js` (render.js 544 → 546; S-26 moves it to `light.js`): cached radial
+  sprite per radius (D-051), `#bff8ff`, `BEACON_GLOW` 0.08 → 0.036 at 60 % → 0, after the grid, under the chunks, for every
+  `R.extraLights` entry in view. Drawn direct, drawcost's 20 overlapping holes went 1.3 → 2.2× (budget 2×), so the discs
+  are summed in a quarter-res layer over their union box and blitted once: 1.70×. `R.beaconGlow` = alpha (tests use 0).
+- **Measured (`tests/glow.cjs`, 1280×800, carved 25×25 floor, core 11 cells off):** floor 3 cells in 3.3 → 7.1 luma
+  (outside the pool 3.2, so 2.2×); a rock cell in the pool 22.2 → 22.2. Viewed: a soft haze, floor still reads dark.
+  The check failed on the old code (3.3 vs 3.2).
+- **B-034 (fixed):** the new touch check (568×320, 640×360, 667×375, 844×390; Surge, 8888 ×3, ◎ ⟂ ✦) failed first at the
+  three small sizes (◎ −111 / −39 / −12 px into the panel); the spec's 600 px query was too narrow → D-064. Viewed 568×320.
+- **B-035 (open, Debt):** "INTEGRITY" (11 px caps) is wider than its 54 px label box and touches its bar at every size.
+- Changelog v0.1.27–v0.1.33 archived word for word (8 KB cap).

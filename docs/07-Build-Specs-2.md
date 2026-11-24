@@ -4,7 +4,7 @@ Continues `07-Build-Specs.md` (same rules; build order is in its header, D-063).
 Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 110 Lumen cells, 5580 open of 11440.
 (S-16 Beacons built in #46; as-built notes D-060.)
 
-## S-25 — Beacon floor glow + B-034 short-landscape row (polish, no sink) (D-061)
+## S-25 — Beacon floor glow + B-034 short-landscape row (polish, no sink) (D-061) — ✅ built session 43 (#48, D-064: 700 px)
 - **Floor glow (Q-014):** each beacon draws an additive cyan disc (`BEACON_GLOW` 0.08 alpha at the centre, 0.45× at 60 %,
   0 at `BEACON_LIGHT`) on the main canvas right after `drawGrid`, so walls and ore draw over it and the light layer dims it
   like the floor. One cached sprite per radius (D-051), culled to the view like pickups. Static: no pulse, so reduced motion

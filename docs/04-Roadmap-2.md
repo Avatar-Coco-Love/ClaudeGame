@@ -5,9 +5,8 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 
 ## Debt
 - Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
-- **B-034 Landscape 568×320 (session 41):** with ◎ and ⟂ both unlocked the top row overlaps the bank panel (◎ starts at 168 px,
-  the panel ends at 244). Pre-dates Beacons; 640 px and wider are clear. Fix: let the bank panel shrink in short landscape.
-  Design 42: scheduled in S-25 (◎ ⟂ glyph-only + minimap 100 px under 600 px wide; measured row positions in the spec).
+- **B-035 "INTEGRITY" label (session 43):** 11 px caps overflow the 54 px label box and touch the bar. Widen the label
+  or shorten it ("Hull"), with a check that no `.bar-row label` scrollWidth exceeds its width.
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.
 - **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
