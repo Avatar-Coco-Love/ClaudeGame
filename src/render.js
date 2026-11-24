@@ -6,6 +6,7 @@ import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
+const NEXUS_GLOW_BOX = 112; // px half-size: outer ring 62 × 1.05 pulse + 1 line + 32 (4σ of shadowBlur 16) + margin
 
 export class Renderer {
   constructor(canvas, minimap) {
@@ -19,6 +20,7 @@ export class Renderer {
     this.mini = document.createElement('canvas');
     this.cam = { x: 0, y: 0 };
     this.time = 0;
+    this.extraLights = []; // [{x, y, r}] world-space light holes beyond the core, Nexus and beam
     this.resize();
     addEventListener('resize', () => this.resize());
   }
@@ -179,7 +181,7 @@ export class Renderer {
       ctx.drawImage(this.getChunk(cx, cy), cx * CHUNK_PX, cy * CHUNK_PX);
     }
 
-    this.drawNexus(ctx);
+    this.drawNexus(ctx, left, top, vw, vh);
     this.drawCrack(ctx);
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
@@ -212,10 +214,16 @@ export class Renderer {
     ctx.stroke();
   }
 
-  drawNexus(ctx) {
+  drawNexus(ctx, left, top, vw, vh) {
     const n = this.game.nexus, t = this.time;
+    // S-15: a shadowBlur stroke blurs a layer as big as the clip, on or off screen: unclipped, the three rings cost ~10 ms a
+    // frame on a software canvas (headless Chromium, no throttle) even with the Nexus off screen. So: skip it off screen, and
+    // clip each glow to the box it can reach (same pixels). m = widest ring (deposit, or the Radiance sweep) + shadow + shake.
+    const m = Math.max(NEXUS_RADIUS, this.game.nexusPulse > 0 ? this.game.nexusLight() : 0) + 48;
+    if (n.x + m < left || n.x - m > left + vw || n.y + m < top || n.y - m > top + vh) return;
     ctx.save();
     ctx.translate(n.x, n.y);
+    ctx.beginPath(); ctx.rect(-m, -m, m * 2, m * 2); ctx.clip();
     // Deposit ring
     ctx.setLineDash([6, 10]); ctx.lineDashOffset = -t * 20;
     ctx.strokeStyle = 'rgba(120, 200, 255, 0.22)'; ctx.lineWidth = 2;
@@ -229,6 +237,7 @@ export class Renderer {
       { r: 62, rot: t * 0.12, col: '#ff4fd8', a: 0.35, wdt: 1.5 },
     ];
     ctx.shadowBlur = 16;
+    ctx.save(); ctx.beginPath(); ctx.rect(-NEXUS_GLOW_BOX, -NEXUS_GLOW_BOX, NEXUS_GLOW_BOX * 2, NEXUS_GLOW_BOX * 2); ctx.clip();
     for (const rg of rings) {
       ctx.save(); ctx.rotate(rg.rot); ctx.globalAlpha = rg.a;
       ctx.strokeStyle = rg.col; ctx.shadowColor = rg.col; ctx.lineWidth = rg.wdt;
@@ -239,6 +248,7 @@ export class Renderer {
       }
       ctx.stroke(); ctx.restore();
     }
+    ctx.restore();
     const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
     grd.addColorStop(0, 'rgba(255,255,255,0.95)'); grd.addColorStop(0.4, 'rgba(46,242,255,0.6)'); grd.addColorStop(1, 'rgba(46,242,255,0)');
     ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.fill();
@@ -472,6 +482,7 @@ export class Renderer {
     const hole = (wx, wy, r, strength = 1) => {
       const p = this.worldToScreen(wx, wy);
       const x = p.x / 2, y = p.y / 2, rr = r * s;
+      if (x + rr < 0 || y + rr < 0 || x - rr > this.light.width || y - rr > this.light.height) return; // S-15: off the canvas
       const grd = l.createRadialGradient(x, y, 0, x, y, rr);
       grd.addColorStop(0, `rgba(0,0,0,${strength})`);
       grd.addColorStop(0.55, `rgba(0,0,0,${strength * 0.85})`);
@@ -479,6 +490,7 @@ export class Renderer {
       l.fillStyle = grd; l.beginPath(); l.arc(x, y, rr, 0, Math.PI * 2); l.fill();
     };
     hole(g.player.x, g.player.y, LIGHT_RADIUS);
+    for (const e of this.extraLights) hole(e.x, e.y, e.r); // S-15: tools/perf.cjs prices S-16's beacon holes through this
     hole(g.nexus.x, g.nexus.y, g.nexusLight());
     if (g.beam.on) {
       const rs = g.beam.rays.length > 1 ? g.beam.rays : [g.beam]; // S-13: each Wide ray end lights its own, smaller hole

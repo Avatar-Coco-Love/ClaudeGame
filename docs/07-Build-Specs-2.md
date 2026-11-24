@@ -3,12 +3,6 @@
 Continues `07-Build-Specs.md` (same rules; build order is in its header, D-048). Supply numbers are in that file's header.
 Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 110 Lumen cells, 5580 open of 11440.
 
-## S-15 — Throttled perf check (Tooling)
-- `tools/perf.cjs`: headless Chromium at 1280×800 DSF 1, CDP `Emulation.setCPUThrottlingRate` 4, seed 77, `dev.teleport(30)`,
-  then 20 s of real mining in Wide (`g.research.wide = true; g.beamMode = 'wide'`) with 300 floor pickups on screen
-  (`g.spawnPickup(x, y, 'shard', true)` around the core). Reports frame time mean / p95 / max from `requestAnimationFrame` deltas.
-  Budget: p95 ≤ 16.7 ms. Also a run with 20 light holes (fake beacon spots) to price S-16. Not in smoke (too slow); log in `09`.
-
 ## S-21 — Pulse ready shot + Glitch burst 1.8× (M3 tune) (D-054)
 - **Ready shot:** at full charge, held fire releases only if the burst has something within its reach: a live Glitch on the
   ray or any solid cell (`raycast` within `range × PULSE_RANGE`). Otherwise it stays at charge 1 until a target enters the

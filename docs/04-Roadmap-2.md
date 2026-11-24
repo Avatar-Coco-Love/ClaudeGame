@@ -16,7 +16,8 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - **Audit 29 leftovers:** buy-logic dedupe (`game.js` `canAfford`/`buy` vs `canAffordNexus`/`buyNexus`), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
 - **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
 - **Render cost:** ✅ pickups are culled to the view (B-014, #21) and drawn as glow sprites, as are Scanner glyphs (B-027, D-051, #39).
-  Particles are still drawn uncull'd (short-lived, local). Next to price (S-15): `drawLight` is ≈ 67 % of JS draw time (two radial
-  gradients + a full-screen `drawImage` each frame); headless ×4 throttle runs 121 ms/frame with no loot, so measure on a real phone too.
+  Particles are still drawn uncull'd (short-lived, local). ✅ Nexus glow culled + clipped (S-15, D-057, #43). Left (flushed, no
+  throttle, 1280×800): `drawLight` 4.0 of 9.5 ms, 3.6 of it the smoothed 2× upscale (no same-pixel fix found); 300 pickups +11 ms
+  (rotated `lighter` sprites); the un-timed rest (chunks, minimap, HUD) ~4 ms. Next: measure on a real phone (`tools/perf.cjs`).
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.

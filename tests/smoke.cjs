@@ -32,6 +32,7 @@ const pulse = require('./pulse.cjs');
 const audit29 = require('./audit29.cjs');
 const touch = require('./touch.cjs');
 const audit34 = require('./audit34.cjs');
+const drawcost = require('./drawcost.cjs');
 const audioChecks = require('./audio.cjs');
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
@@ -450,6 +451,7 @@ async function rngChecks() {
     await audit29.browserChecks(browser, url, check, errors);
     await touch.browserChecks(browser, url, check, errors);
     await audit34.browserChecks(browser, url, check, errors);
+    await drawcost.browserChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----
