@@ -28,3 +28,7 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
   record; dev relight-all mid-Wake relit a Spire twice. Node checks in `cycle.cjs`.
 - Perf (×4): overview 16.7/33.4 ms frames, play after Continue = home baseline. Touch: no blockers. Moved to config:
   ending line share + margin, `PLACE_BURST`, `WAKE_FRAME_PX` in cells. Debt logged. `09` 54–58 archived. Smoke 283/283.
+
+## Session 64 wrap-up — CLAUDE.md context rules (v1.0.4, #70)
+- Owner asked why the conversation hit ~475k tokens after 10 PRs. Cause and rules in D-095; CLAUDE.md "Context
+  discipline" gained the 3-PR cap, the orchestration brief and the cheap-verification rule. Docs only; counter stays 64.

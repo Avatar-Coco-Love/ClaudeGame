@@ -74,3 +74,5 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
   on load and carry (`cleanRecords`); a world that ended before records existed gets its record on load. A Spire relights once.
 - **A rule broken twice gets a check:** an inline `//` comment swallowed code 4 times (sessions 59–64, incl. the Wake
   ring); `tests/comments.cjs` flags comment text that ends like code. Rejected: a full linter (no build step, D-001).
+
+Continued in `06-Decisions-13.md` (D-095 on).

@@ -31,6 +31,14 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - Don't read whole files you don't need. Use Grep, or read line ranges. `docs/09` grows forever, so only read its tail.
 - Delegate broad exploration, reviews, and audits to subagents and keep only their conclusions. Run independent subagents in parallel.
 - One PR per session is the norm. If you notice your context getting large, wrap up: ship what works and write the handoff in `docs/02`.
+- **Hard cap: at most 3 PRs per conversation (D-095).** You can't see your token count, so count PRs. After the 3rd,
+  update `docs/02` and stop, even if more were asked for: tell the user to continue in a new conversation.
+- **Many PRs asked for? Orchestrate, don't do them inline.** Give each PR to a fresh subagent (or a new session) with
+  this brief: read `CLAUDE.md` + `docs/02`, do the next task, ship it, reply in ≤ 10 lines (PR #, what, smoke count,
+  next step). Keep only that reply. The cap above counts PRs you build yourself.
+- **Verify cheaply:** while iterating, run only the test file you're changing (`node tests/<x>.cjs`); run the full smoke
+  once before the PR (and again only after a fix), and print only its FAIL lines + the count. View one screenshot per
+  visual change, not every size. Never print whole files or long tool output into the conversation.
 - Keep `docs/02` short (under ~60 lines). It is the handoff note, not a history. History goes in `09`.
 - If a file passes ~600 lines, split it as part of that session's work.
 
