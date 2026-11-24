@@ -1,20 +1,6 @@
 # 09 — Implementation Log, part 8
 
-Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newest at the bottom; read the tail only.
-
-## Session 62 — Design: Relay reclaim specced (v1.0.1, #67)
-- Q-018 (player request: "is the Relay just there forever?") → D-092 + S-34 (pick up in its ring, free, no save change).
-- Play-tested the v1.0 arc from the smoke screenshots (ending sequence + card at 2 sizes, cycle-1 Nexus, title line).
-  Seen: the card's "0m 00s" is the test's instant relight, not a bug; the overview map is mostly dark on a fresh world
-  (only explored cells show) — fine: it is the player's own map.
-- cycle.cjs pinned the title version to 'v1.0.0' (failed at 1.0.1): now reads VERSION. Smoke 273/273.
-
-## Session 63 — Build: S-34 Relay reclaim (v1.0.2, #68)
-- `craft.js` `pickUpRelay` + `tryPlace` branch; `main.js` toasts, hint, ⊕↑ button state (D-093). No save change.
-- The browser check caught the real gap: on touch the ✦ button was hidden with nothing carried (tap timed out), so
-  pick-up was desktop-only; the button now appears in any Relay ring. relay.cjs's "button hides after the last
-  placement" now expects it shown (standing in the new ring). Spec text said "✦:"; the hint names ⊕↑, what's on screen.
-- `tests/reclaim.cjs`: 3 node checks (fail with `craft.js` stashed) + 1 touch browser check. Viewed `reclaim-320x568.png`.
+Continues `09-Implementation-Log.md` (sessions 59–63 archived in audit 69: `archive/2026-11-24-09-sessions-59-63.md`). Newest at the bottom; read the tail only.
 
 ## Session 64 — Audit: skip keys, card fit, records, B-053…B-059 (v1.0.3, #69)
 - Four subagents (correctness, perf, touch, code health + docs drift); each finding re-run here.
@@ -61,6 +47,17 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
   300 s recharge, hexagram + take ring, warmer beam core; chip `#buffs` + toast; `SAVE_FORMAT` 15 (D-099).
 - `tests/anomaly.cjs` (7 checks, 20 seeds = 320 sites all valid) + 2 browser checks (chip + toast; deposit ends it);
   `anomaly()` added to the audio one-shot bounds. Screenshot viewed: chip, toast, hexagram in a carved room, warm beam.
-- **B-060 (open, audit 69):** smoke's S-27 browser check ("first sight toasts 1/5" + minimap) failed in 2 of 3 full
+- **B-060 (→ fixed in audit 69, below):** smoke's S-27 browser check ("first sight toasts 1/5" + minimap) failed in 2 of 3 full
   runs on this branch (a second Spire already seen), 0 of 44 standalone `browserChecks` runs; main passed once. Random
   New World seed → likely a seed where the teleport sees two Spires. Its detail now prints seed, Spires, core cell.
+
+## Session 69 — Audit: B-060 root-caused, docs split (v1.1.9, #75)
+- **B-060 → fixed, two causes.** (1) `nearSpire` waited 4 s wall clock for the Spire toast, which queues behind the
+  2.6 s "Entering the Deep" milestone timed by game dt (clamped 0.05 s): with 6× CPU throttle 3 of 4 runs read
+  "Entering the Deep"; no pages leak between checks (0 contexts open there), so it is runner load. Now a `stats.time`
+  wait. (2) Node probe of the approach over 3000 random seeds: 18 (0.6 %) saw a second Spire (≥ 12-cell gap where
+  sectors meet, e.g. seed 1712963517). New World is now pinned (seed 901943132, gap 78) + a node check on the gap.
+- Guard that fails on the old code: the 320 px page runs `slowFrames(130 ms)`; old wait 2/2 FAIL, new 3/3 + 2/2 at 6× pass.
+- Docs: `09` sessions 59–63 archived word for word; `02` per-system detail → new `08-Systems-Reference.md`; `04` done
+  Tooling + M2–M5 → `archive/2026-11-24-04-done-m2-m5.md`. D-099…D-096 spot-checked against config/code: match.
+- Scope note: run as one agent (no parallel sweeps available); perf, touch and code-health sweeps carried to audit 74.

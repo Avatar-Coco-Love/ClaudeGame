@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 68** · **Version: v1.1.8** (session 68: Build, S-35 Anomalies; rotation: 69 Audit, 70 Build, 71 Build, 72 Design).
+_Last updated: 2026-11-24_ · **Session counter: 69** · **Version: v1.1.9** (session 69: Audit, B-060; rotation: 70 Build, 71 Build, 72 Design, 74 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -20,32 +20,16 @@ _Last updated: 2026-11-24_ · **Session counter: 68** · **Version: v1.1.8** (se
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
-- Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
-  Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach; a full charge waits for a target in reach (S-21, D-059).
-- Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
-  ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
-  Relays (S-22, D-076): 40◆ + 12▲, carry 1, ≤ 3, d ≥ 24, 16 cells from Relays / vault centres / Spire footprints; cargo
-  within 64 px banks like the Nexus (`game.atDeposit()`), no heal; B / ⊕↑ in a ring picks it up (S-34, D-093); ⊕ glyph, 100 px light, minimap ring. B places `craft.last`.
-- Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
-- Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
-  (`{x, y, seen, fed, mask, lit, mode, keep}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
-  Feed (S-20, D-078): in the 7×7 interior ▲ flows in 8/s, cargo then bank (D-070), arc fed / 80; at 80 `mask` = S-28's
-  start pattern (`startMask`, `FACET_RING`; lit facets glow) + "Spire primed"; a broken Spire (D-069) relights instead. Wake lanes D-071.
-  Facets (S-28, D-080, D-083): 0.35 s of the aim ray (or one Pulse burst) flips a primed facet + neighbours; all 8 →
-  relit: 260 px light (`game.spireLights` = `R.lightSets[2]`), chime, filled hexagon, `mode` saved; primed hint. Drift only (S-23).
-  Wake (S-23, D-086, `wake.js`): Surge, enter primed → 4 lanes cleared, Glitches go for the core (charge 100, −10), 40 s → relit 'surge'; fail → step out/in. S-31: tier −1, no despawn, orange clock (D-088); camera frames the core (D-089).
-  Ending (S-24, D-090, `ending.js`): 5/5 relit → 8 s map overview + lines (skippable) → card; `ended` saved, dark 0.93 → 0.5.
-  New Cycle (S-29, D-091): card / title → fresh seed, `cycle` + 1, `records` (best, per cycle) kept, Nexus hue `NEXUS_HUES`.
-  One toggle per aim for every beam (D-084: Pulse `beam.facetLatch`; a Glitch on the ray pauses the dwell latch).
-- Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073; phones: below the core / under the bank panel, tap answers first, D-084), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
-  −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
+- Lumen ● (S-10) buys Research (S-11): Scanner ping (S-12), beam modes Wide / Pulse (S-13, S-14, S-21). Detail: `08`.
+- Crafting (S-16): Beacons (light, S-25 glow) and Relays (remote deposit, S-22; reclaim S-34), `craft.js`. Detail: `08`.
+- Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
+- Darkness/light overlay, minimap, Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires) every 10 s, on deposit, and on page hide. Saves carry a format number (now 15); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`).
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
-- Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
+- Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): M7 Anomalies S-35…S-37 in `07-Build-Specs-5.md` (D-098); everything earlier built; M6 ✅ (v1.1). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
-- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (wakeprobe D-087; surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -54,5 +38,5 @@ _Last updated: 2026-11-24_ · **Session counter: 68** · **Version: v1.1.8** (se
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 69 (Audit): health check per CLAUDE.md (parallel subagents; archive `09` entries before audit 64; check D-xxx).
-Include B-060 (S-27 spire toast flake) in the bug hunt. After it, session 70 builds S-36 from `07-Build-Specs-5.md`.
+Session 70 (Build): S-36 Lodestone + Ballast from `07-Build-Specs-5.md` (bot-tuned, per its spec). Browser checks that
+approach a Spire pin the seed and wait by game time (D-100).
