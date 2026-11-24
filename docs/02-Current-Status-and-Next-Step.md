@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 41** · **Version: v0.2.45** (session 41: build; rotation: 42 Design, 43 Build, 44 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 42** · **Version: v0.2.46** (session 42: design; rotation: 43 Build, 44 Audit, 45 Build).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -27,7 +27,7 @@ _Last updated: 2026-11-24_ · **Session counter: 41** · **Version: v0.2.45** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-3`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Build specs (`07-…-2`, `-3`), order D-056: S-19 Spires v1a, S-22 Relays, S-20 relight, Surge bot, S-23 Wake, S-24 ending. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053); no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-25 glow+B-034, S-26 `light.js`, S-19/S-27 Spires, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053); no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -56,4 +56,4 @@ _Last updated: 2026-11-24_ · **Session counter: 41** · **Version: v0.2.45** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 42 (Design): play-test Beacons in Drift + Surge (Q-014: pool brightness), settle Q-013 (New Cycle), refresh S-19/S-20 in `07`; note B-034.
+Session 43 (Build): S-25 in `07-Build-Specs-2.md`: beacon floor glow (D-061) + B-034 short-landscape row; smoke checks fail first.
