@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.4 — 2026-11-24 (#70)
+- **Behind the scenes:** new working rules for the sessions that build the game (smaller conversations, cheaper
+  checks). Nothing changes in play.
+
 ## v1.0.3 — 2026-11-24 (#69)
 - **Fixes from a health check:** the key you press to skip the ending no longer also presses a button you clicked
   earlier (it could toggle mute), and holding it can't dismiss the summary before you see it. The hint no longer

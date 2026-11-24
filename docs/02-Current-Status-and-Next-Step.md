@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.3** (session 64: audit; v1.0 shipped in 61; rotation: 65 Build, 66 Build, 67 Design, 69 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 64** · **Version: v1.0.4** (session 64: audit + D-095 context rules; v1.0 shipped in 61; rotation: 65 Build, 66 Build, 67 Design, 69 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
