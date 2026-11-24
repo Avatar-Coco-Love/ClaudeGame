@@ -64,15 +64,4 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs.md` / `-2.md`; b
 - Larger world (e.g. 256×256) with lazy chunk generation: only after the throttled perf check, and only if rings feel too short (D-022; moved out of M2 by D-046).
 
 ## Debt
-- Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
-- **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
-  If a play-test says so, try a slot above the left stick's zone.
-- **Dev teleport onto a cache (dev only, session 19):** a teleport room that covers a vault cache removes it with no loot.
-- **Glitch inside a vault (watch, session 18):** spawning only checks for open cells, so a Glitch can appear in a sealed vault's
-  hollow; it gains no ground and fades in 6 s (D-017). Harmless; exclude vault hollows from spawns if a play-test sees it.
-- **Bedrock edge (watch):** the border reads near-black; session 32 saw the beam spark on it (no crack). Fine unless play-tests mind.
-- **Audit 29 leftovers:** buy-logic dedupe (`game.js` ≈121-163), silent-audio stub ×9, Node-only smoke checks → `tests/world.cjs`; re-run the perf audit.
-- **Missed chime (watch):** the S-4 arpeggio plays only if the hold empties inside the ring. Keep unless a play-test minds.
-- **Render cost:** ✅ pickups are culled to the view (B-014, #21). Particles are still drawn uncull'd (short-lived, local). Each on-screen pickup keeps its `shadowBlur`; measure on the throttled perf check (Tooling) before changing that.
-- **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
-- **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
+- Moved to `04-Roadmap-2.md` (audit 34, size cap).

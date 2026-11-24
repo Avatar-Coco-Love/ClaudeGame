@@ -308,7 +308,7 @@ export class Game {
           if (it.kind === 'lumen') this.stats.lumen++;
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
-        } else if (d < p.r + 6) {
+        } else {
           this.audio.full();
           this.notify('cargo-full');
         }

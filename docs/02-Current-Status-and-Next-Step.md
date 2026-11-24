@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 33** · **Version: v0.2.37** (session 33: build S-17 touch pass; rotation: 34 Audit, 35–36 Build, 37 Design).
+_Last updated: 2026-11-24_ · **Session counter: 34** · **Version: v0.2.38** (session 34: audit, glow sprites; rotation: 35–36 Build, 37 Design, 39 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 33** · **Version: v0.2.37** (s
 - Scanner ping marks exactly the ore within 12 cells, cools 20 s, survives reload; Research tab fits 320 px (session 21);
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
-- Audit 29 fixes (31, `audit29.cjs`); touch pass (33, `touch.cjs`: landscape title, ◎⟂♪≡ above y 90, 320 px hint, 2nd finger).
+- Fixes: audit 29 (31, `audit29.cjs`); touch pass (33, `touch.cjs`); glow sprites, 300 pickups 540 → 33 ms/frame (34, `audit34.cjs`).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no sound has square-wave buzz (audit, session 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 34 (Audit): parallel subagent audit per CLAUDE.md (bugs, perf, mobile/touch, code health, docs drift); fix the top issues, log the rest in `04` Debt; archive `09` per CLAUDE.md.
+Session 35 (Build): S-14 Pulse beam (`07`, D-042: `PULSE_MUL` 1.0, 0.3 s recover). Debt + watch items now live in `04-Roadmap-2.md`.

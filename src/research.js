@@ -1,4 +1,4 @@
-// Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen. v1 has one node, the Scanner ping.
+// Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen: the Scanner ping (here) and Wide Beam (`beam.js`).
 // The ping is intent -> realized like movement: `intent.scan` asks, `tryScan` realizes it only if unlocked and off cooldown.
 import { CELL, T, RESEARCH, SCAN_RADIUS, SCAN_COOLDOWN_S, SCAN_SHOW_S, SCAN_SPEED } from './config.js';
 
@@ -17,7 +17,6 @@ export function scanWithin(world, px, py, radius = SCAN_RADIUS) {
   }
   return out;
 }
-export const oreWithin = scanWithin; // pre-S-12 name, kept for tests and tools
 
 export function researchNode(id) { return RESEARCH.find(r => r.id === id); }
 export function canResearch(game, id) {

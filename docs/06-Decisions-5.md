@@ -54,9 +54,17 @@ later generator change never moves a Spire. The core is unmineable so the goal c
   angles (could cluster on one side); Spires at the world corners (d > 90 exists only diagonally, unfair by direction);
   skipping seen sites like vaults (the win needs all of them); mineable Spires (a player could erase the ending).
 
-## D-050 — Touch layout rules (S-17, session 33)
+### D-050 — Touch layout rules (2026-11-24, session 33, S-17)
 Landscape phones (`max-height: 480px` + coarse pointer) put ◎ ⟂ ♪ ≡ in one row left of the minimap, all above y 90; portrait keeps
 the column. Coarse-pointer HUD/sheet buttons are ≥ 44 px. A lifted stick adopts another live touch on its half from where it is now
 (no jump). Probes exit 1 on an unknown `MODE` (`tools/mode.mjs`), so `MODE=pulse` fails until S-14 lands.
 - Rejected: moving the buttons to the left edge (the move thumb lives there); a bottom bar (both thumbs); adopting with the old
   stick's origin (the core would lurch toward a stale offset); a separate pause sheet (cut in D-048).
+
+### D-051 — Repeated glow shapes are sprites (2026-11-24, audit 34, B-027; supersedes D-032's rejected sprite)
+Pickups and Scanner glyphs are baked once per kind into a glow sprite at the current zoom × DPR (`render.js` `glowSprite`) and
+drawn with one `drawImage`; rebuilt only when that scale changes. Measured first (D-032 asked for it): each `shadowBlur` draw cost
+≈ 3.4 ms on headless Chromium, 30 pickups took a frame from 22 to 120 ms; with sprites 300 cost 33 ms. Culling (D-032) stays.
+`tests/audit34.cjs` counts shadowed draws so it stays this way. One-off glows (Nexus, core, beam, Glitches ≤ 9) keep `shadowBlur`.
+- Rejected: dropping the glow (pillar 1 look); a lower pickup cap (eats saved loot, B-005/D-047); waiting for S-15's perf tool
+  (the cost was already measured and the fix is local to `render.js`).

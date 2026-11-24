@@ -291,23 +291,59 @@ export class Renderer {
     ctx.restore();
   }
 
-  // Only pickups in view (plus their glow) are drawn: each costs a shadowBlur fill, and the floor keeps loot across the whole
-  // map (saved since B-011), so an uncull'd floor of 400 made every frame pay for loot far off screen (B-014, audit 19).
+  // B-027 (D-051): a shape drawn with shadowBlur costs ~3 ms per draw on a software canvas, so every repeated glowing shape
+  // (pickups, Scanner glyphs) is baked once into a sprite at the current device scale and drawn with one drawImage.
+  // `half` is the sprite's half-size in world px; `paint(g)` draws the shape around (0, 0). Rebuilt only when zoom or DPR changes.
+  glowSprite(key, half, paint) {
+    const res = this.zoom * this.dpr;
+    if (this.spriteRes !== res) { this.sprites = {}; this.spriteRes = res; }
+    let sp = this.sprites[key];
+    if (sp) return sp;
+    const px = Math.ceil(half * 2 * res), c = document.createElement('canvas');
+    c.width = c.height = px;
+    const g = c.getContext('2d');
+    g.translate(px / 2, px / 2); g.scale(res, res);
+    paint(g); // shadowBlur is in canvas pixels here, as on the main canvas
+    return (this.sprites[key] = { canvas: c, half });
+  }
+  pickupSprite(kind) {
+    return this.glowSprite('p-' + kind, 5 + 16 / (this.zoom * this.dpr), g => {
+      const col = RESOURCE[kind].color;
+      g.fillStyle = col; g.shadowColor = col; g.shadowBlur = 10;
+      g.beginPath();
+      if (kind === 'shard') { g.moveTo(0, -5); g.lineTo(3, 0); g.lineTo(0, 5); g.lineTo(-3, 0); }
+      else if (kind === 'lumen') g.arc(0, 0, 3.5, 0, Math.PI * 2);
+      else { g.moveTo(0, -5); g.lineTo(4.5, 3); g.lineTo(-4.5, 3); }
+      g.fill();
+    });
+  }
+  scanSprite(type) {
+    return this.glowSprite('s-' + type, 14 + 16 / (this.zoom * this.dpr), g => {
+      g.shadowBlur = 10;
+      if (type === T.CACHE) { // S-12: the cache glyph (square in square, upright), white, 1.3x the ore glyph
+        g.strokeStyle = g.fillStyle = g.shadowColor = '#ffffff'; g.lineWidth = 2.5;
+        g.strokeRect(-12, -12, 24, 24); g.fillRect(-5, -5, 10, 10);
+        return;
+      }
+      const k = SCAN_KIND[type];
+      g.font = '600 18px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = g.shadowColor = k.color;
+      g.fillText(k.glyph, 0, 0);
+    });
+  }
+
+  // Only pickups in view (plus their glow) are drawn: the floor keeps loot across the whole map (saved since B-011), so an
+  // uncull'd floor of 400 made every frame pay for loot far off screen (B-014, audit 19).
   drawPickups(ctx, left, top, vw, vh) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     const m = 16, x0 = left - m, y0 = top - m, x1 = left + vw + m, y1 = top + vh + m;
     for (const it of this.game.pickups) {
       if (it.x < x0 || it.x > x1 || it.y < y0 || it.y > y1) continue;
-      const col = RESOURCE[it.kind].color;
-      const bob = Math.sin(this.time * 5 + it.x) * 0.3 + 1;
-      ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10;
+      const sp = this.pickupSprite(it.kind), bob = Math.sin(this.time * 5 + it.x) * 0.3 + 1;
       ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(this.time * 2 + it.y); ctx.scale(bob, bob);
-      ctx.beginPath();
-      if (it.kind === 'shard') { ctx.moveTo(0, -5); ctx.lineTo(3, 0); ctx.lineTo(0, 5); ctx.lineTo(-3, 0); }
-      else if (it.kind === 'lumen') ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
-      else { ctx.moveTo(0, -5); ctx.lineTo(4.5, 3); ctx.lineTo(-4.5, 3); }
-      ctx.fill(); ctx.restore();
+      ctx.drawImage(sp.canvas, -sp.half, -sp.half, sp.half * 2, sp.half * 2);
+      ctx.restore();
     }
     ctx.restore();
   }
@@ -459,19 +495,13 @@ export class Renderer {
       ctx.globalAlpha = Math.max(0, 1 - r / (R + 40)) * 0.8;
       ctx.beginPath(); ctx.arc(sc.x, sc.y, Math.min(r, R + 40), 0, Math.PI * 2); ctx.stroke();
     }
-    ctx.font = '600 18px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 10;
-    for (const m of sc.marks) {
+    ctx.shadowBlur = 0;
+    for (const m of sc.marks) { // B-027: glyphs are glow sprites (scanSprite), not shadowBlur text
       const a = markAlpha(this.game, m);
       if (a <= 0) continue;
-      const cx = (m.x + 0.5) * CELL, cy = (m.y + 0.5) * CELL;
-      if (m.type === T.CACHE) { // S-12: the cache glyph (square in square, upright), white, 1.3x the ore glyph
-        ctx.globalAlpha = a; ctx.strokeStyle = ctx.fillStyle = ctx.shadowColor = '#ffffff'; ctx.lineWidth = 2.5;
-        ctx.strokeRect(cx - 12, cy - 12, 24, 24); ctx.fillRect(cx - 5, cy - 5, 10, 10);
-        continue;
-      }
-      const k = SCAN_KIND[m.type];
-      ctx.globalAlpha = a; ctx.fillStyle = k.color; ctx.shadowColor = k.color;
-      ctx.fillText(k.glyph, cx, cy);
+      const sp = this.scanSprite(m.type), cx = (m.x + 0.5) * CELL, cy = (m.y + 0.5) * CELL;
+      ctx.globalAlpha = a;
+      ctx.drawImage(sp.canvas, cx - sp.half, cy - sp.half, sp.half * 2, sp.half * 2);
     }
     ctx.restore();
   }
