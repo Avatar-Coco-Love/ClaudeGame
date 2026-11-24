@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 50** · **Version: v0.4.54** (session 50: build; rotation: 51 Build, 52 Design, 54 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 51** · **Version: v0.4.55** (session 51: build; rotation: 52 Design, 53 Build, 54 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -24,12 +24,13 @@ _Last updated: 2026-11-24_ · **Session counter: 50** · **Version: v0.4.54** (s
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Spires (S-19, D-049, D-068, `spire.js`): 5 dormant 9×9 sites at d 64–74, one per 72° sector, saved as `game.spires`
   (`{x, y, seen, fed, mask, lit}`); shell cuttable, core + facets `UNBREAKABLE`. Found (S-27, D-072): toast + tone, minimap hexagon, breath, stats line.
-  Design 47: feed = cargo ▲ then bank ▲ (D-070), a broken Spire relights when primed (D-069), Wake lanes D-071.
+  Feed (S-20, D-078): in the 7×7 interior ▲ flows in 8/s, cargo then bank (D-070), arc fed / 80; at 80 `mask` = S-28's
+  start pattern (`startMask`, `FACET_RING`; lit facets glow) + "Spire primed"; a broken Spire (D-069) relights instead. Wake lanes D-071.
 - Darkness/light overlay, explored-only minimap, Nexus pointer (slides clear of HUD boxes, D-074), toasts (queued, D-073), hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons) every 10 s, on deposit, and on page hide. Saves carry a format number (now 11); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-5`).
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-6`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
 - Specs (`07-…-2/3/4`, 1 PR each, D-063): S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
@@ -42,4 +43,5 @@ _Last updated: 2026-11-24_ · **Session counter: 50** · **Version: v0.4.54** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 51 (Build): S-20 Spire feed (`07-…-3`, D-055, D-069, D-070); `SAVE_FORMAT` stays 11 (`fed` + `mask` are in S-19's record); checks in a new test file.
+Session 52 (Design): play-test feeding + priming in both modes (`tests/spirefeed.cjs` scenes), re-check S-28's spec against
+the shipped `mask` / `FACET_RING` / `toggleMask` (D-078), spec the Surge bot's `spire` route; then S-28 is the next build.

@@ -162,6 +162,8 @@ function updateHud() {
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`, 2600, KEEP);
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
+    if (ev === 'spire-primed') { toast('Spire primed', 3200, KEEP); persist(); } // S-20
+    if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
     if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed') persist(); } // S-16, S-22
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);

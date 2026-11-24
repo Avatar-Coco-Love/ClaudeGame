@@ -43,3 +43,15 @@ Continues `06-Decisions-9.md` (same rules: supersede, never edit; list rejected 
 - M3's last item (S-21, #45) shipped before D-063 was written, but no version bump followed; D-056/D-063 still said
   "M4 done → v0.3". D-046's rule is the highest N with M1…MN all ✅: M1–M4 → **v0.4.54**. Both headers now say ✅.
 - Rejected: v0.3 (would keep a minor that matches no rule); renumbering past versions (history in `05` stays as shipped).
+
+### D-078 — S-20 feed details: facet ring order, mask bits, arc, heal (2026-11-24, session 51; applies D-069, D-070)
+- `FACET_RING` (`spire.js`) orders the 8 facets clockwise from (+2, −4); bit k of `mask` = facet k lit (S-28 reads it,
+  `toggleMask` is its rule). The start pattern draws distinct facets from `seededStream(seed, 'facets' + i)` (smoke: 40
+  seeds × 5, every pattern needs exactly `SPIRE_TAPS[i]` taps by brute force).
+- The interior is |dx|, |dy| ≤ 3 cells from the record's centre; one ▲ per 1/8 s, each with the deposit tick and a violet
+  streak into the core; priming plays the 3-note deposit chime (already bounded by `audio.cjs`), no new sound.
+- The arc (radius 24, outside the 17 px cargo ring) shows whenever the core is in an unlit Spire's interior, with a faint
+  full track, so 0▲ reads as "nothing to give". Primed facets: lit = filled glowing hexagon, unlit = clear outline.
+- A broken Spire relit at 80 saves `mask` 255. A save's `fed` > 80 loads as 80; fed 80 with no mask primes on entry, free.
+- Rejected: an arc only while ▲ flows (a primed or empty-handed visit would show nothing); a new primed tone (the chime
+  already means "delivered"); saving the tap set instead of the mask (S-28 needs the live state, not the history).

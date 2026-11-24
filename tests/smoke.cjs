@@ -60,6 +60,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await audit44.nodeChecks(check).catch(e => check('audit 44 checks ran', false, e.message));
   await spire.nodeChecks(check).catch(e => check('S-19 spire checks ran', false, e.message));
   await spire.foundChecks(check).catch(e => check('S-27 spire found checks ran', false, e.message));
+  await require('./spirefeed.cjs').nodeChecks(check).catch(e => check('S-20 spire feed checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -316,6 +317,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await relay.browserChecks(browser, url, check, errors, plantSaveAndReload, process.env.RELAY_SHOT);
     await glow.browserChecks(browser, url, check, errors);
     await spire.browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
+    await require('./spirefeed.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await audioChecks.browserChecks(browser, url, check, errors);

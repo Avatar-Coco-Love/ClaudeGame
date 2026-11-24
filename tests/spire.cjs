@@ -193,4 +193,4 @@ async function browserChecks(browser, url, check, errors, shots) {
   await ph.close();
 }
 
-module.exports = { nodeChecks, foundChecks, browserChecks };
+module.exports = { nodeChecks, foundChecks, browserChecks, nearSpire };
