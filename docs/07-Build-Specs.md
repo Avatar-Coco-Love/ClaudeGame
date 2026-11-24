@@ -27,7 +27,7 @@ for later nodes (D-036). Spare Prisms after Core Matrix + Radiance: ~1100▲ (S-
 `render.js` is 540 lines and `game.js` 484; Pulse, Beacons and Spires all add to both. Behaviour must not change.
 - Glitch update/spawn/loot (`game.js` ≈329–430) → `src/glitch.js`; its inline numbers (cap, interval, aggro 560, tiers,
   knockback, heal 45/s) → `config.js` as `GLITCH_*`. Minimap + HUD drawing → `src/hud.js` (~110 lines out of `render.js`).
-- Drop dead code: `oreWithin`, the unused `mat` in `onCellBroken`, `integrity: 100`, ROCK/DENSE `fill`/`edge` overridden by rings.
+- Drop dead code (`oreWithin` went in audit 34): the unused `mat` in `onCellBroken`, `integrity: 100`, ROCK/DENSE `fill`/`edge` overridden by rings.
 - Scanner desc and `RESEARCH_HINT` build "12 cells"/"55 cells" from `SCAN_RADIUS`/`LUMEN_D`. One ore-glyph type set, shared.
 - **Verify:** smoke green with no check changed except imports; S-5 determinism check (same seed + script → same spawns) passes;
   a 60 s scripted Surge run gives identical `stats` before and after (log both in `09`). Left in Debt: buy-logic dedupe, smoke split.
