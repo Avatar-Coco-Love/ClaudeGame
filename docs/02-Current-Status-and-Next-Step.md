@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-24_
 
-**Session counter: 28** · **Version: v0.1.30** (session 28 handled the inbox; 29 % 5 == 4, so next is an Audit)
+**Session counter: 29** · **Version: v0.1.31** (session 29: Audit; #32 shipped a deploy fix first, the audit fixes follow)
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build). Deployed from `main` through GitHub Pages. Share image `og.png` (D-044); the Projects page card is live (Projects repo #14, session 29).
@@ -56,4 +56,4 @@ _Last updated: 2026-11-24_
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Next session (29) is an **Audit** (see CLAUDE.md). After it, the Build is S-14 Pulse beam from `07` (D-042), then Q-011 probes with `MODE=pulse`.
+Finish session 29's **Audit** PR: fix the top findings logged in `09` (session 29), put the rest under "Debt" in `04`. Then the Build is S-14 Pulse beam from `07` (D-042), then Q-011 probes with `MODE=pulse`.

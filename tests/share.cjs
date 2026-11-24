@@ -18,6 +18,16 @@ function run() {
   const png = buf.length > 24 && buf.toString('ascii', 1, 4) === 'PNG';
   const w = png ? buf.readUInt32BE(16) : 0, h = png ? buf.readUInt32BE(20) : 0;
   out.push({ name: 'og.png is a 1200×630 PNG under 400 KB', ok: w === 1200 && h === 630 && buf.length < 400 * 1024, detail: `${w}×${h}, ${Math.round(buf.length / 1024)} KB` });
+  // B-020: the deploy copies an explicit file list, so og.png 404'd on the live site. Everything the page or its share card
+  // needs must be in that list: og.png plus every relative src/href in index.html (by its top-level path segment).
+  const yml = fs.readFileSync(path.join(ROOT, '.github/workflows/pages.yml'), 'utf8');
+  const cp = (yml.match(/cp -r ([^\n]+?) _site\//) || [])[1] || '';
+  const shipped = new Set(cp.split(/\s+/).filter(Boolean));
+  const refs = [...html.matchAll(/\b(?:src|href)="([^"]+)"/g)].map(m => m[1])
+    .filter(u => !/^(https?:|data:|#|\/\/|mailto:)/.test(u)).map(u => u.replace(/^\.\//, '').split(/[/?#]/)[0]);
+  const missing = [...new Set(['og.png', ...refs])].filter(f => !shipped.has(f));
+  out.push({ name: 'the Pages deploy ships og.png and every file index.html links (B-020)', ok: !!cp && missing.length === 0,
+    detail: missing.length ? 'missing: ' + missing.join(', ') : [...shipped].join(' ') });
   return out;
 }
 
