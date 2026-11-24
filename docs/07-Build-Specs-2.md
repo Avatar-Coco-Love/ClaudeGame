@@ -24,22 +24,7 @@ Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 
 - **Smoke:** byte-same screenshot before/after at 3 spots (home, a beacon cave, a Wide beam in the Deep), like S-18 did;
   `tools/perf.cjs` "holes" within 5 % of session 41's 133 ms mean. `render.js` under 480 lines.
 
-## S-19 — Spires v1a: sites, cells, save (M5, first slice) (D-049)
-No relight, no found toast yet: this slice puts the goal in the world and the save. Look + found = S-27.
-- **Count and place:** `SPIRE_COUNT` 5, one per 72° sector (sector start angle from the seed), centre at d `SPIRE_D` [64, 74]
-  cells, 9×9 footprint inside the bedrock border, ≥ 12 cells from every vault centre. Sites come from `seededStream(seed,'spire')`,
-  `SPIRE_TRIES` 40 candidates per sector, seed-only like `vaultSites` (D-023). Session 32 measured 40 seeds: 5/5 sectors always fit.
-- **D-024 for old saves:** take the first candidate whose footprint has no explored cell; if none, the least-explored one, and
-  only unexplored cells are re-typed. The chosen centres are saved, never re-derived:
-  `spires: [{x, y, seen: false, fed: 0, mask: null, lit: false}]` (the whole M5 record now, so S-27/S-20/S-28 need no format bump).
-- **Shape:** a 1-cell ring of `T.SPIRE_SHELL` on the 9×9 edge (hp 6, no yield, like a vault shell) with a 1-cell gap on each
-  axis, open floor inside, a 3×3 `T.SPIRE` core and 8 shell cells of `T.FACET` at (±2, ±4) and (±4, ±2): core and facets are
-  unmineable (the beam sparks, no crack, like bedrock). Draw: shell like a vault shell, the core a dim violet-white hexagon
-  outline, facets small dim hexagons. Static here; S-27 adds the breath.
-- **Save:** `SAVE_FORMAT` 10 adds `spires`; the upgrade step runs the D-024 rule. Glitches ignore Spires.
-- **Smoke:** 5 sites on 40/40 seeds, all d 64–74, ≥ 12 from vaults, inside the border; same seed → same sites; core and
-  facets take no beam damage, shell does; a format-9 save with a tunnel through candidate 1 gets candidate ≥ 2 and keeps
-  its tunnel; reload keeps the centres; `dev.teleport(70, a)` beside one, screenshot at DSF 1 (view).
+## S-19 — ✅ built session 46 (#51); as-built notes D-068 (candidates, Spire gap 12, `keep`).
 
 ## S-27 — Spires v1a: found (M5) (D-049)
 - **Look:** the core hexagon breathes (6 s, alpha 0.35–0.6; static under reduced motion). Minimap: a hollow violet-white

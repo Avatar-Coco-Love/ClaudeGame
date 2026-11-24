@@ -10,6 +10,7 @@ import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { tryPlace, loadBeacons } from './craft.js';
+import { chooseSpires, loadSpires, stampSpires } from './spire.js';
 
 
 export class Game {
@@ -18,6 +19,9 @@ export class Game {
     this.mode = mode;
     const skip = save && Array.isArray(save.vaultSkip) ? save.vaultSkip : []; // B-037: a save is never trusted to be well-formed
     this.world = new World(seed, skip);
+    // S-19 (D-049): the saved Spires, or chosen now from the seed (+ what an old/malformed save has seen, D-024).
+    this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
+    stampSpires(this.world, this.spires);
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
     this.bank = { shard: 0, prism: 0, lumen: 0 };
@@ -350,6 +354,7 @@ export class Game {
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
+      spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }

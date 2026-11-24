@@ -43,7 +43,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 
 ## M5 — The arc (a reason to go deep) — ships v1.0
 - ✅ (#50) **S-26 `light.js` split:** darkness + floor glow in `light.js`, chunk painting in `terrain.js`, `R.lightSets`; cached hole sprites (D-067).
-- **S-19 Spires v1a:** 5 dormant Spires at d 64–74, one per sector: sites, cells, the whole M5 save record (D-049, D-063).
+- ✅ (#51) **S-19 Spires v1a:** 5 dormant Spires at d 64–74, one per sector: sites, cells, `SAVE_FORMAT` 10 record (D-049, D-068).
 - **S-27 Spires found:** breath, minimap hexagon, "A dormant Spire (n/5)" toast + tone, stats line.
 - **S-20 Spire feed:** 80▲ from cargo primes a Spire (D-055).
 - **S-28 Facet puzzle + relit:** 8 facets, 3–5 taps, 260 px light (Drift; Surge too until S-23) (D-055).

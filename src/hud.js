@@ -9,6 +9,7 @@ const MINI_COLORS = {
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
   [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
   [T.LUMEN]: [255, 201, 79],
+  [T.SPIRE_SHELL]: [150, 140, 220], [T.SPIRE]: [120, 104, 200], [T.FACET]: [150, 140, 220], // S-19: dim violet; S-27 adds the mark
 };
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
