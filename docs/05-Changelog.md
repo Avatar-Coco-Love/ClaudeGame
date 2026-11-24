@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.51 — 2026-11-24 (#52)
+- No gameplay change: a design pass on the road to the Spires. Waking a Spire will take 80 Prisms from your cargo first
+  and then from your bank, so a world you have already mined out can still be finished in either mode; Surge's Spire
+  defence now plans for Spires that sit against the edge of the map; and a Spire your old save had already explored
+  past will still count toward the ending.
+
 ## v0.2.50 — 2026-11-24 (#51)
 - Five dormant Spires now stand in the Deep, one in each direction, 64–74 cells out: a 9×9 shell of pale violet stone
   with an opening on every side, small hexagon facets set in the walls, and a dim hexagon core at the centre. The shell
@@ -69,27 +75,4 @@ One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D
   let go to fire one burst that punches through up to 3 cells, or a Glitch. Full charge fires by itself; a short tap just fizzles.
   Q / ⟂ now cycles Focus → Wide → Pulse. Works with the mouse, Space, and the touch aim stick, in Drift and Surge.
 
-## v0.2.38 — 2026-11-24 (#39)
-- Smoother frames with loot on the floor: glowing Shards, Prisms and Lumen are now drawn from a ready-made glow, so a cache burst
-  or a dropped hold no longer slows the game. Scanner pings with many ore marks are smooth too. They look the same as before.
-
-## v0.2.37 — 2026-11-24 (#38)
-- Phones: in landscape the title logo and version line fit, and ◎ ⟂ ♪ ≡ move into one row at the top, away from your aiming thumb.
-  ⟂ now says which beam is on (Focus / Wide). Buttons are at least 44 px; the first hint wraps instead of being cut at 320 px.
-  Lifting one aim finger while another is down hands the stick to the other finger.
-
-## v0.2.36 — 2026-11-24 (#37)
-- No gameplay change. Design pass: the next six builds are planned (phone layout fixes, Pulse beam, Beacons, and the first
-  dormant Spires, the goal of v1.0). The README now lists every key and touch button.
-
-## v0.2.35 — 2026-11-24 (#36)
-- Fixes: mining always drops ore again, even on a floor crowded with scattered cargo (old loot fades first; your own cargo never does).
-  A Glitch your beam has just destroyed can no longer hit you, and one destroyed as it gives up still drops its loot.
-  F and Q are no longer swallowed by the tiny pause on a crystal break. The Matrix sheet's bank counts up as you deposit.
-  A Scanner ping with nothing in range still sweeps its ring, so you can see it fired.
-
-## v0.2.34 — 2026-11-24 (#35)
-- No gameplay change. The game now has a finish line: version 1.0 arrives with the Spires, the ending and New Cycle.
-  The middle version number now counts finished milestones, so this is 0.2 (the depth rings, vaults and Lumen are done).
-
-Older entries: v0.1.27–v0.1.33 in `archive/changelog-v0.1.27-v0.1.33.md`, v0.1.22–v0.1.26 in `archive/changelog-v0.1.22-v0.1.26.md`, v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.
+Older entries: v0.2.34–v0.2.38 in `archive/changelog-v0.2.34-v0.2.38.md`, v0.1.27–v0.1.33 in `archive/changelog-v0.1.27-v0.1.33.md`, v0.1.22–v0.1.26 in `archive/changelog-v0.1.22-v0.1.26.md`, v0.1.17–v0.1.21 in `archive/changelog-v0.1.17-v0.1.21.md`, v0.1.10–v0.1.16 in `archive/changelog-v0.1.10-v0.1.16.md`, v0.1.1–v0.1.9 in `archive/changelog-v0.1.1-v0.1.9.md`.

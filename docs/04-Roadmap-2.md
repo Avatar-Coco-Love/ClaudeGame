@@ -29,5 +29,5 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   node-only checks → `tests/world.cjs`; `craft.js` `placeRefusal`/`tryPlace` both compute the core cell; `style.css` has two
   `@media (max-width: 380px)` blocks (merge); `tools/perf.cjs` leaves beacon glow, beacon glyphs and chunk blits untimed (~31 %
   of the holes run) (light-hole gradient cache ✅ #50, D-067).
-- **B-039 (watch, audit 44):** portrait 320 px with ◆ ▲ ● all at 4 digits, the bank panel runs under the minimap (panel right
+- **B-039 (scheduled in S-27, Design 47: 3 px over at 2750◆ 1470▲ 141●):** portrait 320 px with ◆ ▲ ● all at 4 digits, the bank panel runs under the minimap (panel right
   ≈ 240, minimap left ≈ 212). A real world caps at ~2750◆ / 1470▲ / ~141●, so ● stays 3 digits; fix if a late save shows it.

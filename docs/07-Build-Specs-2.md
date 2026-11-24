@@ -26,11 +26,16 @@ Deep basis (session 32, 40 seeds, d ≥ 64): per world ~648 prism, 588 crystal, 
 
 ## S-19 — ✅ built session 46 (#51); as-built notes D-068 (candidates, Spire gap 12, `keep`).
 
-## S-27 — Spires v1a: found (M5) (D-049)
+## S-27 — Spires v1a: found (M5) (D-049; re-checked Design 47 against D-068/D-069)
 - **Look:** the core hexagon breathes (6 s, alpha 0.35–0.6; static under reduced motion). Minimap: a hollow violet-white
-  hexagon once any footprint cell is explored, always shown after that.
-- **Found:** first sight in a save → toast "A dormant Spire (n/5)" + one soft low tone (measured like S-14's, add to
-  `tests/audio.cjs` ceilings). The Matrix stats line adds "Spires 0/5 lit" once one is found. Same in Drift and Surge.
+  hexagon at the record's centre once any footprint cell is explored, always shown after that (a broken Spire too, D-069).
+- **Found:** first sight in a save → toast "A dormant Spire (n/N)" (N = `game.spires.length`, 5 on every seed so far) + one
+  soft low tone (measured like S-14's, add to `tests/audio.cjs` ceilings). The Matrix stats line adds "Spires 0/N lit" once
+  one is found. Same in Drift and Surge. A save that already explored a footprint (v0.2.50) is marked `seen` on load,
+  silently (no burst of toasts).
 - **Save:** sets `spires[i].seen` (S-19's field; no format bump).
-- **Smoke:** the toast fires once across a reload; minimap pixel at a seen Spire, none at an unseen one; tone within ceilings;
-  stats line; screenshot (view) at DSF 1 and 320×568.
+- **Rider B-039 (Design 47):** in the `max-width: 380px` block, `.bank { gap: 10px }` (merge the two 380 px blocks, audit 44
+  debt). Measured at 320×568 (DSF 2, Surge, 2750◆ 1470▲ 141●): bank panel right 215 vs minimap left 212 (3 px over).
+- **Smoke:** the toast fires once across a reload; a pre-seen save gets no toast; minimap pixel at a seen Spire, none at
+  an unseen one; tone within ceilings; stats line; at 320×568 with 2750◆ 1470▲ 141● the panel ends ≥ 6 px left of the
+  minimap (fails on the old CSS); screenshot (view) at DSF 1 and 320×568.
