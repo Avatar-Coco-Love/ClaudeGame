@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 56** · **Version: v0.4.60** (session 56: build; rotation: 57 Design, 58 Build, 59 Audit, 60 Build).
+_Last updated: 2026-11-24_ · **Session counter: 57** · **Version: v0.4.61** (session 57: design; rotation: 58 Build, 59 Audit, 60 Build, 62 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -37,8 +37,8 @@ _Last updated: 2026-11-24_ · **Session counter: 56** · **Version: v0.4.60** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-7`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-4`, 1 PR each, D-063; refreshed Design 52, D-079…D-082): S-24, S-29. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
-- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
+- Specs (`07-…-4`, 1 PR each, D-063; refreshed Design 52, D-079…D-082): S-31, S-24, S-29; M6 S-32, S-33 (D-087). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (wakeprobe D-087; surgebot S-30/D-085: A*, fights, `--route=mine|rim|hug|spire`; spireloop + facetprobe D-079/D-080, spirerun D-070, relayrun D-076, vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49); each lives on in the smoke suite.
@@ -47,6 +47,5 @@ _Last updated: 2026-11-24_ · **Session counter: 56** · **Version: v0.4.60** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 57 (Design): play-test the Wake (Surge) and the facet puzzle (Drift) with Playwright screenshots; settle Q-017
-(is the Wake hard enough for a person at mid?) and tune if not; re-check S-24 + S-29 specs against the built Spires.
-Then S-24 (ending), S-29 (New Cycle → v1.0). Debt from audit 54 (H1, H2, H4, T3) in `04-Roadmap-2.md`. Read only this file to start.
+Session 58 (Build): **S-31 Wake fix + tune** (`07-Build-Specs-4.md`; B-048 open: walking away holds a Wake). Then S-24, S-29
+(v1.0). Debt from audit 54 (H1, H2, H4, T3) in `04-Roadmap-2.md`. Read only this file to start.

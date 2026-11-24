@@ -29,3 +29,13 @@ Continues `09-Implementation-Log-6.md` (split at the 8 KB cap, session 55). Newe
   nothing), B-044's check (re-proved: fails with the fix removed), spirefeed's 320 Surge facet check reads the drawn mask.
 - Viewed `wake-1280x800.png` / `wake-320x568.png`: ring, lanes, hint read well; lit clock facets are faint (same draw as
   the puzzle). Smoke 254/254.
+
+## Session 57 — Design: the Wake for a person (v0.4.61, #62)
+- New probe `tools/wakeprobe.mjs` (D-087): `perfect` / `human` / `still` guards, no god mode, 3 tries per seed.
+- **B-048 (open, S-31):** `surgebot` start build spent 2083 of 2401 Wake frames > 5 cells from the core (retreating to
+  heal) and held anyway: Wake Glitches despawn past `GLITCH_DESPAWN_PX` from the player core. So S-23's bot table
+  over-reported start (12/12 held); mid/max guards stayed in the interior and are fine.
+- Tunes tried on a scratch copy (reverted): guard cells 0; tier −1; tier −1 + waves 1.2 / 1.0 s. Picked tier −1 (S-31).
+- Playtest (Playwright 1280×800, mid, idle in the interior, viewed): 9 s in, charge 80, core 56/160 hp, 4 Glitches;
+  the one lit clock facet is hard to see next to the orange ring (→ S-31 orange clock); lanes beyond the light are dark.
+- Specs: S-31 (fix + tune, before S-24), S-24 note (`DARK_ALPHA` to config), S-32 Spitter, S-33 weather. Q-017 → D-087.
