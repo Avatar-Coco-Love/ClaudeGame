@@ -249,7 +249,7 @@ function craftRow(id, desc, stock, cost, can, craftIt) {
   const g = game, row = document.createElement('div'), list = id === 'relay' ? g.relays : g.beacons;
   row.className = 'upgrade'; row.dataset.id = id;
   row.innerHTML = `
-    <div class="u-main"><div class="u-name">${PLACE_NAME[id]}</div><div class="u-desc">${desc} ${input.usingTouch ? `Tap ${PLACE_GLYPH[id]}` : 'Press B'} out in the caves</div>
+    <div class="u-main"><div class="u-name">${PLACE_NAME[id]}</div><div class="u-desc">${desc} ${input.usingTouch ? `Tap ${PLACE_GLYPH[id]}` : `Press ${keys.K('place')}`} out in the caves</div>
       <div class="u-val">Carried <b>${g.craft[id]}/${stock}</b> · Placed ${list.length}/${PLACE_MAX[id]}</div></div>
     <button class="buy" ${can(g) ? '' : 'disabled'}>${costHtml(cost)}</button>`;
   row.querySelector('.buy').addEventListener('click', () => {
@@ -272,8 +272,8 @@ function researchRow(r) {
     if (!buyResearch(g, r.id)) return;
     renderPanel(); persist();
     $('upgrade-list').querySelector(`[data-id="${r.id}"]`)?.classList.add('flash');
-    if (r.id === 'wide') toast(input.usingTouch ? 'Wide Beam online — tap ⟂ to switch' : 'Wide Beam online — press Q to switch', 3200);
-    if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : 'Scanner online — press F to ping', 3200);
+    if (r.id === 'wide') toast(input.usingTouch ? 'Wide Beam online — tap ⟂ to switch' : `Wide Beam online — press ${keys.K('beamMode')} to switch`, 3200);
+    if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : `Scanner online — press ${keys.K('scan')} to ping`, 3200);
   });
   return row;
 }

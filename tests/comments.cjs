@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-// Audit 79 (B-064): S-40 swallowed `ctx.textAlign = 'center'` in hud.js, an assignment the first patterns missed.
+// Audit 79 (B-065): S-40 swallowed `ctx.textAlign = 'center'` in hud.js, an assignment the first patterns missed.
 const CODEY = /\);\s*\}?\s*$|;\s*\}\s*(\/\/|$)|\b(ctx|game|g)\.[a-zA-Z]+\(.*\);|'[^']*'\s*\/\/|\b(ctx|game|g|r|this)\.[a-zA-Z.]+\s*=[^=].*;\s*$/;
 
 function swallowed() {

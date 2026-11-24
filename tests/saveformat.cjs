@@ -31,6 +31,15 @@ async function nodeChecks(check) {
   try { up = upgradeSave(JSON.parse(JSON.stringify(old))); new Game({ seed: 5, mode: 'drift', audio, save: up }); } catch (e) { err = e.message; }
   check('one upgrade step per format; a format-1 save upgrades to SAVE_FORMAT and loads (D-005, H5)',
     STEPS.length === SAVE_FORMAT - 1 && !err && up && up.v === SAVE_FORMAT, `${STEPS.length} steps, format ${SAVE_FORMAT}, upgraded to ${up && up.v} ${err}`);
+  // Audit 79 (B-066, B-067): a save missing its bank or map used to throw on the title (no frame loop at all) or on Continue.
+  const cur = JSON.parse(JSON.stringify(s)), bare = { v: SAVE_FORMAT, seed: 1, mode: 'drift' };
+  const noMap = upgradeSave({ ...JSON.parse(JSON.stringify(cur)), explored: 'not base64!' }), noSeed = upgradeSave({ ...JSON.parse(JSON.stringify(cur)), seed: 'x' });
+  const noBank = upgradeSave({ ...JSON.parse(JSON.stringify(cur)), bank: null, cargo: { shard: 'x', prism: -3, lumen: 2.7 } });
+  let loads = '';
+  try { const g = new Game({ seed: cur.seed, mode: 'drift', audio, save: noBank }); g.bank.shard += 1; loads = JSON.stringify([g.bank, g.cargo]); } catch (e) { loads = e.message; }
+  check('a save without a seed or a readable map is no save; a missing / damaged bank and cargo load as whole counts (B-066, B-067, B-037)',
+    upgradeSave(bare) === null && noMap === null && noSeed === null && loads === '[{"shard":1,"prism":0,"lumen":0},{"shard":0,"prism":0,"lumen":2}]',
+    JSON.stringify({ bare: upgradeSave(bare), noMap, noSeed, loads }));
 }
 
 module.exports = { nodeChecks, PIN };

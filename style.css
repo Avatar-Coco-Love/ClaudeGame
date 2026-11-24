@@ -39,7 +39,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .buttons button { width: 36px; height: 36px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: calc(16px * var(--ts)); }
 #hint { position: absolute; bottom: max(22px, calc(env(safe-area-inset-bottom) + 10px)); left: 50%; transform: translateX(-50%); padding: 8px 14px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 999px; font-size: calc(13px * var(--ts)); color: var(--ink); white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis; }
-#matrix-btn { position: absolute; bottom: max(70px, calc(env(safe-area-inset-bottom) + 58px)); left: 50%; transform: translateX(-50%);
+#matrix-btn { white-space: nowrap; position: absolute; bottom: max(70px, calc(env(safe-area-inset-bottom) + 58px)); left: 50%; transform: translateX(-50%);
   padding: 12px 22px; border-radius: 12px; border: 1px solid var(--cyan); background: rgba(10, 40, 60, .85); color: var(--cyan);
   font-weight: 600; letter-spacing: .04em; box-shadow: 0 0 18px rgba(46,242,255,.35); animation: glow 1.6s ease-in-out infinite; }
 #scan-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--gold); background: rgba(40, 30, 8, .85); color: var(--gold);
@@ -114,7 +114,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
 .set-row { display: flex; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid rgba(90,120,255,.15); }
 .set-row > span { flex: 1; min-width: 0; } .set-row small { display: block; font-size: calc(12px * var(--ts)); color: var(--dim); }
 .set-row input[type=range] { flex: 1.4; min-width: 0; height: 40px; accent-color: var(--cyan); }
-.set-row output { width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+.set-row output { min-width: 3.2ch; flex: none; text-align: right; font-variant-numeric: tabular-nums; }
 .set-row [role=switch], .set-row .set-cycle { min-width: 72px; min-height: 40px; border-radius: 9px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
 .set-row [role=switch][aria-checked=true] { border-color: var(--cyan); background: rgba(46,242,255,.14); color: #fff; }
 /* S-39 Keys view: replaces the main rows; rows a little shorter so ten fit on a laptop. */
@@ -160,7 +160,13 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
 @media (pointer: coarse) {
   .buttons { gap: 8px; }
   .buttons button, #matrix-close, #settings-close { width: 44px; height: 44px; }
-  .mode-toggle button, .tabs button, .buy, .set-row [role=switch], .set-row .set-cycle { min-height: 44px; }
+  .mode-toggle button, .tabs button, .buy, .set-row [role=switch], .set-row .set-cycle, .set-row input[type=range] { min-height: 44px; }
+}
+/* Audit 79 (B-070, B-071): Large text up to 420 px wide: the four tabs go 2 × 2 and the hint wraps, instead of spilling. */
+@media (max-width: 420px) {
+  .text-large .tabs { flex-wrap: wrap; } .text-large .tabs button { flex: 1 1 40%; }
+  .text-large #matrix-btn { bottom: max(92px, calc(env(safe-area-inset-bottom) + 80px)); } /* clears a 2-line Large hint */
+  .text-large #hint { white-space: normal; width: max-content; max-width: calc(100vw - 32px); text-align: center; border-radius: 14px; line-height: 1.35; }
 }
 /* Landscape phone: ◎ ⟂ ♪ ≡ in one row left of the minimap, out of the right (aim) thumb's reach. Portrait keeps the column. */
 @media (max-height: 480px) and (pointer: coarse) {

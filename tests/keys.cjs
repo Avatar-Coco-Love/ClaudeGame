@@ -22,6 +22,12 @@ async function nodeChecks(check) {
   check('S-39 eventCode prefers e.code; key-only events map to codes; labels',
     eventCode({ code: 'KeyW', key: 'z' }) === 'KeyW' && eventCode({ key: 'Enter' }) === 'Enter' && eventCode({ key: 'g' }) === 'KeyG'
       && eventCode({ key: ' ' }) === 'Space' && keyLabel('KeyG') === 'G' && keyLabel('ShiftLeft') === 'Shift' && moveLabel(d) === 'WASD');
+  // Audit 79 (B-068): three texts still said "Press B" / "press Q" / "press F" after S-39. No player-facing string in src
+  // may name a bindable key by letter; it goes through keys.K(action) so it follows the binding (and AZERTY).
+  const hard = [];
+  for (const f of fs.readdirSync(path.join(ROOT, 'src')).filter(f => f.endsWith('.js'))) fs.readFileSync(path.join(ROOT, 'src', f), 'utf8').split('\n')
+    .forEach((l, i) => { if (/[Pp]ress (Space|[A-Z])\b(?![a-z])/.test(l.replace(/\/\/.*$/, ''))) hard.push(`${f}:${i + 1}`); });
+  check('no player-facing text names a bindable key by letter; it uses keys.K (B-068)', hard.length === 0, hard.join(', '));
 }
 
 async function browserChecks(browser, url, check, errors, shots) {
