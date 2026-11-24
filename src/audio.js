@@ -119,6 +119,7 @@ export class Audio {
   facet(on) { this.tone(on ? 740 : 494, 0.12, { type: 'sine', vol: 0.06 }); }
   spireRelit() { [392, 494, 587].forEach((f, i) => this.tone(f, 0.3, { type: 'sine', vol: 0.07, delay: i * 0.1 })); }
   anomaly() { [523, 659, 784].forEach((f, i) => this.tone(f, 0.16, { type: 'sine', vol: 0.06, slide: 120, delay: i * 0.06 })); } // S-35: a rising take tone
+  anomalyEnd() { [784, 659, 523].forEach((f, i) => this.tone(f, 0.14, { type: 'sine', vol: 0.045, slide: -80, delay: 0.35 + i * 0.06 })); } // S-37: the take tone falling, after the deposit chime
   beacon() { this.tone(660, 0.22, { type: 'sine', vol: 0.07, slide: 220 }); } // S-16: a soft rising placement tone
   modeSwitch() { this.tone(520, 0.06, { type: 'sine', vol: 0.06 }); } // S-13: a short soft click when Q / ⟂ changes the beam
   // S-14: Pulse release, a soft low thump (sine, pitch drops) that grows with the charge; a fizzle is a faint short tick.

@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 70** · **Version: v1.1.10** (session 70: Build, S-36; rotation: 71 Build, 72 Design, 74 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 71** · **Version: v1.2.11** (session 71: Build, S-37, M7 ✅; rotation: 72 Design, 73 Build, 74 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -18,6 +18,7 @@ _Last updated: 2026-11-24_ · **Session counter: 70** · **Version: v1.1.10** (s
 - Anomalies (S-35/36, D-099, D-101, `anomaly.js`): 16 seed-only sites (3/5/8 by ring) in rock, kind 1/3 each: Overclock
   (beam ×1.5), Lodestone (reach ×2, pull ×1.5), Ballast (cargo ×1.5) via `stat()`; kinds stack; end when a deposit banks
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
+  S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -30,7 +31,7 @@ _Last updated: 2026-11-24_ · **Session counter: 70** · **Version: v1.1.10** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): M7 Anomalies S-37 in `07-Build-Specs-5.md` (D-098); everything earlier built; M6 ✅ (v1.1). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). Next specs: M8 (Design 72). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -39,5 +40,5 @@ _Last updated: 2026-11-24_ · **Session counter: 70** · **Version: v1.1.10** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 71 (Build): S-37 Anomalies found (minimap dots, Scanner ping, take/end tones, phone chip layout) from
-`07-Build-Specs-5.md`; it marks M7 ✅ → VERSION 1.2.0. Browser checks that approach a Spire pin the seed (D-100).
+Session 72 (Design): play-test M7 (Anomalies in both modes, phones) and write build-ready specs (S-38…) for the first
+M8 items in `docs/04` that don't wait on the owner's audio pack (e.g. PWA offline, accessibility audit, low-end perf).

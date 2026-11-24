@@ -21,7 +21,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 - **Nexus Development** *(built: Radiance)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
 - **Research** *(built: Scanner, Wide beam, Pulse beam)*: unlocks new *kinds* of things (new beam modes, new materials).
 - **Crafting** *(built: Beacons S-16, Relays S-22)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
-- **Temporary Upgrades** *(specced: Anomalies, D-098)*: buffs found in the world that scale a Matrix stat until your next deposit.
+- **Temporary Upgrades** *(built: Anomalies, D-098, M7 ✅)*: buffs found in the world that scale a Matrix stat until your next deposit.
 
 ## Scope and end state (D-045)
 - **v1.0 = M5 ships:** M1–M5 in `04`, ending with Spires, an ending sequence and **New Cycle**. The win: relight every dormant

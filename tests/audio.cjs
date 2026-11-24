@@ -70,7 +70,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -104,6 +104,10 @@ async function browserChecks(browser, url, check, errors) {
   const sf = [shots['facet(true)'], shots['facet(false)'], shots['spireRelit()']];
   check('facet flip + Spire relit tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-28)',
     sf.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(sf));
+  // S-37: the Anomaly take (rising) and end (falling, after the deposit chime) tones: soft sines like the Spire set.
+  const an = [shots['anomaly()'], shots['anomalyEnd()']];
+  check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
+    an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
   const dep = await pg.evaluate(renderSfx, ['for (let i = 0; i < 140; i++) at(i * 0.035, () => a.deposit(i)); at(4.9, () => a.depositDone(2))', 6]);
   check('a 140-item deposit is not a 5 s beep chain: loud ≤ 1 s (B-017)', dep.loudS <= 1, JSON.stringify(dep));
