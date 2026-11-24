@@ -1,6 +1,6 @@
 # 09 — Implementation Log, part 8
 
-Continues `09-Implementation-Log.md` (sessions 59–63 archived in audit 69: `archive/2026-11-24-09-sessions-59-63.md`). Newest at the bottom; read the tail only.
+Continues `09-Implementation-Log.md` (sessions 59–63 archived in audit 69: `archive/2026-11-24-09-sessions-59-63.md`). Continued in `09-Implementation-Log-9.md` (session 72 on).
 
 ## Session 64 — Audit: skip keys, card fit, records, B-053…B-059 (v1.0.3, #69)
 - Four subagents (correctness, perf, touch, code health + docs drift); each finding re-run here.

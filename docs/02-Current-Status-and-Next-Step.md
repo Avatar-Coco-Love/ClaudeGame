@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 71** · **Version: v1.2.11** (session 71: Build, S-37, M7 ✅; rotation: 72 Design, 73 Build, 74 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 72** · **Version: v1.2.12** (session 72: Design, M8 specs; rotation: 73 Build, 74 Audit, 75 Build, 76 Build, 77 Design).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -28,10 +28,10 @@ _Last updated: 2026-11-24_ · **Session counter: 71** · **Version: v1.2.11** (s
 - Darkness/light overlay, minimap, Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires) every 10 s, on deposit, and on page hide. Saves carry a format number (now 15); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-8`), `08` per-system detail.
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-9`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). Next specs: M8 (Design 72). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -40,5 +40,5 @@ _Last updated: 2026-11-24_ · **Session counter: 71** · **Version: v1.2.11** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 72 (Design): play-test M7 (Anomalies in both modes, phones) and write build-ready specs (S-38…) for the first
-M8 items in `docs/04` that don't wait on the owner's audio pack (e.g. PWA offline, accessibility audit, low-end perf).
+Session 73 (Build): build **S-38 PWA** (`07-Build-Specs-6.md`): manifest + icons, network-first `sw.js` with a
+`VERSION`-named cache, `tests/pwa.cjs` (offline reload reaches the title and starts a New World).
