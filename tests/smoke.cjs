@@ -78,6 +78,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
   await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
+  await require('./echo.cjs').nodeChecks(check).catch(e => check('S-42 echo checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -357,6 +358,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await require('./quality.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-41 graphics quality browser checks ran', false, e.message));
     await require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message));
+    await require('./echo.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_SHOT).catch(e => check('S-42 echo browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
 
     // ---- Settings (S-3, D-016) ----

@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.2.19';
+export const VERSION = '1.2.20';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -191,7 +191,20 @@ export const RESEARCH = [
   { id: 'scanner', name: 'Scanner', desc: `Ping: shows ore and vault caches within ${SCAN_RADIUS} cells for a few seconds`, cost: 10 },
   { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
   { id: 'pulse', name: 'Pulse Beam', desc: 'Hold to charge, release to fire: 1.5× reach, pierces 3 cells', cost: 40 },
+  { id: 'echo', name: 'Echo', desc: 'A lesser core that follows you and mines exposed ore', cost: 30 }, // S-42 (D-108)
 ];
+// S-42 Echo (D-108, echo.js): follows down a BFS field from the core's cell, blinks back when stranded, Gathers exposed ore.
+export const ECHO_R = 6;                 // px collision radius
+export const ECHO_FIELD = 24;            // cells: the field's bound (box and path length)
+export const ECHO_FIELD_S = 0.5;         // s between field rebuilds (and on any cell break within the bound)
+export const ECHO_HOLD = [1.5, 3];       // cells from the core: the spot it settles in
+export const ECHO_SPEED_MUL = 1.15;      // × the core's Thrusters speed
+export const ECHO_BLINK_CELLS = 10;      // path distance past which it blinks
+export const ECHO_STUCK_S = 1.5, ECHO_STUCK_PX = 4; // < 4 px progress toward the core in 1.5 s -> blink
+export const ECHO_FADE_S = 0.25;         // each way
+export const ECHO_REACH = 5;             // cells from the core an ore cell may be to Gather it
+export const ECHO_DMG = 0.5;             // × the core's Beam Power dps
+export const ECHO_PICK_S = 0.25;         // s between target searches while it has none
 export const RESEARCH_HINT = `Gold Lumen ● hides past ${LUMEN_D} cells, in the Deep`;
 
 // Beam modes (S-13, D-036), in Q / ⟂ cycle order. Rays are parallel, `offsets` px sideways; range and damage are multipliers

@@ -37,3 +37,18 @@ Continues `09-Implementation-Log-9.md` (part 9 neared the 8 KB cap at session 77
   dropped `export` from 16. Docs: D-026, D-044 stale (D-111), 08 bot routes + `deep`. Q-023 (iPad keyboard rebinding).
 - D-xxx check: all 109 compared with code by the drift sweep; mismatches only as above. Archived sessions 69–73 and
   changelog v1.0.0–v1.1.10 word for word.
+
+## Session 80 — Build: S-42 Echo v1, follow + blink + Gather (v1.2.20, #87)
+- `src/echo.js` (BFS field 49×49 from the core's cell, line-of-sight shortcut, blink, Gather), Research row `echo` 30 ●,
+  `World.breaks` counter, `audio.echoBlink` (in `audio.cjs` ceilings), `dev.echo()`, `drawEcho` before the core. D-112.
+- `tests/echo.cjs` (node 10 + browser 2, in smoke): buys at 30 not 29; L-bend follow, 0 blinks; sealed → blink in 0.57 s;
+  Shard mined, rock beside untouched; cargo full / Nexus / Ending pause; same seed → same stats; 0.5× beam dps.
+  Proved: with euclid-only progress the L-bend check fails (1 blink at the corner).
+- `tools/echobot.mjs` (surgebot `mine` + `echo`/`onTick` options), 12 seeds × 10 min, mid: Drift strands 0, lag
+  2.77 / p90 2.86 cells, blinks/min 1.00 / p90 1.40, ◆/min 38.6 → 55.8 (×1.45); Surge strands 0, lag 2.81 / 2.87,
+  blinks 1.20 / 2.20, ◆/min 42.4 → 58.6 (×1.38). Start build: ×1.12 Drift, ×1.05 Surge. Parity within 10 %.
+- Observed: +40 % income at mid build is a big late reward for 30 ●; Design 82 should judge it against the pillars
+  (Q-024). Screenshot (1000×700) viewed: the diamond reads below the core, small but clear.
+- **B-074** (flaky, not fixed): the S-16 beacon minimap-dot checks failed once in a full smoke (pixel `219,222,195`,
+  not `191,248,255`) and passed 4/4 alone and on the next full run; the Echo is not in that test. Logged as Debt.
+- Smoke: 392/392 (two full runs green; one run had B-074).
