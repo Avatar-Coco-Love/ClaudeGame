@@ -41,3 +41,12 @@ Continues `06-Decisions-11.md` (same rules: supersede, never edit; list rejected
 - Card: time to 5/5 (`endedAt`), cells mined + Glitches cleared (live stats), Drift / Surge / restored counts, Continue,
   New Cycle disabled ("Next update"). Reopened from the Matrix ("Ending summary"). The lifted dark stays (`darkAlpha`).
 - Rejected: animating the zoom (sprite caches rebuild per zoom step); a separate "lifted" save field (`ended` implies it).
+
+### D-091 — S-29 New Cycle as built; v1.0.0 (2026-11-24, session 61, Build; implements D-062, D-046)
+- `game.cycle` + `game.records` (`{ best, cycles: { n: { time, drift, surge } } }`, written by `checkEnding`, seconds
+  rounded) are saved (`SAVE_FORMAT` 14; old saves cycle 0, `{}`). New Cycle (card, or title once `ended`): a confirm,
+  then `start(null, carry)` with a random seed; carries cycle + 1, records, mode. The Nexus inner ring + core glow take
+  `NEXUS_HUES[cycle % 5]` (cyan, green, gold, violet, rose). Title from cycle 1: "Cycle n · best 12m 05s to light all five".
+- Rejected: carrying Research or Radiance (D-062: nothing that plays twice; a cycle is a fresh run); a records screen
+  (the card + title line hold the two numbers that matter until a play-test asks for more).
+- **v1.0.0:** M1–M5 shipped (D-045, D-046). After 1.0, M6 → 1.1 (S-32, S-33 specced; Q-018 Relay reclaim open).

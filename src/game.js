@@ -2,7 +2,7 @@
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
 import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
-  RESPAWN_INVULN_S, RESPAWN_CLEAR_PX } from './config.js';
+  RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
@@ -25,6 +25,7 @@ export class Game {
     this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
+    this.cycle = 0; this.records = {}; // S-29: carried into every New Cycle (records: { best, cycles: { n: { time, drift, surge } } })
     this.ended = false; this.endedAt = null; this.endSeq = null; // S-24: saved / saved (time of 5/5) / the running sequence
     this.wake = null; this.wakeBlock = null; // S-23: the running Wake (never saved) / the Spire a failed one waits to be left
     this.facetAim = null; // S-28: { s, k, t, done } while the aim ray rests on a primed facet (spire.js)
@@ -80,6 +81,9 @@ export class Game {
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
     if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
   }
+
+  /** S-29: the Nexus's hue this cycle ('r, g, b'). */
+  nexusHue() { return NEXUS_HUES[this.cycle % NEXUS_HUES.length]; }
 
   coreRingIndex() { return this.world.ring(Math.floor(this.player.x / CELL), Math.floor(this.player.y / CELL)); }
   ringName() { return RINGS[this.ringNow].name; }
@@ -388,6 +392,7 @@ export class Game {
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
       ended: this.ended, endedAt: this.endedAt, // S-24
+      cycle: this.cycle, records: this.records, // S-29
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
@@ -401,6 +406,8 @@ export class Game {
     for (const k of Object.keys(this.upgrades)) if (s.upgrades && s.upgrades[k] != null) this.upgrades[k] = s.upgrades[k];
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
+    this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
+    this.records = s.records && typeof s.records === 'object' ? s.records : {};
     this.ended = s.ended === true; this.endedAt = Number.isFinite(s.endedAt) ? s.endedAt : null; // S-24 (B-037: never trust a save)
     Object.assign(this.research, s.research || {});
     this.craft.beacon = Math.min(BEACON_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.beacon)) || 0)); // S-16; B-038 clamp

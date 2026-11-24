@@ -188,9 +188,9 @@ export class Renderer {
     ctx.beginPath(); ctx.arc(0, 0, NEXUS_RADIUS, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.globalCompositeOperation = 'lighter';
-    const pulse = 1 + Math.sin(t * 2) * 0.05;
+    const pulse = 1 + Math.sin(t * 2) * 0.05, hue = this.game.nexusHue();
     const rings = [
-      { r: 46, rot: t * 0.3, col: '#2ef2ff', a: 0.9, wdt: 2.5 },
+      { r: 46, rot: t * 0.3, col: `rgb(${hue})`, a: 0.9, wdt: 2.5 }, // S-29: the cycle's hue
       { r: 32, rot: -t * 0.5, col: '#8a5cff', a: 0.9, wdt: 2 },
       { r: 62, rot: t * 0.12, col: '#ff4fd8', a: 0.35, wdt: 1.5 },
     ];
@@ -208,7 +208,7 @@ export class Renderer {
     }
     ctx.restore();
     const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
-    grd.addColorStop(0, 'rgba(255,255,255,0.95)'); grd.addColorStop(0.4, 'rgba(46,242,255,0.6)'); grd.addColorStop(1, 'rgba(46,242,255,0)');
+    grd.addColorStop(0, 'rgba(255,255,255,0.95)'); grd.addColorStop(0.4, `rgba(${hue},0.6)`); grd.addColorStop(1, `rgba(${hue},0)`);
     ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.fill();
     if (this.game.nexusPulse > 0) { // Radiance bought: a white ring sweeps out to the new light edge
       const k = 1 - this.game.nexusPulse;

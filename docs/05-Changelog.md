@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.0.0 — 2026-11-24 (#66)
+- **Lumen Core 1.0.** The whole arc is in: dig out from the Nexus, upgrade, go deep, relight all five Spires (by puzzle in
+  Drift, by holding them in Surge) and lift the dark.
+- **New Cycle:** after the ending, start a fresh world from the summary card or the title screen. Bank, upgrades, Spires,
+  Beacons and Relays start over; your records carry on (your best time to light all five, and each cycle's result). Each
+  cycle the Nexus glows a new colour. The title shows your cycle and best time.
+
 ## v0.4.64 — 2026-11-24 (#65)
 - **The ending:** relight the last of the five Spires and the view pulls back over the whole world. Each Spire draws a
   line of light home to the Nexus in turn while the darkness lifts. Press any key or tap to skip. Then a summary card:
