@@ -2,9 +2,8 @@
 // draws a line to the Nexus in turn, the darkness eases DARK_ALPHA[0] -> [1]), skippable by any key or tap; reduced motion:
 // an ENDING_FADE_S fade with no lines or pull-out. Then the summary card (main.js). `game.ended` is saved, so a reload
 // skips the sequence and keeps the lifted dark; `game.endSeq` ({ t }) is not.
-import { CELL, ENDING_S, ENDING_FADE_S, DARK_ALPHA, SPIRE_MARK_COLOR } from './config.js';
+import { CELL, ENDING_S, ENDING_FADE_S, ENDING_LINE_SHARE, ENDING_MARGIN_CELLS, DARK_ALPHA, SPIRE_MARK_COLOR } from './config.js';
 
-const LINE_SHARE = 0.8; // the lines draw in the first 80 % of the sequence, then all hold
 
 /** Called when a Spire relights: the last one ends the world (once). */
 export function checkEnding(game) {
@@ -44,7 +43,7 @@ export function endingView(r) {
   if (!g.endSeq || reduced(g)) return null;
   let R = 0;
   for (const s of g.spires) R = Math.max(R, Math.hypot((s.x + 0.5) * CELL - g.nexus.x, (s.y + 0.5) * CELL - g.nexus.y));
-  return { x: g.nexus.x, y: g.nexus.y, zoom: Math.min(r.w, r.h) / (2 * (R + 6 * CELL)) };
+  return { x: g.nexus.x, y: g.nexus.y, zoom: Math.min(r.w, r.h) / (2 * (R + ENDING_MARGIN_CELLS * CELL)) };
 }
 
 /** The overview frame (replaces the world draw while the full sequence runs): the explored map (the minimap's pixels,
@@ -77,7 +76,7 @@ export function drawOverview(r, ctx, ov) {
 function drawEnding(ctx, r, zoom) {
   const g = r.game, q = g.endSeq;
   if (!q || reduced(g)) return;
-  const n = g.spires.length, per = endingDur(g) * LINE_SHARE / n, col = SPIRE_MARK_COLOR;
+  const n = g.spires.length, per = endingDur(g) * ENDING_LINE_SHARE / n, col = SPIRE_MARK_COLOR;
   ctx.save();
   ctx.strokeStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 18; ctx.lineCap = 'round';
   ctx.lineWidth = 3 / zoom; // ~3 screen px at any zoom
@@ -92,10 +91,10 @@ function drawEnding(ctx, r, zoom) {
   ctx.restore();
 }
 
-/** The summary card's numbers (all from saved state, so the card reads the same after a reload). */
 /** '12m 05s'. */
 export const fmtTime = t => `${Math.floor(t / 60)}m ${String(Math.floor(t % 60)).padStart(2, '0')}s`;
 
+/** The summary card's numbers (all from saved state, so the card reads the same after a reload). */
 export function endingSummary(game) {
   const by = m => game.spires.filter(s => s.lit && s.mode === m).length, t = game.endedAt ?? game.stats.time;
   return { time: fmtTime(t), cycle: game.cycle, best: game.records.best, mined: game.stats.mined,

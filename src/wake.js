@@ -111,7 +111,8 @@ export function drawWake(ctx, game) {
   const f = k.charge / SPIRE_CHARGE, a0 = -Math.PI / 2, col = `rgb(${SPIRE_WAKE_RGB})`;
   ctx.save();
   ctx.strokeStyle = col; ctx.shadowColor = col; ctx.lineWidth = 4;
-  ctx.shadowBlur = 0; ctx.globalAlpha = 0.25; ctx.beginPath(); // audit 59: no blur left over from the last facet drawn ctx.arc(k.core.x, k.core.y, WAKE_RING_CELLS * CELL, 0, Math.PI * 2); ctx.stroke();
+  ctx.shadowBlur = 0; ctx.globalAlpha = 0.25; ctx.beginPath(); // audit 59: no blur left over from the last facet
+  ctx.arc(k.core.x, k.core.y, WAKE_RING_CELLS * CELL, 0, Math.PI * 2); ctx.stroke(); // B-053: this line had been swallowed by the comment above
   ctx.globalAlpha = 0.95; ctx.shadowBlur = 12;
   if (f > 0) { ctx.beginPath(); ctx.arc(k.core.x, k.core.y, WAKE_RING_CELLS * CELL, a0, a0 + Math.PI * 2 * f); ctx.stroke(); }
   ctx.restore();

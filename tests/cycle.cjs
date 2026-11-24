@@ -18,7 +18,7 @@ async function nodeChecks(check) {
   check('S-29: the ending records this cycle (time, Drift / Surge relights) and the best time; cycle + records survive a save; an old save is cycle 0',
     rec.best === 600 && rec.cycles[0].time === 600 && rec.cycles[0].surge === 3 && rec.cycles[0].drift === 2 && h.cycle === 3 && h.records.best === 600
     && up.cycle === 0 && JSON.stringify(up.records) === '{}', JSON.stringify({ rec, h: [h.cycle, h.records.best], up: [up.cycle, up.records] }));
-  check('S-29: the Nexus hue is NEXUS_HUES[cycle % 5] (cycle 0 = the original cyan)', g.nexusHue() === '46, 242, 255' && h.nexusHue() === NEXUS_HUES[3]
+  check('S-29: the Nexus hue is NEXUS_HUES[cycle % 5] (cycle 0 = the original cyan)', g.nexusHue() === NEXUS_HUES[0] && h.nexusHue() === NEXUS_HUES[3]
     && (() => { h.cycle = 6; return h.nexusHue() === NEXUS_HUES[1]; })(), '');
 }
 
@@ -54,7 +54,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     nc: document.getElementById('new-cycle').classList.contains('hidden'), ver: document.getElementById('version').textContent }));
   if (shots) await page.screenshot({ path: `${shots}/cycle-title-1280x800.png` });
   check('S-29: after a reload the title names the cycle and the best time; New Cycle stays hidden until this world ends; version ≥ 1.0 (D-046)',
-    title.shown && /^Cycle 1 · best \d+m \d\ds to light all five$/.test(title.line) && title.nc && title.ver === 'v' + VERSION && VERSION.split('.')[0] >= 1, JSON.stringify(title));
+    title.shown && /^Cycle 1 · best \d+m \d\ds to light every Spire$/.test(title.line) && title.nc && title.ver === 'v' + VERSION && VERSION.split('.')[0] >= 1, JSON.stringify(title));
   await page.close();
 }
 

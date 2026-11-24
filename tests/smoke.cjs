@@ -47,6 +47,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   for (const r of require('./docs.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./share.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./tuning.cjs').run()) check(r.name, r.ok, r.detail);
+  for (const r of require('./comments.cjs').run()) check(r.name, r.ok, r.detail);
   await require('./world.cjs').nodeChecks(check);
   await require('./saveformat.cjs').nodeChecks(check).catch(e => check('save-format checks ran', false, e.message));
   await require('./audit49.cjs').nodeChecks(check).catch(e => check('audit 49 checks ran', false, e.message));

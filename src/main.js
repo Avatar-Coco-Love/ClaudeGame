@@ -55,7 +55,7 @@ function showTitle() {
   $('new-cycle').classList.toggle('hidden', !(save && save.ended));
   const cyc = save && Number.isInteger(save.cycle) ? save.cycle : 0, best = save && save.records && save.records.best;
   $('cycle-line').classList.toggle('hidden', cyc < 1);
-  $('cycle-line').textContent = cyc >= 1 ? `Cycle ${cyc}${Number.isFinite(best) ? ` · best ${fmtTime(best)} to light all five` : ''}` : '';
+  $('cycle-line').textContent = cyc >= 1 ? `Cycle ${cyc}${Number.isFinite(best) ? ` · best ${fmtTime(best)} to light every Spire` : ''}` : '';
 }
 
 function selectMode(mode) {
@@ -314,7 +314,7 @@ function renderPanel() {
   }
   document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));
   const spires = spiresSeen(g) ? ` · Spires ${spiresLit(g)}/${g.spires.length} lit` : ''; // S-27: once one is found
-  $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m${spires}`;
+  $('stats').textContent = `Cells mined ${g.stats.mined} · Glitches cleared ${g.stats.glitches} · Time ${Math.floor(g.stats.time / 60)}m${spires}`; // minutes only: the line redraws with the sheet, not per second
   $('ending-open').classList.toggle('hidden', !g.ended); // S-24: the card stays reachable
 }
 $('matrix-btn').addEventListener('click', openPanel);
