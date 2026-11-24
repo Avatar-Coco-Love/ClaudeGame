@@ -1,6 +1,6 @@
 # 07 — Build Specs
 
-Specs ready to build, in **build order (D-063): M6 S-32, S-33 (S-34 Relay reclaim built #68) (`-4.md`; v1.0 shipped: S-30, S-23, S-31, S-24, S-29 built; S-22/S-20/S-28 built, `-3.md`)**; `-2.md` keeps the Deep basis and lists the built S-25, S-26, S-19, S-27, S-22, S-20, S-28; `-4.md`'s header lists S-30, S-23, S-31, S-24, S-29, S-34. Written by Design sessions; Design 47 re-checked S-27…S-29 against the built Spires (D-068) → D-069…D-071; Design 52 refreshed S-28, S-23, S-24, S-29 and wrote S-30 (D-079…D-082). A Build session takes the top spec, builds it, deletes it here,
+Specs ready to build, in **build order (D-063): M7 S-35, S-36, S-37 (`-5.md`, D-098); M6 S-32, S-33 and S-34 built (`-4.md`); v1.0 specs all built (`-3.md`, `-4.md`)**; `-2.md` keeps the Deep basis and lists the built S-25, S-26, S-19, S-27, S-22, S-20, S-28; `-4.md`'s header lists S-30, S-23, S-31, S-24, S-29, S-34. Written by Design sessions; Design 47 re-checked S-27…S-29 against the built Spires (D-068) → D-069…D-071; Design 52 refreshed S-28, S-23, S-24, S-29 and wrote S-30 (D-079…D-082). A Build session takes the top spec, builds it, deletes it here,
 and marks the item ✅ in `04`. Numbers here are starting values; they go in `src/config.js`, never inline.
 **Header rule:** every spec that adds a sink names its currency and compares it with the world's supply below; one spec = one PR.
 Measured basis (session 3, 40 seeds, see `09`): Shards in a world ≈ 2750◆ (1376 crystal cells × 2), maxing the Core Matrix costs 2482◆.

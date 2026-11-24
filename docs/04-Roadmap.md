@@ -60,7 +60,8 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - ✅ **S-32 Spitter** (ranged Glitch, Deep; #71, D-096). ✅ **S-33 Weather** (storm / aurora; #72, D-097).
 
 ## M7 — Temporary upgrades
-- Anomalies found in the world that give a buff until you next deposit (e.g. double magnet, beam overclock).
+- Specced (D-098, `07-…-5`): **S-35** Anomalies v1 (Overclock, ends at a deposit), **S-36** Lodestone +
+  Ballast, **S-37** map, ping, sound → v1.2.
 
 ## M8 — Polish & platform
 - **Recorded audio v1a: audition** (D-037, *waiting on the owner's CC0 pack in `docs/inbox/`*): measure every file, shortlist 2–3

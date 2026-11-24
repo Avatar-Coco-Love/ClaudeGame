@@ -47,3 +47,11 @@ Continues `09-Implementation-Log-7.md` (split at the 8 KB cap, session 62). Newe
   mine haul storm ÷ aurora 0.92). D-097 has the tuning table; Q-019 opened (shallow storms pay ~0).
 - Observed: spec numbers overshot the +25 % cap (aurora +46 %, deep storm ~+50 %); first tints lit the whole dark
   teal / violet. Screenshots after toning down: dark stays dark, violet reads, ore outlines shimmer. M6 ✅ → v1.1.
+
+## Session 67 — Design: weather play-test, M7 specced (v1.1.7, #73)
+- `surgebot --weather=on|off` (mine + deep, start + mid, both modes, 8 seeds × 6 min): every boost ≤ +25 %; the
+  shallow storm adds +3–7 % haul and ~1.5× kills. Q-019 settled no (D-098). Screenshots (`?dev`, teleport 40): aurora and
+  storm tints read, map stays dark, the toast shows. Seen: deep Surge hauls more than deep Drift (18 vs 12/min) in
+  this short run; Q-007's long-run parity numbers still stand, no change.
+- M7 specs S-35…S-37 in `07-Build-Specs-5.md` (Anomalies: sites, Overclock, deposit end, `SAVE_FORMAT` 15; then
+  Lodestone + Ballast bot-tuned; then map / ping / sound / touch). Q-020 opened (timer as well as deposit?).

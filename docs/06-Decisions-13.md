@@ -31,3 +31,17 @@ Continues `06-Decisions-12.md` (same rules: supersede, never edit; list rejected
 - M6 = S-32 + S-33 (D-087); Swarm / Burrower were "later" ideas, now in Later → M6 ✅, VERSION 1.1 (D-046).
 - Rejected: a saved event timer (save bump for a 40 s effect); +1 on every aurora break (+46 %); cap +1 (spawn rate,
   not cap, drives the storm's haul); tinting the dark as strongly as first drawn (it lit the map).
+
+### D-098 — Design 67: weather play-test, Q-019 settled; M7 = Anomalies (2026-11-24, session 67, Design)
+- Play-test (`surgebot`, 8 seeds × 6 min, weather forced on ÷ off, haul/min): mine start/mid drift (aurora) +13 / +16 %,
+  surge (storm) +3 / +7 % with kills/min +67 / +50 %; deep start/mid drift +16 / +2 %, surge +20 / +9 %. All ≤ +25 %.
+  Screenshots: aurora's teal dark + ore shimmer and the storm's violet both read without lighting the map.
+- **Q-019 → no:** a shallow storm pays little haul but brings ~1.5× the fights; shallow Surge stays calm by design.
+  Rejected: extra loot in a storm near the Nexus (a Surge-only reward, Q-001); weakening the Nexus repel (D-002).
+- **M7 shape (S-35…S-37):** 16 seeded Anomaly sites (entities embedded in rock, no layout change), 3 kinds that scale
+  one Matrix stat each (Overclock beam ×1.5, Lodestone magnet, Ballast cargo) until the next deposit that banks
+  anything; sites recharge after 300 s of play. Same in both modes; death doesn't end a buff (Drift can't die).
+- Rejected: timed buffs (a clock to watch; the deposit already closes the loop, Q-020 open); one-shot finite sites
+  (M7 would empty out by mid game); Anomalies as Glitch drops (a Surge-only source); a random kind per recharge (saved
+  RNG state for no play value); a 4th kind for thrust (three closes the loop, pillar 4); Anomaly as a new cell type
+  (changes layout under old saves, D-024).
