@@ -23,13 +23,11 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   per-item save/rotate/drawImage), holes 145 / 200 (light 70 %). Batch pickups without per-item save/restore if loot matters.
 - **Glitches still can't path:** after S-6 they give up instead of sticking, so a Surge player deep in tunnels sees Glitches appear, push at rock and fade. If play-tests find that reads as broken, a cheap flow-field toward the core (one BFS per second over explored cells) is the next step; M6's Burrower is the other answer.
 - **Late-game parity:** Drift's ore near the Nexus is finite, Glitch drops renewable. Re-run `tools/parity.mjs` with a depleted inner ring (or 30+ min) when M2 depth rings land.
-- **Audit 39 leftovers (code health):** **split `drawLight` (+ light holes) out of `render.js` (546 lines) before S-19** (now S-26, D-063) adds Spire
-  drawing; unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`, `VAULT_TEMPLATES`, `WIDE_OFFSET` (low; audit 44 again).
+- **Audit 39 leftovers (code health):** (`light.js` split ✅ #50) unused exports `SCAN_TYPES`, `scanWithin`, `researchNode`, `VAULT_TEMPLATES`, `WIDE_OFFSET` (low; audit 44 again).
 - **Audit 44 leftovers:** one buy helper for `canAfford`/`buy`, `canAffordNexus`/`buyNexus`, research and `craftBeacon`, and one
   `buyRow` for the 3 repeated panel click handlers in `main.js`; split `tests/smoke.cjs` (≈ 540 lines) before 600, e.g. the
   node-only checks → `tests/world.cjs`; `craft.js` `placeRefusal`/`tryPlace` both compute the core cell; `style.css` has two
   `@media (max-width: 380px)` blocks (merge); `tools/perf.cjs` leaves beacon glow, beacon glyphs and chunk blits untimed (~31 %
-  of the holes run); `drawLight` builds a radial gradient per light hole per frame (cache a sprite per radius like D-051, prove
-  identical pixels; holes run 1.27× loot at ×4: 168.7 / 216.7 ms mean / p95).
+  of the holes run) (light-hole gradient cache ✅ #50, D-067).
 - **B-039 (watch, audit 44):** portrait 320 px with ◆ ▲ ● all at 4 digits, the bank panel runs under the minimap (panel right
   ≈ 240, minimap left ≈ 212). A real world caps at ~2750◆ / 1470▲ / ~141●, so ● stays 3 digits; fix if a late save shows it.

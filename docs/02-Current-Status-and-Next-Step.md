@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 44** · **Version: v0.2.48** (session 44: audit; rotation: 45 Build, 47 Design, 49 Audit).
+_Last updated: 2026-11-24_ · **Session counter: 45** · **Version: v0.2.49** (session 45: build; rotation: 46 Build, 47 Design, 49 Audit).
 **Scope (D-045, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M8 post-1.0, then finished. VERSION minor = milestones shipped (D-046).
 
 ## What's real right now
@@ -18,7 +18,7 @@ _Last updated: 2026-11-24_ · **Session counter: 44** · **Version: v0.2.48** (s
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
   Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach; a full charge waits for a target in reach (S-21, D-059).
 - Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
-  ≥ 4 cells apart, ≤ 20): permanent 140 px light (`R.extraLights` = `game.beacons`), minimap dot, faint floor glow (S-25, D-061). Code `craft.js`.
+  ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).
 - Darkness/light overlay, explored-only minimap, Nexus pointer, hints, synthesized audio (beam hum = soft bed, B-016/D-038, measured
   −42 → −57 dBFS by `tests/audio.cjs`, which also bounds every one-shot and the deposit ticks (D-039); recorded CC0 audio waits on the owner's pack, D-037, M8), and a mute toggle.
@@ -27,7 +27,7 @@ _Last updated: 2026-11-24_ · **Session counter: 44** · **Version: v0.2.48** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-3`).
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7, D-027): `window.__lumen.dev.*` (resources, teleport 0/30/60 cells, god, mode, max all); panel via `?dev` or backtick.
-- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-26 `light.js`, S-19/S-27 Spires, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053); no file > 600 lines (`docs.cjs`).
+- Specs (`07-…-2/3/4`, 1 PR each, D-063): S-19/S-27 Spires, S-22 Relays, S-20/S-28 relight, bot, S-23, S-24, S-29 (D-062). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 - M2 rules (D-022…D-024): depth = 3 rings in the 160-cell world; new generation changes layout only where a save hasn't looked. Bots/probes in `tools/` (vaultfind, surgefarm, parity D-019, deeprun D-029, standoff D-054, perf D-057; each file's header says how). Economy: a world holds ~2750◆ / 1470▲; a full Core Matrix costs 2482◆ / 246▲.
 
 ## Verified (headless Chromium, desktop + Pixel 7 emulation)
@@ -49,11 +49,11 @@ _Last updated: 2026-11-24_ · **Session counter: 44** · **Version: v0.2.48** (s
   also an unopened vault cache 10 cells away, with one soft tone, but not at 14 cells (session 25).
   Wide cracks 3 wall cells at 0.45× Focus each, two rays on one cell count once; Q is dropped under the Matrix (session 26).
 - Audit 29 (`audit29.cjs`); touch (33, `touch.cjs`); glow sprites 540 → 33 ms (34, `audit34.cjs`); Pulse 2 / 3 cells per burst (35, `pulse.cjs`); S-18 split: same Surge run + byte-same screenshot (36); a full Pulse fires out of reach (37); draw cost as counts + ratios (38, `drawcost.cjs`);
-  blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`); full Pulse holds at open floor, one-shots tier 3 at Beam 2 (40); beacons: rules, light pixel, reload, format 8, phones ×3 (41, `craft.cjs`); pool floor 3.3 → 7.1 luma, walls same (43, `glow.cjs`); no HUD overlap at 4 landscape sizes (43); Pulse waits at bedrock, bad saves load, HUD text fits, no bare tuning in `game.js` (audit 44).
+  blur/hidden drop a Pulse charge, HUD fingers not adopted, sheets ≥ 44 px at 3 phone sizes, Glitch sprites (audit 39, `audit39.cjs`); full Pulse holds at open floor, one-shots tier 3 at Beam 2 (40); beacons: rules, light pixel, reload, format 8, phones ×3 (41, `craft.cjs`); pool floor 3.3 → 7.1 luma, walls same (43, `glow.cjs`); no HUD overlap at 4 landscape sizes (43); Pulse waits at bedrock, bad saves load, HUD text fits, no bare tuning in `game.js` (audit 44); S-26 split byte-same ×8 scenes (45).
 - Every sound rendered offline: a full-hold deposit is loud 0.35 s (was 4.4 s); no square-wave buzz (audit 24).
 
 ## Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 45 (Build): S-26 — split `drawLight` + light holes + beacon floor glow out of `render.js` into `light.js` (spec in `07`), byte-same screenshots.
+Session 46 (Build): S-19 — Spires v1a: 5 sites, `T.SPIRE_SHELL`/`T.SPIRE`/`T.FACET` cells (draw in `terrain.js`), `SAVE_FORMAT` 10 (spec in `07-…-2`).

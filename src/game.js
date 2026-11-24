@@ -28,7 +28,7 @@ export class Game {
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
     this.craft = { beacon: 0 }; // S-16: crafted, not yet placed
-    this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's extraLights
+    this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's lightSets[0] (light.js)
     this.placeResult = null;    // S-16: last placement outcome, read by the HUD toast
     this.player = {
       x: c.x, y: c.y + SPAWN_OFFSET, r: PLAYER_R,

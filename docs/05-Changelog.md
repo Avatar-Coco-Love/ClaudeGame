@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.49 — 2026-11-24 (#50)
+- Behind the scenes: the darkness and light-pool drawing moved into its own module, ready for Relays and Spires to cast
+  light the same way Beacons do. The picture is the same; each light pool is now stamped from a ready-made template
+  instead of being rebuilt every frame (light drawing ~17 % less work with 20 Beacons on screen).
+
 ## v0.2.48 — 2026-11-24 (#49)
 - A fully charged Pulse aimed at the unbreakable edge of the map now keeps waiting instead of thumping uselessly every
   second and a half; it still fires the moment rock or a Glitch is in reach.

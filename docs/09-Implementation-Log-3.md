@@ -58,3 +58,11 @@ Continues `09-Implementation-Log-2.md` (split at the 8 KB cap, session 41). Newe
 - **B-039 (watch, Debt):** 320 portrait with 4-digit ◆ ▲ ● puts the bank under the minimap (pre-dates this PR).
 - Not fixed (Debt): buy helper / `buyRow`, smoke split, unused exports, duplicate media block, perf timers, light-hole gradient
   cache (T3: skipped for room; needs a pixel-identity proof). `09` sessions 34–38 archived word for word. All D-xxx checked.
+
+## Session 45 — Build: S-26 `light.js` split + light-hole cache (v0.2.49, #50)
+- `src/light.js` (`drawLight`, `drawLightGlow` = S-25 glow moved from `craft.js`), `src/terrain.js` (`paintChunk`); `render.js`
+  546 → 464 lines. `R.lightSets` with `extraLights` alias (D-067). Split alone: 8/8 scene hashes identical to v0.2.48.
+- Hole sprite cache: max 2/255 difference, see D-067. `tools/perf.cjs` ONLY=holes ×4 (this machine runs slower than session
+  41's 133 ms): old 185 / 191 ms mean, split 188 / 181, cache 172 / 181; draw JS 27.5 → 22.7 ms; FLUSH=1 162 vs 181 ms mean.
+- New drawcost checks: two light sets light like one (failed old: 2 / 22 draws); a warm frame builds 0 gradients (old: 21).
+- No bugs found. Scratch tool for the pixel proof was not committed (pattern: freeze rAF, seed `Math.random`, `R.time = 0`).

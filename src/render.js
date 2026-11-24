@@ -1,9 +1,12 @@
-// World drawing (terrain chunk cache, entities, beam, light, Scanner). Screen-space HUD drawing (minimap, Nexus pointer,
-// touch sticks) is in hud.js. Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, MATERIAL, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW } from './config.js';
+// World drawing (terrain chunk cache, entities, beam, Scanner). Screen-space HUD drawing (minimap, Nexus pointer, touch
+// sticks) is in hud.js; darkness, light holes and floor glow in light.js; painting one terrain chunk in terrain.js (S-26).
+// Terrain is cached per chunk and only redrawn when mined.
+import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
-import { drawBeacons, drawBeaconGlow } from './craft.js';
+import { drawBeacons } from './craft.js';
+import { drawLight, drawLightGlow } from './light.js';
+import { paintChunk } from './terrain.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48;
@@ -22,10 +25,14 @@ export class Renderer {
     this.cam = { x: 0, y: 0 };
     this.time = 0;
     this.beaconGlow = BEACON_GLOW; // S-25 floor-glow centre alpha (tests set 0 to compare)
-    this.extraLights = []; // [{x, y, r}] world-space light holes beyond the core, Nexus and beam: the game's beacons (S-16)
+    this.lightSets = [[]]; // S-26: lists of world-space lights {x, y, r} beyond the core, Nexus and beam (light.js)
     this.resize();
     addEventListener('resize', () => this.resize());
   }
+
+  /** The beacon light set (S-16 name, kept for tests and tools): `lightSets[0]`. */
+  get extraLights() { return this.lightSets[0]; }
+  set extraLights(v) { this.lightSets[0] = v; }
 
   resize() {
     this.dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -38,7 +45,7 @@ export class Renderer {
 
   attach(game) {
     this.game = game;
-    this.extraLights = game.beacons; // S-16: the same array, so a placed beacon lights at once
+    this.lightSets = [game.beacons]; // S-16: the same array, so a placed beacon lights at once (S-22 adds relays)
     this.chunks.clear();
     const w = game.world;
     this.mini.width = w.w; this.mini.height = w.h;
@@ -68,7 +75,7 @@ export class Renderer {
     const w = this.game.world;
     const key = cy * w.chunksW + cx;
     let ch = this.chunks.get(key);
-    if (ch && w.dirtyChunks.has(key)) { this.paintChunk(ch.canvas, cx, cy); w.dirtyChunks.delete(key); }
+    if (ch && w.dirtyChunks.has(key)) { paintChunk(w, ch.canvas, cx, cy); w.dirtyChunks.delete(key); }
     if (!ch) {
       if (this.chunks.size >= MAX_CACHED_CHUNKS) {
         let oldest = null;
@@ -80,75 +87,12 @@ export class Renderer {
         c.width = c.height = CHUNK_PX;
         ch = { canvas: c };
       }
-      this.paintChunk(ch.canvas, cx, cy);
+      paintChunk(w, ch.canvas, cx, cy);
       w.dirtyChunks.delete(key);
       this.chunks.set(key, ch);
     }
     ch.used = this.time;
     return ch.canvas;
-  }
-
-  paintChunk(c, cx, cy) {
-    const g = c.getContext('2d'), w = this.game.world;
-    g.clearRect(0, 0, CHUNK_PX, CHUNK_PX);
-    const x0 = cx * CHUNK, y0 = cy * CHUNK;
-    // Pass 1: fills + subtle bevel.
-    for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
-      const t = w.get(x0 + x, y0 + y);
-      if (t === T.EMPTY) continue;
-      const m = w.look(x0 + x, y0 + y, t);
-      g.fillStyle = m.fill;
-      g.fillRect(x * CELL, y * CELL, CELL, CELL);
-      if (t !== T.BEDROCK) {
-        g.strokeStyle = m.edge; g.globalAlpha = 0.09; g.lineWidth = 1;
-        g.strokeRect(x * CELL + 4.5, y * CELL + 4.5, CELL - 9, CELL - 9);
-        g.globalAlpha = 1;
-      }
-    }
-    // Pass 2: ore gems (glowing).
-    g.shadowBlur = 10;
-    for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
-      const t = w.get(x0 + x, y0 + y);
-      if (!(t in ORE_KIND) && t !== T.CACHE) continue;
-      const m = MATERIAL[t], px = x * CELL + CELL / 2, py = y * CELL + CELL / 2;
-      if (t === T.CACHE) { // S-9: a square-in-square glyph, upright, so it never reads as ore
-        g.shadowColor = m.edge; g.strokeStyle = m.edge; g.lineWidth = 2;
-        g.strokeRect(px - 9, py - 9, 18, 18); g.fillStyle = m.edge; g.fillRect(px - 4, py - 4, 8, 8);
-        continue;
-      }
-      if (t === T.LUMEN) { // S-10: a round gold bead with a halo ring; the only round ore, so it never reads as ◆ or ▲
-        g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge; g.lineWidth = 1.5;
-        g.globalAlpha = 0.9; g.beginPath(); g.arc(px, py, 5, 0, Math.PI * 2); g.fill();
-        g.globalAlpha = 0.6; g.beginPath(); g.arc(px, py, 9, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
-        continue;
-      }
-      const h = (((x0 + x) * 73856093) ^ ((y0 + y) * 19349663)) >>> 0;
-      const rot = (h % 628) / 100, sz = 5 + (h % 4);
-      g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge;
-      g.save(); g.translate(px, py); g.rotate(rot);
-      g.beginPath();
-      if (t === T.CRYSTAL) { g.moveTo(0, -sz); g.lineTo(sz * 0.6, 0); g.lineTo(0, sz); g.lineTo(-sz * 0.6, 0); }
-      else { g.moveTo(0, -sz); g.lineTo(sz * 0.87, sz * 0.5); g.lineTo(-sz * 0.87, sz * 0.5); }
-      g.closePath();
-      g.globalAlpha = 0.85; g.fill(); g.globalAlpha = 1;
-      g.restore();
-    }
-    // Pass 3: neon edges wherever solid meets open space.
-    g.lineWidth = 2; g.lineCap = 'round'; g.shadowBlur = 8;
-    for (let y = 0; y < CHUNK; y++) for (let x = 0; x < CHUNK; x++) {
-      const gx = x0 + x, gy = y0 + y, t = w.get(gx, gy);
-      if (t === T.EMPTY) continue;
-      const m = w.look(gx, gy, t);
-      g.strokeStyle = m.edge; g.shadowColor = m.edge;
-      const px = x * CELL, py = y * CELL;
-      g.beginPath();
-      if (!w.solid(gx, gy - 1)) { g.moveTo(px + 1, py + 1); g.lineTo(px + CELL - 1, py + 1); }
-      if (!w.solid(gx, gy + 1)) { g.moveTo(px + 1, py + CELL - 1); g.lineTo(px + CELL - 1, py + CELL - 1); }
-      if (!w.solid(gx - 1, gy)) { g.moveTo(px + 1, py + 1); g.lineTo(px + 1, py + CELL - 1); }
-      if (!w.solid(gx + 1, gy)) { g.moveTo(px + CELL - 1, py + 1); g.lineTo(px + CELL - 1, py + CELL - 1); }
-      g.stroke();
-    }
-    g.shadowBlur = 0;
   }
 
   // ---------- frame ----------
@@ -175,7 +119,7 @@ export class Renderer {
     const vw = this.w / s, vh = this.h / s;
     const left = this.cam.x - vw / 2, top = this.cam.y - vh / 2;
     this.drawGrid(ctx, left, top, vw, vh);
-    drawBeaconGlow(this, ctx, left, top, vw, vh); // S-25: under the walls, dimmed by the light layer like the floor
+    drawLightGlow(this, ctx, left, top, vw, vh); // S-25: under the walls, dimmed by the light layer like the floor
 
     const w = game.world;
     const cx0 = Math.max(0, Math.floor(left / CHUNK_PX)), cy0 = Math.max(0, Math.floor(top / CHUNK_PX));
@@ -493,33 +437,7 @@ export class Renderer {
     ctx.restore();
   }
 
-  drawLight(ctx) {
-    const l = this.lctx, g = this.game, s = this.zoom / 2; // light canvas is half-res
-    l.globalCompositeOperation = 'source-over';
-    l.clearRect(0, 0, this.light.width, this.light.height);
-    l.fillStyle = 'rgba(2, 3, 10, 0.93)';
-    l.fillRect(0, 0, this.light.width, this.light.height);
-    l.globalCompositeOperation = 'destination-out';
-    const hole = (wx, wy, r, strength = 1) => {
-      const p = this.worldToScreen(wx, wy);
-      const x = p.x / 2, y = p.y / 2, rr = r * s;
-      if (x + rr < 0 || y + rr < 0 || x - rr > this.light.width || y - rr > this.light.height) return; // S-15: off the canvas
-      const grd = l.createRadialGradient(x, y, 0, x, y, rr);
-      grd.addColorStop(0, `rgba(0,0,0,${strength})`);
-      grd.addColorStop(0.55, `rgba(0,0,0,${strength * 0.85})`);
-      grd.addColorStop(1, 'rgba(0,0,0,0)');
-      l.fillStyle = grd; l.beginPath(); l.arc(x, y, rr, 0, Math.PI * 2); l.fill();
-    };
-    hole(g.player.x, g.player.y, LIGHT_RADIUS);
-    for (const e of this.extraLights) hole(e.x, e.y, e.r); // S-15: tools/perf.cjs prices S-16's beacon holes through this
-    hole(g.nexus.x, g.nexus.y, g.nexusLight());
-    if (g.beam.on) {
-      const rs = g.beam.rays.length > 1 ? g.beam.rays : [g.beam]; // S-13: each Wide ray end lights its own, smaller hole
-      for (const r of rs) hole(r.ex, r.ey, rs.length > 1 ? 48 : 80, 0.7);
-    }
-    if (g.beam.flash > 0 && g.beam.flashLine) hole(g.beam.flashLine.ex, g.beam.flashLine.ey, 80, 0.7 * g.beam.flash / g.beam.flashMax); // S-14
-    ctx.drawImage(this.light, 0, 0, this.w, this.h);
-  }
+  drawLight(ctx) { drawLight(this, ctx); } // S-26: light.js; a method so tools/perf.cjs can time it
 
   // S-11: the Scanner ring and the ore glyphs it reveals, drawn above the darkness (world transform).
   drawScan(ctx) {

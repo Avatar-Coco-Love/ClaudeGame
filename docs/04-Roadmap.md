@@ -42,7 +42,7 @@ Items tagged **S-n** have a build-ready spec in `07-Build-Specs*.md`; build orde
 - **S-22 Relays v1** (12▲ + 40◆, ≤ 3): remote deposit, no heal; reuses S-16 placement (D-056). M4 done → v0.3.
 
 ## M5 — The arc (a reason to go deep) — ships v1.0
-- **S-26 `light.js` split:** `drawLight` + floor glow out of `render.js`, light sets for Relays/Spires; byte-same screenshots.
+- ✅ (#50) **S-26 `light.js` split:** darkness + floor glow in `light.js`, chunk painting in `terrain.js`, `R.lightSets`; cached hole sprites (D-067).
 - **S-19 Spires v1a:** 5 dormant Spires at d 64–74, one per sector: sites, cells, the whole M5 save record (D-049, D-063).
 - **S-27 Spires found:** breath, minimap hexagon, "A dormant Spire (n/5)" toast + tone, stats line.
 - **S-20 Spire feed:** 80▲ from cargo primes a Spire (D-055).
