@@ -37,3 +37,14 @@ Continues `09-Implementation-Log-8.md` (part 8 hit the 8 KB cap at session 71). 
 - `tools/parity.mjs` 0/0 guard; Wake config comment now cites S-31/D-087. D-105 settles the patch digit (PRs since 1.0).
 - D-xxx check: the drift sweep compared every decision with code; only D-046 had drifted (D-105). D-096…D-104 spot-checked.
 - Archived sessions 64–68 word for word to `archive/2026-11-24-09-sessions-64-68.md`. Rest of the findings → `04-…-2` Debt.
+
+## Session 75 — Build: S-39 keys by position, remappable (v1.2.15, #81)
+- `src/keys.js` (actions, defaults, `cleanKeys`, `bindKey` swap, `eventCode`, labels) + `src/keysui.js` (Settings Keys
+  view, every on-screen key name). `input.js` reads `e.code`; Space/arrows preventDefault as before.
+- `tests/keys.cjs` (3 node + 6 browser checks): KeyW with key "z" moves up, key "w" on KeyZ does not; rebind Scanner → G
+  via the sheet, Esc cancels, clash swaps, Reset, saved across reload, G pings and F doesn't, badge shows G; damaged
+  entry loads defaults. Proved: with the old `input.js` the position check and the Settings flow fail.
+- Observed: New World after a save asks `confirm()` (dismissed headless), so the test drops the save before reloading.
+- **B-064** (smoke S-3 check): "controls ≥ 40 px" measured hidden buttons too (0 px); it now counts shown controls only,
+  and `keys.cjs` checks the Keys view's own buttons ≥ 40 px. (A first full run also went red because VERSION was bumped mid-run.)
+- Screenshot 1280×800 of the Keys view (Scanner on G) viewed: ten rows + Reset/Back fit without scrolling.

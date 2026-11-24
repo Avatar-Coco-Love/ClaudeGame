@@ -14,6 +14,7 @@ import { Audio } from './audio.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { createDev } from './dev.js';
 import { registerOffline } from './pwa.js';
+import { setupKeys } from './keysui.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -36,10 +37,12 @@ let panelOpen = false;
 let saveTimer = 0;
 let toastTimer = 0;
 let selectedMode = 'drift';
+let lastHud = ''; // updateHud's change key (S-39: cleared when a key is rebound)
 
 const settings = loadSettings(); // shared live object: Game reads shake/reducedMotion from it (S-3)
 $('version').textContent = 'v' + VERSION;
 applySettings();
+const keys = setupKeys({ settings, saveSettings, input, changed() { lastHud = ''; } }); // S-39: rebinding redraws the hint
 
 // ---------- title screen ----------
 function showTitle() {
@@ -133,21 +136,20 @@ function tickToast(dt) {
 
 function hint() {
   const g = game, touch = input.usingTouch;
-  if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : 'WASD to move · Aim with mouse · Hold click or Space to mine';
+  if (g.stats.mined === 0) return touch ? 'Left thumb: move · Right thumb: aim + mine' : `${keys.move()} to move · Aim with mouse · Hold click or ${keys.K('mine')} to mine`;
   if (g.cargoRoom() <= 0) return 'Cargo full — follow the arrow back to the Nexus';
   if (primedHere(g) && g.mode === 'surge') return g.wake && g.wake.s === spireHere(g) ? 'Circle the core: beam the Glitches before they reach it' // S-23; B-051: this Spire's Wake
     : g.wake ? 'Another Spire is waking — go back and guard it' : g.wakeBlock ? 'Step out and back in to wake the Spire again' : '';
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
-  if (relayAt(g) && g.cargoTotal() === 0 && g.craft.relay < RELAY_STOCK) return touch ? `Tap ${PLACE_GLYPH.relay}↑ to pick up this Relay` : 'B: pick up this Relay'; // S-34: the button shows ⊕↑ here
-  if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : 'Press E for the Core Matrix';
-  if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : 'Upgrade ready — press E at the Nexus'; // B-010
+  if (relayAt(g) && g.cargoTotal() === 0 && g.craft.relay < RELAY_STOCK) return touch ? `Tap ${PLACE_GLYPH.relay}↑ to pick up this Relay` : `${keys.K('place')}: pick up this Relay`; // S-34: the button shows ⊕↑ here
+  if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : `Press ${keys.K('matrix')} for the Core Matrix`;
+  if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : `Upgrade ready — press ${keys.K('matrix')} at the Nexus`; // B-010
   if (g.stats.upgrades === 0 && g.bank.shard + g.cargo.shard >= upgradeCost(0).shard) return 'Bring shards home to the Nexus to upgrade';
   if (g.anomaly.near) return 'Anomaly — fly into it; it lasts until you deposit'; // S-37: until the first take this session
   if (g.stats.mined < 12) return 'Cyan crystal veins drop Shards ◆';
   return '';
 }
 
-let lastHud = '';
 function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
@@ -172,7 +174,7 @@ function updateHud() {
     $('scan-btn').classList.toggle('hidden', !g.research.scanner); // S-11: shown once unlocked, dim while cooling down
     $('scan-btn').classList.toggle('cooling', !scanReady);
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
-    $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (Q to switch)`;
+    $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (${keys.K('beamMode')} to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
     const pk = placeKind(g), pn = PLACE_NAME[pk]; // S-16, S-22: shown while anything is carried: the item B / ✦ places, and its count
     const lift = !!relayAt(g); // S-34: in a Relay's ring the same button picks it up (touch players have no B key)
@@ -180,7 +182,7 @@ function updateHud() {
     $('place-glyph').textContent = lift ? PLACE_GLYPH.relay : PLACE_GLYPH[pk];
     $('beacon-count').textContent = lift ? '↑' : g.craft[pk];
     const lbl = lift ? 'Pick up this Relay' : `Place a ${pn}`;
-    $('beacon-btn').title = `${lbl} (B)`; $('beacon-btn').setAttribute('aria-label', lbl);
+    $('beacon-btn').title = `${lbl} (${keys.K('place')})`; $('beacon-btn').setAttribute('aria-label', lbl);
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
     const h = hint();
     $('hint').textContent = h;
@@ -383,8 +385,8 @@ function applySettings() {
 }
 function setSetting(k, v) { settings[k] = v; saveSettings(settings); applySettings(); }
 let settingsOpen = false;
-function openSettings() { settingsOpen = true; applySettings(); $('settings').classList.remove('hidden'); $('settings-close').focus(); }
-function closeSettings() { settingsOpen = false; $('settings').classList.add('hidden'); $('settings-btn').focus(); }
+function openSettings() { settingsOpen = true; applySettings(); keys.opened(); $('settings').classList.remove('hidden'); $('settings-close').focus(); }
+function closeSettings() { settingsOpen = false; keys.closed(); $('settings').classList.add('hidden'); $('settings-btn').focus(); }
 $('settings-btn').addEventListener('click', openSettings);
 $('settings-close').addEventListener('click', closeSettings);
 $('settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });

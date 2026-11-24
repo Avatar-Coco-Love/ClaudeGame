@@ -75,6 +75,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
+  await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -340,6 +341,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await relay.browserChecks(browser, url, check, errors, plantSaveAndReload, process.env.RELAY_SHOT);
     await glow.browserChecks(browser, url, check, errors);
     await pwa.browserChecks(browser, url, check, errors);
+    await require('./keys.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-39 keys browser checks ran', false, e.message));
     await spire.browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./spirefeed.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
     await require('./facet.cjs').browserChecks(browser, url, check, errors, process.env.SPIRE_SHOT);
@@ -398,7 +400,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await np.click('#settings-btn'); await np.waitForTimeout(100);
     const st = await np.evaluate(() => { const sh = document.querySelector('#settings .sheet'), r = sh.getBoundingClientRect();
       return { top: Math.round(r.top), bottom: Math.round(r.bottom), scroll: sh.scrollHeight > sh.clientHeight,
-        short: [...document.querySelectorAll('#settings button, #settings input')].filter(e => e.getBoundingClientRect().height < 40).map(e => e.id || e.dataset.setting) }; });
+        short: [...document.querySelectorAll('#settings button, #settings input')].filter(e => e.getClientRects().length && e.getBoundingClientRect().height < 40).map(e => e.id || e.dataset.setting) }; });
     ovTitle.push(...await overflow());
     check('Settings fits at 320×568, controls ≥ 40 px (S-3)', st.top >= 0 && st.bottom <= 568 && !st.scroll && st.short.length === 0, JSON.stringify(st));
     await np.click('#settings-close'); await np.waitForTimeout(100);
