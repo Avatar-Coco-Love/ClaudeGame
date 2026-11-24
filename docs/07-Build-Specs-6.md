@@ -31,7 +31,7 @@ controlled, read and drawn. **Save:** no world-save change (`SAVE_FORMAT` stays 
 - **Smoke:** `KeyW`-by-code moves up with `key: 'z'`; rebind Scanner to KeyG → G pings, F doesn't; a clash swaps;
   reset restores; a damaged `keys` entry loads defaults; badges show the bound key. Touch is unchanged (D-050).
 
-## S-40 — Readable text and a colour check (M8) (D-103)
+## S-40 — Readable text and a colour check (M8) (D-103) — ✅ built #82 (D-107)
 - Measured at 1280×800 (Design 72): 11 px text in the HUD (cargo and integrity numbers, labels, buff chips, `<kbd>`)
   and on the title (footer, version). Floor: **12 px** for anything shown during play; 11 px stays for the footer.
 - Settings: **Text size** Normal / Large (×1.2) via one CSS variable on `:root`; Large must still fit: at 320×568 and

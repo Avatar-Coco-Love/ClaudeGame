@@ -64,3 +64,15 @@ Continues `06-Decisions-13.md` (same rules: supersede, never edit; list rejected
   when present, else the code's letter; `src/keysui.js` names keys in badges, titles, hints and the title line.
 - Rejected: listing the ten rows on the main sheet (scrolls at 320×568); refusing a clash instead of swapping (spec says
   swap); allowing Tab (a keyboard-only player could lose focus navigation in Settings).
+
+### D-107 — S-40 readable text + colour check as built; v1.2.16 (2026-11-24, session 76, Build; implements D-103)
+- Every `font-size` in `style.css` is `calc(Npx * var(--ts))`; `--ts` is 1, or 1.2 under `:root.text-large`, set from
+  `settings.largeText` (boolean, cleaned like the other switches). One **Large text** switch, not a Normal/Large picker.
+  All 11 px play/sheet text → 12 px; the title footer alone stays 11 px. The canvas "NEXUS" label: 12 / 14 px.
+- Fit at Large: on phones (≤ 480 px wide, and short 568–700 px landscape) the bank stays a fixed 15 px; bar label and
+  value widths scale with `--ts` (label 72 px base: INTEGRITY's ink is 70 px with its letter-spacing).
+- Colour check (`tests/colours.cjs`): Machado 2009 severity 1 in linear sRGB, CIE76. A pair passes at ΔE ≥ 25 **or**
+  with different shapes, each shape proved from the draw code. Shard/Prism is 18 under deuteranopia: passes by ◆ ▲.
+- Rejected: a new Prism colour (spec: shape, not colour); scaling the phone bank (overlaps the minimap at 320 px and
+  ◎ at 568 px); CSS `zoom` (scales boxes and 44 px targets too, not just text).
+

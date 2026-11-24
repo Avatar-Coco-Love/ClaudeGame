@@ -375,10 +375,11 @@ function applySettings() {
   audio.setMuted(settings.muted);
   if (settings.reducedMotion || !settings.shake) { if (game) game.shake = 0; }
   document.body.classList.toggle('reduce-motion', settings.reducedMotion);
+  document.documentElement.classList.toggle('text-large', settings.largeText); // S-40: --ts 1.2 in style.css
   $('mute-btn').textContent = settings.muted ? '♪̸' : '♪';
   $('set-volume').value = settings.volume;
   $('set-volume-val').textContent = settings.volume;
-  for (const k of ['muted', 'shake', 'reducedMotion']) {
+  for (const k of ['muted', 'shake', 'reducedMotion', 'largeText']) {
     const b = document.querySelector(`#settings [data-setting="${k}"]`);
     b.setAttribute('aria-checked', settings[k]); b.textContent = settings[k] ? 'On' : 'Off';
   }
