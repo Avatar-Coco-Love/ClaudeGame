@@ -8,7 +8,7 @@ import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
 import { WORLD_W, WORLD_H } from './config.js';
 
-export const SAVE_FORMAT = 10;
+export const SAVE_FORMAT = 11;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -21,6 +21,7 @@ export const STEPS = [
   s => ({ ...s, pickups: (s.pickups || []).map(q => [q[0], q[1], q[2], 1]) }), // 7 -> 8: `kept` tags (B-022); an old floor may hold scattered cargo, so all of it is kept
   s => ({ ...s, craft: { beacon: 0 }, beacons: [] }), // 8 -> 9: Beacons (S-16): none crafted, none placed
   s => ({ ...s, spires: chooseSpires(s.seed, s.explored, s.broken) }), // 9 -> 10: Spires (S-19) only where this save hasn't looked (D-024)
+  s => ({ ...s, craft: { ...s.craft, relay: 0, last: 'beacon' }, relays: [] }), // 10 -> 11: Relays (S-22): none crafted, none placed
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.

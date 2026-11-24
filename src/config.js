@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '0.2.53';
+export const VERSION = '0.4.54';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -186,6 +186,12 @@ export const BEACON_COST = 5, BEACON_STOCK = 3, BEACON_MAX = 20, BEACON_GAP = 4,
 // S-25 (D-061): an additive cyan floor disc under the walls, so open floor in a pool reads lit. Centre alpha; 0.45× at 60 %, 0 at the edge.
 export const BEACON_GLOW = 0.08;
 export const BEACON_RGB = '191, 248, 255'; // white-cyan #bff8ff: the beacon's map dot, body, ring and light (H4: one place)
+// S-22 (D-056): a Relay is a crafted remote deposit. RELAY_COST each, RELAY_STOCK carried, RELAY_MAX placed, on open floor
+// d ≥ RELAY_MIN_D cells and ≥ RELAY_GAP cells from another Relay, the Nexus centre, every vault centre and every Spire footprint.
+// Cargo within RELAY_R px banks like the Nexus ring; no heal, no Glitch repel. Lights RELAY_LIGHT px. Same in Drift and Surge.
+export const RELAY_COST = { shard: 40, prism: 12 }, RELAY_STOCK = 1, RELAY_MAX = 3, RELAY_MIN_D = 24, RELAY_GAP = 16, RELAY_R = 64, RELAY_LIGHT = 100;
+export const RELAY_STREAK_PX = 200; // at a Relay, deposit streaks fly this far toward the Nexus
+export const RELAY_RGB = '120, 232, 255'; // cyan-white #78e8ff: the Relay's body, map ring, floor glow (bluer than a Beacon)
 
 export const MODES = {
   drift: { name: 'Drift', blurb: 'Calm. No hostiles. Mine, explore, build at your own pace.' },

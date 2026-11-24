@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK,
+import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -9,7 +9,7 @@ import { tryScan, updateScan, emptyScan } from './research.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
-import { tryPlace, loadBeacons } from './craft.js';
+import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen } from './spire.js';
 
 
@@ -31,8 +31,9 @@ export class Game {
     this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0 }; // lumen: ever picked up (S-10 shows ● after the first)
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
-    this.craft = { beacon: 0 }; // S-16: crafted, not yet placed
+    this.craft = { beacon: 0, relay: 0, last: 'beacon' }; // S-16, S-22: crafted, not yet placed; `last` = what B / ✦ places
     this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's lightSets[0] (light.js)
+    this.relays = [];           // S-22: placed, [{ i, x, y, r, glow }]; the Renderer's lightSets[1]
     this.placeResult = null;    // S-16: last placement outcome, read by the HUD toast
     this.player = {
       x: c.x, y: c.y + SPAWN_OFFSET, r: PLAYER_R,
@@ -99,6 +100,8 @@ export class Game {
   cargoTotal() { return this.cargo.shard + this.cargo.prism + this.cargo.lumen; }
   cargoRoom() { return this.stat('cargo') - this.cargoTotal(); }
   inNexus() { return Math.hypot(this.player.x - this.nexus.x, this.player.y - this.nexus.y) < NEXUS_RADIUS; }
+  /** Where cargo banks: the Nexus ring or a Relay's (S-22). Healing, the Matrix and Glitch repel stay the Nexus's alone. */
+  atDeposit() { return this.inNexus() || !!relayAt(this); }
 
   canAfford(id) {
     const lvl = this.upgrades[id];
@@ -276,7 +279,7 @@ export class Game {
           if (it.kind === 'lumen') this.stats.lumen++;
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
-        } else if (!this.inNexus()) { // B-033: in the Nexus the deposit makes room this frame; no "return to the Nexus"
+        } else if (!this.atDeposit()) { // B-033: in the Nexus the deposit makes room this frame; no "return to the Nexus"
           this.audio.full();
           this.notify('cargo-full');
         }
@@ -285,15 +288,18 @@ export class Game {
   }
 
   updateDeposit(dt) {
-    if (!this.inNexus() || this.cargoTotal() === 0) { this.depositTimer = 0; this.depositKinds.clear(); return; }
+    if (!this.atDeposit() || this.cargoTotal() === 0) { this.depositTimer = 0; this.depositKinds.clear(); return; }
     this.depositTimer += dt;
+    // Streaks fly to the Nexus; at a Relay they fly off toward it (RELAY_STREAK_PX along the way, S-22).
+    const p = this.player, far = this.inNexus() ? 0 : Math.hypot(this.nexus.x - p.x, this.nexus.y - p.y);
+    const tx = far ? p.x + (this.nexus.x - p.x) / far * RELAY_STREAK_PX : this.nexus.x, ty = far ? p.y + (this.nexus.y - p.y) / far * RELAY_STREAK_PX : this.nexus.y;
     while (this.depositTimer > DEPOSIT_TICK_S && this.cargoTotal() > 0) {
       this.depositTimer -= DEPOSIT_TICK_S;
       const kind = KINDS.find(k => this.cargo[k] > 0);
       this.cargo[kind]--; this.bank[kind]++;
       this.audio.deposit(this.depositCount++);
       this.depositKinds.add(kind);
-      this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx: this.nexus.x, ty: this.nexus.y, life: 0.4, max: 0.4, color: RESOURCE[kind].color, size: 3 });
+      this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx, ty, life: 0.4, max: 0.4, color: RESOURCE[kind].color, size: 3 });
       if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); }
     }
   }
@@ -359,7 +365,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), relays: this.relays.map(b => b.i), stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
@@ -379,6 +385,9 @@ export class Game {
     Object.assign(this.research, s.research || {});
     this.craft.beacon = Math.min(BEACON_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.beacon)) || 0)); // S-16; B-038 clamp
     loadBeacons(this, s.beacons);
+    this.craft.relay = Math.min(RELAY_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.relay)) || 0)); // S-22
+    this.craft.last = s.craft && s.craft.last === 'relay' ? 'relay' : 'beacon';
+    loadRelays(this, s.relays);
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y, kp] of (Array.isArray(s.pickups) ? s.pickups : []).filter(Array.isArray)) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });
