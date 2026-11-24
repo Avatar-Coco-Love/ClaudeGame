@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.46 — 2026-11-24 (#47)
+- No gameplay change. Design pass: Beacons were play-tested in open caves, where their light was hard to see on the dark
+  floor; the next update gives each Beacon pool a faint glow on the floor and fixes the top buttons crowding the bank on
+  small landscape phones. Decided what a New Cycle keeps after the ending: your cycle count, your records and a new Nexus
+  colour, nothing that makes the next world easier. The road to v1.0 is planned as eleven small updates.
+
 ## v0.2.45 — 2026-11-24 (#46)
 - Beacons: a new **Craft** tab at the Nexus turns 5 Prisms into a Beacon (carry up to 3). Out in the caves press B, or tap ✦,
   to set one down on your spot: it lights the area around it for good and shows as a white-cyan dot on the minimap. Up to

@@ -15,3 +15,15 @@ Continues `09-Implementation-Log-2.md` (split at the 8 KB cap, session 41). Newe
   checks failed on the old CSS first (4 tabs scrolled the sheet sideways at 320; ✦ in the row pushed ◎ into the bank at 667).
   `audit29`'s B-022 check pinned `SAVE_FORMAT === 8`; now `>= 8` and the upgrade must reach the current format. Smoke 152/152.
 - **B-034 (open, Debt):** at 568×320 landscape ◎ + ⟂ already overlap the bank panel; pre-dates S-16.
+
+## 2026-11-24 — Session 42 (v0.2.46): Design — Beacons, Pulse, the Deep; Q-013, Q-014; M5 specs split
+- **Beacons (seed 77, 1280×800, core 9 cells away):** biggest open Hearth cave (426 cells, d 20) and Deep cave (1457, d 61):
+  floor inside the pool 3.4 luma = unlit floor; only the glyph shows. Rock/tunnel walls in the pool 33 luma (reads). An
+  in-page prototype (additive disc under the walls) at 0.05 gave 6.9–8.8, at 0.10 ~10, viewed: 0.10 reads as soft haze → D-061, S-25.
+- **Pulse (Deep, Beam 2, Surge + god):** the ready shot sits full in an open cave with a solid reach line; reads well, no change.
+- **The Deep:** `deeprun` 10 seeds, first Lumen median 30 s at Beam 2 (p90 82), 20 s at Beam 4 + 3 others. Viewed d 70 maxed.
+- **B-034 measured:** with 4-digit ◆ ▲ ● in Surge the bank panel is 12–239 px at every landscape size (content, not
+  min-width: `min-width: 0` changes nothing); ◎ starts at 168 / 240 / 267 px at 568 / 640 / 667 wide. Fix target in S-25.
+- **Decisions:** D-061 (Q-014 floor glow), D-062 (Q-013 New Cycle carries cycle, records, a Nexus hue; no power),
+  D-063 (11 one-PR specs to 1.0: S-25, S-26, S-19, S-27, S-22, S-20, S-28, bot, S-23, S-24, S-29; new `07-Build-Specs-4.md`).
+- No code beyond `VERSION`. Play-test script kept out of the repo (one-off; the S-25 smoke check replaces it).
