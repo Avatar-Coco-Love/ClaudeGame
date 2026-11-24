@@ -362,6 +362,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./echo.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_SHOT).catch(e => check('S-42 echo browser checks ran', false, e.message));
     await require('./echoorder.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_ORDER_SHOT).catch(e => check('S-43 echo order browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
+    await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));
 
     // ---- Settings (S-3, D-016) ----
     const sp = await browser.newPage({ viewport: { width: 1280, height: 800 } });

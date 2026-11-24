@@ -40,7 +40,7 @@ for **M9 Echo** (D-108), built after M8's S-41. Build order: S-42 → S-43 (buil
 - **Smoke:** cycling by key and by button; Guard kills a held Glitch, Gather ignores it; Guard pops a Spitter bolt;
   touch row fits with ◇ at both phone sizes; old save (format 15) loads with 'gather'.
 
-## S-44 — Ambient music: a quiet generative bed by depth and mode (M8) (D-114)
+## S-44 — Ambient music: a quiet generative bed by depth and mode (M8) (D-114) — ✅ built (#90, D-115)
 **Sink:** none. **Layer:** none (a setting). **Save:** settings only (`music`, D-016 store); no `SAVE_FORMAT` change.
 - `src/music.js`, Web Audio synthesis only (no files, no dependency). One `Music` object fed by `audio.js`'s context
   and its own gain node under `master` (so Volume and Mute apply); `update(dt, state)` from the frame loop with

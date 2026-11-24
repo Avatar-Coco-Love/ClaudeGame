@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.2.22';
+export const VERSION = '1.4.23';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -279,3 +279,15 @@ export const QUALITY_WINDOW_S = 3, QUALITY_SLOW_MS = 24, QUALITY_FAST_MS = 18, Q
 // Audit 79 (B-073, D-110): a step down must buy a p90 below QUALITY_GAIN × the p90 that caused it, or it is undone and Auto
 // stops stepping down (a 30 Hz rAF cap — iOS Low Power, battery saver — is not slow drawing; dropping quality can't help it).
 export const QUALITY_GAIN = 0.85;
+
+// S-44 (D-114): ambient music, synthesized (music.js). Bus gain = MUSIC_GAIN × settings.music / 100, under master.
+export const DEFAULT_MUSIC = 50;
+export const MUSIC_GAIN = 0.5;
+export const MUSIC_ROOT_HZ = 146.83; // D3 in Hearth; drops RING_PITCH_STEP semitones per ring, like the beam hum
+export const MUSIC_SCALES = [[0, 2, 4, 7, 9], [0, 2, 3, 5, 7, 9, 10], [0, 2, 3, 5, 7, 8, 10]]; // Hearth pentatonic / Veil dorian / Deep aeolian
+export const MUSIC_PROGRESSIONS = [[0, 3, 1, 2], [0, 3, 0, 6], [0, 5, 3, 6]]; // chord roots (scale degrees) per ring
+export const MUSIC_CHORD_S = [10, 14], MUSIC_ATTACK_S = 3, MUSIC_RELEASE_S = 4; // a chord every 10-14 s, fades in 3 s, out 4 s
+export const MUSIC_PAD = { gain: 0.05, triMix: 0.5, lowpassHz: 900 };
+export const MUSIC_BELL = { gain: 0.12, gapS: [3, 7], decayS: 0.8, attackS: 0.03, octave: 2 };
+export const MUSIC_PULSE = { gain: 0.09, bpm: 70, noteS: 0.2, attackS: 0.02, octave: 0, wakeRate: 1.5 };
+export const MUSIC_XFADE_S = 4, MUSIC_END_FADE_S = 3, MUSIC_LOOKAHEAD_S = 0.1, MUSIC_MAX_VOICES = 6;

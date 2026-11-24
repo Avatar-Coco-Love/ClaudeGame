@@ -1,5 +1,5 @@
 // Player settings (S-3, D-016). One object under its own key, never in the world save.
-import { DEFAULT_VOLUME } from './config.js';
+import { DEFAULT_VOLUME, DEFAULT_MUSIC } from './config.js';
 import { defaultKeys, cleanKeys } from './keys.js';
 import { GRAPHICS } from './quality.js';
 
@@ -10,16 +10,17 @@ const LEGACY_MUTED = 'lumencore.muted'; // pre-S-3 mute pref, folded in on first
 function defaults() {
   let reduced = false;
   try { reduced = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { /* no matchMedia */ }
-  return { volume: DEFAULT_VOLUME, muted: false, shake: true, reducedMotion: reduced, largeText: false, graphics: 'auto', keys: defaultKeys() };
+  return { volume: DEFAULT_VOLUME, music: DEFAULT_MUSIC, muted: false, shake: true, reducedMotion: reduced, largeText: false, graphics: 'auto', keys: defaultKeys() };
 }
 
 // Keep only known keys with the right types, so a damaged or hand-edited entry can't break the game.
 function clean(s) {
   const d = defaults();
   if (!s || typeof s !== 'object') return d;
-  const vol = Number(s.volume);
+  const vol = Number(s.volume), mus = Number(s.music);
   return {
     volume: Number.isFinite(vol) ? Math.max(0, Math.min(100, Math.round(vol))) : d.volume,
+    music: Number.isFinite(mus) ? Math.max(0, Math.min(100, Math.round(mus))) : d.music, // S-44: old settings load 50
     muted: typeof s.muted === 'boolean' ? s.muted : d.muted,
     shake: typeof s.shake === 'boolean' ? s.shake : d.shake,
     reducedMotion: typeof s.reducedMotion === 'boolean' ? s.reducedMotion : d.reducedMotion,

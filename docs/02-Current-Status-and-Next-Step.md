@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 82** · **Version: v1.2.22** (session 82: Design; rotation: 83 Build, 84 Audit, 85 Build, 86 Build, 87 Design).
-**Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), then finished. VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-24_ · **Session counter: 83** · **Version: v1.4.23** (session 83: Build; rotation: 84 Audit, 85 Build, 86 Build, 87 Design, 88 Build).
+**Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), all ✅ as of v1.4.23 (M8 last). VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -21,6 +21,8 @@ _Last updated: 2026-11-24_ · **Session counter: 82** · **Version: v1.2.22** (s
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
+- Music (S-44, D-115, `music.js`): synthesized pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
+  Ending fades out; own PRNG (seed + 'music'); Music slider (`settings.music`, default 50). `tests/music.cjs` (11 checks).
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
@@ -41,10 +43,10 @@ _Last updated: 2026-11-24_ · **Session counter: 82** · **Version: v1.2.22** (s
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 16); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-10`), `08` per-system detail.
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-11`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 built (#87), S-43 built (#88): M9 specs all built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 (#87), S-43 (#88), S-44 (#90) built: M1–M9 ✅, every spec built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js`; no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -53,5 +55,5 @@ _Last updated: 2026-11-24_ · **Session counter: 82** · **Version: v1.2.22** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 83 (Build): build **S-44** ambient music (`07-Build-Specs-7.md`, D-114): `src/music.js`, Music slider,
-`tests/music.cjs` + `audio.cjs` ceilings; then M8 ✅ and VERSION 1.4.23 (D-114). Top perf debt: chunk-blit pre-scale (`04-…-2`).
+Session 84 (Audit): parallel sweeps (bugs, perf, touch, code health, docs drift) incl. `music.js`; fix the top issues,
+log the rest in `04-…-2` Debt; archive `09` parts older than audit 79; check D-xxx vs code. Top perf debt: chunk-blit pre-scale.
