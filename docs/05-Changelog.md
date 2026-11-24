@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.1.7 — 2026-11-24 (#73)
+- **Planning:** weather was play-tested and stays as it is. Next up: **Anomalies**, strange shapes buried in the
+  rock that boost your beam, your Attractor or your cargo until you next deposit, then come back a few minutes later.
+
 ## v1.1.6 — 2026-11-24 (#72)
 - **Weather:** every 5–7 minutes of play, the dark changes for 40 s. In Surge a violet **static storm** rolls in and
   Glitches come faster and in greater numbers (more fights, more loot); in Drift an **aurora** makes the ore in your
