@@ -42,3 +42,19 @@ Continues `06-Decisions-7.md` (same rules: supersede, never edit; list rejected 
   15 / 87 / 114 px. Above 700 px the full row fits (720 px: ◎ at 320 ≥ panel + 8).
 - Rejected: glyph-only at 600 px only (640/667 still overlap); shrinking only the buttons (568 still 39 px short); dropping ●
   from the panel on small screens (hides a currency the player spends); a second HUD row (covers more of the play field).
+
+### D-065 — The ⟂ button names the beam mode (2026-11-24, audit 44; supersedes D-041's rejected "mode label on ⟂")
+- **As built since S-17 (#38):** `#mode-name` shows Focus / Wide / Pulse next to ⟂ (`main.js`), hidden ≤ 700 px wide in short
+  landscape (D-064) where only the glyph fits. Portrait 320 px fits "⟂ Focus" at 44 px tall (audit 44 text-overflow check).
+- **Why the reversal:** on touch the toast is gone in a second and the three beams only read while mining; a thumb-sized button
+  needs a resting label. D-041's worry (width at 320 px) is now measured, not assumed (`tests/touch.cjs`, B-035 check).
+- Rejected: glyph only everywhere (touch players can't tell Wide from Focus while idle); a colour per mode alone (fails
+  colour-blind players and adds a palette rule for no gain over a word).
+
+### D-066 — Tuning numbers in `game.js` are checked, not reminded (2026-11-24, audit 44)
+- Audits 34, 39 and 44 each flagged inline tuning in `game.js`. Moved unchanged to `config.js` (`PLAYER_ACCEL`, `PLAYER_R`,
+  `PARTICLE_CAP`, `CORE_REVEAL`, `SPAWN_OFFSET`, `ATTRACT_PULL`, `PICKUP_SETTLE_S`, `DEPOSIT_TICK_S`, `HURT_*`, `RESPAWN_*`).
+  `tests/tuning.cjs` (in smoke) fails on any number in `game.js` code outside a short list of cosmetic ones (particles, shake).
+- Rejected: an ESLint `no-magic-numbers` rule (new dev dependency + config, against the no-build rule); checking every `src`
+  file (render/audio are cosmetic by nature, the list would be the whole file); a line-count ratchet (passes a swapped number).
+- **Audit 44 D-check:** every D-001…D-064 was compared with the code; all match except D-041's ⟂ label (superseded above).

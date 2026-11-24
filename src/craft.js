@@ -55,7 +55,7 @@ export function tryPlace(game) {
 /** Saved beacons come back only on open cells (a save is never trusted to be well-formed). */
 export function loadBeacons(game, list) {
   const w = game.world, seen = new Set();
-  for (const i of list || []) {
+  for (const i of Array.isArray(list) ? list : []) { // B-037: a non-array (`{}`, `3`) is no beacons, not a crash
     if (!Number.isInteger(i) || i < 0 || i >= w.cells.length || w.cells[i] !== T.EMPTY || seen.has(i)) continue;
     seen.add(i);
     if (game.beacons.length < BEACON_MAX) game.beacons.push(makeBeacon(w, i));

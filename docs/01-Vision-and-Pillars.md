@@ -19,7 +19,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 - **Core Matrix** *(built)*: permanent stat upgrades to the core.
 - **Nexus Development** *(built: Radiance)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
 - **Research** *(built: Scanner, Wide beam, Pulse beam)*: unlocks new *kinds* of things (new beam modes, new materials).
-- **Crafting** *(planned)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
+- **Crafting** *(built: Beacons, S-16)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
 - **Temporary Upgrades** *(planned)*: run-scoped buffs found in the world.
 
 ## Scope and end state (D-045)

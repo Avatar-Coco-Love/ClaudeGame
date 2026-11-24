@@ -18,7 +18,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bank { display: flex; gap: 16px; font-size: 18px; margin-bottom: 6px; text-shadow: 0 0 8px currentColor; }
 .bank b { font-weight: 700; }
 .bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--dim); margin-top: 4px; }
-.bar-row label { width: 54px; text-transform: uppercase; letter-spacing: .06em; }
+.bar-row label { width: 68px; flex: none; white-space: nowrap; text-transform: uppercase; letter-spacing: .06em; } /* B-035: INTEGRITY is 64 px */
 .bar-row span { width: 54px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
 .bar { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
 #cargo-fill { height: 100%; width: 0; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); transition: width .1s; }
@@ -114,7 +114,6 @@ kbd { font: 11px ui-monospace, monospace; border: 1px solid currentColor; border
 @media (max-width: 480px) {
   .top-left { min-width: 0; padding: 8px 10px; } .bank { font-size: 15px; }
   #minimap { width: 96px; height: 96px; }
-  .bar-row label { width: 46px; }
   .sheet header { flex-wrap: wrap; row-gap: 6px; } #matrix-bank { order: 3; flex-basis: 100%; } /* B-031: ✕ stays on the sheet */
 }
 @media (pointer: coarse) { #settings kbd { display: none; } }

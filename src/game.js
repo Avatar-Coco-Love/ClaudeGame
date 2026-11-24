@@ -1,6 +1,8 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES } from './config.js';
+import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK,
+  PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
+  RESPAWN_INVULN_S, RESPAWN_CLEAR_PX } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
@@ -9,15 +11,13 @@ import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
 import { tryPlace, loadBeacons } from './craft.js';
 
-const ACCEL = 9;          // how quickly velocity chases its target (1/s)
-const PLAYER_R = 10;
-const PARTICLE_CAP = 500;
 
 export class Game {
   constructor({ seed, mode, save, audio, settings = null }) {
     this.audio = audio;
     this.mode = mode;
-    this.world = new World(seed, (save && save.vaultSkip) || []);
+    const skip = save && Array.isArray(save.vaultSkip) ? save.vaultSkip : []; // B-037: a save is never trusted to be well-formed
+    this.world = new World(seed, skip);
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
     this.bank = { shard: 0, prism: 0, lumen: 0 };
@@ -31,7 +31,7 @@ export class Game {
     this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's extraLights
     this.placeResult = null;    // S-16: last placement outcome, read by the HUD toast
     this.player = {
-      x: c.x, y: c.y + 40, r: PLAYER_R,
+      x: c.x, y: c.y + SPAWN_OFFSET, r: PLAYER_R,
       vx: 0, vy: 0,
       targetVx: 0, targetVy: 0,     // intent-derived (unconstrained)
       realizedVx: 0, realizedVy: 0, // what actually happened after collision
@@ -55,11 +55,11 @@ export class Game {
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
-    this.vaultSkip = (save && save.vaultSkip) || []; // S-9: fixed for this world's life (D-023)
+    this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) this.load(save);
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
-    this.world.reveal(this.player.x, this.player.y, 230);
+    this.world.reveal(this.player.x, this.player.y, CORE_REVEAL);
     // S-8: the depth ring the core is in. A session toasts each ring once on first entry; the start ring counts as seen.
     this.ringNow = this.coreRingIndex();
     this.ringsSeen = new Set([this.ringNow]);
@@ -131,7 +131,7 @@ export class Game {
     const speed = this.stat('thrust');
     p.targetVx = intent.move.x * speed;
     p.targetVy = intent.move.y * speed;
-    const k = Math.min(1, ACCEL * dt);
+    const k = Math.min(1, PLAYER_ACCEL * dt);
     p.vx += (p.targetVx - p.vx) * k;
     p.vy += (p.targetVy - p.vy) * k;
     const moved = moveBody(this.world, p, p.vx * dt, p.vy * dt, true);
@@ -178,7 +178,7 @@ export class Game {
     this.shake = Math.max(0, this.shake - dt * 30);
     this.nexusPulse = Math.max(0, this.nexusPulse - dt * 1.4);
     this.coreRing = Math.max(0, this.coreRing - dt / CORE_RING_S);
-    const newly = this.world.reveal(p.x, p.y, 230);
+    const newly = this.world.reveal(p.x, p.y, CORE_REVEAL);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
     return newly;
   }
@@ -254,8 +254,8 @@ export class Game {
       it.age += dt;
       const dx = p.x - it.x, dy = p.y - it.y, d = Math.hypot(dx, dy);
       const room = this.cargoRoom() > 0;
-      if (room && d < mag && it.age > 0.25) {
-        const pull = 900 * (1 - d / mag) + 250;
+      if (room && d < mag && it.age > PICKUP_SETTLE_S) {
+        const pull = ATTRACT_PULL[0] * (1 - d / mag) + ATTRACT_PULL[1];
         it.vx += (dx / d) * pull * dt; it.vy += (dy / d) * pull * dt;
         it.vx *= 0.9; it.vy *= 0.9;
       } else {
@@ -265,7 +265,7 @@ export class Game {
       const nx = it.x + it.vx * dt, ny = it.y + it.vy * dt;
       if (!this.world.solidAtPx(nx, it.y)) it.x = nx; else it.vx *= -0.4;
       if (!this.world.solidAtPx(it.x, ny)) it.y = ny; else it.vy *= -0.4;
-      if (d < p.r + 6 && it.age > 0.25) {
+      if (d < p.r + 6 && it.age > PICKUP_SETTLE_S) {
         if (room) {
           this.cargo[it.kind]++;
           if (it.kind === 'lumen') this.stats.lumen++;
@@ -282,8 +282,8 @@ export class Game {
   updateDeposit(dt) {
     if (!this.inNexus() || this.cargoTotal() === 0) { this.depositTimer = 0; this.depositKinds.clear(); return; }
     this.depositTimer += dt;
-    while (this.depositTimer > 0.035 && this.cargoTotal() > 0) {
-      this.depositTimer -= 0.035;
+    while (this.depositTimer > DEPOSIT_TICK_S && this.cargoTotal() > 0) {
+      this.depositTimer -= DEPOSIT_TICK_S;
       const kind = KINDS.find(k => this.cargo[k] > 0);
       this.cargo[kind]--; this.bank[kind]++;
       this.audio.deposit(this.depositCount++);
@@ -300,8 +300,8 @@ export class Game {
     if (this.god) return; // dev god mode (S-7); never saved
     const p = this.player;
     p.integrity -= amount;
-    p.invuln = 0.5; p.hurtFlash = 0.3;
-    p.vx += dx * 320; p.vy += dy * 320;
+    p.invuln = HURT_INVULN_S; p.hurtFlash = 0.3;
+    p.vx += dx * HURT_KNOCKBACK; p.vy += dy * HURT_KNOCKBACK;
     this.addShake(8);
     this.audio.hurt();
     if (p.integrity <= 0) this.destabilize();
@@ -313,9 +313,9 @@ export class Game {
     for (const kind of KINDS) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind, true);
     this.cargo = { shard: 0, prism: 0, lumen: 0 };
     this.burst(p.x, p.y, 50, '#ffffff', 300);
-    p.x = this.nexus.x; p.y = this.nexus.y + 40; p.vx = p.vy = 0;
-    p.integrity = this.stat('hull'); p.invuln = 2; this.beam.charge = 0;
-    this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > 900);
+    p.x = this.nexus.x; p.y = this.nexus.y + SPAWN_OFFSET; p.vx = p.vy = 0;
+    p.integrity = this.stat('hull'); p.invuln = RESPAWN_INVULN_S; this.beam.charge = 0;
+    this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > RESPAWN_CLEAR_PX);
     this.notify('destabilized');
   }
 
@@ -364,10 +364,10 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     Object.assign(this.research, s.research || {});
-    this.craft.beacon = Math.max(0, Math.floor((s.craft && s.craft.beacon) || 0)); // S-16
+    this.craft.beacon = Math.min(BEACON_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.beacon)) || 0)); // S-16; B-038 clamp
     loadBeacons(this, s.beacons);
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
-    for (const [k, x, y, kp] of s.pickups || []) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });
+    for (const [k, x, y, kp] of (Array.isArray(s.pickups) ? s.pickups : []).filter(Array.isArray)) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });
   }
 }

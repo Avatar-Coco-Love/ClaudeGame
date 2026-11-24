@@ -82,6 +82,29 @@ async function browserChecks(browser, url, check, errors, shots) {
     await ctx.close();
   }
 
+  // ---- B-035 (audit 44): no HUD text wider than its box at the narrowest portrait and landscape phones, Surge, all buttons shown.
+  // "INTEGRITY" was 64 px of ink in a 46 / 54 px label and ran into its bar. Checks every visible leaf text node in #hud.
+  for (const vp of [{ width: 320, height: 568 }, { width: 568, height: 320 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push(`touch text ${vp.width}: ` + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    await pg.evaluate(() => { const { game: g, dev } = window.__lumen; dev.setMode('surge'); g.demo = true; g.enemies = []; g.craft.beacon = 3; });
+    await pg.waitForTimeout(250);
+    const res = await pg.evaluate(() => {
+      const over = [...document.querySelectorAll('#hud *')].filter(e => e.offsetParent && !e.children.length && e.textContent.trim() && e.clientWidth > 0)
+        .filter(e => e.scrollWidth > e.clientWidth + 1).map(e => `${e.id || e.tagName}:${e.textContent.trim().slice(0, 12)} ${e.scrollWidth}>${e.clientWidth}`);
+      const into = [...document.querySelectorAll('.bar-row')].filter(r => r.offsetParent).map(r => {
+        const rg = document.createRange(); rg.selectNodeContents(r.querySelector('label'));
+        return [r.querySelector('label').textContent, Math.round(rg.getBoundingClientRect().right), Math.round(r.querySelector('.bar').getBoundingClientRect().left)]; });
+      return { over, into };
+    });
+    const hits = res.into.filter(([, ink, bar]) => ink > bar - 4);
+    check(`${vp.width}×${vp.height}: no HUD text overflows its box; bar labels end ≥ 4 px before their bar (B-035)`,
+      res.over.length === 0 && hits.length === 0 && res.into.length === 2, JSON.stringify(res));
+    await ctx.close();
+  }
+
   // ---- Portrait 320×568: the first touch hint wraps (≤ 2 lines, nothing cut); the column stays on the right.
   {
     const ctx = await phone({ width: 320, height: 568 }), pg = await ctx.newPage();

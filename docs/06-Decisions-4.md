@@ -46,7 +46,7 @@ per cell and once per Glitch per frame. `beam.ex/ey/target/enemy` stay the centr
 1-word toast and a 520 Hz 0.06 s click (peak −33.7 dBFS, the kit's quietest). A saved mode that isn't unlocked loads as Focus.
 - Rejected: side rays starting at the nose (they skip the cells beside the core, leaving a ragged 1–3 cell hall); summing damage
   when two rays hit one cell (diagonal aim would beat Focus on single cells, against D-036); a mode label on the ⟂ button (the toast
-  and the 3 beams already say it; the button stays narrow at 320 px).
+  and the 3 beams already say it; the button stays narrow at 320 px). _(Superseded by D-065: ⟂ names the mode since S-17.)_
 
 ### D-042 — Wide stays as tuned; Pulse trades throughput for reach (2026-11-23, design 27, Q-011 first look; retunes D-036's S-14)
 Measured per mode (`MODE=` on the probes, `09` session 27): Focus reaches Lumen ~1.9× faster and hunts Prisms 1.6× faster; Wide

@@ -1,0 +1,3 @@
+# Stray screenshots from probes and sweeps (audit 44). og.png is the share image (D-044) and stays tracked.
+/*.png
+!/og.png

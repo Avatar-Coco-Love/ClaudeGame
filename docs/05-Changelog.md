@@ -3,6 +3,13 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v0.2.48 — 2026-11-24 (#49)
+- A fully charged Pulse aimed at the unbreakable edge of the map now keeps waiting instead of thumping uselessly every
+  second and a half; it still fires the moment rock or a Glitch is in reach.
+- A damaged or hand-edited save no longer stops the game from loading: odd Beacon or floor-loot entries are skipped, and
+  the carried Beacon count is kept between 0 and 3.
+- The "INTEGRITY" label in Surge no longer runs into its bar on any screen size.
+
 ## v0.2.47 — 2026-11-24 (#48)
 - Beacons now give the floor around them a faint cyan glow, so a Beacon placed in an open cave lights up the ground, not
   just its own glyph. Walls and ore still draw on top, and the glow stays dim enough that the dark still feels dark.
