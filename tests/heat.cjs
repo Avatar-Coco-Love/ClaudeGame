@@ -131,22 +131,4 @@ async function browserChecks(browser, url, check, errors, shot) {
 }
 
 module.exports = { nodeChecks, browserChecks };
-if (require.main === module) {
-  let fail = 0;
-  const report = (name, ok, detail) => { if (!ok) fail++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); };
-  (async () => {
-    await nodeChecks(report);
-    if (process.argv.includes('--browser') || process.env.HEAT_SHOT) {
-      const http = require('http'), fs = require('fs'), path = require('path'), { chromium } = require('playwright');
-      const root = path.join(__dirname, '..'), types = { '.js': 'text/javascript', '.html': 'text/html', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml' };
-      const server = http.createServer((req, res) => { const f = path.join(root, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
-        fs.readFile(f, (e, d) => { if (e) { res.writeHead(404); res.end(); } else { res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream' }); res.end(d); } }); });
-      await new Promise(r => server.listen(0, r));
-      const browser = await chromium.launch(), errors = [];
-      await browserChecks(browser, `http://localhost:${server.address().port}/`, report, errors, process.env.HEAT_SHOT);
-      report('no page errors', errors.length === 0, errors.join('; '));
-      await browser.close(); server.close();
-    }
-    process.exit(fail ? 1 : 0);
-  })();
-}
+if (require.main === module) require('./serve.cjs').runStandalone({ nodeChecks, browserChecks, browser: process.argv.includes('--browser') || !!process.env.HEAT_SHOT, shot: process.env.HEAT_SHOT });

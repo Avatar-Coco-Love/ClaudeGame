@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.5.41 — 2026-11-25
+- **Nothing changes on screen.** Behind the scenes, every test now shares one small web server instead of eleven
+  copies of it, so the checks that keep each release playable are simpler to maintain.
+
 ## v1.5.40 — 2026-11-25 (M10 done: world and biomes)
 - **Flare vents in the Kiln.** Small warm-white hexagons dot the Kiln floor. Every 8 s each one brightens and pulses
   for a second, then flares: a core caught inside is shoved out and its beam gains heat (enough to overheat a hot

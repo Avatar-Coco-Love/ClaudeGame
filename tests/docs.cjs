@@ -33,6 +33,10 @@ function run() {
   const long = code.map(f => [f, fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').length]).filter(([, n]) => n > CODE_CAP);
   check(`code files under ${CODE_CAP} lines`, long.length === 0 && code.length > 10, long.map(([f, n]) => `${f}=${n}`).join(', ') || `${code.length} files`);
 
+  const pasted = fs.readdirSync(path.join(ROOT, 'tests')).filter(f => f.endsWith('.cjs') && f !== 'serve.cjs')
+    .filter(f => /http\.createServer\s*\(/.test(fs.readFileSync(path.join(ROOT, 'tests', f), 'utf8')));
+  check('tests serve through tests/serve.cjs (no pasted http servers)', pasted.length === 0, pasted.join(', '));
+
   const inbox = fs.readdirSync(path.join(ROOT, 'docs/inbox')).filter(f => f !== 'README.md');
   check('inbox processed (only README left)', inbox.length === 0, inbox.join(', '));
   return out;

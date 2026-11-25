@@ -12,20 +12,14 @@
 // prices a step by the frame time it frees (that step becomes a no-op).
 // S-41: QUALITY=0|1|2 fixes the graphics level (default 0; Auto is off so the run measures one level).
 // Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge|far] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
-const http = require('http'), fs = require('fs'), path = require('path');
+const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
 const SECONDS = +(process.env.SECONDS || 20), RATE = +(process.env.RATE || 4), ONLY = process.env.ONLY;
 const FLUSH = process.env.FLUSH === '1';
 const SKIP = (process.env.SKIP || '').split(',').filter(Boolean); // e.g. SKIP=drawLight: price a step by the frame time it frees
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
-const server = http.createServer((req, res) => {
-  const p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
-  if (!p.startsWith(ROOT) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
-  res.writeHead(200, { 'content-type': TYPES[path.extname(p)] || 'application/octet-stream' });
-  fs.createReadStream(p).pipe(res);
-});
+const server = require('../tests/serve.cjs').createServer(ROOT);
 
 const QUALITY = Math.max(0, Math.min(2, Number(process.env.QUALITY) || 0));
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];

@@ -1,18 +1,10 @@
 // Health check: serves the repo, drives the game in headless Chromium, exits non-zero on any failure.
 // Usage: node tests/smoke.cjs   (uses the pre-installed Playwright; no npm install needed)
-const http = require('http');
-const fs = require('fs');
 const path = require('path');
 const { chromium, devices } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
-const server = http.createServer((req, res) => {
-  const p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
-  if (!p.startsWith(ROOT) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
-  res.writeHead(200, { 'content-type': TYPES[path.extname(p)] || 'application/octet-stream' });
-  fs.createReadStream(p).pipe(res);
-});
+const server = require('./serve.cjs').createServer(ROOT); // one static server for every test (session 101)
 
 // Plant a save, then reload. Always use this: a plain reload fires `pagehide`, which saves the running game over the
 // planted one (bit sessions 4 and 5). `edit(save)` runs in the page and returns the save to store (null = current save).

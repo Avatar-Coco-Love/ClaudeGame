@@ -37,3 +37,10 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
   now share one unblurred path (1.00×). Drawn on explored cells, rock or open; hidden while `endSeq` runs.
 - Rejected: a flare only on its first frame (a 60 Hz step could make it miss); new empty vent cells (would move a
   256 save's layout); a vent sound now (needs its own audio ceiling pass).
+
+### D-133 — One test server: `tests/serve.cjs` (session 101, debt)
+- `createServer()` / `serve()` / `runStandalone()` hold the static server and the standalone runner that 11 test files
+  (and `smoke.cjs`, `tools/perf.cjs`) each pasted. Standalone flags kept (`--browser`, `*_SHOT`, `SHOTS`).
+- A rule broken twice gets a check: `docs.cjs` fails if any other `tests/*.cjs` calls `http.createServer`.
+- Rejected: leave the copies (they drifted: MIME maps, decode, `startsWith` guard differed); route standalone runs through
+  `smoke.cjs --only` (the full smoke's setup is minutes; one file must stay seconds).
