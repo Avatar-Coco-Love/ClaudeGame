@@ -65,3 +65,14 @@ alternatives). D-145 on.
   deterministic; it guards the balance against unrelated changes). Bots aim at `beamFoes` (one list of hittables).
 - Rejected: a side-to-side jink to beat a thin ray (no more touches: the bot still won); a shorter gap (more loot, the
   ratio rose); take 3+ at hp 0.5 (a 4 px mote emptying a quarter of a stack reads wrong, and still noisy).
+
+## D-151 — Arc beam mode: jumps × 0.5, to its own type within 2 cells, most cracked first (S-55, session 116)
+- Spec'd × 0.8 ray + 2 jumps × 0.35 to "touching" same-type cells. Measured (aim bot: nearest remaining cell, from one
+  spot, `tests/arc.cjs`): 3-, 4-, 5-, 9-cell crystal clusters clear 1.06 / 1.20 / 1.24 / 1.25× Focus: under the
+  spec's 1.3–1.5 band. Small clusters cap low: the last cells have no one left to jump to.
+- Shipped: `ARC_MUL` **0.5**; ore jumps to any cell of the hit's type within 2 cells (Chebyshev, a gap is fine, never
+  another ore or rock), the **most cracked first** (finishes what the ray left behind), then nearest. Result 1.37 /
+  1.36 / 1.44 / 1.45×; rock 0.79× (Focus stays the digger). Creatures: the 2 nearest other creatures ≤ 2 cells
+  (Glitch, Spitter, surfaced Burrower, mote; never a bolt) via `beamFoes`. Same code in Drift and Surge.
+- Rejected: × 0.55 (a 6-row passes 1.5); joined-only (8-way) veins (3-cell column 1.21× at 0.5: a broken middle cuts
+  the vein); nearest-first alone (a long vein strands half-cracked cells behind the ray).

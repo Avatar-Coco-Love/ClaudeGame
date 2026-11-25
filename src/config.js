@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.6.56';
+export const VERSION = '1.6.57';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -230,6 +230,7 @@ export const RESEARCH = [
   { id: 'scanner', name: 'Scanner', desc: `Ping: shows ore and vault caches within ${SCAN_RADIUS} cells for a few seconds`, cost: 10 },
   { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
   { id: 'pulse', name: 'Pulse Beam', desc: 'Hold to charge, release to fire: 1.5× reach, pierces 3 cells', cost: 40 },
+  { id: 'arc', name: 'Arc Beam', desc: 'Hits jump to 2 more of the same kind nearby: ore veins, creature packs', cost: 35 }, // S-55 (D-151)
   { id: 'echo', name: 'Echo', desc: 'A lesser core that follows you and mines exposed ore', cost: 30 }, // S-42 (D-108)
 ];
 // S-42 Echo (D-108, echo.js): follows down a BFS field from the core's cell, blinks back when stranded, Gathers exposed ore.
@@ -257,7 +258,12 @@ export const BEAM_MODES = {
   focus: { name: 'Focus', research: null, offsets: [0], range: 1, dmg: 1 },
   wide: { name: 'Wide', research: 'wide', offsets: [-WIDE_OFFSET, 0, WIDE_OFFSET], range: WIDE_RANGE, dmg: WIDE_DMG },
   pulse: { name: 'Pulse', research: 'pulse', offsets: [0], range: 1, dmg: 1, pulse: true }, // S-14: charge/release, `updatePulse`
+  arc: { name: 'Arc', research: 'arc', offsets: [0], range: 1, dmg: 0.8, arc: true, glyph: '↯' }, // S-55: `arcTargets` (arc.js)
 };
+// Arc (S-55, D-151): the ray deals × 0.8 (`dmg`); what it hits arcs to up to ARC_N more of the same kind within ARC_CELLS
+// cells, ARC_MUL × the ray's dps each: a creature -> the nearest other creatures (never a bolt), an ore cell -> cells of
+// its type, most cracked first. Rock arcs to nothing (0.8× Focus); a 3–9 cell cluster 1.34–1.46× Focus (spec's 0.35: 1.06–1.25).
+export const ARC_N = 2, ARC_CELLS = 2, ARC_MUL = 0.5;
 // Pulse (S-14, D-042): held fire charges 0 -> 1 over PULSE_CHARGE_S (held at 1, it fires once a Glitch or
 // wall is in reach: S-21 ready shot, D-054); a release at >= PULSE_MIN bursts
 // beam dps × PULSE_CHARGE_S × charge × PULSE_MUL along range × PULSE_RANGE, carrying what a broken cell doesn't use on to

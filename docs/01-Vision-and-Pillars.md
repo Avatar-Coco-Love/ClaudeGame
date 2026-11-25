@@ -19,7 +19,7 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
 ## Progression layers (keep them distinct — never unlock the same thing twice)
 - **Core Matrix** *(built)*: permanent stat upgrades to the core.
 - **Nexus Development** *(built: Radiance)*: the hub itself grows (light radius, structures). Paid in Prisms only (D-009).
-- **Research** *(built: Scanner, Wide beam, Pulse beam; M9: the Echo ally, D-108)*: unlocks new *kinds* of things (new beam modes, new materials).
+- **Research** *(built: Scanner, Wide beam, Pulse beam, Arc beam; M9: the Echo ally, D-108)*: unlocks new *kinds* of things (new beam modes, new materials).
 - **Crafting** *(built: Beacons S-16, Relays S-22)*: turns resources into placeable items (light beacons, relays). Beacons live here, not in Nexus Development.
 - **Temporary Upgrades** *(built: Anomalies, D-098, M7 ✅)*: buffs found in the world that scale a Matrix stat until your next deposit.
 

@@ -62,6 +62,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await research.nodeChecks(check).catch(e => check('S-11 research checks ran', false, e.message));
   await beam.nodeChecks(check).catch(e => check('S-13 beam checks ran', false, e.message));
   await pulse.nodeChecks(check).catch(e => check('S-14 pulse checks ran', false, e.message));
+  await require('./arc.cjs').nodeChecks(check).catch(e => check('S-55 arc checks ran', false, e.message));
   await audit29.nodeChecks(check).catch(e => check('audit 29 checks ran', false, e.message));
   await audit39.nodeChecks(check).catch(e => check('audit 39 checks ran', false, e.message));
   await craft.nodeChecks(check).catch(e => check('S-16 craft checks ran', false, e.message));
@@ -349,6 +350,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await research.browserChecks(browser, url, check, errors, plantSaveAndReload);
     await beam.browserChecks(browser, url, check, errors);
     await pulse.browserChecks(browser, url, check, errors);
+    await require('./arc.cjs').browserChecks(browser, url, check, errors, process.env.ARC_SHOT).catch(e => check('S-55 arc browser checks ran', false, e.message));
     await audit29.browserChecks(browser, url, check, errors);
     await touch.browserChecks(browser, url, check, errors);
     await audit34.browserChecks(browser, url, check, errors);

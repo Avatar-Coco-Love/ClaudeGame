@@ -5,7 +5,7 @@ update the line here when a system changes. Decisions live in `06`, specs in `07
 
 ## Systems
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
-  Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach; a full charge waits for a target in reach (S-21, D-059).
+  Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach; a full charge waits for a target in reach (S-21, D-059); Arc (35●, S-55, D-151, `arc.js`) 0.8× ray + 2 jumps × 0.5 to the same kind ≤ 2 cells (most cracked ore first; creatures, never bolts).
   Echo (30●, S-42, D-112, `src/echo.js`): follows down a 24-cell BFS field, blinks beside the core when > 10 cells / sealed off / stuck 1.5 s; Gathers exposed ore ≤ 5 cells from the core at 0.5× beam dps. `tools/echobot.mjs`. Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp bolt / 0.8 s at the foe nearest the core ≤ 140 px, clear line); saved `echoOrder`.
 - Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
   ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.

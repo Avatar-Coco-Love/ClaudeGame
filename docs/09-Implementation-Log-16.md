@@ -61,3 +61,10 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
   (8), 0.910 / 0.899 (16). Kiln gate unchanged: PASS. Perf `shoal` run: 1.04× base mean (CPU ×4, 8 s).
 - Screenshot of a swarm viewed: six mint diamonds with short trails, readable in the dark Shoal.
 - Smoke 541/541 (+8, `mote.cjs`: spawn, current, contact, carry, loot, mode switch / save, gate, drawn).
+
+## Session 116 — Build: S-55 Arc beam mode (v1.6.57, D-151)
+- `arc.js` (`arcFoes`, `arcCells`, `drawArcs`); `castBeam` adds jumps to its cell / foe sets at `ARC_MUL`, heat counts
+  them (`heatHit`). Research row 35 ●, 4th in the Q cycle; the ⟂ button's glyph is now per mode (`#mode-glyph`, ↯).
+- As specced (× 0.35, joined vein) clusters ran 1.06–1.25× Focus; retuned (D-151) to 1.36–1.45×, rock 0.79×.
+- Screenshot viewed: jagged cyan-white jumps from the hit to two crystals of a 3×5 vein; button reads "↯ Arc".
+- Smoke 547/547 (+6, `arc.cjs`: research + cycle, × 0.8 / × 0.5, own-type ≤ 2 cells, creatures not bolts, rates, UI).
