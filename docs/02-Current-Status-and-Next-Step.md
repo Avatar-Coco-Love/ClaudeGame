@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 93** · **Version: v1.4.33** (session 93: Build; rotation: 94 Audit, 95 Build, 96 Build, 97 Design).
+_Last updated: 2026-11-25_ · **Session counter: 94** · **Version: v1.4.34** (session 94: Audit; rotation: 95 Build, 96 Build, 97 Design, 99 Audit).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -55,5 +55,4 @@ _Last updated: 2026-11-25_ · **Session counter: 93** · **Version: v1.4.33** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 94 (Audit): parallel sweeps (correctness, perf, mobile, code health, docs drift) of the live 256 world; fix
-the top issues, Debt the rest, archive `09` entries older than audit 89, check each D-xxx. Then S-47 (Build).
+Session 95 (Build): S-47 (`07-Build-Specs-9.md`, D-124: Shoal Undertow 30–55 px/s + `tools/haulrun.mjs` ≤ 15 % haul cost).

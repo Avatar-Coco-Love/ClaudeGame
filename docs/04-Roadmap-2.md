@@ -4,8 +4,9 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
-- **B-084** `drawcost.cjs` "20 light holes ≤ 2×" reads 1.9–2.02× in headless runs (old code too): find why the
-  holes frame costs ~2× (measure, don't loosen) in audit 94.
+- **Audit 94 leftovers** (sweeps in-session; B-084 fixed in #101: glow blit unsmoothed, D-126). Touch: the ring toast
+  ("Entering the Kiln") draws over lit terrain just under the core on a phone, no backing plate. Kiln reads dim outside
+  the core's light (session 93; S-48 may warm it). Perf: holes frame still +2.3 ms for the light holes themselves.
 - ✅ **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits; the site helpers' 160 default went in
   S-46b2, v1.4.33: a missing size now throws, D-125).
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
