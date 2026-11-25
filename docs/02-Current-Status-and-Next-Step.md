@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 86** · **Version: v1.4.26** (session 86: Build; rotation: 87 Design, 88 Build, 89 Audit, 90 Build, 91 Build).
-**Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), all ✅ as of v1.4.23 (M8 last). VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-25_ · **Session counter: 87** · **Version: v1.4.27** (session 87: Design; rotation: 88 Build, 89 Audit, 90 Build, 91 Build, 92 Design).
+**Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -46,7 +46,7 @@ _Last updated: 2026-11-25_ · **Session counter: 86** · **Version: v1.4.26** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-11`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): every spec built; M6 ✅ (v1.1), M7 ✅ (v1.2). M8 specs S-38…S-41 in `07-Build-Specs-6.md` (D-103); S-38…S-41 built. M9 Echo (owner's ally ask, D-108): S-42 (#87), S-43 (#88), S-44 (#90) built: M1–M9 ✅, every spec built. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-44 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`** (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 86** · **Version: v1.4.26** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 87 (Design): play-test with Playwright (desktop + 568×320 / 320×568 touch, Drift and Surge), then write specs
-S-45+ in `07` for the next 3–5 build items, drawing on `04-…-2` "Audit 84 leftovers" (GC churn, config numbers, D-107 drift).
+Session 88 (Build): **S-45** World size as saved data (`07-Build-Specs-8.md`, D-120): format 18 `size`, old saves load
+at 160 identical (pinned hash test), every world still 160 in this PR.

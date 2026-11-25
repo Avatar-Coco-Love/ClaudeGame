@@ -58,3 +58,19 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
 - **B-074** found: runs 2–3 failed the beacon-dot checks (also 1 in 4 on the old CSS). `new-world` is a random seed, and an
   explored Anomaly site (amber `255,190,120`) or a seen Spire drawn within ~5 map px covers the dot. `craft.cjs` now
   hides marks within 6 cells (8 runs: 3 hid one, all pass).
+
+## Session 87 — Design: the game grows, M10–M14 (v1.4.27, D-119, D-120)
+- Owner (chat): "not even close to being done". D-119 supersedes D-045/D-108's "finished" and "no standalone bosses":
+  M10 world + biomes → M11 economy → M12 enemies + tools → M13 events + puzzles → M14 two-form bosses (Surge fight /
+  Drift puzzle, same reward). Roadmap in `04-Roadmap-3.md`; "Later" lost Swarm/Burrower and the larger world.
+- Measured (Chromium, 4× CPU, 6 seeds): `new World` 160 / 256 / 320 = 36 / 65 / 85 ms median (65 / 112 / 151 max);
+  `new Game` 42 / 67 / 142 ms; Node unthrottled 8 / 16 / 22 ms. Save 9.5 / 22.8 / 35 KB. A 256 copy at d 100 ran with no
+  errors and frames no worse than 160 (chunk cache already lazy). → D-120: eager 256, lazy generation parked (Q-025).
+- Generation is centre-relative for rings/Spires but noise is absolute, so a 256 world isn't a superset of a 160 one:
+  old saves keep 160 (format 18 `size`). Spires move with the centre (same d 64–74).
+- Play-test: desktop 1280×800 Drift at d 60 and 568×320 Pixel 7 Surge at d 30, screenshots viewed, 0 errors. Deep is
+  near-black outside the light, so Shoal/Kiln palettes must read at low light (S-46). The minimap fits 160 cells in
+  ~140 px (~87 px on the phone); 256 whole would be ~0.5 px/cell → S-46 windows it to 160 cells.
+- Specs S-45…S-48 (`07-Build-Specs-8.md`). CLAUDE.md: owner gives feedback / Claude decides; unattended runs (one PR,
+  check open PRs first, ≤ 10-line reply); no account memory tools. VERSION line updated for M10 → 1.5 … M14 → 1.9.
+
