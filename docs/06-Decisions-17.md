@@ -45,6 +45,16 @@ Continues `06-Decisions-16.md` (same rules: supersede, never edit; list rejected
   purpose); **biomes as angular sectors** (would cut through Veil/Deep and the Spire band; rings reuse `world.rings`, the
   ring toast, hp and music by ring).
 
+### D-122 — S-46 ships in two slices; outer vaults start at d 86 (session 90, amends S-46)
+- **S-46a** (this PR): `RINGS` Shoal (r0 80, hp ×2.2) / Kiln (r0 104, hp ×2.6) with `colours.cjs`-held edges; profile
+  256 = 5 rings, 6 + 4 vaults, Anomalies `[3, 5, 8, 6, 6]`; the new lists use salts `vault-outer`, `anomaly-outer`,
+  `anomaly-outer-kind`. 256 stays dev-only. **S-46b**: minimap window, ending map frame, perf budget, then
+  `WORLD_SIZE_NEW = 256` (flipping before the window would ship a 256 world on a whole-map minimap).
+- Outer vaults draw at d **86**–118, not 82: `SPIRE_D[1] + SPIRE_VAULT_GAP` = 86, so no outer vault can change the
+  Spire choice (at 82 it moved the Spires, and so the inner Anomalies, of 1 seed in 40). A check pins the inequality.
+- Rejected: flipping to 256 in one PR (too big for one session's smoke + perf work); making Spires ignore outer vaults
+  (a vault could then sit inside a Spire's gap); bright edges like the ore (mint ≈ Shard, ember ≈ Lumen / amber: ΔE < 25).
+
 ### D-121 — D-107's "every font size scales" has two exceptions (audit 89, docs drift; amends D-107)
 - The title `h1` (`clamp(28px, 10.5vw, 76px)`, landscape `clamp(24px, 6.3vw, 46px)`) scales with the viewport, not
   `--ts`: it is already ≥ 24 px, so Large text adds nothing to readability there. The phone `.bank` stays 15 px

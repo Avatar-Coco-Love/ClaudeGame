@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.29';
+export const VERSION = '1.4.30';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -16,13 +16,14 @@ export const DEPOSIT_TICK = { vol: 0.12, decay: 0.8, minVol: 0.015, throttle: 0.
 export const CELL = 32;
 // S-45 (D-120): a world's size (cells per side, square) is saved data. New worlds / New Cycles use WORLD_SIZE_NEW; a save
 // written before size was saved (format ≤ 17) is WORLD_SIZE_OLD. Each size has a profile: what differs between sizes.
-export const WORLD_SIZE_NEW = 160; // S-46 raises it to 256
+export const WORLD_SIZE_NEW = 160; // S-46b raises it to 256 (with the minimap window + perf budget)
 export const WORLD_SIZE_OLD = 160;
 // rings: how many of RINGS the world uses; vaults: vaultSites count; anomalies: Anomaly sites per ring (ANOMALY_D).
-// 160 = the pre-M10 numbers word for word (tests/worldsize.cjs pins the result). 256 is dev-only until S-46 fills it in.
+// 160 = the pre-M10 numbers word for word (tests/worldsize.cjs pins the result). 256 (S-46a, D-122): 5 rings, 4 more vaults
+// (outerVaults, VAULT_D_OUTER) and Anomalies in Shoal / Kiln, both drawn after the old lists with their own salts.
 export const WORLD_PROFILES = {
-  160: { rings: 3, vaults: 6, anomalies: [3, 5, 8] },
-  256: { rings: 3, vaults: 6, anomalies: [3, 5, 8] },
+  160: { rings: 3, vaults: 6, outerVaults: 0, anomalies: [3, 5, 8] },
+  256: { rings: 5, vaults: 6, outerVaults: 4, anomalies: [3, 5, 8, 6, 6] },
 };
 export const worldProfile = size => WORLD_PROFILES[size] || WORLD_PROFILES[WORLD_SIZE_OLD];
 export const CHUNK = 16; // cells per render chunk edge
@@ -103,6 +104,9 @@ export const LUMEN_SALT = 0x27d4eb2f;
 // S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
 export const VAULT_HALF = 3; // vault footprints are (2·3 + 1)² = 7×7 cells (world.js templates; anomaly.js clearance)
 export const VAULT_D = [50, 72];     // centre distance from the Nexus, in cells
+// S-46a: a 256 world's outerVaults (own salt 'vault-outer', after the first list). d0 = SPIRE_D[1] + SPIRE_VAULT_GAP,
+// so no outer vault can move a Spire (the spec's 82 moved 1 seed in 40, D-122).
+export const VAULT_D_OUTER = [86, 118];
 export const VAULT_GAP = 20;         // min cells between vault centres
 export const VAULT_TRIES = 200;
 export const VAULT_LOOT = { shard: 20, prism: 6 };
@@ -147,6 +151,10 @@ export const RINGS = [
   { name: 'Hearth', r0: 0,  rockFill: '#17215a', rockEdge: '#3d6bff', denseFill: '#231658', denseEdge: '#8a5cff', hpMul: 1 },
   { name: 'Veil',   r0: 24, rockFill: '#0f2c40', rockEdge: '#2fc4b0', denseFill: '#26164e', denseEdge: '#a070ff', hpMul: 1.4 },
   { name: 'Deep',   r0: 48, rockFill: '#1c1048', rockEdge: '#6a4dff', denseFill: '#33103f', denseEdge: '#e04cc8', hpMul: 2 },
+  // S-46a (D-122): only a 256 world (profile rings 5) reaches these. Edges held ΔE ≥ 25 from the ore, Anomaly amber and
+  // the other new ring under 3 colour-blind sims (tests/colours.cjs). Shoal glassy mint + ice, Kiln ember + rose.
+  { name: 'Shoal',  r0: 80, rockFill: '#0c2a26', rockEdge: '#3a9a80', denseFill: '#0e1c30', denseEdge: '#3f6890', hpMul: 2.2 },
+  { name: 'Kiln',   r0: 104, rockFill: '#2a1206', rockEdge: '#a84e1a', denseFill: '#2c0c16', denseEdge: '#b02a40', hpMul: 2.6 },
 ];
 export const RING_PITCH_STEP = 2; // semitones the beam hum drops per ring (S-8)
 
@@ -263,12 +271,12 @@ export const MODES = {
 export const WEATHER_EVERY_S = [300, 120], WEATHER_S = 40, WEATHER_EASE_S = 2;
 export const STORM_SPAWN_MUL = 0.75, STORM_CAP_ADD = 2, AURORA_BONUS = 1, AURORA_CHANCE = 0.4;
 export const WEATHER_TINT = { storm: [14, 4, 26], aurora: [3, 13, 13] }; // darkness RGB at full strength (base 2, 3, 10)
-// S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep), seed-only
+// S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep; + Shoal / Kiln at 256), seed-only
 // (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre
 // distance ANOMALY_D[ring] cells, ≥ ANOMALY_GAP cells apart, clear of vault footprints and Spire footprints by ANOMALY_CLEAR
 // cells (Chebyshev, from the footprint edge). Taken when the core's centre is within ANOMALY_TAKE cells of an open site's
 // centre; a taken site recharges ANOMALY_RECHARGE_S of play time later. A buff lasts until a deposit banks ≥ 1 item.
-export const ANOMALY_D = [[9, 23], [25, 47], [49, 76]], ANOMALY_GAP = 12, ANOMALY_CLEAR = 1;
+export const ANOMALY_D = [[9, 23], [25, 47], [49, 76], [82, 102], [106, 124]], ANOMALY_GAP = 12, ANOMALY_CLEAR = 1;
 export const ANOMALY_TRIES = 600, ANOMALY_TAKE = 0.6, ANOMALY_RECHARGE_S = 300;
 export const ANOMALY_BEAM_MUL = 1.5;
 // S-36 (D-101): Lodestone scales Attractor reach and pull, Ballast the cargo limit (rounded down). Bot-tuned (`surgebot --anomaly`).

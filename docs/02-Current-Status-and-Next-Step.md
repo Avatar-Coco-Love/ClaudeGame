@@ -1,11 +1,11 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 89** · **Version: v1.4.29** (session 89: Audit; rotation: 90 Build, 91 Build, 92 Design, 93 Build, 94 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 90** · **Version: v1.4.30** (session 90: Build; rotation: 91 Build, 92 Design, 93 Build, 94 Audit).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
-- 160×160-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` / `_OLD` both 160 (256 dev-only via `new Game({ size })`). Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), vault shell + cache, Spire shell / core / facet, and a bedrock border.
+- 160×160-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` / `_OLD` both 160 (256 dev-only via `new Game({ size })`). Rings (S-46a, D-122): Hearth / Veil / Deep; a 256 world (dev-only) adds Shoal (d 80, ×2.2) / Kiln (d 104, ×2.6), 4 outer vaults, Anomalies [3,5,8,6,6]. Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), vault shell + cache, Spire shell / core / facet, and a bedrock border.
 - Core movement: analog intent → target velocity → acceleration → axis-separated collision → realized velocity, plus corner assist so the core slides into 1-cell tunnels.
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 89** · **Version: v1.4.29** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 90 (Build): S-46 the 256 world (`07-Build-Specs-8.md`): Shoal / Kiln rings, appended sites, windowed minimap,
-perf budget. Pass `world.w` to every site helper (audit 89 watch in `04-Roadmap-2.md` Debt).
+Session 91 (Build): S-46b (`07-Build-Specs-8.md`, D-122): minimap 160-cell window + Nexus edge arrow, ending map frames
+the explored area, perf budget checks, then `WORLD_SIZE_NEW` = 256. Pass `world.w` to every site helper (Debt).

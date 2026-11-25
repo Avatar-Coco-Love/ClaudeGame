@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.30 — 2026-11-25
+- **Two new depths, waiting past the Deep.** The Shoal (glassy mint and ice) and the Kiln (ember and rose) now exist,
+  with tougher rock, their own vaults and Anomalies. They arrive in play with the bigger world in the next update;
+  today's worlds are unchanged.
+
 ## v1.4.29 — 2026-11-25
 - **Health check.** No change in play: tidier code under the hood before the bigger world arrives, with new checks that
   every vault, Spire and Anomaly stays clear of the world's edge.

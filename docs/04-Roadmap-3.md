@@ -6,7 +6,8 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 
 ## M10 — World and biomes (D-120)
 - ✅ **S-45** World size as saved data (v1.4.28, format 18; old saves stay 160, pinned hash). Spec in `07-Build-Specs-8.md`.
-- **S-46** The 256 world: Shoal (d 80–104) and Kiln (d ≥ 104) rings, appended sites, windowed minimap, perf budget.
+- ✅ **S-46a** Shoal / Kiln rings, palettes, appended vaults (d 86–118) + Anomalies at 256, dev-only (v1.4.30, D-122).
+- **S-46b** The 256 world goes live: windowed minimap, ending-map frame, perf budget, then `WORLD_SIZE_NEW` = 256.
   (Moved from "Later": *Larger world with lazy chunk generation*; eager generation measured enough, Q-025.)
 - **S-47** Shoal: brittle glass (a break cracks one neighbour) + Undertow currents + its music progression.
 - **S-48** Kiln: beam heat that vents + flare vents + its music progression.

@@ -18,6 +18,7 @@ Measured basis (session 87, 4× CPU): `new World` 160 / 256 = 36 / 65 ms median 
   a save whose bitset length doesn't match its size → no save. `saveformat.cjs` passes untouched.
 
 ## S-46 — The 256 world and two rings past Deep (M10) (D-120)
+_D-122: split. S-46a (built, v1.4.30) = rings, palettes, sites (outer vaults d 86–118). S-46b = minimap, ending map, perf, the flip._
 **Save:** none new (S-45 carries `size`). New worlds and New Cycles are 256.
 - `WORLD_SIZE_NEW` = 256. `RINGS` gains **Shoal** (r0 80, hp ×2.2) and **Kiln** (r0 104, hp ×2.6), each with its own
   rock / dense palette (Shoal glassy mint + ice, Kiln ember orange + rose; `tests/colours.cjs` pairs vs Shard, Prism,
