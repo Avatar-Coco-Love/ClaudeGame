@@ -53,3 +53,5 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
   bank wraps under the tabs, 3 rows. Screenshots viewed (Core, Research Large, Settings).
 - New `touch.cjs` check at 568×320 + 667×375 (rows, ✕/tabs ≥ 44 px inside the sheet, Settings rows above the fold):
   FAILS on the old CSS, passes now.
+- Smoke run 1: 417/419 — `02` at 61 lines, and `textsize.cjs` saw a 1 px sideways scroller (the hidden title used
+  `overflow: hidden`; now `clip-path`, no overflow). Both fixed.

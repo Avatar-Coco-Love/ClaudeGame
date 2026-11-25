@@ -23,8 +23,7 @@ _Last updated: 2026-11-25_ · **Session counter: 86** · **Version: v1.4.26** (s
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): synthesized pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
   Ending fades out; own PRNG (seed + 'music'); Music slider (`settings.music`, default 50). `tests/music.cjs` (11 checks).
-- Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
-  Short landscape phones (D-118): Matrix tabs + bank + ✕ share a row, Settings in two columns.
+- Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020); short landscape phones: two columns (D-118).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
 - Lumen ● (S-10) buys Research (S-11): Scanner ping (S-12), beam modes Wide / Pulse (S-13, S-14, S-21). Detail: `08`.

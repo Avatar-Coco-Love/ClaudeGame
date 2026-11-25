@@ -231,7 +231,8 @@ body.ending-seq #hud { opacity: 0; pointer-events: none; transition: opacity .4s
   #matrix .sheet { display: flex; flex-wrap: wrap; align-items: center; align-content: flex-start; column-gap: 10px; }
   #matrix .sheet > * { flex: 0 0 100%; order: 4; }
   #matrix header { display: contents; }
-  #matrix h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #matrix .sheet { position: relative; } /* the hidden title's box stays inside the sheet */
+  #matrix h2 { position: absolute; left: 0; top: 0; width: 1px; height: 1px; clip-path: inset(50%); white-space: nowrap; } /* no overflow: hidden, so no 1 px scroller (textsize.cjs) */
   #matrix .tabs { flex: 1 1 300px; order: 1; margin: 0; }
   #matrix .tabs button { padding: 0 6px; letter-spacing: .04em; }
   #matrix-bank { flex: 0 0 auto; order: 2; margin-left: auto; } #matrix-close { flex: 0 0 auto; order: 3; }
