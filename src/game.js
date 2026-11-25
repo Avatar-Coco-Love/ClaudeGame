@@ -393,6 +393,7 @@ export class Game {
     this.burst(p.x, p.y, 50, '#ffffff', 300);
     p.x = this.nexus.x; p.y = this.nexus.y + SPAWN_OFFSET; p.vx = p.vy = 0;
     p.integrity = this.stat('hull'); p.invuln = RESPAWN_INVULN_S; this.beam.charge = 0;
+    this.heat = 0; this.heatState.over = 0; this.heatState.flash = 0; // B-087 (audit 99): a respawn at the Nexus never starts overheated
     this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > RESPAWN_CLEAR_PX);
     this.bolts = [];
     this.notify('destabilized');

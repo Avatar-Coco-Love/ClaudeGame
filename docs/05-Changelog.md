@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.39 — 2026-11-25
+- **A core that falls in the Kiln comes back cool.** Respawning at the Nexus no longer keeps the beam's heat, so it
+  fires straight away.
+- **Messages are easier to read:** pop-up messages such as "Entering the Kiln" now sit on a dark plate.
+
 ## v1.4.38 — 2026-11-25
 - **Kiln rock heats your beam.** Mining in the Kiln builds heat: a warm white arc grows round the core, and after
   about 8 s of steady fire the beam overheats and stays off for a moment (a soft hiss) before it works again.

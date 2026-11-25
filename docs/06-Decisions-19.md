@@ -15,3 +15,12 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
   Kiln cells and cool between them. `KILN_HEAT_S` stays 8.
 - Rejected: a heat field in the save (spec: transient); heat in `world.hit` (would make the Echo and cracks heat);
   an extra Pulse rule (heat per burst) — a second rule the spec chose not to have.
+
+### D-131 — Audit 99: heat resets on a destabilize; B-086 closed with a guard (session 99, audit)
+- `destabilize()` zeroes `game.heat` and any overheat / flash, like `beam.charge`: a respawn at the Nexus fires at once
+  (B-087: it kept the Kiln's heat, so a core that died overheated came back with its beam held off). Check in `heat.cjs`.
+- B-086 not reproduced: 12 seeded d 110 teleport runs (beam, moving), every cached chunk matched a fresh `paintChunk`
+  (0 stale of ~360). Likely a measurement slip (`CELL` is 32 px; this audit's first probe divided by 16 and "found"
+  ore that wasn't there). `tests/audit99.cjs` keeps the cache-vs-world comparison (it fails with the dirty repaint removed).
+- The toast gets the panel's backing plate everywhere (it read poorly over lit terrain on phones).
+- Rejected: heat kept through death (no reason to punish a respawn twice); keeping B-086 open without a repro.

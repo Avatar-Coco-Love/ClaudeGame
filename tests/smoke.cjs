@@ -380,6 +380,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./echoorder.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_ORDER_SHOT).catch(e => check('S-43 echo order browser checks ran', false, e.message));
     await require('./undertow.cjs').browserChecks(browser, url, check, errors, process.env.UNDERTOW_SHOT).catch(e => check('S-47 undertow browser checks ran', false, e.message));
     await require('./heat.cjs').browserChecks(browser, url, check, errors, process.env.HEAT_SHOT).catch(e => check('S-48a heat browser checks ran', false, e.message));
+    await require('./audit99.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 99 browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
     await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));
 

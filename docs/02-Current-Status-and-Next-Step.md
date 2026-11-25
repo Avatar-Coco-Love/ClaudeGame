@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 98** · **Version: v1.4.38** (session 98: Build; rotation: 99 Audit, 100 Build, 101 Build, 102 Design).
+_Last updated: 2026-11-25_ · **Session counter: 99** · **Version: v1.4.39** (session 99: Audit; rotation: 100 Build, 101 Build, 102 Design, 104 Audit).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,7 +21,7 @@ _Last updated: 2026-11-25_ · **Session counter: 98** · **Version: v1.4.38** (s
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Undertow (S-47a, D-127, `undertow.js`): ~half the Shoal's chunks flow 30–55 px/s (seeded, unsaved), eased 0.5 s into the realized velocity; pickups ×0.5.
   Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
-  Kiln heat (S-48a, D-130, `heat.js`): Kiln beam damage heats (8 s → 1.2 s overheat), cools 2×; arc, phrygian; unsaved.
+  Kiln heat (S-48a, D-130, `heat.js`): Kiln beam damage heats (8 s → 1.2 s overheat), cools 2×; arc, phrygian; unsaved; reset by a destabilize (D-131).
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
@@ -56,4 +56,4 @@ _Last updated: 2026-11-25_ · **Session counter: 98** · **Version: v1.4.38** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 99 (Audit): parallel audit per `CLAUDE.md` (incl. Debt B-086, the d 110 draw gap); archive `09` entries older than audit 94; then 100 Build: S-48b flare vents → v1.5 (`07-Build-Specs-10.md`).
+Session 100 (Build): S-48b flare vents → v1.5 (`07-Build-Specs-10.md`, M10 close-out).
