@@ -37,10 +37,13 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - One creature, two appetites (D-142) replaces "a Drift twin hazard"; the shield pylon / lens is cut (a beam buff
   twice). A generic Swarm / Burrower outside the biomes is not planned (Q-029 holds Glitch tiers past 3).
 
-## M13 — Events and puzzles
-- World events beyond weather, seeded on `stats.time` like D-097: cave-in, Lumen bloom, a rift that opens for ~30 s
-  (a pocket of rare ore), roaming elites (Surge) / a wandering lode (Drift).
-- New Vault and Spire puzzle types; one puzzle per biome (Shoal: route a current; Kiln: vent timing).
+## M13 — Events and puzzles (specced, `07-Build-Specs-14.md`, D-152)
+- **S-57a** Rift: every 240–360 s a 3 × 3 pocket of the ring's best ore opens 8–12 cells out for 45 s; gate `eventrun.mjs`.
+- **S-57b** Rift pointer (edge chevron) + open / close tones.
+- **S-58** Flare Lock: a Kiln outer vault's shell cuts only in a 2 s soft window of its 8 s cycle.
+- **S-59** Tide Lock: a Shoal outer vault's shell cuts only against the current. M13 done → v1.8.
+- One face in both modes (D-152). Cut: cave-in (a tax, no choice), Lumen bloom (in the rift), roaming elites /
+  wandering lode (two unequal faces; Q-029), new Spire puzzles (M14's bosses bring the take-apart puzzle).
 
 ## M14 — Bosses (two forms, D-119)
 - One boss per biome. Surge: a fight. Drift: take it apart as a puzzle (cut its shell in the right order). Same reward.

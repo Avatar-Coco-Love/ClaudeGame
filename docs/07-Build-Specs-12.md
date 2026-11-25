@@ -61,6 +61,9 @@ and the two modes within 0.05 of each other.
   and Spitters (Surge), Burrowers and motes (both modes). So it guards the core in Surge and ore in Drift: same tool,
   same numbers. No light, no stat. (Cut: the shield pylon / lens of `04`: a lens buffs beam damage, which the Core
   Matrix and Overclock already give: the same thing twice.)
+- **Design 117 (D-153):** since S-53c / S-54 every biome creature hunts the core's hold in both modes, so a Ward guards
+  the core (and the hold) in both. Gate: `biomefoe.mjs` with 2 Wards kept at the bot's dig site lifts the ratio but
+  stays ≤ 1.00 in each mode (a Ward halves a creature's cost; it never turns one into income).
 - **Close-out:** `VERSION` minor → 1.7 (D-108), `04-Roadmap-3` M12 ✅, `02` scope line.
 - Smoke: craft price, placement rules, bolts only within 4 cells with a line, Drift = Surge rate, refund, format bump,
   old save loads with none. Screenshot of a Ward firing, viewed.
