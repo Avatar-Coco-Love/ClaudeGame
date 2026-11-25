@@ -171,6 +171,23 @@ async function browserChecks(browser, url, check, errors, shot) {
   const { MUSIC_RUMBLE: R } = await import('../src/config.js');
   check('S-53b burrower: the music rumble is on while it is within 4 cells (3 cells: level ≥ 0.5) and off beyond',
     near.built && near.to >= R.gain * 0.5 - 1e-9 && near.to <= R.gain + 1e-9 && far === 0, JSON.stringify({ near, far }));
+  // Audit 114 (B-091): the tell's shadowBlur in 'lighter' blurred a full-canvas layer (~6 ms a frame, software canvas). It is
+  // clipped to a box round its cell now; the clip must cut no lit pixel (same image with the clip disabled, 3 tell phases, zoom 1 and 0.62).
+  const tc = await pg.evaluate(async () => {
+    const mod = await import('./src/burrower.js');
+    const pad = window.__lumen.renderer.glowPad; // zoom × DPR 1 and the narrowest zoom (0.62) at DPR 1
+    const draw = (noclip, t, z) => { const c = document.createElement('canvas'); c.width = c.height = 320; const ctx = c.getContext('2d');
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 320, 320); let clips = 0; const clip = ctx.clip.bind(ctx);
+      ctx.clip = (...a) => { clips++; if (!noclip) clip(...a); }; ctx.scale(z, z);
+      mod.drawBurrowerTell({ game: { burrow: { b: { cx: 4, cy: 4, state: 'tell', t } }, settings: null }, zoom: z, dpr: 1, glowPad: pad }, ctx);
+      return { px: ctx.getImageData(0, 0, 320, 320).data, clips }; };
+    let diff = 0, lit = 0, clips = 0;
+    for (const [t, z] of [[0.8, 1], [0.4, 1], [0.01, 1], [0.01, 0.62]]) { const a = draw(false, t, z), o = draw(true, t, z); clips += a.clips;
+      for (let i = 0; i < a.px.length; i++) { diff = Math.max(diff, Math.abs(a.px[i] - o.px[i])); if (i % 4 === 0 && o.px[i] > 0) lit++; } }
+    return { diff, lit, clips };
+  });
+  check('burrower: the tell glow is clipped to its cell box and the clip cuts no lit pixel (B-091, audit 114)',
+    tc.clips >= 4 && tc.diff === 0 && tc.lit > 1000, JSON.stringify(tc));
   await pg.close();
 }
 

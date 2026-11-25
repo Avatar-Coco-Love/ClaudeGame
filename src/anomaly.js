@@ -143,16 +143,21 @@ export function drawAnomalies(r, ctx, left, top, vw, vh) {
     const k = ANOMALY_KINDS[s.kind], R = CELL * 0.42, rot = still ? 0 : r.time * 0.6;
     ctx.globalAlpha = open ? 0.95 : 0.28;
     ctx.strokeStyle = `rgb(${k.rgb})`; ctx.shadowColor = `rgb(${k.rgb})`; ctx.shadowBlur = open ? 14 : 4; ctx.lineWidth = 2;
+    const m = R + r.glowPad(14); // B-091 (audit 114): a blur in 'lighter' is clipped to its reach (~4 ms a draw unclipped)
+    ctx.save(); ctx.beginPath(); ctx.rect(x - m, y - m, m * 2, m * 2); ctx.clip();
     for (const off of [0, Math.PI]) {
       ctx.beginPath();
       for (let j = 0; j < 3; j++) { const a = rot + off - Math.PI / 2 + j * Math.PI * 2 / 3; ctx[j ? 'lineTo' : 'moveTo'](x + Math.cos(a) * R, y + Math.sin(a) * R); }
       ctx.closePath(); ctx.stroke();
     }
+    ctx.restore();
   });
   const ring = g.anomalyRing;
   if (ring) {
     ctx.globalAlpha = ring.t; ctx.strokeStyle = `rgb(${ring.rgb})`; ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 16; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(ring.x, ring.y, CELL * (0.5 + 2.5 * (1 - ring.t)), 0, Math.PI * 2); ctx.stroke();
+    const rr = CELL * (0.5 + 2.5 * (1 - ring.t)), m = rr + r.glowPad(16);
+    ctx.beginPath(); ctx.rect(ring.x - m, ring.y - m, m * 2, m * 2); ctx.clip();
+    ctx.beginPath(); ctx.arc(ring.x, ring.y, rr, 0, Math.PI * 2); ctx.stroke();
   }
   ctx.restore();
 }

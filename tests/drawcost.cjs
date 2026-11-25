@@ -99,6 +99,43 @@ async function browserChecks(browser, url, check, errors) {
   check('300 on-screen pickups draw ≤ 4× an empty frame (S-15, relative)', lootX <= 4, `${lootX.toFixed(2)}× (${JSON.stringify(r.m)} ms)`);
   check('20 on-screen light holes draw ≤ 2× an empty frame (S-15, relative)', holesX <= 2, `${holesX.toFixed(2)}×`);
   check('the Nexus glow is ≤ 35 % of a frame drawn at home (S-15, relative)', nexusShare <= 0.35, `${(100 * nexusShare).toFixed(0)} %`);
+
+  // B-091 (audit 114, D-149): a shadowBlur draw in a non-source-over composite ('lighter') blurs and composites a layer as big as
+  // the clip: ~4 ms a draw unclipped on a software canvas, ~0.1 clipped. Real frames with every such glow on screen (live
+  // vents, an anomaly site + its take ring, the Scanner ring, a Burrower tell): each of those draws must run under a clip.
+  const gc = await pg.evaluate(async () => {
+    const { game: g, renderer: R, input, dev } = window.__lumen, P = CanvasRenderingContext2D.prototype, C = 32;
+    const { VENT_PERIOD_S } = await import('./src/config.js');
+    const st = new WeakMap(), stack = c => { let s = st.get(c); if (!s) st.set(c, s = [false]); return s; };
+    const orig = {}, bad = new Set(), n = {}; let scene = '';
+    const wrap = (k, f) => { orig[k] = P[k]; P[k] = function (...a) { f(this); return orig[k].apply(this, a); }; };
+    wrap('save', c => { const s = stack(c); s.push(s[s.length - 1]); });
+    wrap('restore', c => { const s = stack(c); if (s.length > 1) s.pop(); });
+    wrap('clip', c => { const s = stack(c); s[s.length - 1] = true; });
+    for (const k of ['fill', 'stroke', 'fillRect', 'strokeRect', 'fillText', 'strokeText', 'drawImage']) wrap(k, c => {
+      if (!(c.shadowBlur > 0) || c.globalCompositeOperation === 'source-over') return;
+      n[scene] = (n[scene] || 0) + 1;
+      const s = stack(c); if (!s[s.length - 1]) bad.add(`${scene}: ${(new Error().stack.split('\n')[3] || '').trim().replace(/\(?https?:\/\/[^/]+\//, '')}`);
+    });
+    const frame = (name, x, y) => { scene = name; R.cam.x = x; R.cam.y = y; g.shake = 0; R.draw(0, input); scene = ''; };
+    g.god = true;
+    dev.teleport(110); // Kiln: every vent flaring
+    for (const s of g.vents.sites) { s.phase = VENT_PERIOD_S - 0.3 - g.stats.time; g.world.explored[s.y * g.world.w + s.x] = 1; }
+    let v = g.vents.sites[0]; for (const s of g.vents.sites) if (Math.hypot(s.x * C - g.player.x, s.y * C - g.player.y) < Math.hypot(v.x * C - g.player.x, v.y * C - g.player.y)) v = s;
+    frame('vents', (v.x + 0.5) * C, (v.y + 0.5) * C);
+    const a = g.anomaly.sites.find((s, i) => !(i in g.anomaly.taken) && !s.void), ax = (a.x + 0.5) * C, ay = (a.y + 0.5) * C;
+    g.player.x = ax + C; g.player.y = ay; g.anomalyRing = { x: ax, y: ay, t: 0.5, rgb: '255,255,255' };
+    frame('anomaly', ax, ay); g.anomalyRing = null;
+    g.scan = { cooldown: 9, age: 0.3, x: g.player.x, y: g.player.y, ring: true, marks: [], end: 5 };
+    frame('scan', g.player.x, g.player.y); g.scan = { cooldown: 0, age: 0, x: 0, y: 0, ring: false, marks: [], end: 0 };
+    const bx = Math.floor(g.player.x / C) + 2, by = Math.floor(g.player.y / C);
+    g.burrow.off = true; g.burrow.b = { cx: bx, cy: by, fx: bx, fy: by, prog: 1, x: (bx + 0.5) * C, y: (by + 0.5) * C, r: 11, state: 'tell', t: 0.4, hp: 6, maxHp: 6, flash: 0, heading: 0 };
+    frame('tell', g.player.x, g.player.y); g.burrow.b = null;
+    for (const k in orig) P[k] = orig[k];
+    return { n, bad: [...bad] };
+  });
+  check('every shadowBlur draw in a lighter composite runs under a clip: vents, anomaly, Scanner ring, Burrower tell (B-091, audit 114)',
+    ['vents', 'anomaly', 'scan', 'tell'].every(k => gc.n[k] > 0) && gc.bad.length === 0, JSON.stringify(gc));
   await pg.close();
 }
 

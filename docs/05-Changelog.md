@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.55 — 2026-11-25
+- **Smoother Kiln.** Flaring vents, Anomaly sites, the Scanner ring and the Burrower's tell look exactly the same but
+  cost far less to draw, so the Kiln no longer stutters on slower machines (measured: its frames ~15 % faster, the
+  slowest ones about twice as fast).
+
 ## v1.6.54 — 2026-11-25
 - **The Burrower bites your hold in Drift.** In the Kiln it now heads for the core in both modes, with the same lilac
   tell. Move away in time and it surfaces into air; stay put and in Surge it hits your hull, in Drift it takes 4 items

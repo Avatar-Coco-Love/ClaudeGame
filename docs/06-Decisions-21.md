@@ -44,3 +44,12 @@ alternatives). D-145 on.
 - The gate result is recorded as the tool's line in `09` (spec allowed either), not a smoke check: 8 seeds × 2 modes ×
   2 runs add ~25 s to a 10+ min smoke and the bot route is noisier (±0.03) than a smoke check should be.
 - Bite order is a fixed list `BITE_ORDER` (≈ ⬟ ▲ ● ◆) exported from `burrower.js`; the bite never touches the belly.
+
+### D-149 — Blurred 'lighter' draws run under a clip; perf scenes per biome (session 114, audit)
+- Any shadowBlur draw in a non-source-over composite is clipped to its shape's box padded by `R.glowPad(blur)` (2 × blur
+  in canvas px, as world px at zoom × DPR < 1, + 2). Measured: 3.9 ms a draw unclipped vs 0.09 (B-091). Extends S-15's
+  Nexus clip and B-027's glow sprites (D-051); `drawcost.cjs` checks it on real frames, so a new system with such a glow
+  adds its scene there. Plain source-over blurs (core, Echo body, Spires) are cheap (0.15 ms) and stay as they are.
+- `tools/perf.cjs` has a run per biome scene with its creatures (`kiln`); a new biome or foe adds one in its build PR.
+- Rejected: glow sprites for vents / sites (their alpha and radius animate every frame: many sprite sizes); dropping
+  the blur in 'lighter' (changes the look); a source check by regex (misses blur state set elsewhere, e.g. the Scanner).

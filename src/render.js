@@ -281,6 +281,10 @@ export class Renderer {
   // B-027 (D-051): a shape drawn with shadowBlur costs ~3 ms per draw on a software canvas, so every repeated glowing shape
   // (pickups, Scanner glyphs) is baked once into a sprite at the current device scale and drawn with one drawImage.
   // `half` is the sprite's half-size in world px; `paint(g)` draws the shape around (0, 0). Rebuilt only when zoom or DPR changes.
+  /** B-091 (audit 114, D-149): world px a shadowBlur of `blur` reaches (shadowBlur is in canvas px, so the reach grows as zoom × DPR
+   *  drops below 1). A blur drawn in 'lighter' is clipped to its shape's box padded by this; tests/drawcost.cjs checks the clip. */
+  glowPad(blur) { return 2 * blur / Math.min(1, this.zoom * this.dpr) + 2; }
+
   glowSprite(key, half, paint) {
     const res = this.zoom * this.dpr;
     if (this.spriteRes !== res) { this.sprites = {}; this.spriteRes = res; }
@@ -512,7 +516,10 @@ export class Renderer {
     if (sc.ring && r < R + 40) {
       ctx.strokeStyle = '#ffc94f'; ctx.lineWidth = 3; ctx.shadowColor = '#ffc94f'; ctx.shadowBlur = 14;
       ctx.globalAlpha = Math.max(0, 1 - r / (R + 40)) * 0.8;
-      ctx.beginPath(); ctx.arc(sc.x, sc.y, Math.min(r, R + 40), 0, Math.PI * 2); ctx.stroke();
+      const rr = Math.min(r, R + 40), m = rr + this.glowPad(14); // B-091: a blur in 'lighter' is clipped to its reach
+      ctx.save(); ctx.beginPath(); ctx.rect(sc.x - m, sc.y - m, m * 2, m * 2); ctx.clip();
+      ctx.beginPath(); ctx.arc(sc.x, sc.y, rr, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
     }
     ctx.shadowBlur = 0;
     for (const m of sc.marks) { // B-027: glyphs are glow sprites (scanSprite), not shadowBlur text

@@ -31,6 +31,9 @@ update the line here when a system changes. Decisions live in `06`, specs in `07
   Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
   Kiln heat (S-48a, D-130, `heat.js`): beam on Kiln rock heats (8 s → 1.2 s overheat), cools 2×; arc; reset by a death (D-131).
   Flare vents (S-48b, D-132, `vent.js`): 126 seed Kiln sites, 8 s cycle (1 s tell, 0.6 s flare r 2.5): shove + 0.4 heat. Both unsaved. A vent ≤ 5 cells (`VENT_HEAR_R`) sounds its tell once a cycle (`audio.ventTell`, audit 109, D-144).
+  Biome ores (S-49, D-135, format 19): Tide ≈ (`T.TIDE`, Shoal ROCK / DENSE where seed noise at x/5 > 0.76) and Calx ⬟ (`T.CALX`,
+  Kiln, > 0.79), re-typed last in `generate()`; hp 3.0 / 4.2 (not ring-scaled), yield 1; Calx counts as Kiln rock for heat.
+  `ORE_KIND` has both (Scanner, Echo, minimap). Spent with ◆ on Overdrive (S-50) and the Chart (S-52). Added in audit 114.
 - PWA, Graphics, Keys, Text (moved word for word from `02` in Design 112):
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
