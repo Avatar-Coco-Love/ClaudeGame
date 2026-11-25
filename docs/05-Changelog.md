@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.34 — 2026-11-25
+- **Smoother with many lights.** The soft floor glow under Beacons, Relays and lit Spires costs less to draw, so a
+  screen full of light pools stays smooth. It looks the same.
+
 ## v1.4.33 — 2026-11-25
 - **The world is bigger.** New Worlds and New Cycles are now 256 cells across: past the Deep lie two new rings, the
   Shoal and the Kiln, with tougher rock, four more vaults and more Anomalies. Worlds you already have keep their size.

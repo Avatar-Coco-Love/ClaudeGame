@@ -30,3 +30,11 @@ Continues `06-Decisions-17.md` (same rules: supersede, never edit; list rejected
 - Perf budget in smoke (`bigworld.cjs`): `new Game` 256 at CPU ×4 median ≤ 150 ms, full save ≤ 32 KB, draw d 100 ≤ 1.3×
   d 30 (High, Auto off). Rejected: pinning every node test to 160 (loses 256 coverage for no reason); a `?size=` URL
   switch for tests (a player-reachable knob for a test need); keeping the default and grepping callers (silent again).
+
+## D-126 — The floor-glow layer is blitted unsmoothed (session 94, audit; B-084)
+- `drawLightGlow` draws its quarter-res layer (`GLOW_DOWN` 4) onto the frame with image smoothing off. Measured headless
+  at 1280×800 with 20 pools over the view: that blit 4.0 → 1.4 ms of a ~10 ms frame; drawcost "holes" 2.0× → 1.67×.
+  The glow's centre alpha is 0.08, so a 4-px block step is under one 8-bit level (screenshot at 0.3 viewed, zoomed).
+- Rejected: loosening the 2× check (the check was right: S-25 was built against it with no margin); GLOW_DOWN 2
+  smoothed (3.9 ms, the cost is the smoothed scale, not the layer size); a full-res layer (1:1 blit 0.9 ms, but 20
+  full-res disc draws into it cost what D-061 already measured at 2.2×).

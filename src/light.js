@@ -89,6 +89,9 @@ export function drawLightGlow(r, ctx, left, top, vw, vh) {
   }
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
+  // B-084 (audit 94): the smoothed 4× upscale cost ~2.6 ms of a ~5.8 ms frame (headless, 20 pools over the view); unsmoothed
+  // it is ~1.4 ms. The gradient is faint and smooth, so a GLOW_DOWN block is far below one 8-bit step (screenshot viewed).
+  ctx.imageSmoothingEnabled = false;
   ctx.drawImage(L, 0, 0, lw, lh, x0, y0, lw / k, lh / k);
   ctx.restore();
 }
