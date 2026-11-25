@@ -39,3 +39,16 @@ Continues `09-Implementation-Log-12.md` (part 12 neared the 8 KB cap at session 
 - Specs: `07-Build-Specs-10.md` S-48a (heat by damage share ≤ 1, overheat 1.2 s, phrygian, haulrun d 116 ≤ 1.20×) and
   S-48b (flare vents, no terrain change, near sites only, v1.5 close-out).
 - Smoke: see PR (docs only; +0 checks).
+
+## Session 98 — Build: S-48a Kiln beam heat + phrygian music (v1.4.38, D-130)
+- `src/heat.js`: `heatHit` (from `castBeam` / `releasePulse` only), `updateHeat` (after the beam, every frame),
+  `drawHeat` (arc r 22 past heat 0.3 + overheat ring flash, off in reduced motion). `audio.overheat()` (sine only).
+  Hint "Kiln rock heats your beam: let it cool" until the first overheat ends. Music: `MUSIC_RING_MAX` 4, phrygian.
+- `tools/haulrun.mjs` gains `D` (default 90); D ≥ 104 toggles heat. `20 3 116`: median ×1.000, mean ×1.016, max
+  ×1.063 (18/20 pairs). Many legs dig < 10 Kiln cells and cool between breaks, so heat costs a haul little.
+- `tests/heat.cjs` (10, in smoke): overheat at 8.00 s; 72 frames off with no damage; restart 0.25; cooling 0.25/s off
+  and on Deep rock; 60 s steady → 16.0 % overheated (spec 17 ± 2: the first ramp from 0 is 8 s, not 6); Wide /
+  Overclock / Surge = 8.00 s; Echo + direct `world.hit` add 0; no save key; haul ≤ 1.20; arc drawn at d 112.
+  `music.cjs`: Kiln in every ring × mode (gap 0.0 dB), clamp check moved to ring 4 (flat 2nd heard). `audio.cjs`: hiss.
+- Observed: a Pulse burst counts as one frame of share (capped), so Pulse never overheats in practice (D-130).
+  Screenshot at d 112 with heat 0.7 viewed: the arc reads as a thin warm-white ring segment, distinct from the cyan core.

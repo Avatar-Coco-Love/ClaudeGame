@@ -14,6 +14,7 @@ import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
+import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
@@ -91,6 +92,7 @@ export class Game {
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
     this.undertow = makeUndertow(this.world); // S-47: Shoal currents from the seed (never saved)
+    this.heat = 0; this.heatState = makeHeat(); // S-48a: Kiln beam heat (heat.js); never saved
     this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); only `cancel` is saved (B-081)
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
@@ -237,11 +239,20 @@ export class Game {
   }
 
   updateBeam(dt, intent) {
+    this.castOnce(dt, intent);
+    updateHeat(this, dt); // S-48a: after the beam ran, so this frame's Kiln damage counts
+  }
+
+  castOnce(dt, intent) {
     const p = this.player, b = this.beam;
     const was = b.on;
     const held = !!(intent.fire && intent.aim);
     b.target = null; b.enemy = null; b.rays = [];
     b.flash = Math.max(0, b.flash - dt);
+    if (overheated(this)) { // S-48a: the intent stays on; the realized beam (and a Pulse charge) is off until it cools
+      b.on = false; b.charge = 0; this.audio.beam(false); this.facetAim = null;
+      return;
+    }
     if (BEAM_MODES[this.beamMode] && BEAM_MODES[this.beamMode].pulse) { // S-14: no continuous beam, no hum; charge -> burst
       b.on = false; this.audio.beam(false); this.facetAim = null;
       updatePulse(this, dt, held, !!intent.cancel);

@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 97** · **Version: v1.4.37** (session 97: Design; rotation: 98 Build, 99 Audit, 100 Build, 101 Build).
+_Last updated: 2026-11-25_ · **Session counter: 98** · **Version: v1.4.38** (session 98: Build; rotation: 99 Audit, 100 Build, 101 Build, 102 Design).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,6 +21,7 @@ _Last updated: 2026-11-25_ · **Session counter: 97** · **Version: v1.4.37** (s
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Undertow (S-47a, D-127, `undertow.js`): ~half the Shoal's chunks flow 30–55 px/s (seeded, unsaved), eased 0.5 s into the realized velocity; pickups ×0.5.
   Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
+  Kiln heat (S-48a, D-130, `heat.js`): Kiln beam damage heats (8 s → 1.2 s overheat), cools 2×; arc, phrygian; unsaved.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
@@ -44,15 +45,15 @@ _Last updated: 2026-11-25_ · **Session counter: 97** · **Version: v1.4.37** (s
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 18, `size`); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-13`), `08` per-system detail.
+- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 18, `size`); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- History: `05` changelog, `06` decisions (D-xxx, part 19 from D-130), `03` questions (Q-xxx), `09` log (tail: `09-…-13`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-46b2 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, refined in `-9` (D-124); S-48 split into S-48a / S-48b in `-10` (D-129) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-48a built. **S-48b in `07-Build-Specs-10.md`** (D-129). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - Per-session checks: `archive/2026-11-24-09-sessions-49-53.md` (each lives on in smoke).
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 98 (Build): S-48a Kiln beam heat + overheat + phrygian music + `haulrun` d 116 leg (`07-Build-Specs-10.md`, D-129).
+Session 99 (Audit): parallel audit per `CLAUDE.md` (incl. Debt B-086, the d 110 draw gap); archive `09` entries older than audit 94; then 100 Build: S-48b flare vents → v1.5 (`07-Build-Specs-10.md`).
