@@ -104,8 +104,9 @@ export const LUMEN_SALT = 0x27d4eb2f;
 // S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
 export const VAULT_HALF = 3; // vault footprints are (2·3 + 1)² = 7×7 cells (world.js templates; anomaly.js clearance)
 export const VAULT_D = [50, 72];     // centre distance from the Nexus, in cells
-export const VAULT_D_OUTER = [86, 118]; // S-46a: a 256 world's outerVaults (own salt 'vault-outer', after the first list);
-// d0 = SPIRE_D[1] + SPIRE_VAULT_GAP, so no outer vault can move a Spire (the spec's 82 moved 1 seed in 40, D-122)
+// S-46a: a 256 world's outerVaults (own salt 'vault-outer', after the first list). d0 = SPIRE_D[1] + SPIRE_VAULT_GAP,
+// so no outer vault can move a Spire (the spec's 82 moved 1 seed in 40, D-122).
+export const VAULT_D_OUTER = [86, 118];
 export const VAULT_GAP = 20;         // min cells between vault centres
 export const VAULT_TRIES = 200;
 export const VAULT_LOOT = { shard: 20, prism: 6 };

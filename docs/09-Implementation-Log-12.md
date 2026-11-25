@@ -27,4 +27,5 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
 - Observed: at the spec's d 82, one seed in 40 had an outer vault move its Spires (and so inner Anomalies); 86 fixes it.
 - Checks: `worldsize.cjs` +6 (5 rings at the right d, 160 keeps 3, outer vaults, Anomaly counts / bands, gap rule,
   appended = inner lists unchanged); `colours.cjs` reads 4 new edges, 30 pairs. Fail on old code (no Shoal in RINGS).
+- Smoke 431/431 (was 425; +6 worldsize). B-082: first run failed `comments.cjs` (a `;` comment line); fixed.
 - Screenshots at d 90 / 110 of a dev 256 world viewed: "Entering the Shoal" / "Kiln" toasts, mint / rose rock reads.
