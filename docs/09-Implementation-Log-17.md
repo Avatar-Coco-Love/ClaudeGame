@@ -40,4 +40,4 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
   Final, 16 seeds: Deep 1.092 / 1.089, Kiln 1.079 / 1.078: PASS (24: 1.073 / 1.077, 1.094 / 1.097). ~1.6 rifts / 10 min.
 - Observed: Surge runs swing ±10 % from any change to the path (one seed 1080 vs 1419), so 8 seeds can't see a 5–10 %
   effect. Screenshot (1280 × 800): the Hearth pocket (● + ◆) outlined violet-white beside the Nexus, toast on top: reads.
-- `tests/rift.cjs` (8 node checks incl. the gate, 1 browser); smoke see PR.
+- `tests/rift.cjs` (8 node checks incl. the gate, 1 browser). Smoke 574/574 (+9).
