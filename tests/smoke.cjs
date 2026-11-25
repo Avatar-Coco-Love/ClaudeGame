@@ -359,6 +359,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./audit54.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 54 browser checks ran', false, e.message));
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./anomalyfound.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-37 anomaly-found browser checks ran', false, e.message));
+    await require('./worldsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-46b world-size browser checks ran', false, e.message));
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await require('./quality.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-41 graphics quality browser checks ran', false, e.message));
     await require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message));

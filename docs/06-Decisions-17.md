@@ -45,6 +45,15 @@ Continues `06-Decisions-16.md` (same rules: supersede, never edit; list rejected
   purpose); **biomes as angular sectors** (would cut through Veil/Deep and the Spire band; rings reuse `world.rings`, the
   ring toast, hp and music by ring).
 
+### D-123 — S-46b splits again; the minimap has no Nexus edge arrow (session 91, amends S-46b)
+- **S-46b1** (this PR): minimap = a `MINIMAP_WINDOW_CELLS` 160 window centred on the core, clamped to the world
+  (`hud.js miniWindow`); the ending overview frames the box of explored cells + Spires + Nexus (`ending.js exploredBox`,
+  once per sequence). **S-46b2**: perf budget checks, then `WORLD_SIZE_NEW = 256`.
+- **No edge arrow:** measured, not guessed: with a 160 window clamped in a 256 world, `ox` ∈ [0, 96] cells, so the
+  Nexus (cell 128) is always ≥ 32 cells inside it. A check walks every core position. The arrow would be dead code.
+- Rejected: drawing the arrow anyway (untestable at 256); scaling the whole 256 map into the minimap (cells < 1 px);
+  centring the ending on the Nexus with a radius (cuts off far explored corners in a 256 world).
+
 ### D-122 — S-46 ships in two slices; outer vaults start at d 86 (session 90, amends S-46)
 - **S-46a** (this PR): `RINGS` Shoal (r0 80, hp ×2.2) / Kiln (r0 104, hp ×2.6) with `colours.cjs`-held edges; profile
   256 = 5 rings, 6 + 4 vaults, Anomalies `[3, 5, 8, 6, 6]`; the new lists use salts `vault-outer`, `anomaly-outer`,

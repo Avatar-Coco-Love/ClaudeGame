@@ -29,3 +29,14 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
   appended = inner lists unchanged); `colours.cjs` reads 4 new edges, 30 pairs. Fail on old code (no Shoal in RINGS).
 - Smoke 431/431 (was 425; +6 worldsize). B-082: first run failed `comments.cjs` (a `;` comment line); fixed.
 - Screenshots at d 90 / 110 of a dev 256 world viewed: "Entering the Shoal" / "Kiln" toasts, mint / rose rock reads.
+
+## Session 91 — Build: S-46b1 minimap window + ending frame (v1.4.31, D-123)
+- S-46b split again (D-123): this slice = minimap window + ending frame; perf budget + the flip to 256 are S-46b2.
+- `hud.js miniWindow`: `MINIMAP_WINDOW_CELLS` 160 square round the core, clamped; the minimap blits that source rect
+  and translates, so every mark helper keeps `x * sc`. A 160 world: whole map, pixel-identical.
+- Observed: in a 256 world the clamped window always holds the Nexus (≥ 32 cells in), so the spec's edge arrow was cut.
+- `ending.js exploredBox`: the overview frames explored cells + Spires + Nexus, once per sequence (cached on the renderer).
+- Checks: `worldsize.cjs` +3 node (160 = whole map; every 256 core position keeps core + Nexus inside; box) +1 browser
+  (256 minimap pixels: core gold, Nexus white). New checks fail on old code (no `miniWindow` / `exploredBox`).
+- Smoke 435/435 (was 431; +4 worldsize). Screenshots viewed: ending overview 1280×800, 256 minimap far out.
+

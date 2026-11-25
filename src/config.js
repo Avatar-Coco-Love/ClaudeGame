@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.30';
+export const VERSION = '1.4.31';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -16,8 +16,9 @@ export const DEPOSIT_TICK = { vol: 0.12, decay: 0.8, minVol: 0.015, throttle: 0.
 export const CELL = 32;
 // S-45 (D-120): a world's size (cells per side, square) is saved data. New worlds / New Cycles use WORLD_SIZE_NEW; a save
 // written before size was saved (format ≤ 17) is WORLD_SIZE_OLD. Each size has a profile: what differs between sizes.
-export const WORLD_SIZE_NEW = 160; // S-46b raises it to 256 (with the minimap window + perf budget)
+export const WORLD_SIZE_NEW = 160; // S-46b2 raises it to 256 (after the perf budget; the minimap window shipped in S-46b1)
 export const WORLD_SIZE_OLD = 160;
+export const MINIMAP_WINDOW_CELLS = 160; // S-46b: the minimap shows this many cells per side around the core (clamped to the world)
 // rings: how many of RINGS the world uses; vaults: vaultSites count; anomalies: Anomaly sites per ring (ANOMALY_D).
 // 160 = the pre-M10 numbers word for word (tests/worldsize.cjs pins the result). 256 (S-46a, D-122): 5 rings, 4 more vaults
 // (outerVaults, VAULT_D_OUTER) and Anomalies in Shoal / Kiln, both drawn after the old lists with their own salts.

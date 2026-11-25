@@ -1,6 +1,6 @@
 // Screen-space HUD drawing (S-18 split out of render.js; behaviour unchanged): the explored-only minimap, the Nexus pointer,
 // and the touch sticks. Each takes the Renderer `r` (its canvases, camera, time and game).
-import { CELL, T, RINGS, RESOURCE, ORE_KIND, ANOMALY_KINDS } from './config.js';
+import { CELL, T, RINGS, RESOURCE, ORE_KIND, ANOMALY_KINDS, MINIMAP_WINDOW_CELLS } from './config.js';
 import { markAlpha } from './research.js';
 import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
@@ -28,16 +28,25 @@ export function paintMiniCell(r, i) {
   d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
 }
 
+/** S-46b: the minimap's window, a MINIMAP_WINDOW_CELLS square centred on the core and clamped to the world (a 160 world:
+ *  the whole map, as before). sc = minimap px per world px; (ox, oy) = the window's top-left in world px. */
+export function miniWindow(w, px, py, size) {
+  const win = Math.min(MINIMAP_WINDOW_CELLS, w.w, w.h) * CELL, clamp = (v, hi) => Math.max(0, Math.min(hi, v));
+  return { sc: size / win, ox: clamp(px - win / 2, w.w * CELL - win), oy: clamp(py - win / 2, w.h * CELL - win), win };
+}
+
 export function drawMinimap(r) {
   const m = r.mctx, g = r.game, w = g.world;
   if (r.miniDirty) { r.miniCtx.putImageData(r.miniData, 0, 0); r.miniDirty = false; }
   const size = r.minimap.width;
+  m.setTransform(1, 0, 0, 1, 0, 0);
   m.clearRect(0, 0, size, size);
   m.fillStyle = 'rgba(3,4,12,0.85)'; m.fillRect(0, 0, size, size);
+  const { sc, ox, oy, win } = r.miniWin = miniWindow(w, g.player.x, g.player.y, size);
   m.imageSmoothingEnabled = false;
-  m.drawImage(r.mini, 0, 0, size, size);
-  const sc = size / (w.w * CELL);
-  m.fillStyle = '#ffffff';
+  m.drawImage(r.mini, ox / CELL, oy / CELL, win / CELL, win / CELL, 0, 0, size, size);
+  m.translate(-ox * sc, -oy * sc); // every mark below draws at x * sc as before; those outside the window fall off the canvas
+  m.fillStyle = '#ffffff'; // the Nexus (D-123: a 160 window in a 256 world always holds it, so no edge arrow)
   m.beginPath(); m.arc(g.nexus.x * sc, g.nexus.y * sc, 3, 0, Math.PI * 2); m.fill();
   for (const q of g.scan.marks) { // S-11 ping blips, same lifetime as the glyphs
     const a = markAlpha(g, q);
@@ -55,6 +64,7 @@ export function drawMinimap(r) {
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
+  m.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 // T1 (audit 49): the HUD boxes the pointer must stay clear of, read from the DOM at most twice a second (a layout read

@@ -41,13 +41,25 @@ export function darkAlpha(game) {
   return DARK_ALPHA[0] + (DARK_ALPHA[1] - DARK_ALPHA[0]) * e;
 }
 
-/** While the full sequence runs: a fixed overview (camera on the Nexus, zoom that fits every Spire). Else null. */
+/** While the full sequence runs: a fixed overview framing the explored area (S-46b: its bounding box, with every Spire
+ *  and the Nexus inside it, plus ENDING_MARGIN_CELLS), worked out once per sequence. Else null. */
 export function endingView(r) {
-  const g = r.game;
-  if (!g.endSeq || reduced(g)) return null;
-  let R = 0;
-  for (const s of g.spires) R = Math.max(R, Math.hypot((s.x + 0.5) * CELL - g.nexus.x, (s.y + 0.5) * CELL - g.nexus.y));
-  return { x: g.nexus.x, y: g.nexus.y, zoom: Math.min(r.w, r.h) / (2 * (R + ENDING_MARGIN_CELLS * CELL)) };
+  const g = r.game, q = g.endSeq;
+  if (!q || reduced(g)) return null;
+  if (!r.endBox || r.endBox.seq !== q) r.endBox = { seq: q, ...exploredBox(g) };
+  const b = r.endBox, m = ENDING_MARGIN_CELLS * CELL;
+  const zoom = Math.min(r.w / (b.x1 - b.x0 + 2 * m), r.h / (b.y1 - b.y0 + 2 * m));
+  return { x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2, zoom };
+}
+
+/** World-px box round every explored cell, every Spire and the Nexus. */
+export function exploredBox(g) {
+  const w = g.world;
+  let x0 = g.nexus.x, x1 = g.nexus.x, y0 = g.nexus.y, y1 = g.nexus.y;
+  const add = (cx, cy) => { x0 = Math.min(x0, cx * CELL); x1 = Math.max(x1, (cx + 1) * CELL); y0 = Math.min(y0, cy * CELL); y1 = Math.max(y1, (cy + 1) * CELL); };
+  for (let y = 0, i = 0; y < w.h; y++) for (let x = 0; x < w.w; x++, i++) if (w.explored[i]) add(x, y);
+  for (const s of g.spires) add(s.x, s.y);
+  return { x0, x1, y0, y1 };
 }
 
 /** The overview frame (replaces the world draw while the full sequence runs): the explored map (the minimap's pixels,
