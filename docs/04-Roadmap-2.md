@@ -4,7 +4,6 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
-- **B-074 flaky beacon minimap dot** (`craft.cjs`, session 80): one full-smoke failure, then 5 passes; cause not yet found (the pixel is read 2 rAFs after a teleport).
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
   #92 (B-081, D-117). Perf:
   `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,

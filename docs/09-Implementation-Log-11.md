@@ -55,3 +55,6 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
   FAILS on the old CSS, passes now.
 - Smoke run 1: 417/419 — `02` at 61 lines, and `textsize.cjs` saw a 1 px sideways scroller (the hidden title used
   `overflow: hidden`; now `clip-path`, no overflow). Both fixed.
+- **B-074** found: runs 2–3 failed the beacon-dot checks (also 1 in 4 on the old CSS). `new-world` is a random seed, and an
+  explored Anomaly site (amber `255,190,120`) or a seen Spire drawn within ~5 map px covers the dot. `craft.cjs` now
+  hides marks within 6 cells (8 runs: 3 hid one, all pass).

@@ -86,10 +86,14 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload) {
   const placed = await pg.evaluate(() => ({ r: window.__lumen.game.placeResult, n: window.__lumen.game.beacons.length, lights: window.__lumen.renderer.extraLights.length }));
   const lit = async () => pg.evaluate(([bx, by, f]) => {
     const { game: g, dev } = window.__lumen; dev.teleport(21, 0);
+    // B-074: the world is random; an explored Anomaly site or seen Spire within ~5 map px is drawn over the beacon's dot.
+    const C = 32, near = (x, y) => Math.hypot((x + 0.5) * C - bx, (y + 0.5) * C - by) < 6 * C; let hid = 0;
+    g.anomaly.sites.forEach(q => { if (!q.void && near(q.x, q.y)) { q.void = true; hid++; } });
+    g.spires.forEach(q => { if (q.seen && near(q.x, q.y)) { q.seen = false; hid++; } });
     return new Promise(res => requestAnimationFrame(() => requestAnimationFrame(() => {
       const dark = (0, eval)(f)(); const m = window.__lumen.renderer.mctx, sc = 140 / (g.world.w * 32);
       const px = m.getImageData(Math.round(bx * sc), Math.round(by * sc), 1, 1).data;
-      res({ at: dark(bx, by), off: dark(bx, by - 220), mini: [px[0], px[1], px[2]].join(',') });
+      res({ at: dark(bx, by), off: dark(bx, by - 220), mini: [px[0], px[1], px[2]].join(','), hid });
     })));
   }, [b.x, b.y, darkAt.toString()]);
   const l1 = await lit();
