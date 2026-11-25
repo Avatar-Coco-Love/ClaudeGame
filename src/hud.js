@@ -1,6 +1,6 @@
 // Screen-space HUD drawing (S-18 split out of render.js; behaviour unchanged): the explored-only minimap, the Nexus pointer,
 // and the touch sticks. Each takes the Renderer `r` (its canvases, camera, time and game).
-import { CELL, T, RINGS, RESOURCE, ORE_KIND, ANOMALY_KINDS, MINIMAP_WINDOW_CELLS } from './config.js';
+import { CELL, T, RINGS, RESOURCE, ORE_KIND, ANOMALY_KINDS, MINIMAP_WINDOW_CELLS, RIFT_RGB } from './config.js';
 import { markAlpha } from './research.js';
 import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
@@ -118,6 +118,25 @@ export function drawNexusPointer(r, ctx) {
     ctx.fillText('NEXUS', p.lx, p.ly + 4);
     ctx.restore();
   }
+}
+
+/** S-57b: a small violet-white chevron on the screen edge toward an open rift whose 3 × 3 pocket is wholly off screen
+ *  (the Nexus pointer's placement, kept clear of the HUD boxes and of the Nexus arrow). `r.riftPointer` is for tests. */
+export function drawRiftPointer(r, ctx) {
+  const g = r.game, o = g.rift && g.rift.open;
+  r.riftPointer = null;
+  if (!o) return;
+  const a = r.worldToScreen((o.x - 1) * CELL, (o.y - 1) * CELL), b = r.worldToScreen((o.x + 2) * CELL, (o.y + 2) * CELL);
+  if (b.x > 0 && a.x < r.w && b.y > 0 && a.y < r.h) return; // some of the pocket is on screen
+  const n = r.pointer, rects = n ? [...r.hudRects, { left: n.x - 16, right: n.x + 16, top: n.y - 16, bottom: n.y + 16 }] : r.hudRects;
+  const p = r.riftPointer = nexusPointerSpot(r.w, r.h, (a.x + b.x) / 2, (a.y + b.y) / 2, rects);
+  if (!p) return;
+  ctx.save();
+  ctx.translate(p.x, p.y); ctx.rotate(p.a);
+  ctx.strokeStyle = ctx.shadowColor = `rgb(${RIFT_RGB})`; ctx.shadowBlur = 8; ctx.lineWidth = 3; ctx.lineJoin = ctx.lineCap = 'round';
+  ctx.globalAlpha = g.settings && g.settings.reducedMotion ? 0.9 : 0.75 + Math.sin(r.time * 5) * 0.2;
+  ctx.beginPath(); ctx.moveTo(-6, -9); ctx.lineTo(6, 0); ctx.lineTo(-6, 9); ctx.stroke();
+  ctx.restore();
 }
 
 export function drawSticks(ctx, input) {

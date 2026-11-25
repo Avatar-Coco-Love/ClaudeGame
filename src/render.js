@@ -3,7 +3,7 @@
 // Terrain is cached per chunk and only redrawn when mined.
 import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS, PICKUP_FRAMES } from './config.js';
 import { markAlpha } from './research.js';
-import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
+import { paintMiniCell, drawMinimap, drawNexusPointer, drawRiftPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
 import { drawSinks } from './heatsink.js';
 import { drawWards } from './ward.js';
@@ -200,6 +200,7 @@ export class Renderer {
     ctx.restore();
 
     drawNexusPointer(this, ctx);
+    drawRiftPointer(this, ctx); // S-57b: toward an open rift off screen
     drawSticks(ctx, input);
     drawMinimap(this);
   }

@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 120** · **Version: v1.7.61** (session 120: Build; rotation: 121 Build, 122 Design, 123 Build).
+_Last updated: 2026-11-25_ · **Session counter: 121** · **Version: v1.7.62** (session 121: Build; rotation: 122 Design, 123 Build, 124 Audit).
 **Scope (D-119, `01`):** M1–M12 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy, v1.7 = M12 creatures + tools). Next: M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -14,7 +14,7 @@ _Last updated: 2026-11-25_ · **Session counter: 120** · **Version: v1.7.61** (
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch stuck 6 s fades out (D-017); kills drop a Prism half the time (D-018).
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
-- Rift (S-57a, D-156, `rift.js`): every 240–360 s (waits out weather), 45 s, a 3 × 3 rock pocket 8–12 cells out in the core's ring turns to ore (×2 yield; Shoal / Kiln 3 + 6 ▲), reverts unmined; unsaved, both modes; shimmer, minimap dot, toast. Gate `eventrun.mjs` PASS on 16 seeds (D-156). Detail: `08`.
+- Rift (S-57a, D-156, `rift.js`): every 240–360 s (waits out weather), 45 s, a 3 × 3 rock pocket 8–12 cells out in the core's ring turns to ore (×2 yield; Shoal / Kiln 3 + 6 ▲), reverts unmined; unsaved, both modes; shimmer, minimap dot, toast; S-57b (D-157): edge chevron while off screen, open / close chimes. Gate `eventrun.mjs` PASS on 16 seeds (D-156). Detail: `08`.
 - Weather (S-33, D-097, `weather.js`): every 300–420 s (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
   Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending (the cut event is saved, D-117).
 - Anomalies (S-35/36, D-099, D-101, `anomaly.js`): seed-only sites (3/5/8 by ring; a 256 world 28) in rock, kind 1/3 each: Overclock
@@ -39,15 +39,14 @@ _Last updated: 2026-11-25_ · **Session counter: 120** · **Version: v1.7.61** (
   Wards (S-56, D-153/154, `ward.js`: ▲8 ◆30, 1.2 hp / 0.8 s at the nearest creature ≤ 4 cells, both modes; a Ward kill pays no loot). Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
-  steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 22); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 22 from D-152; last D-156), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 109–113 archived in audit 119), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 22 from D-152; last D-157), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 109–113 archived in audit 119), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-56 + S-57a built (M12 done, `07-…-12/13`). M13 left: S-57b, S-58, S-59 (`07-…-14`, D-152). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-57b built (M12 done, `07-…-12/13`). M13 left: S-58, S-59 (`07-…-14`, D-152). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`, `rift.cjs`).
 
 ## Next step (one thing)
-Session 121 (Build): S-57b Rift pointer and tone (`07-Build-Specs-14.md`). `05` is at 7.5 KB: start `05-Changelog-2.md` if it would pass 8 KB.
+Session 122 (Design): play-test the rift (chevron, chimes) and re-check S-58 / S-59 in `07-Build-Specs-14.md`; spec the first M14 items (S-60+). `05` is 7.8 KB: split it before the next entry (`docs.cjs` reads `05`'s top for VERSION).

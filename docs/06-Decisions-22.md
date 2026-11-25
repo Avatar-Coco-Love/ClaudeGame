@@ -60,3 +60,11 @@ alternatives). D-152 on.
   weather off to measure the rift alone. A pocket needs all 9 cells rock / dense (stricter than the spec's list).
 - Rejected: shorter gaps (more events, not a better one); 3 × 3 → 4 × 4 (the shape is the read); a gate on 8 seeds with
   a wider band (would pass a rift worth nothing in one mode); keeping 6 ⬟ undoubled in the Kiln only (two rules by ring).
+
+### D-157 — S-57b Rift pointer: off screen = the whole pocket, kept clear of the Nexus arrow (session 121, build)
+- The chevron shows while no part of the 3 × 3 pocket is on screen (`drawRiftPointer`), placed by the Nexus pointer's
+  code (40 px inset, slid inward off HUD boxes) with the Nexus arrow added as one more box, so the two never overlap.
+  Colour `RIFT_RGB` (the shimmer's), an open chevron (not the Nexus's filled arrow shape), steady under reduced motion.
+- Chimes: sine G5 → D6 (open, vol 0.06) and D6 → G5 (close, 0.035): peak −33 / −38 dBFS, 0 % > 2 kHz (`audio.cjs` row).
+- Rejected: the Nexus pointer's 40 px inset as the "on screen" test (the chevron would sit beside a visible pocket);
+  a pointer only on the minimap (already there, S-57a); a triangle wave "glass" (energy above 2 kHz, D-039 ceilings).

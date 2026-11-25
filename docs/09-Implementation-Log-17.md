@@ -41,3 +41,12 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
 - Observed: Surge runs swing ±10 % from any change to the path (one seed 1080 vs 1419), so 8 seeds can't see a 5–10 %
   effect. Screenshot (1280 × 800): the Hearth pocket (● + ◆) outlined violet-white beside the Nexus, toast on top: reads.
 - `tests/rift.cjs` (8 node checks incl. the gate, 1 browser). Smoke 574/574 (+9).
+
+## Session 121 — Build: S-57b Rift pointer and tones (v1.7.62, D-157)
+- `hud.js` `drawRiftPointer` (after the Nexus pointer, `r.riftPointer` for tests); `audio.js` `riftOpen` / `riftClose`,
+  called from `openRift` / `closeRift`. Scanner: rift cells are ore types, so a ping marks all 9 (no new rule; tested).
+- First chevron (2 px, no glow, 0.6 alpha) read as a grey tick in the screenshot; now 3 px with an 8 px glow. Viewed at
+  1280 × 800 with the pocket off screen bottom-left: violet-white chevron next to the cyan Nexus arrow, no overlap.
+- Chimes rendered: open peak −33.1 dBFS (as loud as the Anomaly take), close −38.0, 0 % > 2 kHz, loud ≤ 0.15 s.
+- `rift.cjs` +2 (node: chimes once each + Scanner 9 marks; browser: chevron only off screen, points at the pocket,
+  gone at the close), stash-proved failing on the old code; `audio.cjs` +1 row. Smoke 577/577 (+3).

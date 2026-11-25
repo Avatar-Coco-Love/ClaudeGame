@@ -126,6 +126,9 @@ export class Audio {
   // S-14: Pulse release, a soft low thump (sine, pitch drops) that grows with the charge; a fizzle is a faint short tick.
   pulse(charge) { this.tone(150, 0.2, { type: 'sine', vol: 0.04 + 0.06 * charge, slide: -80 }); }
   overheat() { this.tone(520, 0.4, { type: 'sine', vol: 0.05, slide: -340 }); this.tone(330, 0.35, { type: 'sine', vol: 0.03, slide: -200, delay: 0.05 }); } // S-48a: a soft falling hiss-sigh (sine only: no highs)
+  // S-57b: a rift opens with a rising two-note glass chime (sine G5 then D6); it closes with the same falling, softer.
+  riftOpen() { [784, 1175].forEach((f, i) => this.tone(f, 0.35, { type: 'sine', vol: 0.06, delay: i * 0.12 })); }
+  riftClose() { [1175, 784].forEach((f, i) => this.tone(f, 0.3, { type: 'sine', vol: 0.035, delay: i * 0.12 })); }
   ventTell() { this.tone(110, 0.45, { type: 'sine', vol: 0.06, slide: 110, throttle: 0.4, key: 'vent' }); } // audit 109: a Kiln vent's tell, a soft low rising swell
   pulseFizzle() { this.tone(360, 0.05, { type: 'sine', vol: 0.025 }); }
   // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.

@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.7.62 — 2026-11-25
+- **Rifts are easier to find.** A rift off screen gets a small violet-white chevron at the screen edge that points to it,
+  and a soft rising glass chime when it opens (falling, quieter, when it closes). The Scanner marks rift ore like any ore.
+
 ## v1.7.61 — 2026-11-25
 - **Rifts (first M13 event).** Every 4–6 minutes of play a rift opens 8–12 cells from you in your ring: a 3 × 3 pocket of
   rock turns to that ring's ore for 45 s, each cell rich (twice the drops), with a shimmer, a minimap dot and a toast.
