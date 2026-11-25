@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.57 — 2026-11-25
+- **Arc Beam (Research, 35 ●).** A fourth beam mode after Pulse (Q / ⟂, a ↯ zigzag on the button). Its ray is a bit
+  weaker (0.8×), but what it hits jumps to up to 2 more of the same kind within 2 cells: crystals of the same colour
+  nearby, or the creatures next to the one you hit. Clears ore clusters ~1.35–1.45× faster than Focus; on plain rock
+  Focus is still the digger.
+
 ## v1.6.56 — 2026-11-25
 - **Mote swarms in the Shoal.** Six tiny mint diamonds now come out of the open floor every 40–60 s while you are in the
   Shoal, riding the currents. In Surge they dart at the core (4 damage a touch); in both modes a mote that touches you

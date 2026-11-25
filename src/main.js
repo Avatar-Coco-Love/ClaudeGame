@@ -194,6 +194,7 @@ function updateHud() {
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (${keys.K('beamMode')} to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
+    $('mode-glyph').textContent = BEAM_MODES[g.beamMode].glyph || '⟂'; // S-55: Arc shows a zigzag
     const pk = placeKind(g), pn = PLACE_NAME[pk]; // S-16, S-22: shown while anything is carried: the item B / ✦ places, and its count
     const lift = relayAt(g) ? 'relay' : sinkAt(g) ? 'sink' : null; // S-34, S-51: on a Relay / Heat Sink the same button picks it up (touch players have no B key)
     $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay + g.craft.sink < 1 && !lift);

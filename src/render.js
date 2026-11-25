@@ -20,6 +20,7 @@ import { drawVents } from './vent.js';
 import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
 import { drawMotes } from './mote.js';
+import { drawArcs } from './arc.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48; // at k = 1; audit 84: scaled by 1/k² (chunk canvases are pre-scaled), never under what one view needs
@@ -175,7 +176,7 @@ export class Renderer {
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
     drawBurrower(this, ctx); // S-53
-    this.drawBeam(ctx);
+    this.drawBeam(ctx); drawArcs(ctx, this.game); // S-55: Arc jumps over the ray
     drawSpireFeed(this, ctx, left, top, vw, vh); // S-20: primed facets + the fed / 80 arc
     drawEcho(this, ctx); // S-42
     this.drawPlayer(ctx);

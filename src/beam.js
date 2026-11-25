@@ -2,11 +2,12 @@
 // frame ({ ox, oy, ex, ey, target, enemy }). `beam.ex/ey/target/enemy` stay the centre ray's, so the darkness, crack overlay
 // and older checks keep working. Every mode scales from the Core Matrix Beam Power and Range stats; none adds a stat.
 import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
-  PULSE_FLASH_S, BEAM_GLITCH_MUL } from './config.js';
+  PULSE_FLASH_S, BEAM_GLITCH_MUL, CELL, ARC_MUL } from './config.js';
 import { UNBREAKABLE } from './world.js';
 import { facetAt, toggleFacet } from './spire.js';
 import { beamFoes } from './spitter.js';
 import { heatHit } from './heat.js';
+import { arcFoes, arcCells } from './arc.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -48,17 +49,20 @@ export function castBeam(game, dt) {
     ray.ex = ox + dx * dist; ray.ey = oy + dy * dist;
     return ray;
   });
+  b.arcs = mode.arc ? arcJumps(game, b.rays[0], cells, foes) : null; // S-55: arc targets join the sets, at ARC_MUL each
   // Damage is applied once per Glitch and once per cell per frame, however many rays touch it.
   for (const e of foes) {
-    e.hp -= dps * dt * BEAM_GLITCH_MUL; e.flash = 0.08;
-    if (Math.random() < dt * 40) {
+    const k = b.arcs && b.arcs.foes.has(e) ? ARC_MUL : 1;
+    e.hp -= dps * k * dt * BEAM_GLITCH_MUL; e.flash = 0.08;
+    if (k === 1 && Math.random() < dt * 40) {
       const r = b.rays.find(q => q.enemy === e);
       game.particle(r.ex, r.ey, (Math.random() - 0.5) * 160, (Math.random() - 0.5) * 160, 0.3, '#ff7a3d', 2);
     }
   }
-  for (const { hit, rays } of cells.values()) {
-    const res = game.world.hit(hit.x, hit.y, dps * dt);
-    if (res) heatHit(game, hit.x, hit.y, dps * dt); // S-48a: Kiln rock heats the core's beam
+  for (const { hit, rays, arc } of cells.values()) {
+    const amt = dps * (arc ? ARC_MUL : 1) * dt, res = game.world.hit(hit.x, hit.y, amt);
+    if (res) heatHit(game, hit.x, hit.y, amt); // S-48a: Kiln rock heats the core's beam (S-55: arcs too)
+    if (arc) { if (res && res.broken) game.onCellBroken(hit.x, hit.y, res.type); continue; }
     const target = { x: hit.x, y: hit.y, frac: res && !res.broken ? res.frac : 0 };
     for (const r of rays) r.target = target;
     if (Math.random() < dt * 45) {
@@ -68,9 +72,31 @@ export function castBeam(game, dt) {
     }
     if (res && res.broken) game.onCellBroken(hit.x, hit.y, res.type);
   }
+  if (b.arcs) b.arcs = b.arcs.lines;
   const mid = b.rays[mode.offsets.indexOf(0)];
   b.ex = mid.ex; b.ey = mid.ey; b.target = mid.target; b.midEnemy = !!mid.enemy; // B-044: the facet latch reads it
   b.enemy = mid.enemy || (b.rays.find(r => r.enemy) || {}).enemy || null;
+}
+
+/** S-55: what the Arc ray's hit jumps to, added to `cells` / `foes` (flagged as arcs). Returns { foes, lines }. */
+function arcJumps(game, ray, cells, foes) {
+  const out = { foes: new Set(), lines: [] };
+  if (ray.enemy) {
+    if (ray.enemy.bolt) return out;
+    for (const o of arcFoes(game, ray.enemy)) {
+      if (foes.has(o)) continue;
+      foes.add(o); out.foes.add(o); out.lines.push({ x1: ray.ex, y1: ray.ey, x2: o.x, y2: o.y, foe: true });
+    }
+  } else if (cells.size) {
+    const { hit } = cells.values().next().value;
+    for (const c of arcCells(game.world, hit.x, hit.y)) {
+      const k = c.y * game.world.w + c.x;
+      if (cells.has(k)) continue;
+      cells.set(k, { hit: { x: c.x, y: c.y }, rays: [], arc: true });
+      out.lines.push({ x1: ray.ex, y1: ray.ey, x2: (c.x + 0.5) * CELL, y2: (c.y + 0.5) * CELL });
+    }
+  }
+  return out;
 }
 
 // ---------- Pulse (S-14, D-042) ----------
