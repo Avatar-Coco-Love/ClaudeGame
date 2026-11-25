@@ -83,7 +83,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()', 'riftOpen()', 'riftClose()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -125,6 +125,9 @@ async function browserChecks(browser, url, check, errors) {
   check('Kiln vent tell swell: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (audit 109)', vt && vt.peakDb <= -28 && vt.above2k < 1 && vt.loudS <= 0.5, JSON.stringify(vt));
   const cr = shots['crunch()']; // S-53c: the Burrower bite crunch, a short low noise burst
   check('Burrower bite crunch: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.3 s (S-53c)', cr && cr.peakDb <= -24 && cr.peakDb > -60 && cr.above2k < 1 && cr.loudS <= 0.3, JSON.stringify(cr));
+  const ro = shots['riftOpen()'], rc = shots['riftClose()']; // S-57b: once per rift (every 4–6 min), soft sines like the Anomaly set
+  check('Rift open + close chimes: peak ≤ -24 dBFS, close ≥ 3 dB softer, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-57b)',
+    ro && rc && [ro, rc].every(v => v.peakDb <= -24 && v.peakDb > -60 && v.above2k < 1 && v.loudS <= 0.5) && rc.peakDb <= ro.peakDb - 3, JSON.stringify({ ro, rc }));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // S-53b: the Burrower rumble (held while one is within 4 cells), alone on the music bus at the default Music 50: on at

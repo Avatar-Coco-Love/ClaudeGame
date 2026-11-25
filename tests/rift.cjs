@@ -97,6 +97,19 @@ async function nodeChecks(check) {
       log.length === 2 && log[1].t === st[0] + 10 && log[1].open === null && log2.length === 0 && log3.length === 0,
       `cut ${JSON.stringify(log)}; in wake ${JSON.stringify(log2)}; ending ${log3.length}`);
   }
+  { // S-57b: the open chime plays at the open, the close chime at the close; the Scanner ping marks the pocket like ore
+    const calls = [], spy = new Proxy({}, { get: (_, k) => () => calls.push(k) }), st = riftStarts(4242, 1).map(Math.ceil);
+    const { tryScan } = await import('../src/research.js');
+    const g = new Game({ seed: 4242, mode: 'surge', audio: spy }); updateRift(g); run(g, st[0]);
+    const o = g.rift.open, opened = calls.filter(k => /^rift/.test(k)).join(',');
+    let marked = 0;
+    if (o) { at(g, o.x + 4, o.y); g.research.scanner = true; g.scan.cooldown = 0; tryScan(g);
+      marked = o.cells.filter(c => g.scan && g.scan.marks.some(m => m.x === c.x && m.y === c.y)).length; }
+    run(g, st[0] + RIFT_S + 1);
+    const both = calls.filter(k => /^rift/.test(k)).join(',');
+    check('S-57b rift: the open chime plays once at the open and the close chime once at the close; a Scanner ping marks all 9 pocket cells',
+      !!o && opened === 'riftOpen' && both === 'riftOpen,riftClose' && marked === 9, `calls ${both}, marked ${marked}`);
+  }
   { // the gate (D-156): tools/eventrun.mjs, Deep + Kiln, at its default 16 seeds × 10 min
     const out = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, '../tools/eventrun.mjs')], { encoding: 'utf8' });
     const line = out.trim().split('\n').pop();
@@ -118,6 +131,15 @@ async function browserChecks(browser, url, check, errors, shot) {
   if (shot) await pg.screenshot({ path: shot });
   const r = await pg.evaluate(() => ({ open: !!window.__lumen.game.rift.open, rects: window.__riftRects, toast: document.body.innerText.includes('A rift opened nearby') }));
   check('S-57a rift: an open pocket shimmers on screen and its toast shows', r.open && r.rects >= 9 && r.toast, JSON.stringify(r));
+  // S-57b: the chevron shows only while the pocket is wholly off screen, only while open, and points at the pocket
+  const ptr = await pg.evaluate(async () => { const L = window.__lumen, g = L.game, R = L.renderer, o = g.rift.open, wait = () => new Promise(f => setTimeout(f, 120));
+    const out = { onScreen: !!R.riftPointer }, p = g.player, home = { x: p.x, y: p.y }, C = 32;
+    Object.assign(p, { x: (o.x + 0.5) * C + 2 * R.w, y: (o.y + 0.5) * C }); p.vx = p.vy = 0; await wait(); await wait(); await wait(); await wait(); await wait(); // pocket two screen widths left of the core
+    const q = R.riftPointer; out.off = !!q; out.left = !!q && q.x < R.w / 2 && Math.abs(Math.cos(q.a) + 1) < 0.2;
+    g.stats.time = g.rift.start + 46; await wait(); out.closed = !!R.riftPointer || !!g.rift.open;
+    Object.assign(p, home); return out; });
+  check('S-57b rift: an edge chevron points to an open rift only while its pocket is off screen; none once it closes',
+    !ptr.onScreen && ptr.off && ptr.left && !ptr.closed, JSON.stringify(ptr));
   await pg.close();
 }
 

@@ -72,6 +72,7 @@ export function openRift(game) {
   });
   r.open = { k: r.k, x: s.x, y: s.y, ring: s.ring, cells, t0: game.stats.time };
   r.opened++;
+  game.audio.riftOpen(); // S-57b
   game.notify('rift-open');
   return true;
 }
@@ -82,6 +83,7 @@ export function closeRift(game) {
   if (!r.open) return;
   for (const c of r.open.cells) if (game.world.get(c.x, c.y) !== T.EMPTY) game.world.retype(c.x, c.y, c.prev); else r.mined++; // tools: cells taken
   r.open = null;
+  game.audio.riftClose(); // S-57b
   game.notify('rift-close');
 }
 
