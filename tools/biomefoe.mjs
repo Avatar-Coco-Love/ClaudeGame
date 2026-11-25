@@ -1,5 +1,5 @@
 // S-53b (D-142, D-146): the biome creature weight gate. Per seed and mode, the surgebot mine route runs `--minutes` in a
-// biome ring at the top build (base max), once with the creature and once without (`game.burrow.off`). The core starts
+// biome ring at the top build (base max), once with the creature and once without (`game.burrow.off` / `game.swarm.off`). The core starts
 // on a cleared 3×3 pad mid-ring with a Relay placed there (a top-build player banks in the biome), mines only that ring's
 // ore, and beams a surfaced Burrower like any foe. Haul = ◆-equivalent banked + still carried (◆ 1, ▲ ● 4, ≈ ⬟ 12;
 // D-146). Gate: with / without in 0.85–0.95 for each mode, and Drift within 0.05 of Surge.

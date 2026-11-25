@@ -60,4 +60,4 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
 - Gate (`biomefoe.mjs --biome=shoal`, now generic over biomes): as specced FAIL 1.08 / 1.04; shipped PASS 0.907 / 0.896
   (8), 0.910 / 0.899 (16). Kiln gate unchanged: PASS. Perf `shoal` run: 1.04× base mean (CPU ×4, 8 s).
 - Screenshot of a swarm viewed: six mint diamonds with short trails, readable in the dark Shoal.
-- Smoke: `mote.cjs` (+8: spawn, current, contact, carry, loot, mode switch / save, gate, drawn).
+- Smoke 541/541 (+8, `mote.cjs`: spawn, current, contact, carry, loot, mode switch / save, gate, drawn).
