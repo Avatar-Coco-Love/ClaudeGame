@@ -67,3 +67,13 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
   content PRs; a split spec's slices each stay usable. `CLAUDE.md` +1 line, `02` one-off note removed.
 - `05` v1.4.23–v1.4.29 archived word for word (`archive/changelog-v1.4.23-v1.4.29.md`, cap).
 - Smoke 495/495 (+6: `overdrive.cjs`).
+
+## Session 106 — Build: S-51 Heat Sink (v1.5.47, D-141)
+- `src/heatsink.js` (craft / place / pick up / load / draw / minimap), `craft.js` `PLACE_KINDS`, `heat.js` gain × `sinkMul`,
+  save format 20 (`craft.sink`, `sinks`), Craft tab row (5-ring worlds), place button `.off` + reason off Kiln floor.
+- Observed: 60 s steady fire overheats 6.0 % inside a Sink vs 16.0 % outside (spec 7.4 / 17 ± 2; the 60 s window ends
+  mid-cycle). Screenshot (1000×700) viewed: lilac pentagon under the core, dashed 5-cell floor ring, ⬠↑ button.
+- B-091 (fixed before merge): the HUD's change key lacked `craft.sink` / on-a-Sink, so the button count went stale; added.
+- `tests/heatsink.cjs` (13 checks); the inside-Sink check fails with `HEATSINK_MUL` = 1 (proved).
+- `relay.cjs` Craft-tab check now expects the Sink row after the Relay in a 256 world (rows listed exactly, as before).
+- Smoke 508/508 (+13: `heatsink.cjs`).

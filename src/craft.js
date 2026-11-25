@@ -6,10 +6,11 @@
 import { CELL, T, NEXUS_RADIUS, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_GAP, BEACON_LIGHT, BEACON_REVEAL, BEACON_RGB,
   RELAY_COST, RELAY_STOCK, RELAY_MAX, RELAY_MIN_D, RELAY_GAP, RELAY_R, RELAY_LIGHT, RELAY_RGB, PLACE_BURST } from './config.js';
 import { SPIRE_HALF } from './spire.js';
+import { sinkRefusal, sinkAt, pickUpSink, makeSink, SINK_COLOR } from './heatsink.js';
 
 export const BEACON_COLOR = `rgb(${BEACON_RGB})`; // white-cyan, on the map and in the world
 export const RELAY_COLOR = `rgb(${RELAY_RGB})`;   // S-22: cyan-white
-export const PLACE_GLYPH = { beacon: '✦', relay: '⊕' };
+export const PLACE_GLYPH = { beacon: '✦', relay: '⊕', sink: '⬠' }; // S-51: the Heat Sink's outline pentagon
 
 function makeBeacon(world, i) {
   const x = i % world.w, y = Math.floor(i / world.w);
@@ -49,10 +50,11 @@ export function makeRelay(world, i) {
   return { i, x: (x + 0.5) * CELL, y: (y + 0.5) * CELL, r: RELAY_LIGHT, glow: RELAY_RGB };
 }
 
-/** What B / ✦ places: the item crafted most recently, if still carried, else the other one carried (S-22). */
+export const PLACE_KINDS = ['beacon', 'relay', 'sink']; // S-51: every placeable; `craft.last` is one of these
+/** What B / ✦ places: the item crafted most recently, if still carried, else the first other one carried (S-22, S-51). */
 export function placeKind(game) {
-  const c = game.craft, last = c.last === 'relay' ? 'relay' : 'beacon', other = last === 'relay' ? 'beacon' : 'relay';
-  return c[last] > 0 || !(c[other] > 0) ? last : other;
+  const c = game.craft, last = PLACE_KINDS.includes(c.last) ? c.last : 'beacon';
+  return c[last] > 0 ? last : PLACE_KINDS.find(k => c[k] > 0) || last;
 }
 
 /** Why an item can't go on the core's cell now, or null if it can. Pure: tests reuse it. */
@@ -61,8 +63,9 @@ export function placeRefusal(game, kind = placeKind(game)) {
   const cx = Math.floor(p.x / CELL), cy = Math.floor(p.y / CELL), i = cy * w.w + cx;
   const relay = kind === 'relay', list = relay ? game.relays : game.beacons;
   if (game.craft[kind] < 1) return 'none';
-  if (list.length >= (relay ? RELAY_MAX : BEACON_MAX)) return 'max';
-  if (!w.inBounds(cx, cy) || w.cells[i] !== T.EMPTY || game.beacons.some(b => b.i === i) || game.relays.some(b => b.i === i)) return 'blocked';
+  if (kind !== 'sink' && list.length >= (relay ? RELAY_MAX : BEACON_MAX)) return 'max';
+  if (!w.inBounds(cx, cy) || w.cells[i] !== T.EMPTY || [game.beacons, game.relays, game.sinks].some(l => l.some(b => b.i === i))) return 'blocked';
+  if (kind === 'sink') return sinkRefusal(game, cx, cy); // S-51: Kiln floor only, HEATSINK_GAP apart
   const dn = Math.hypot((cx + 0.5) * CELL - game.nexus.x, (cy + 0.5) * CELL - game.nexus.y);
   if (dn < (relay ? RELAY_MIN_D * CELL : NEXUS_RADIUS)) return 'nexus';
   const cellsTo = b => Math.hypot(b.i % w.w - cx, Math.floor(b.i / w.w) - cy);
@@ -78,6 +81,8 @@ export function placeRefusal(game, kind = placeKind(game)) {
 export function tryPlace(game) {
   const at = relayAt(game);
   if (at) return pickUpRelay(game, at); // S-34 (D-092): B / ✦ inside a Relay's ring picks it up instead
+  const sink = sinkAt(game);
+  if (sink) return pickUpSink(game, sink); // S-51: B / ✦ on a Heat Sink picks it up
   const kind = placeKind(game), why = placeRefusal(game, kind);
   game.placeKind = kind;
   game.placeResult = why || 'placed';
@@ -86,6 +91,12 @@ export function tryPlace(game) {
   const p = game.player, w = game.world, i = Math.floor(p.y / CELL) * w.w + Math.floor(p.x / CELL);
   game.craft[kind]--;
   game.audio.beacon();
+  if (kind === 'sink') {
+    const s = makeSink(w, i);
+    game.sinks.push(s);
+    if (game.motionOn()) game.burst(s.x, s.y, PLACE_BURST.n, SINK_COLOR, PLACE_BURST.speed);
+    return true;
+  }
   if (kind === 'relay') {
     const r = makeRelay(w, i);
     game.relays.push(r);

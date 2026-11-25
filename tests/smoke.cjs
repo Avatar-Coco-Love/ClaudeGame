@@ -89,6 +89,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./vent.cjs').nodeChecks(check).catch(e => check('S-48b vent checks ran', false, e.message));
   await require('./ore.cjs').nodeChecks(check).catch(e => check('S-49 ore checks ran', false, e.message));
   await require('./overdrive.cjs').nodeChecks(check).catch(e => check('S-50 overdrive checks ran', false, e.message));
+  await require('./heatsink.cjs').nodeChecks(check).catch(e => check('S-51 heat sink checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -378,6 +379,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./vent.cjs').browserChecks(browser, url, check, errors, process.env.VENT_SHOT).catch(e => check('S-48b vent browser checks ran', false, e.message));
     await require('./ore.cjs').browserChecks(browser, url, check, errors, process.env.ORE_SHOT).catch(e => check('S-49 ore browser checks ran', false, e.message));
     await require('./overdrive.cjs').browserChecks(browser, url, check, errors, process.env.OVERDRIVE_SHOT).catch(e => check('S-50 overdrive browser checks ran', false, e.message));
+    await require('./heatsink.cjs').browserChecks(browser, url, check, errors, process.env.HEATSINK_SHOT).catch(e => check('S-51 heat sink browser checks ran', false, e.message));
     await require('./audit99.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 99 browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
     await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));
