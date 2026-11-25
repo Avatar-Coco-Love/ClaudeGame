@@ -10,7 +10,7 @@
 import {
   CELL, T, MATERIAL, NEXUS_RADIUS, KILN_RING, GLITCH_HIT_CD_S, GLITCH_LOOT_SHARDS, GLITCH_PRISM_CHANCE,
   BURROW_FIRST_S, BURROW_EVERY_S, BURROW_SPAWN_R, BURROW_STEP_S, BURROW_TELL_CELLS, BURROW_TELL_S, BURROW_UP_S, BURROW_HP,
-  BURROW_DMG, BURROW_DODGE, BURROW_ORE_R, BURROW_AWAY, BURROW_TRIP_S, BURROW_LEASH, BURROW_R, BURROW_RGB,
+  BURROW_DMG, BURROW_DODGE, BURROW_ORE_R, BURROW_AWAY, BURROW_TRIP_S, BURROW_LEASH, BURROW_R, BURROW_RGB, MUSIC_RUMBLE,
 } from './config.js';
 import { glitchTier } from './glitch.js';
 
@@ -162,6 +162,14 @@ export function updateBurrower(game, dt) {
   const ax = b.cx - pcx, ay = b.cy - pcy, ad = Math.hypot(ax, ay) || 1;
   b.gx = Math.round(b.cx + ax / ad * BURROW_AWAY); b.gy = Math.round(b.cy + ay / ad * BURROW_AWAY);
   b.state = 'away'; b.trip = 0; b.step = BURROW_STEP_S; b.ore = null;
+}
+
+/** S-53b: the rumble level for music.js: 0 with no Burrower within MUSIC_RUMBLE.cells of the core, else 0.5…1 by closeness. */
+export function burrowerRumble(game) {
+  const b = game && game.burrow && game.burrow.b;
+  if (!b) return 0;
+  const d = Math.hypot(b.x - game.player.x, b.y - game.player.y) / CELL;
+  return d > MUSIC_RUMBLE.cells ? 0 : 0.5 + 0.5 * (1 - d / MUSIC_RUMBLE.cells);
 }
 
 // ---------- drawing (render.js) ----------

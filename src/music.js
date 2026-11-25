@@ -5,7 +5,7 @@
 import { seededStream } from './world.js';
 import {
   RING_PITCH_STEP, MUSIC_RING_MAX, MUSIC_GAIN, MUSIC_ROOT_HZ, MUSIC_SCALES, MUSIC_PROGRESSIONS, MUSIC_CHORD_S, MUSIC_ATTACK_S,
-  MUSIC_RELEASE_S, MUSIC_PAD, MUSIC_BELL, MUSIC_PULSE, MUSIC_XFADE_S, MUSIC_END_FADE_S, MUSIC_LOOKAHEAD_S,
+  MUSIC_RELEASE_S, MUSIC_PAD, MUSIC_BELL, MUSIC_PULSE, MUSIC_RUMBLE, MUSIC_XFADE_S, MUSIC_END_FADE_S, MUSIC_LOOKAHEAD_S,
 } from './config.js';
 
 const LOG_MAX = 64;
@@ -48,7 +48,26 @@ export class Music {
     }
   }
 
-  // state = { ring, mode, wake, ending } or null (title screen): null / ending / Music 0 / muted fade to silence.
+  // S-53b: the Burrower rumble, built on first use and kept (one drone, never a voice in `notes`); `lv` 0…1 sets its level.
+  rumble(lv) {
+    const ctx = this.audio.ctx, R = MUSIC_RUMBLE, to = lv > 0 ? R.gain * lv : 0;
+    if (!this.drone) {
+      if (!to) return;
+      const g = ctx.createGain(), am = ctx.createGain(), f = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), depth = ctx.createGain();
+      g.gain.setValueAtTime(0, ctx.currentTime); f.type = 'lowpass'; f.frequency.value = R.lowpassHz; f.Q.value = 0.5;
+      am.gain.setValueAtTime(1 - R.wobble, ctx.currentTime); lfo.frequency.value = R.wobbleHz; depth.gain.value = R.wobble;
+      lfo.connect(depth); depth.connect(am.gain); f.connect(am); am.connect(g); g.connect(this.bus);
+      for (const [type, mul, gain] of [['sine', 1, 1 - R.triMix], ['triangle', 1.5, R.triMix]]) {
+        const o = ctx.createOscillator(), og = ctx.createGain(); o.type = type; o.frequency.value = R.hz * mul; og.gain.value = gain;
+        o.connect(og); og.connect(f); o.start();
+      }
+      lfo.start();
+      this.drone = { g, to: 0 };
+    }
+    if (Math.abs(to - this.drone.to) > 0.005) { this.drone.to = to; this.ramp(this.drone.g.gain, to, MUSIC_RUMBLE.rampS); }
+  }
+
+  // state = { ring, mode, wake, ending, rumble } or null (title screen): null / ending / Music 0 / muted fade to silence.
   update(dt, state) {
     const a = this.audio, ctx = a.ctx;
     if (!ctx || !a.master) return;
@@ -66,6 +85,7 @@ export class Music {
       // stacks on it; the layers are kept too, so a mode changed meanwhile crossfades at the next chord.
       if (!this.chord || now >= this.chord.t + this.chord.len) { this.nextChord = now; this.nextBell = now + this.between(MUSIC_BELL.gapS); this.nextPulse = now; }
     }
+    this.rumble(state.rumble || 0);
     const want = state.wake || state.mode === 'surge' ? 'pulse' : 'bell';
     if (state.wake !== this.wake && this.layer) this.setLayer(want, now); // a Wake starts/ends now, not at the next chord
     this.wake = !!state.wake; this.ring = Math.max(0, Math.min(MUSIC_RING_MAX, state.ring | 0)); this.want = want;

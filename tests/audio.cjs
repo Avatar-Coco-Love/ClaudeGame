@@ -112,6 +112,14 @@ async function browserChecks(browser, url, check, errors) {
   check('Kiln vent tell swell: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (audit 109)', vt && vt.peakDb <= -28 && vt.above2k < 1 && vt.loudS <= 0.5, JSON.stringify(vt));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
+  // S-53b: the Burrower rumble (held while one is within 4 cells), alone on the music bus at the default Music 50: on at
+  // full level 0–6 s (measured 3.5–6 s, after the bus fade-in), off at 6. A held sound: sustained ceiling, low only, and gone within 1 s of the Burrower leaving.
+  const { renderMusic } = require('./music.cjs'), kiln = rumble => ({ ring: 4, mode: 'drift', wake: false, ending: false, rumble });
+  const ru = await pg.evaluate(renderMusic, [[[0, kiln(1)], [6, kiln(0)]], 8, { only: 'rumble' }]);
+  const ruOn = ru.win.slice(70, 120), ruTail = ru.win.slice(140);
+  const rum = { onDb: Math.max(...ruOn), quietOnDb: Math.min(...ruOn), peakDb: ru.peakDb, above2k: ru.above2k, tailDb: Math.max(...ruTail) };
+  check('Burrower rumble: held ≤ -45 dBFS per 50 ms (the bed is ~-47 RMS) and audible (≥ -60), peak ≤ -38, < 1 % energy > 2 kHz, silent 1 s after it leaves (S-53b)',
+    rum.onDb <= -45 && rum.quietOnDb >= -60 && rum.peakDb <= -38 && rum.above2k < 1 && rum.tailDb < -80, JSON.stringify(rum));
   // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
   const dep = await pg.evaluate(renderSfx, ['for (let i = 0; i < 140; i++) at(i * 0.035, () => a.deposit(i)); at(4.9, () => a.depositDone(2))', 6]);
   check('a 140-item deposit is not a 5 s beep chain: loud ≤ 1 s (B-017)', dep.loudS <= 1, JSON.stringify(dep));

@@ -2,6 +2,7 @@
 import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { orderLabel } from './echo.js';
+import { burrowerRumble } from './burrower.js';
 import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, placeRefusal, relayAt, PLACE_GLYPH } from './craft.js';
@@ -471,7 +472,7 @@ function frame(now) {
     if (!paused && !game.endSeq && !endingOpen && quality.sample(gap)) renderer.setQuality(quality.level);
   }
   // S-44: the music bed follows the world (silent on the title and under the Ending sequence / card).
-  music.update(dt, game && !game.demo && !paused ? { ring: game.ringNow, mode: game.mode, wake: !!game.wake, ending: endingOpen || !!game.endSeq } : null);
+  music.update(dt, game && !game.demo && !paused ? { ring: game.ringNow, mode: game.mode, wake: !!game.wake, ending: endingOpen || !!game.endSeq, rumble: burrowerRumble(game) } : null);
   tickToast(dt);
   requestAnimationFrame(frame);
 }

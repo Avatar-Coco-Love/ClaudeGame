@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 110** · **Version: v1.6.51** (session 110: Build; rotation: 111 Build, 112 Design, 113 Build).
+_Last updated: 2026-11-25_ · **Session counter: 111** · **Version: v1.6.52** (session 111: Build; rotation: 112 Design, 113 Build, 114 Audit).
 **Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,7 +21,7 @@ _Last updated: 2026-11-25_ · **Session counter: 110** · **Version: v1.6.51** (
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
-- Burrower (S-53a, D-145, `burrower.js`): Kiln creature, both modes; tunnels, 0.8 s lilac tell, Surge lunge 22 / Drift eats ore; unsaved.
+- Burrower (S-53a/b, D-145/146, `burrower.js`): Kiln creature, both modes; tunnels, lilac tell, Surge lunge 22 / Drift eats ore; music rumble ≤ 4 cells; unsaved. Gate `tools/biomefoe.mjs`.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
@@ -54,4 +54,5 @@ _Last updated: 2026-11-25_ · **Session counter: 110** · **Version: v1.6.51** (
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 111 (Build): S-53b Burrower rumble (`audio.cjs` row) + `tools/biomefoe.mjs` Kiln gate, tune (D-145); then S-54.
+Session 112 (Design): Q-030 — the Burrower weighs nothing at the top build (`biomefoe.mjs` Drift 1.01, Surge 1.00; band
+0.85–0.95): pick its retune from the session 111 table in `09`, write it as S-53c in `07`; then S-54.

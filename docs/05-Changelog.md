@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.52 — 2026-11-25
+- **You can hear a Burrower coming.** While one is within a few cells of the core, a low wobbling rumble joins the
+  music (louder as it gets closer, gone as soon as it leaves). It follows the Music slider.
+
 ## v1.6.51 — 2026-11-25
 - **New creature: the Burrower (Kiln, new worlds).** Something tunnels through the Kiln's rock, leaving open passages
   behind it. Watch for a rock cell glowing lilac and cracking: a moment later it bursts out. In Surge it lunges at the

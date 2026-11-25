@@ -136,6 +136,14 @@ async function browserChecks(browser, url, check, errors, shot) {
   if (shot) await pg.screenshot({ path: shot });
   const n = await pg.evaluate(() => window.__tellRects);
   check('S-53 burrower: the tell glow is drawn on its rock cell', ok && n > 0, JSON.stringify({ ok, n }));
+  // S-53b: the music rumble follows it: on (level 0.5…1) within 4 cells, back to 0 once it is farther.
+  const near = await pg.evaluate(() => { const m = window.__lumen.music; return { built: !!m.drone, to: m.drone ? m.drone.to : null }; });
+  await pg.evaluate(() => { const b = window.__lumen.game.burrow.b; b.x += 32 * 8; });
+  await pg.waitForTimeout(150);
+  const far = await pg.evaluate(() => { const m = window.__lumen.music; return m.drone ? m.drone.to : null; });
+  const { MUSIC_RUMBLE: R } = await import('../src/config.js');
+  check('S-53b burrower: the music rumble is on while it is within 4 cells (3 cells: level ≥ 0.5) and off beyond',
+    near.built && near.to >= R.gain * 0.5 - 1e-9 && near.to <= R.gain + 1e-9 && far === 0, JSON.stringify({ near, far }));
   await pg.close();
 }
 
