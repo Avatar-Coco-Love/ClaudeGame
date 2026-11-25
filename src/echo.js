@@ -29,7 +29,7 @@ const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const AROUND = [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]; // blink spots, fixed order (D-025: no draw)
 
 /** The Echo for a game that owns it, placed beside the core (fading in). null without the Research. */
-export function makeEcho(game) {
+function makeEcho(game) {
   if (!game.research.echo) return null;
   const e = { x: 0, y: 0, r: ECHO_R, vx: 0, vy: 0, targetVx: 0, targetVy: 0, angle: game.player.angle, alpha: 0,
     blink: { phase: 'in', t: 0 }, field: new Int16Array(SIDE * SIDE), fx: 0, fy: 0, fieldT: 0, fieldVer: -1,
@@ -40,7 +40,7 @@ export function makeEcho(game) {
 }
 
 /** Field distance (cells) from the core's cell to cell (x, y); -1 = outside the field or not reachable within it. */
-export function fieldAt(e, x, y) {
+function fieldAt(e, x, y) {
   const lx = x - e.fx + ECHO_FIELD, ly = y - e.fy + ECHO_FIELD;
   return lx < 0 || ly < 0 || lx >= SIDE || ly >= SIDE ? -1 : e.field[ly * SIDE + lx];
 }

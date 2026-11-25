@@ -52,7 +52,7 @@ export function vaultSites(seed, w = WORLD_SIZE_OLD, h = w) {
     const a = rand() * Math.PI * 2, d = VAULT_D[0] + rand() * (VAULT_D[1] - VAULT_D[0]), kind = Math.floor(rand() * VAULT_TEMPLATES.length);
     const x = Math.floor(w / 2 + Math.cos(a) * d), y = Math.floor(h / 2 + Math.sin(a) * d);
     const H = VAULT_HALF;
-    if (x - H < BORDER || y - H < BORDER || x + H > w - BORDER - 1 || y + H > h - BORDER - 1) continue; // footprint stays inside the bedrock border
+    if (!insideBorder(x, y, H, w, h)) continue;
     if (sites.some(v => Math.hypot(v.x - x, v.y - y) < VAULT_GAP)) continue;
     const cells = [];
     VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - H + j) * w + (x - H + i)); }));
@@ -62,6 +62,9 @@ export function vaultSites(seed, w = WORLD_SIZE_OLD, h = w) {
 }
 
 // Cells the beam can never break (it sparks, no crack): the border, and a Spire's core + facets (S-19, D-049).
+/** H3 (audit 89): true when the (2·half + 1)² footprint centred on cell (x, y) lies inside the bedrock border. */
+export const insideBorder = (x, y, half, w, h) => x - half >= BORDER && y - half >= BORDER && x + half <= w - BORDER - 1 && y + half <= h - BORDER - 1;
+
 export const UNBREAKABLE = new Set([T.BEDROCK, T.SPIRE, T.FACET]);
 
 export class World {

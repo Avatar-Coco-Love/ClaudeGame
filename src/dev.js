@@ -1,8 +1,8 @@
 // Dev tools (S-7, D-027). Every action is a plain function on `window.__lumen.dev`; the panel only calls them, so bots,
 // smoke checks and the panel share one entry point. The panel exists only with `?dev` in the URL or after the backtick key.
 // Nothing here enters the save except what the actions themselves change (bank, upgrades, mode, carved cells).
-import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH } from './config.js';
-import { UNBREAKABLE } from './world.js';
+import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH, BORDER } from './config.js';
+import { UNBREAKABLE, insideBorder } from './world.js';
 import { relightSpire } from './spire.js';
 
 const ROOM = 1; // carve (2*ROOM+1)² cells: a 3×3 room around the teleport target
@@ -19,10 +19,10 @@ export function createDev(ui) {
       const game = g(), w = game.world;
       const cx = Math.floor(game.nexus.x / CELL) + Math.round(Math.cos(angle) * cells);
       const cy = Math.floor(game.nexus.y / CELL) + Math.round(Math.sin(angle) * cells);
-      // The room stays off the 2-cell bedrock border (B-013: the old clamp let it carve the inner bedrock ring).
-      const tx = Math.max(2 + ROOM, Math.min(w.w - 3 - ROOM, cx)), ty = Math.max(2 + ROOM, Math.min(w.h - 3 - ROOM, cy));
+      // The room stays off the 2-cell bedrock border (BORDER; B-013: the old clamp let it carve the inner bedrock ring).
+      const tx = Math.max(BORDER + ROOM, Math.min(w.w - BORDER - 1 - ROOM, cx)), ty = Math.max(BORDER + ROOM, Math.min(w.h - BORDER - 1 - ROOM, cy));
       // C1 (audit 49): the room never overlaps an unbreakable cell (a Spire core or facet); else the core landed inside one.
-      const clear = (x, y) => x >= 2 + ROOM && x <= w.w - 3 - ROOM && y >= 2 + ROOM && y <= w.h - 3 - ROOM
+      const clear = (x, y) => insideBorder(x, y, ROOM, w.w, w.h)
         && [...Array((2 * ROOM + 1) ** 2).keys()].every(k => !UNBREAKABLE.has(w.get(x - ROOM + k % (2 * ROOM + 1), y - ROOM + Math.floor(k / (2 * ROOM + 1)))));
       let x = tx, y = ty, best = clear(tx, ty) ? 0 : Infinity;
       for (let dy = -12; dy <= 12 && best; dy++) for (let dx = -12; dx <= 12; dx++) {

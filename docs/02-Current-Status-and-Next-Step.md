@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 88** · **Version: v1.4.28** (session 88: Build; rotation: 89 Audit, 90 Build, 91 Build, 92 Design, 93 Build).
+_Last updated: 2026-11-25_ · **Session counter: 89** · **Version: v1.4.29** (session 89: Audit; rotation: 90 Build, 91 Build, 92 Design, 93 Build, 94 Audit).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -43,10 +43,10 @@ _Last updated: 2026-11-25_ · **Session counter: 88** · **Version: v1.4.28** (s
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
 - Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 18, `size`); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-11`), `08` per-system detail.
+- History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-12`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-44 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`** (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-45 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`** (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 88** · **Version: v1.4.28** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 89 (Audit): health check per CLAUDE.md (parallel subagents: bugs, perf, mobile, code health, docs drift); archive
-`09` entries older than audit 84; then S-46 (the 256 world) is the next Build.
+Session 90 (Build): S-46 the 256 world (`07-Build-Specs-8.md`): Shoal / Kiln rings, appended sites, windowed minimap,
+perf budget. Pass `world.w` to every site helper (audit 89 watch in `04-Roadmap-2.md` Debt).
