@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, WARD_COST, WARD_STOCK, WARD_MAX, WARD_R, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { orderLabel } from './echo.js';
 import { burrowerRumble } from './burrower.js';
@@ -7,6 +7,7 @@ import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, placeRefusal, relayAt, PLACE_GLYPH } from './craft.js';
 import { sinksOn, canCraftSink, craftSink, sinkAt } from './heatsink.js';
+import { canCraftWard, craftWard, wardAt } from './ward.js';
 import { chartOn } from './chart.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { tickEnding, endingSummary, fmtTime } from './ending.js';
@@ -152,6 +153,7 @@ function hint() {
   if (primedHere(g)) return 'Beam a facet: it flips with its two neighbours. Light all 8.'; // S-28 (D-080), both input kinds
   if (relayAt(g) && g.cargoTotal() === 0 && g.craft.relay < RELAY_STOCK) return touch ? `Tap ${PLACE_GLYPH.relay}↑ to pick up this Relay` : `${keys.K('place')}: pick up this Relay`; // S-34: the button shows ⊕↑ here
   if (sinkAt(g) && g.craft.sink < HEATSINK_STOCK) return touch ? `Tap ${PLACE_GLYPH.sink}↑ to pick up this Heat Sink` : `${keys.K('place')}: pick up this Heat Sink`; // S-51
+  if (wardAt(g) && g.craft.ward < WARD_STOCK) return touch ? `Tap ${PLACE_GLYPH.ward}↑ to pick up this Ward` : `${keys.K('place')}: pick up this Ward`; // S-56
   if (g.inNexus()) return touch ? 'Tap Core Matrix to upgrade' : `Press ${keys.K('matrix')} for the Core Matrix`;
   if (g.stats.upgrades === 0 && g.bank.shard >= upgradeCost(0).shard) return touch ? 'Upgrade ready — back to the Nexus' : `Upgrade ready — press ${keys.K('matrix')} at the Nexus`; // B-010
   if (g.stats.upgrades === 0 && g.bank.shard + g.cargo.shard >= upgradeCost(0).shard) return 'Bring shards home to the Nexus to upgrade';
@@ -167,7 +169,7 @@ function updateHud() {
   const lumenSeen = seen(g, 'lumen'); // S-10: ● appears once you have held one
   const oreSeen = [seen(g, 'tide'), seen(g, 'calx')]; // S-49: ≈ / ⬟ the same way (never in a 160 world: none there)
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, g.bank.tide, g.bank.calx, oreSeen.join(), total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.sink, g.craft.last, !!sinkAt(g), g.ringNow, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught].join('|'); // S-28: the primed hint
+  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, g.bank.tide, g.bank.calx, oreSeen.join(), total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.sink, g.craft.ward, g.craft.last, !!sinkAt(g), !!wardAt(g), g.ringNow, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -196,8 +198,8 @@ function updateHud() {
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
     $('mode-glyph').textContent = BEAM_MODES[g.beamMode].glyph || '⟂'; // S-55: Arc shows a zigzag
     const pk = placeKind(g), pn = PLACE_NAME[pk]; // S-16, S-22: shown while anything is carried: the item B / ✦ places, and its count
-    const lift = relayAt(g) ? 'relay' : sinkAt(g) ? 'sink' : null; // S-34, S-51: on a Relay / Heat Sink the same button picks it up (touch players have no B key)
-    $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay + g.craft.sink < 1 && !lift);
+    const lift = relayAt(g) ? 'relay' : sinkAt(g) ? 'sink' : wardAt(g) ? 'ward' : null; // S-34, S-51: on a Relay / Heat Sink the same button picks it up (touch players have no B key)
+    $('beacon-btn').classList.toggle('hidden', g.craft.beacon + g.craft.relay + g.craft.sink + g.craft.ward < 1 && !lift);
     $('place-glyph').textContent = PLACE_GLYPH[lift || pk];
     $('beacon-count').textContent = lift ? '↑' : g.craft[pk];
     const why = !lift && pk === 'sink' ? placeRefusal(g, 'sink') : null, off = why === 'kiln'; // S-51: greyed out off Kiln floor, with the reason
@@ -267,19 +269,19 @@ let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1
 function seen(g, k) { return g.stats[k] > 0 || g.bank[k] > 0; } // a later ore's chip shows once it was ever held (Lumen's rule, S-10)
 const costHtml = c => KINDS.filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
 // S-16, S-22: placement outcomes, short so they read mid-run (D-060).
-const PLACE_NAME = { beacon: 'Beacon', relay: 'Relay', sink: 'Heat Sink' };
-const PLACE_MAX = { beacon: BEACON_MAX, relay: RELAY_MAX, sink: HEATSINK_MAX };
+const PLACE_NAME = { beacon: 'Beacon', relay: 'Relay', sink: 'Heat Sink', ward: 'Ward' };
+const PLACE_MAX = { beacon: BEACON_MAX, relay: RELAY_MAX, sink: HEATSINK_MAX, ward: WARD_MAX };
 function placeToast(kind = 'beacon', why) {
   const n = PLACE_NAME[kind];
   return { placed: `${n} placed`, none: `No ${n}s — craft at the Nexus`, blocked: 'Blocked', nexus: 'Too near the Nexus',
     near: `Too near a ${n}`, vault: 'Too near a vault', spire: 'Too near a Spire', max: `${n} limit (${PLACE_MAX[kind]})`,
     kiln: 'Only on Kiln floor', // S-51
-    picked: kind === 'sink' ? 'Heat Sink picked up' : 'Relay picked up — place it further out',
-    carrying: kind === 'sink' ? `Already carrying ${HEATSINK_STOCK} Heat Sinks` : 'Already carrying a Relay' }[why] || ''; // S-34
+    picked: kind === 'relay' ? 'Relay picked up — place it further out' : `${n} picked up`,
+    carrying: kind === 'relay' ? 'Already carrying a Relay' : `Already carrying ${kind === 'ward' ? WARD_STOCK : HEATSINK_STOCK} ${n}s` }[why] || ''; // S-34
 }
 // S-16, S-22: the Craft tab's rows. Stock, not levels: the value line says what is carried and placed.
 function craftRow(id, desc, stock, cost, can, craftIt) {
-  const g = game, row = document.createElement('div'), list = { beacon: g.beacons, relay: g.relays, sink: g.sinks }[id];
+  const g = game, row = document.createElement('div'), list = { beacon: g.beacons, relay: g.relays, sink: g.sinks, ward: g.wards }[id];
   row.className = 'upgrade'; row.dataset.id = id;
   row.innerHTML = `
     <div class="u-main"><div class="u-name">${PLACE_NAME[id]}</div><div class="u-desc">${desc} ${input.usingTouch ? `Tap ${PLACE_GLYPH[id]}` : `Press ${keys.K('place')}`} out in the caves</div>
@@ -350,6 +352,7 @@ function renderPanel() {
     list.appendChild(craftRow('beacon', `Placed light: brightens ${BEACON_LIGHT} px for good and marks the map.`, BEACON_STOCK, { prism: BEACON_COST }, canCraft, craftBeacon));
     list.appendChild(craftRow('relay', 'Banks your cargo where it stands, like the Nexus ring. No healing.', RELAY_STOCK, RELAY_COST, canCraftRelay, craftRelay));
     if (sinksOn(g)) list.appendChild(craftRow('sink', 'Kiln floor only: within 5 cells your beam heats 60 % slower.', HEATSINK_STOCK, HEATSINK_COST, canCraftSink, craftSink)); // S-51
+    list.appendChild(craftRow('ward', `Guards: bolts the nearest creature within ${WARD_R} cells it can see.`, WARD_STOCK, WARD_COST, canCraftWard, craftWard)); // S-56
   } else if (panelTab === 'research') {
     for (const r of RESEARCH) list.appendChild(researchRow(r));
     if (RESEARCH.every(r => g.research[r.id] || !canResearch(g, r.id)) && !RESEARCH.every(r => g.research[r.id])) {

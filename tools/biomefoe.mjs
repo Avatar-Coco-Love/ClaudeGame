@@ -3,10 +3,13 @@
 // on a cleared 3×3 pad mid-ring with a Relay placed there (a top-build player banks in the biome), mines only that ring's
 // ore, and beams a surfaced Burrower like any foe. Haul = ◆-equivalent banked + still carried (◆ 1, ▲ ● 4, ≈ ⬟ 12;
 // D-146). Gate: with / without in 0.85–0.95 for each mode, and Drift within 0.05 of Surge.
-// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=4] [--minutes=10] [--mode=drift,surge] [--v]
+// S-56 (D-153) `--wards=2`: both runs keep that many Wards at the dig site (every 5 s, if the core is > 3 cells from all of
+// them, they hop to open cells 2–4 cells round it, ≥ WARD_GAP apart, like a player re-placing them). Ward gate: ≤ 1.00 each.
+// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=4] [--minutes=10] [--mode=drift,surge] [--wards=0] [--v]
 import { runBot } from './surgebot.mjs';
-import { CELL, KILN_RING, UNDERTOW_RING, ORE_KIND } from '../src/config.js';
+import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, WARD_GAP } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
+import { makeWard } from '../src/ward.js';
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
 const BIOMES = { // S-54: shoal = the mote swarm
@@ -16,7 +19,21 @@ const BIOMES = { // S-54: shoal = the mote swarm
     stats: g => { const s = g.swarm; return { spawned: s.spawned, touches: s.touches, hits: s.hits, kills: s.kills, taken: s.taken, carried: s.carried, cleared: s.cleared }; } },
 };
 const biome = BIOMES[arg('biome', 'kiln')], seeds = Number(arg('seeds', 4)), minutes = Number(arg('minutes', 10));
-const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v');
+const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v'), WARDS = Number(arg('wards', 0));
+/** S-56: keep WARDS Wards within 3 cells of the core: re-placed round it when it has moved on. */
+function keepWards(g) {
+  const w = g.world, p = g.player, cx = Math.floor(p.x / CELL), cy = Math.floor(p.y / CELL);
+  if (g.wards.some(s => Math.hypot(s.x - p.x, s.y - p.y) <= 3 * CELL)) return;
+  const open = [];
+  for (let y = cy - 4; y <= cy + 4; y++) for (let x = cx - 4; x <= cx + 4; x++) {
+    const d = Math.hypot(x - cx, y - cy);
+    if (d >= 2 && d <= 4 && w.get(x, y) === T.EMPTY) open.push({ x, y });
+  }
+  const pick = [];
+  for (const c of open) if (pick.length < WARDS && pick.every(q => Math.hypot(q.x - c.x, q.y - c.y) >= WARD_GAP)) pick.push(c);
+  if (pick.length) g.wards.splice(0, g.wards.length, ...pick.map(c => makeWard(w, c.y * w.w + c.x)));
+}
+
 export const WEIGHT = { shard: 1, prism: 4, lumen: 4, tide: 12, calx: 12 };
 const worth = o => Object.entries(o).reduce((a, [k, n]) => a + (WEIGHT[k] || 0) * n, 0);
 
@@ -40,9 +57,10 @@ function run(seed, mode, creature) {
     g.bank0 = { ...g.bank };
   };
   const ore = i => game.world.rings[i] === biome.ring && biome.ore.has(ORE_KIND[game.world.cells[i]]);
-  const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', setup, ore });
+  let wt = 0; const onTick = WARDS ? (g, dt) => { if ((wt -= dt) <= 0) { wt = 5; keepWards(g); } } : null;
+  const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', setup, ore, onTick });
   const banked = {}; for (const k in game.bank) banked[k] = game.bank[k] - (game.bank0[k] || 0);
-  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, foe: biome.stats(game) };
+  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, foe: biome.stats(game), shots: game.wardShots || 0 };
 }
 
 const med = v => { const s = [...v].sort((a, b) => a - b); return s.length % 2 ? s[s.length >> 1] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
@@ -58,9 +76,9 @@ for (const mode of modes) {
   ratios[mode] = sum(on, r => r.haul) / Math.max(1e-9, sum(off, r => r.haul));
   console.log(`${mode}: haul with/without ${ratios[mode].toFixed(3)} (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
     `${Object.keys(on[0].foe).map(k => `${k} ${sum(on, r => r.foe[k])}`).join(', ')}, ` +
-    `deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, relay ${sum(on, r => r.relay)}/${seeds}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}, med haul ${med(on.map(r => r.haul)).toFixed(0)}/${med(off.map(r => r.haul)).toFixed(0)}`);
+    `deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, relay ${sum(on, r => r.relay)}/${seeds}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}, ward shots ${sum(on, r => r.shots)}, med haul ${med(on.map(r => r.haul)).toFixed(0)}/${med(off.map(r => r.haul)).toFixed(0)}`);
 }
 if (ratios.drift !== undefined && ratios.surge !== undefined) {
-  const ok = Object.values(ratios).every(r => r >= 0.85 && r <= 0.95) && Math.abs(ratios.drift - ratios.surge) <= 0.05;
-  console.log(`gate (0.85–0.95 each, modes within 0.05): ${ok ? 'PASS' : 'FAIL'} (gap ${Math.abs(ratios.drift - ratios.surge).toFixed(3)})`);
+  const ok = WARDS ? Object.values(ratios).every(r => r <= 1) : Object.values(ratios).every(r => r >= 0.85 && r <= 0.95) && Math.abs(ratios.drift - ratios.surge) <= 0.05;
+  console.log(`gate (${WARDS ? `${WARDS} Wards: ≤ 1.00 each` : '0.85–0.95 each, modes within 0.05'}): ${ok ? 'PASS' : 'FAIL'} (gap ${Math.abs(ratios.drift - ratios.surge).toFixed(3)})`);
 }

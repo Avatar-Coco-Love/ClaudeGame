@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 117** · **Version: v1.6.58** (session 117: Design; rotation: 118 Build, 119 Audit, 120 Build).
-**Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-25_ · **Session counter: 118** · **Version: v1.7.59** (session 118: Build; rotation: 119 Audit, 120 Build, 121 Build).
+**Scope (D-119, `01`):** M1–M12 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy, v1.7 = M12 creatures + tools). Next: M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -34,19 +34,20 @@ _Last updated: 2026-11-25_ · **Session counter: 117** · **Version: v1.6.58** (
   at 0.5× beam dps; never saved beyond `research.echo`. `tests/echo.cjs`, bot `tools/echobot.mjs` (strands 0, ◆/min ×1.4 mid).
   Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp / 0.8 s at the foe nearest the core ≤ 140 px); chip in the
   `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
-- Crafting (S-16, `craft.js`): Beacons (light), Relays (remote deposit, S-22/S-34), Heat Sinks (S-51, D-141, `heatsink.js`: Kiln heat gain × 0.4 within 5 cells). Detail: `08`.
+- Crafting (S-16, `craft.js`): Beacons (light), Relays (remote deposit, S-22/S-34), Heat Sinks (S-51, D-141, `heatsink.js`: Kiln heat gain × 0.4 within 5 cells),
+  Wards (S-56, D-153/154, `ward.js`: ▲8 ◆30, 1.2 hp / 0.8 s at the nearest creature ≤ 4 cells, both modes; a Ward kill pays no loot). Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
-- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 21); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 22 from D-152; last D-153), `03` questions (Q-xxx), `09` log (tail: `09-…-16`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 22); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- History: `05` changelog, `06` decisions (D-xxx, part 22 from D-152; last D-154), `03` questions (Q-xxx), `09` log (tail: `09-…-17`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, S-53c `07-…-13`, D-142, D-147; S-56 left). M13: S-57a/b, S-58, S-59 (`07-…-14`, D-152). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-56 built (M12 done, `07-…-12/13`). M13: S-57a/b, S-58, S-59 (`07-…-14`, D-152). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 118 (Build): S-56 Ward node (`07-Build-Specs-12.md`, with the Design 117 note, D-153) — closes M12 → v1.7.
-Then S-57a Rift (`07-Build-Specs-14.md`).
+Session 119 (Audit): health check per `CLAUDE.md` (archive `09` entries older than audit 114, check D-xxx vs code,
+workflow review). Then S-57a Rift (`07-Build-Specs-14.md`).

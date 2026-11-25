@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.6.58';
+export const VERSION = '1.7.59';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -358,6 +358,11 @@ export const HEAT_RGB = '255, 244, 228'; // warm white: the heat arc round the c
 // vents unchanged). B / ✦ within HEATSINK_PICK_R cells picks it up (full refund: it goes back to stock). Calx lilac.
 export const HEATSINK_COST = { calx: 6, shard: 20 }, HEATSINK_STOCK = 2, HEATSINK_MAX = 6, HEATSINK_GAP = 6, HEATSINK_R = 5, HEATSINK_MUL = 0.4, HEATSINK_PICK_R = 1.5;
 export const HEATSINK_RGB = '200, 160, 255';
+// S-56 (D-153) Ward (ward.js): crafted for WARD_COST, WARD_STOCK carried, WARD_MAX placed, on open floor outside the Nexus disc
+// ≥ WARD_GAP cells from another Ward. Every WARD_S it bolts the creature nearest it within WARD_R cells with a clear line for
+// WARD_DMG hp (a Spitter bolt in one): Glitches / Spitters (Surge), Burrowers / motes (both). Same in Drift and Surge; no light.
+export const WARD_COST = { prism: 8, shard: 30 }, WARD_STOCK = 2, WARD_MAX = 4, WARD_GAP = 6, WARD_R = 4, WARD_S = 0.8, WARD_DMG = 1.2, WARD_PICK_R = 1.5, WARD_SHOT_S = 0.14;
+export const WARD_RGB = '190, 255, 120'; // lime: the Ward's ring, ticks, shot and map mark
 // S-48b Kiln flare vents (D-129, vent.js): seed-only sites on Kiln cells, one per VENT_PER_CELLS Kiln cells, ≥ VENT_GAP apart.
 // Each cycles VENT_PERIOD_S from a seeded phase: a VENT_TELL_S tell, then a VENT_FLARE_S flare of VENT_R cells that shoves the
 // core out at HURT_KNOCKBACK and adds VENT_HEAT heat, once per flare. No damage, no cargo loss. Never saved.

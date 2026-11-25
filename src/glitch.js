@@ -41,8 +41,11 @@ export function updateGlitches(game, dt) {
     if (e.hp <= 0) { // B-023: before the give-up and contact checks, so a Glitch the beam just killed neither hits nor fades lootless
       game.stats.glitches++;
       glitchPop(game, e);
-      if (game.rng['glitch-loot']() < GLITCH_PRISM_CHANCE) game.spawnPickup(e.x, e.y, 'prism'); // D-018
-      for (let j = 0; j < GLITCH_LOOT_SHARDS + e.tier; j++) game.spawnPickup(e.x, e.y, 'shard');
+      const prism = game.rng['glitch-loot']() < GLITCH_PRISM_CHANCE; // drawn either way (D-025: draws stay independent)
+      if (!e.warded) { // D-154: a Ward's kill pays no loot
+        if (prism) game.spawnPickup(e.x, e.y, 'prism'); // D-018
+        for (let j = 0; j < GLITCH_LOOT_SHARDS + e.tier; j++) game.spawnPickup(e.x, e.y, 'shard');
+      }
       game.addShake(4);
       game.enemies.splice(i, 1);
       continue;

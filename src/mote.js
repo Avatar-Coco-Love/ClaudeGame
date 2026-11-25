@@ -114,12 +114,13 @@ function beamed(game, m) {
   const s = game.swarm;
   game.burst(m.x, m.y, 8, `rgb(${MOTE_RGB})`, 140);
   if (m.carry) { game.spawnPickup(m.x, m.y, m.carry); s.dropped++; }
-  for (let j = 0; j < MOTE_LOOT; j++) game.spawnPickup(m.x, m.y, 'shard');
+  if (!m.warded) for (let j = 0; j < MOTE_LOOT; j++) game.spawnPickup(m.x, m.y, 'shard'); // D-154: a Ward's kill: the carried item only
   s.kills++; s.beamed++;
-  if (s.beamed === SWARM_N) { // the whole swarm: the Glitch loot once
+  if (s.beamed === SWARM_N) { // the whole swarm: the Glitch loot once (not when a Ward takes the last mote, D-154)
     game.audio.enemyDie();
-    if (game.rng['swarm-loot']() < GLITCH_PRISM_CHANCE) game.spawnPickup(m.x, m.y, 'prism');
-    for (let j = 0; j < GLITCH_LOOT_SHARDS + s.tier; j++) game.spawnPickup(m.x, m.y, 'shard');
+    const prism = game.rng['swarm-loot']() < GLITCH_PRISM_CHANCE;
+    if (!m.warded && prism) game.spawnPickup(m.x, m.y, 'prism');
+    if (!m.warded) for (let j = 0; j < GLITCH_LOOT_SHARDS + s.tier; j++) game.spawnPickup(m.x, m.y, 'shard');
     s.cleared++;
   }
 }

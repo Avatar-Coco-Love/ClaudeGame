@@ -92,6 +92,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./overdrive.cjs').nodeChecks(check).catch(e => check('S-50 overdrive checks ran', false, e.message));
   await require('./heatsink.cjs').nodeChecks(check).catch(e => check('S-51 heat sink checks ran', false, e.message));
   await require('./chart.cjs').nodeChecks(check).catch(e => check('S-52 chart checks ran', false, e.message));
+  await require('./ward.cjs').nodeChecks(check).catch(e => check('S-56 ward checks ran', false, e.message));
   await require('./burrower.cjs').nodeChecks(check).catch(e => check('S-53 burrower checks ran', false, e.message));
   await require('./mote.cjs').nodeChecks(check).catch(e => check('S-54 mote checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
@@ -386,6 +387,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./overdrive.cjs').browserChecks(browser, url, check, errors, process.env.OVERDRIVE_SHOT).catch(e => check('S-50 overdrive browser checks ran', false, e.message));
     await require('./heatsink.cjs').browserChecks(browser, url, check, errors, process.env.HEATSINK_SHOT).catch(e => check('S-51 heat sink browser checks ran', false, e.message));
     await require('./chart.cjs').browserChecks(browser, url, check, errors, process.env.CHART_SHOT).catch(e => check('S-52 chart browser checks ran', false, e.message));
+    await require('./ward.cjs').browserChecks(browser, url, check, errors, process.env.WARD_SHOT).catch(e => check('S-56 ward browser checks ran', false, e.message));
     await require('./burrower.cjs').browserChecks(browser, url, check, errors, process.env.BURROW_SHOT).catch(e => check('S-53 burrower browser checks ran', false, e.message));
     await require('./mote.cjs').browserChecks(browser, url, check, errors, process.env.MOTE_SHOT).catch(e => check('S-54 mote browser checks ran', false, e.message));
     await require('./audit99.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 99 browser checks ran', false, e.message));

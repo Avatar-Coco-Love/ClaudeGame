@@ -6,6 +6,7 @@ import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
 import { drawAnomalyMarks } from './anomaly.js';
 import { drawSinkMarks } from './heatsink.js';
+import { drawWardMarks } from './ward.js';
 import { drawChartMarks } from './chart.js';
 
 const MINI_COLORS = {
@@ -64,6 +65,7 @@ export function drawMinimap(r) {
   m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown
   for (const q of g.relays) { m.beginPath(); m.arc(q.x * sc, q.y * sc, 3.5, 0, Math.PI * 2); m.stroke(); }
   drawSinkMarks(m, g, sc); // S-51: placed Heat Sinks, a lilac pentagon, always shown
+  drawWardMarks(m, g, sc); // S-56: placed Wards, a lime ring, always shown
   drawAnomalyMarks(m, g, sc); // S-37: seen sites, filled when charged, hollow while recharging
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';

@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, matrixCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, HEATSINK_STOCK, RELAY_STREAK_PX,
+import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, matrixCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, HEATSINK_STOCK, WARD_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -21,6 +21,7 @@ import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
+import { loadWards, updateWards } from './ward.js';
 import { chartOn } from './chart.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
@@ -64,9 +65,10 @@ export class Game {
     this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0, tide: 0, calx: 0 }; // lumen / tide / calx: ever picked up (the HUD shows a chip after the first)
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
-    this.craft = { beacon: 0, relay: 0, sink: 0, last: 'beacon' }; // S-16, S-22: crafted, not yet placed; `last` = what B / ✦ places
+    this.craft = { beacon: 0, relay: 0, sink: 0, ward: 0, last: 'beacon' }; // S-16, S-22: crafted, not yet placed; `last` = what B / ✦ places
     this.beacons = [];          // S-16: placed, [{ i, x, y, r }] (craft.js); also the Renderer's lightSets[0] (light.js)
     this.sinks = [];            // S-51: placed Heat Sinks, [{ i, x, y }] (heatsink.js)
+    this.wards = [];            // S-56: placed Wards, [{ i, x, y, t, shot }] (ward.js)
     this.relays = [];           // S-22: placed, [{ i, x, y, r, glow }]; the Renderer's lightSets[1]
     this.placeResult = null;    // S-16: last placement outcome, read by the HUD toast
     this.player = {
@@ -231,6 +233,7 @@ export class Game {
     if (intent.place) tryPlace(this); // S-16
     if (intent.echoOrder && cycleEchoOrder(this)) this.notify('echo-order'); // S-43
     this.updateBeam(dt, intent);
+    updateWards(this, dt); // S-56: after the beam, before the creatures' passes, so a Ward kill pays this frame
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
     updateBurrower(this, dt); // S-53: after the beam, so a kill on its last surfaced frame pays
     updateSwarm(this, dt); // S-54: after the beam, so a mote beamed this frame pays before it touches anything
@@ -455,7 +458,7 @@ export class Game {
   toSave() {
     return {
       v: SAVE_FORMAT, seed: this.world.seed, size: this.world.w, mode: this.mode,
-      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), relays: this.relays.map(b => b.i), sinks: this.sinks.map(b => b.i), stats: { ...this.stats },
+      bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), relays: this.relays.map(b => b.i), sinks: this.sinks.map(b => b.i), wards: this.wards.map(b => b.i), stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],
       spires: this.spires.map(q => ({ ...q, ...(q.keep ? { keep: [...q.keep] } : {}) })), // S-19: the whole M5 record (D-063)
@@ -489,6 +492,8 @@ export class Game {
     loadRelays(this, s.relays);
     this.craft.sink = sinksOn(this) ? Math.min(HEATSINK_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.sink)) || 0)) : 0; // S-51
     loadSinks(this, s.sinks);
+    this.craft.ward = Math.min(WARD_STOCK, Math.max(0, Math.floor(Number(s.craft && s.craft.ward)) || 0)); // S-56
+    loadWards(this, s.wards);
     loadAnomalies(this, s.anomalies, s.buffs); // S-35
     this.echoOrder = validOrder(s.echoOrder); // S-43: anything else loads as Gather (B-037)
     this.weather.cancel = Number.isInteger(s.weatherCancel) && s.weatherCancel >= 0 ? s.weatherCancel : -1; // B-081
