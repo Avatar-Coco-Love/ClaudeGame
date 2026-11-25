@@ -31,6 +31,18 @@ alternatives). D-137 on.
   splits a spec checks this (`CLAUDE.md`).
 - Rejected: a Retro session type (costs a build slot; already rejected in D-138); dropping record steps (they are the memory).
 
+### D-144 — Audit 109: vents get a tell tone; sweeps in-session; debt carried twice comes first (session 109, audit)
+- A vent's tell sounds `audio.ventTell` (110 → 220 Hz sine, 0.45 s, vol 0.06, throttle 0.4 s) once per cycle when the
+  core is ≤ `VENT_HEAR_R` 5 cells from it, in both modes alike; `audio.cjs` holds it to peak ≤ −28 dBFS (Spire tone's
+  ceiling: it repeats every 8 s). No "seen" test: the core's reveal radius covers 5 cells, so it is always seen.
+- The Chart's arrows honour the dev Undertow toggle (`undertow.off`), as the vent marks honour `vents.off`.
+- B-090 recurred (1.54×): `bigworld.cjs` pins New World's seed (1073741824, ~1.0× ×9 runs); the 1.3× bound stays.
+- D-137…D-143 checked against the code: match. Shoal / Kiln detail moved from `02` to `08` (`02` was at its cap).
+- Workflow (D-138): the last three audits ran without a subagent tool, so `CLAUDE.md` now says how to sweep in-session,
+  and a debt item two audits carried is fixed before new finds (the vent sound waited since audit 99).
+- Rejected: a tell tone for every vent in view (126 sites, 8 s cycle: a drone); a "seen" check (never false at 5 cells);
+  raising the vent's flare instead of a sound (changes balance in an audit).
+
 ### D-143 — S-52 Nexus Chart: a `kiln` row flag, a growing chunk cache, 3 draw calls (session 108, build)
 - The row is `NEXUS_UPGRADES[1]` with `kiln: true`; `chartOn(game)` = `world.profile.rings > KILN_RING` (D-140's rule:
   no size literal) hides it in the sheet, refuses `canAffordNexus` and loads a saved level as 0. Nexus buys now charge

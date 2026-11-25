@@ -5,7 +5,7 @@
 // invulnerability, either mode; Glitches, the Echo and pickups ignore flares. Nothing saved. Sites are bucketed by chunk:
 // only those round the core are stepped, only those in view (+ 3 cells) and explored are drawn; none during the Ending.
 import { CELL, CHUNK, VAULT_HALF, KILN_RING, HURT_KNOCKBACK, VENT_PER_CELLS, VENT_GAP, VENT_TRIES, VENT_PERIOD_S, VENT_TELL_S,
-  VENT_FLARE_S, VENT_R, VENT_HEAT, VENT_RGB } from './config.js';
+  VENT_FLARE_S, VENT_R, VENT_HEAT, VENT_RGB, VENT_HEAR_R } from './config.js';
 import { seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 import { overheat } from './heat.js';
@@ -38,7 +38,7 @@ export function makeVents(world, anomalies) {
     if (!buckets.has(k)) buckets.set(k, []);
     buckets.get(k).push(i);
   });
-  return { sites, buckets, stepped: 0, off: false };
+  return { sites, buckets, stepped: 0, tells: 0, off: false };
 }
 
 /** Where a vent is in its cycle at time `t`: { n (cycle number), u (seconds into it), tell 0..1, flare 0..1 (1 = just fired) }. */
@@ -56,15 +56,17 @@ function sitesIn(game, x0, y0, x1, y1) {
   return out;
 }
 
-/** Once a frame, after the beam (so a flare's overheat holds from the next frame): shove the core out of a live flare. */
+/** Once a frame, after the beam (so a flare's overheat holds from the next frame): shove the core out of a live flare.
+ *  Audit 109: a vent within VENT_HEAR_R cells (inside the core's reveal, so always seen) sounds its tell once per cycle (`audio.ventTell`, both modes alike). */
 export function updateVents(game) {
   const v = game.vents, p = game.player;
   v.stepped = 0;
   if (v.off || game.endSeq || !v.sites.length) return;
-  const cx = p.x / CELL, cy = p.y / CELL, reach = VENT_R + 1;
+  const cx = p.x / CELL, cy = p.y / CELL, reach = Math.max(VENT_R + 1, VENT_HEAR_R);
   for (const i of sitesIn(game, cx - reach, cy - reach, cx + reach, cy + reach)) {
     const s = v.sites[i], ph = ventPhase(s, game.stats.time);
     v.stepped++;
+    if (ph.tell > 0 && s.told !== ph.n && Math.hypot(cx - s.x - 0.5, cy - s.y - 0.5) <= VENT_HEAR_R) { s.told = ph.n; v.tells++; game.audio.ventTell(); }
     if (ph.flare <= 0 || s.fired === ph.n) continue;
     const dx = p.x - (s.x + 0.5) * CELL, dy = p.y - (s.y + 0.5) * CELL, d = Math.hypot(dx, dy);
     if (d > VENT_R * CELL) continue;

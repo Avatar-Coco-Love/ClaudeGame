@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 108** · **Version: v1.6.49** (session 108: Build; rotation: 109 Audit, 110 Build, 111 Build).
+_Last updated: 2026-11-25_ · **Session counter: 109** · **Version: v1.6.50** (session 109: Audit; rotation: 110 Build, 111 Build, 112 Design).
 **Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -20,10 +20,7 @@ _Last updated: 2026-11-25_ · **Session counter: 108** · **Version: v1.6.49** (
   (beam ×1.5), Lodestone (reach ×2, pull ×1.5), Ballast (cargo ×1.5) via `stat()`; kinds stack; end when a deposit banks
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
-- Undertow (S-47a, D-127, `undertow.js`): ~half the Shoal's chunks flow 30–55 px/s (seeded, unsaved), eased 0.5 s into the realized velocity; pickups ×0.5.
-  Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
-  Kiln heat (S-48a, D-130, `heat.js`): beam on Kiln rock heats (8 s → 1.2 s overheat), cools 2×; arc; reset by a death (D-131).
-  Flare vents (S-48b, D-132, `vent.js`): 126 seed Kiln sites, 8 s cycle (1 s tell, 0.6 s flare r 2.5): shove + 0.4 heat. Both unsaved.
+- Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
@@ -56,4 +53,4 @@ _Last updated: 2026-11-25_ · **Session counter: 108** · **Version: v1.6.49** (
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 109 (Audit): per `CLAUDE.md` (subagents, archive old `09`, D-xxx vs code, D-138 review); then S-53 (`07-…-12`).
+Session 110 (Build): S-53 Burrower (`07-Build-Specs-12.md`, D-142); then S-54.

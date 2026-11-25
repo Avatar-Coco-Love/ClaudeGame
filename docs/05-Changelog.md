@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.50 — 2026-11-25
+- **Kiln flare vents now sound their warning.** A vent within about five cells of the core gives a soft low rising
+  swell as it starts to glow, a second before it flares, so you can hear one coming off-screen or behind you. Once per
+  flare per vent, same in Drift and Surge, and quieter than every other cue.
+
 ## v1.6.49 — 2026-11-25
 - **New: Nexus Chart (Nexus tab, new worlds). The economy milestone is complete: v1.6.** Level 1 (≈24 ▲10) draws the
   Shoal's currents on the minimap as arrows (longer = faster) wherever you have explored; level 2 (⬟24 ▲10) marks the

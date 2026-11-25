@@ -56,7 +56,10 @@ async function browserChecks(browser, url, c, errors) {
   check('S-46b2 budget: new Game at 256 under a 4× CPU throttle, median of 3 seeds ≤ 150 ms', build[1] <= 150, `${build.map(v => v.toFixed(0)).join(' / ')} ms`);
 
   // New World is 256; the dev panel shows Ring 90 / 110 there (5 rings) and hides them in a 160 world.
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  // B-090 (audit 109): the draw ratio swings by seed (0.45–1.5×), so New World's random seed is pinned for this page.
+  await pg.evaluate(v => { const r = Math.random; Math.random = () => v; document.getElementById('new-world').click(); Math.random = r; },
+    Number(process.env.BIGWORLD_RAND || 0.5));
+  await pg.waitForTimeout(300);
   const panel = await pg.evaluate(() => {
     const L = window.__lumen, vis = () => ['Ring 90', 'Ring 110'].map(k => { const b = document.querySelector(`[data-dev="${k}"]`); return !!b && !b.classList.contains('hidden'); });
     L.dev.refresh(); const big = vis(), w = L.game.world.w;
@@ -82,11 +85,11 @@ async function browserChecks(browser, url, c, errors) {
     time(near); time(far); time(near); time(far); // warm the chunk cache at both
     const t = { near: [], far: [] };
     for (let i = 0; i < 11; i++) { t.near.push(time(near)); t.far.push(time(far)); }
-    return t;
+    t.seed = g.world.seed; return t;
   });
   const ratio = median(r.far) / median(r.near);
   check('S-46b2 budget: a 256 world draws at d 100 in ≤ 1.3× the time it draws at d 30 (relative, interleaved medians)', ratio <= 1.3,
-    `${ratio.toFixed(2)}× (${median(r.near).toFixed(2)} / ${median(r.far).toFixed(2)} ms)`);
+    `${ratio.toFixed(2)}× (${median(r.near).toFixed(2)} / ${median(r.far).toFixed(2)} ms, seed ${r.seed})`);
   await pg.close();
 }
 

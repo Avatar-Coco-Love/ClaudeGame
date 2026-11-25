@@ -23,3 +23,20 @@ Continues `09-Implementation-Log-14.md` (part 14 neared the 8 KB cap at session 
   format 20 → 21 + clamp; browser: row in 256 (buy charges ≈24 ▲10), none in 160, charted minimap draws in play.
 - Screenshot viewed (minimap ×3 at d 102): mint arrows in the Shoal band were faint at 0.85 alpha on its mint rock tint;
   raised to full alpha, 1.5 px. Warm vent dots read on the Kiln's brown. No bugs found.
+
+## Session 109 — Audit: vent tell tone, Chart dev toggle, Shoal / Kiln in 08, 09 archive (v1.6.50, D-144)
+- No subagent tool in this session: sweeps done in-session (correctness on S-50…S-52, phone sheets, docs drift).
+- Fixed debt carried since audit 99: vents had no sound. A vent ≤ 5 cells away now plays `audio.ventTell` once per
+  cycle at its tell, modes alike; `vent.cjs` check fails on the old code (proved: stash), `audio.cjs` measures it
+  −33.7 dBFS peak, 0 % > 2 kHz, loud 0.1 s (ceiling −28).
+- Chart: arrows ignored the dev `undertow.off` toggle (vents honour `vents.off`); now hidden too. No player impact.
+- Phones (probe, 320×568, 360×640, 568×320, 640×360, touch): Nexus tab with the Chart row at L0 / L1 and the Craft
+  tab with the Sink row: no row past the sheet, no page scroll. 320 Nexus shot viewed: `▲10 ⬟24` fits beside the text.
+- **B-090** (fixed): full smoke read the d 100 / d 30 draw ratio 1.54× (alone 0.99, 1.03). New World's seed is random;
+  6 pinned seeds read 0.72–0.99×. The test now pins 1073741824 (1.00–1.02× ×4); the 1.3× bound is unchanged.
+- D-137…D-143 checked against the code: match (topLevel / matrixCost, `kiln` row clamp, `sinkMul` on gain only).
+- Docs: Shoal / Kiln lines moved word for word from `02` (8185 B, at cap) to `08`; `09` sessions 99–103 archived
+  word for word (part 13 removed). Workflow review (D-138): the last three audits had no subagent tool and the vent
+  sound waited two audits, so `CLAUDE.md` says how to sweep in-session and to fix twice-carried debt first (D-144).
+  Too much: the full smoke now runs > 10 min (logged as debt). Too little: perf re-measures (none since audit 94).
+- Smoke 517/517 (+2: vent tell, its `audio.cjs` ceiling). A first full run read B-090; baseline on `main` 515 checks.

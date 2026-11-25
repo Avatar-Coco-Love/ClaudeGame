@@ -70,7 +70,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -108,6 +108,8 @@ async function browserChecks(browser, url, check, errors) {
   const an = [shots['anomaly()'], shots['anomalyEnd()']];
   const oh = await pg.evaluate(renderSfx, ['a.overheat()', 1.5]); // S-48a: the Kiln overheat hiss
   check('Kiln overheat hiss: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-48a)', oh.peakDb <= -24 && oh.above2k < 1 && oh.loudS <= 0.5, JSON.stringify(oh));
+  const vt = shots['ventTell()']; // audit 109: plays every 8 s per nearby vent, so held to the Spire tone's ceiling
+  check('Kiln vent tell swell: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (audit 109)', vt && vt.peakDb <= -28 && vt.above2k < 1 && vt.loudS <= 0.5, JSON.stringify(vt));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // A full hold (140 items, one every 35 ms as game.updateDeposit does). Old: loud 4.4 s. New: 0.35 s.
