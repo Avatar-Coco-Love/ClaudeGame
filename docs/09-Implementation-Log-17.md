@@ -68,4 +68,4 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
 - Probe (`lock.cjs`, top build): plain vault 1.50 s, lock 2.91 s mean over 32 phases = **1.94×** (≤ 2× PASS). The spec's
   2 s × 1.5 gave 2.48×, so tuned (D-159). Screenshot of the tell viewed: orange shell edge reads in the core's light,
   dimmer past it (same layer as the vents; fine, the cycle is learned up close).
-- `tests/lock.cjs` (6 node + 1 browser checks), failing on the old code (no `lock.js`).
+- `tests/lock.cjs` (6 node + 1 browser checks), failing on the old code (no `lock.js`). Smoke 584/584 (+7).
