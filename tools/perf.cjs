@@ -12,7 +12,9 @@
 // inside each step (a 1-pixel getImageData before and after) for an honest split, at the cost of slower frames; SKIP
 // prices a step by the frame time it frees (that step becomes a no-op).
 // S-41: QUALITY=0|1|2 fixes the graphics level (default 0; Auto is off so the run measures one level).
-// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge|far|kiln|shoal] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
+// Audit 124: scan (base with the Scanner ring kept sweeping: a fresh ring every 0.7 s, the time it is on screen);
+// VP=phone runs at 390×844 DSF 3 (the renderer caps dpr at 2 on L0) instead of 1280×800 DSF 1.
+// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [VP=phone] [ONLY=home|base|loot|holes|surge|far|kiln|shoal|scan] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
 const path = require('path');
 const { chromium } = require('playwright');
 
@@ -22,11 +24,12 @@ const FLUSH = process.env.FLUSH === '1';
 const SKIP = (process.env.SKIP || '').split(',').filter(Boolean); // e.g. SKIP=drawLight: price a step by the frame time it frees
 const server = require('../tests/serve.cjs').createServer(ROOT);
 
+const VP = process.env.VP === 'phone' ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 3 } : { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 };
 const QUALITY = Math.max(0, Math.min(2, Number(process.env.QUALITY) || 0));
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];
 
-async function run(browser, url, name, { loot, holes, home, surge, far, kiln, shoal }) {
-  const pg = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
+async function run(browser, url, name, { loot, holes, home, surge, far, kiln, shoal, scan }) {
+  const pg = await browser.newPage(VP);
   const errors = []; pg.on('pageerror', e => errors.push(e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
@@ -35,7 +38,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
   await pg.click('#new-world');
   await pg.evaluate(() => { Math.random = window.__rnd; });
   await pg.waitForTimeout(300);
-  await pg.evaluate(({ loot, holes, home, surge, far, kiln, shoal, STEPS, SKIP, FLUSH, QUALITY }) => {
+  await pg.evaluate(({ loot, holes, home, surge, far, kiln, shoal, scan, STEPS, SKIP, FLUSH, QUALITY }) => {
     const { game: g, renderer: R, dev, quality } = window.__lumen;
     quality.mode = 'fixed'; R.setQuality(QUALITY); // S-41: no Auto steps mid-run
     g.demo = true; dev.god(true); if (!home) dev.teleport(kiln ? 110 : shoal ? 92 : far ? 100 : 30); // S-46b2: far = d 100 (deep Shoal of a 256 world); kiln = d 110
@@ -52,6 +55,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
       while (surge && g.enemies.length < 9) { const a = k++ * 2.4, d = 250 + (k % 5) * 125; // GLITCH_CAP, tier 1, spread on and off screen
         g.enemies.push({ x: g.player.x + Math.cos(a) * d, y: g.player.y + Math.sin(a) * d, r: 11, vx: 0, vy: 0, tier: 1, hp: 3, maxHp: 3, speed: 90, dmg: 0, spin: 0, flash: 0, hitCd: 0.5, wander: a, alert: false }); }
       if (kiln && !g.burrow.b) g.burrow.timer = 0; // audit 114: a Burrower always digging, telling or up nearby
+      if (scan && (!g.scan.ring || g.scan.age > 0.7)) g.scan = { cooldown: 99, age: 0, x: g.player.x, y: g.player.y, ring: true, marks: [], end: 999 }; // audit 124
       if (shoal && !g.swarm.motes.length) g.swarm.timer = 0; // S-54: a mote swarm always out (god mode: they keep coming back)
       if (!loot) return;
       g.cargo.shard = g.cargo.prism = 0; // never cap out, so pickups keep flowing
@@ -65,7 +69,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
-  }, { loot, holes, home, surge, far, kiln, shoal, STEPS, SKIP, FLUSH, QUALITY });
+  }, { loot, holes, home, surge, far, kiln, shoal, scan, STEPS, SKIP, FLUSH, QUALITY });
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   if (loot) { await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s'); }
@@ -92,11 +96,12 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
-  console.log(`S-15 perf: 1280×800 DSF 1, L${QUALITY}, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
-  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true }, shoal: { loot: false, holes: 0, shoal: true } };
+  console.log(`S-15 perf: ${VP.viewport.width}×${VP.viewport.height} DSF ${VP.deviceScaleFactor}, L${QUALITY}, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
+  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true }, shoal: { loot: false, holes: 0, shoal: true } , scan: { loot: false, holes: 0, scan: true } };
   const out = {};
   for (const [k, v] of Object.entries(runs)) if (!ONLY || ONLY === k) out[k] = await run(browser, url, k, v);
   if (out.base && out.loot) console.log(`loot / base mean frame: ${(out.loot.mean / out.base.mean).toFixed(2)}×`);
+  if (out.base && out.scan) console.log(`scan / base mean frame: ${(out.scan.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.surge) console.log(`surge / base mean frame: ${(out.surge.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.far) console.log(`far / base mean frame: ${(out.far.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.kiln) console.log(`kiln / base mean frame: ${(out.kiln.mean / out.base.mean).toFixed(2)}×`);
