@@ -89,8 +89,11 @@ function beaten(game, b) {
   game.burst(b.x, b.y, 22, `rgb(${BURROW_RGB})`, 220);
   game.audio.enemyDie();
   for (const [kind, n] of Object.entries(b.ate)) for (let i = 0; i < n; i++) game.spawnPickup(b.x, b.y, kind);
-  if (game.rng['burrower-loot']() < GLITCH_PRISM_CHANCE) game.spawnPickup(b.x, b.y, 'prism');
-  for (let j = 0; j < GLITCH_LOOT_SHARDS + b.tier; j++) game.spawnPickup(b.x, b.y, 'shard');
+  const prism = game.rng['burrower-loot']() < GLITCH_PRISM_CHANCE;
+  if (!b.warded) { // D-154: a Ward's kill gives back the belly only
+    if (prism) game.spawnPickup(b.x, b.y, 'prism');
+    for (let j = 0; j < GLITCH_LOOT_SHARDS + b.tier; j++) game.spawnPickup(b.x, b.y, 'shard');
+  }
   game.addShake(4);
   s.kills++; s.b = null; s.timer = nextGap(game);
 }

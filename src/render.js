@@ -6,6 +6,7 @@ import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
 import { drawSinks } from './heatsink.js';
+import { drawWards } from './ward.js';
 import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { endingView, drawOverview } from './ending.js';
@@ -171,6 +172,7 @@ export class Renderer {
     drawBeacons(this, ctx, left, top, vw, vh); // S-16
     drawRelays(this, ctx, left, top, vw, vh); // S-22
     drawSinks(this, ctx, left, top, vw, vh); // S-51
+    drawWards(this, ctx, left, top, vw, vh); // S-56
     this.drawCrack(ctx);
     drawShatter(this, ctx); // S-47b: a faint line from a broken Shoal cell into the one it cracked
     this.drawPickups(ctx, left, top, vw, vh);

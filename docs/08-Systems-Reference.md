@@ -9,6 +9,8 @@ update the line here when a system changes. Decisions live in `06`, specs in `07
   Echo (30●, S-42, D-112, `src/echo.js`): follows down a 24-cell BFS field, blinks beside the core when > 10 cells / sealed off / stuck 1.5 s; Gathers exposed ore ≤ 5 cells from the core at 0.5× beam dps. `tools/echobot.mjs`. Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp bolt / 0.8 s at the foe nearest the core ≤ 140 px, clear line); saved `echoOrder`.
 - Crafting (S-16, D-043, D-060): Craft tab, Beacon 5▲ (carry 3); B / ✦ places one on the core's cell (open, outside the ring,
   ≥ 4 cells apart, ≤ 20): permanent 140 px light (`game.beacons` in `R.lightSets`, `light.js`, D-067), minimap dot, floor glow (S-25, D-061). Code `craft.js`.
+  Wards (S-56, D-153, D-154, `ward.js`): ▲8 ◆30, carry 2, ≤ 4, ≥ 6 cells apart, not the Nexus disc; every 0.8 s 1.2 hp at the
+  nearest creature ≤ 4 cells with a clear line (both modes); a Ward kill drops carried / eaten ore, no loot. Saved `wards` (22).
   Relays (S-22, D-076): 40◆ + 12▲, carry 1, ≤ 3, d ≥ 24, 16 cells from Relays / vault centres / Spire footprints; cargo
   within 64 px banks like the Nexus (`game.atDeposit()`), no heal; B / ⊕↑ in a ring picks it up (S-34, D-093); ⊕ glyph, 100 px light, minimap ring. B places `craft.last`.
 - Vaults (S-9, D-031): 6 sealed 7×7 rooms at d 50–72 (seed-only sites); the centre cache bursts 20◆ + 6▲. Old saves skip seen vaults (`vaultSkip`).

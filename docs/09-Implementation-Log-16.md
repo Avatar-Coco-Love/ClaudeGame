@@ -1,6 +1,6 @@
 # 09 — Implementation Log, part 16
 
-Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 111). Newest at the bottom; read the tail only.
+Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 111). Newest at the bottom; read the tail only. Continued in `09-Implementation-Log-17.md` (118 on).
 
 ## Session 112 — Design: Q-030 Burrower retune, S-53c (v1.6.53, D-147)
 - Play-test: `tools/biomefoe.mjs` (Kiln, top build) with temporary env switches in `burrower.js` / `config.js`, reverted

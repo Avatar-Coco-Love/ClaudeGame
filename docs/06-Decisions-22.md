@@ -25,3 +25,16 @@ alternatives). D-152 on.
   unchanged. Added gate: `biomefoe.mjs` with 2 Wards at the dig site stays ≤ 1.00 in each mode.
 - Rejected: a Drift-only "ore guard" range (no creature hunts loose ore alone any more, except motes carrying
   pickups, which the same 4-cell bolt already covers).
+
+### D-154 — S-56 Ward: a Ward's kill pays no loot (session 118, build)
+- As specced (Ward kills paid the beam's loot), `biomefoe.mjs --wards=2` failed its ≤ 1.00 gate in the Kiln: Surge
+  1.066 (Drift 0.806); Shoal 0.908 / 0.879. The Ward finished the surfaced Burrower after each lunge and its Glitch loot
+  turned the creature into income. Rule now: a creature whose last hp a Ward's bolt takes (`warded`) drops only what it
+  carried or ate (a mote's item, the Burrower's belly), never the kill loot (◆, ▲, a mote's 1 ◆, a swarm's bonus). The
+  loot draw still happens (D-025). Counts as a kill (`stats.glitches`). Same in Drift and Surge.
+- Measured after (8 seeds × 10 min, 2 Wards kept at the dig site): Kiln 0.833 / 0.876, Shoal 0.889 / 0.883: PASS.
+  No Wards: Kiln 0.866 / 0.905, Shoal 0.907 / 0.896. The spec expected a lift; the bot already beams every creature it
+  reaches, so a Ward's kill mostly takes loot the beam would have had. Its worth is hull and attention, not haul.
+- Rejected: halving Ward damage (a Ward too weak to finish a mote swarm does nothing for a player who isn't beaming);
+  Wards ignore the Burrower (one creature exempt is a rule to learn, and the Burrower is the one that hurts most);
+  loot for Glitches only (the Shoal / Kiln creatures and Glitches would follow two rules).
