@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_COUNT, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
+import { CELL, WORLD_W, WORLD_H, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_COUNT, VAULT_HALF, BORDER, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -51,10 +51,11 @@ export function vaultSites(seed, w = WORLD_W, h = WORLD_H) {
   for (let t = 0; t < VAULT_TRIES && sites.length < VAULT_COUNT; t++) {
     const a = rand() * Math.PI * 2, d = VAULT_D[0] + rand() * (VAULT_D[1] - VAULT_D[0]), kind = Math.floor(rand() * VAULT_TEMPLATES.length);
     const x = Math.floor(w / 2 + Math.cos(a) * d), y = Math.floor(h / 2 + Math.sin(a) * d);
-    if (x - 3 < 2 || y - 3 < 2 || x + 3 > w - 3 || y + 3 > h - 3) continue; // footprint stays inside the bedrock border
+    const H = VAULT_HALF;
+    if (x - H < BORDER || y - H < BORDER || x + H > w - BORDER - 1 || y + H > h - BORDER - 1) continue; // footprint stays inside the bedrock border
     if (sites.some(v => Math.hypot(v.x - x, v.y - y) < VAULT_GAP)) continue;
     const cells = [];
-    VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - 3 + j) * w + (x - 3 + i)); }));
+    VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - H + j) * w + (x - H + i)); }));
     sites.push({ x, y, kind, cells });
   }
   return sites;
@@ -92,9 +93,10 @@ export class World {
 
   stampVault(v) {
     const rows = VAULT_TEMPLATES[v.kind];
-    for (let j = 0; j < 7; j++) for (let i = 0; i < 7; i++) {
+    const H = VAULT_HALF, n = 2 * H + 1;
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
       const ch = rows[j][i];
-      if (ch !== ' ') this.cells[(v.y - 3 + j) * this.w + (v.x - 3 + i)] = ch === '#' ? T.VAULT : ch === 'C' ? T.CACHE : T.EMPTY;
+      if (ch !== ' ') this.cells[(v.y - H + j) * this.w + (v.x - H + i)] = ch === '#' ? T.VAULT : ch === 'C' ? T.CACHE : T.EMPTY;
     }
   }
 
@@ -126,7 +128,7 @@ export class World {
       for (let x = 0; x < this.w; x++) {
         const i = y * this.w + x;
         const d = Math.hypot(x + 0.5 - this.cx, y + 0.5 - this.cy);
-        if (x < 2 || y < 2 || x >= this.w - 2 || y >= this.h - 2) { this.cells[i] = T.BEDROCK; continue; }
+        if (x < BORDER || y < BORDER || x >= this.w - BORDER || y >= this.h - BORDER) { this.cells[i] = T.BEDROCK; continue; }
         if (d < 6.5) { this.cells[i] = T.EMPTY; continue; }
         // Caves open up with distance; close to the nexus it's mostly solid so the first tunnels are yours.
         const openness = Math.min(1, Math.max(0, (d - 8) / 30));

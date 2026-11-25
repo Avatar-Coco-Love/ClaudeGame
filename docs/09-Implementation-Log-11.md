@@ -36,3 +36,12 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
 - `09-…-9` + session 78 archived word for word (`archive/2026-11-24-09-sessions-74-78.md`).
 - Smoke: run 1 413/416 (VERSION raced a changelog edit; B-074 beacon dot ×2, passes alone); run 2 416/416.
 
+
+## Session 85 — Build: weather cancel survives a reload, layout numbers to config (v1.4.25, #92)
+- **B-081** a Wake (or the ending) cancels the weather event in progress via `weather.cancel`, which wasn't saved: a
+  reload inside that event's 40 s brought it back. Now saved as `weatherCancel` (format 17, step 16 → 17; D-117).
+  New `weather.cjs` check (Wake cuts storm 1, save, reload: off; storm 2 still starts) failed on the old code
+  ("after reload on"), passes now. The D-097 "reload mid-event resumes" check still passes.
+- Config: `BORDER` (2) and `VAULT_HALF` (3) now live in `config.js`; world / spire / anomaly / craft read them
+  (craft's `- 4` is `SPIRE_HALF`). Same comparisons, so every seed's world is unchanged (`world.cjs` passes).
+- Smoke: 417/417 (was 416; +1 B-081 check). No visual change, so no screenshot.

@@ -86,7 +86,7 @@ export class Game {
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
-    this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); never saved
+    this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); only `cancel` is saved (B-081)
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
@@ -421,6 +421,7 @@ export class Game {
       cycle: this.cycle, records: this.records, // S-29
       anomalies: { ...this.anomaly.taken }, buffs: [...this.buffs], // S-35
       echoOrder: this.echoOrder, // S-43
+      weatherCancel: this.weather.cancel, // B-081: the event a Wake / the ending cancelled stays cancelled after a reload
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
   }
@@ -445,6 +446,7 @@ export class Game {
     loadRelays(this, s.relays);
     loadAnomalies(this, s.anomalies, s.buffs); // S-35
     this.echoOrder = validOrder(s.echoOrder); // S-43: anything else loads as Gather (B-037)
+    this.weather.cancel = Number.isInteger(s.weatherCancel) && s.weatherCancel >= 0 ? s.weatherCancel : -1; // B-081
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }
     for (const [k, x, y, kp] of (Array.isArray(s.pickups) ? s.pickups : []).filter(Array.isArray)) this.pickups.push({ x, y, vx: 0, vy: 0, kind: KINDS[k] || 'shard', age: 1, r: 4, kept: kp === 1 });

@@ -3,12 +3,11 @@
 // Matrix stat (`game.stat()` asks `buffMul`) until the next deposit that banks ≥ 1 item (Nexus or Relay); not a death, not
 // a mode switch, not a timer. A taken site recharges ANOMALY_RECHARGE_S of `stats.time` later.
 // Saved: `anomalies` (site index -> recharge time, taken ones only) and `buffs` (active kind ids).
-import { CELL, T, ANOMALY_COUNTS, ANOMALY_D, ANOMALY_GAP, ANOMALY_CLEAR, ANOMALY_TRIES, ANOMALY_TAKE, ANOMALY_RECHARGE_S,
+import { CELL, T, VAULT_HALF, BORDER, ANOMALY_COUNTS, ANOMALY_D, ANOMALY_GAP, ANOMALY_CLEAR, ANOMALY_TRIES, ANOMALY_TAKE, ANOMALY_RECHARGE_S,
   ANOMALY_KINDS, LIGHT_RADIUS } from './config.js';
 import { seededStream, vaultSites } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 
-const VAULT_HALF = 3; // vault footprints are 7×7
 const KIND_IDS = Object.keys(ANOMALY_KINDS); // overclock, lodestone, ballast
 
 /** Sites for a freshly generated World (call before Spires are stamped or a save is applied): [{ x, y, ring, kind }] in
@@ -23,7 +22,7 @@ export function anomalySites(world) {
     for (let t = 0, n = 0; t < ANOMALY_TRIES && n < count; t++) {
       const a = rand() * Math.PI * 2, d = d0 + rand() * (d1 - d0);
       const x = Math.floor(cx + Math.cos(a) * d), y = Math.floor(cy + Math.sin(a) * d);
-      if (x < 3 || y < 3 || x > w - 4 || y > h - 4) continue;
+      if (x <= BORDER || y <= BORDER || x >= w - BORDER - 1 || y >= h - BORDER - 1) continue; // one cell clear of the bedrock
       const dc = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
       if (dc < d0 || dc > d1 || world.ring(x, y) !== ring) continue;
       const c = world.cells[y * w + x];
