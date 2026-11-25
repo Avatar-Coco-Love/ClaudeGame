@@ -31,3 +31,12 @@ update the line here when a system changes. Decisions live in `06`, specs in `07
   Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
   Kiln heat (S-48a, D-130, `heat.js`): beam on Kiln rock heats (8 s → 1.2 s overheat), cools 2×; arc; reset by a death (D-131).
   Flare vents (S-48b, D-132, `vent.js`): 126 seed Kiln sites, 8 s cycle (1 s tell, 0.6 s flare r 2.5): shove + 0.4 heat. Both unsaved. A vent ≤ 5 cells (`VENT_HEAR_R`) sounds its tell once a cycle (`audio.ventTell`, audit 109, D-144).
+- PWA, Graphics, Keys, Text (moved word for word from `02` in Design 112):
+- PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
+  from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
+- Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
+  D-110: a step down that doesn't beat 0.85 × its p90 is undone and Auto stops stepping down (30 Hz caps); DPR ≤ 1 skips L1.
+- Keys (S-39, D-106, `keys.js`/`keysui.js`): read by position (`e.code`, AZERTY-safe); Settings → Keys rebinds eleven
+  actions (clash swaps, Esc cancels, Reset) into `settings.keys`; arrows/Esc/Enter/Tab fixed; labels follow the bindings.
+- Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
+  `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).

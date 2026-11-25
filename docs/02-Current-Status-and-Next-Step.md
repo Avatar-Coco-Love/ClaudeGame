@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 111** · **Version: v1.6.52** (session 111: Build; rotation: 112 Design, 113 Build, 114 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 112** · **Version: v1.6.53** (session 112: Design; rotation: 113 Build, 114 Audit, 115 Build).
 **Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,9 +21,8 @@ _Last updated: 2026-11-25_ · **Session counter: 111** · **Version: v1.6.52** (
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
-- Burrower (S-53a/b, D-145/146, `burrower.js`): Kiln creature, both modes; tunnels, lilac tell, Surge lunge 22 / Drift eats ore; music rumble ≤ 4 cells; unsaved. Gate `tools/biomefoe.mjs`.
-- PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
-  from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
+- Burrower (S-53a/b, D-145/146, `burrower.js`): Kiln creature, both modes; tunnels, lilac tell, Surge lunge 22 / Drift eats ore; music rumble ≤ 4 cells; unsaved. Gate `tools/biomefoe.mjs` fails today; S-53c fixes it (D-147).
+- PWA (S-38), Graphics Auto / High / Low (S-41), rebindable Keys (S-39), Large text + colour-blind pairs (S-40): `08`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
   Ending fades out; Music slider (`settings.music`, default 50).
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020); short landscape phones: two columns (D-118).
@@ -37,22 +36,16 @@ _Last updated: 2026-11-25_ · **Session counter: 111** · **Version: v1.6.52** (
 - Crafting (S-16, `craft.js`): Beacons (light), Relays (remote deposit, S-22/S-34), Heat Sinks (S-51, D-141, `heatsink.js`: Kiln heat gain × 0.4 within 5 cells). Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
-- Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
-  D-110: a step down that doesn't beat 0.85 × its p90 is undone and Auto stops stepping down (30 Hz caps); DPR ≤ 1 skips L1.
-- Keys (S-39, D-106, `keys.js`/`keysui.js`): read by position (`e.code`, AZERTY-safe); Settings → Keys rebinds eleven
-  actions (clash swaps, Esc cancels, Reset) into `settings.keys`; arrows/Esc/Enter/Tab fixed; labels follow the bindings.
-- Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
-  `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 21); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 21 from D-145), `03` questions (Q-xxx), `09` log (tail: `09-…-15`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 21 from D-145), `03` questions (Q-xxx), `09` log (tail: `09-…-16`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, D-142). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, S-53c `07-…-13`, D-142, D-147). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 112 (Design): Q-030 — the Burrower weighs nothing at the top build (`biomefoe.mjs` Drift 1.01, Surge 1.00; band
-0.85–0.95): pick its retune from the session 111 table in `09`, write it as S-53c in `07`; then S-54.
+Session 113 (Build): S-53c Burrower retune (`07-Build-Specs-13.md`, D-147): gap 20–30, tunnel ore pays nothing, Drift
+heads for the core and bites 4 cargo items (lost); then `biomefoe.mjs` must PASS. Then S-54.
