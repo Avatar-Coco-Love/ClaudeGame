@@ -40,3 +40,12 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
   (256 minimap pixels: core gold, Nexus white). New checks fail on old code (no `miniWindow` / `exploredBox`).
 - Smoke 435/435 (was 431; +4 worldsize). Screenshots viewed: ending overview 1280×800, 256 minimap far out.
 
+## Session 92 — Design: M10 specs refined from measurements (v1.4.32, D-124)
+- Flip simulated (served `config.js` rewritten to 256), CPU ×4: `new Game` 160 / 256 = 38 / 67 ms median; save
+  9.5 / 22.8 KB, fixed-length (explore all doesn't grow it); frame d 100 / d 30 = 0.94–0.99 at High, Auto off.
+- Observed: with Auto on, the same probe read d 100 at +10 %, +43 %, +15 % (Auto stepping): perf checks fix the level.
+- Spec bugs found: S-48's 6 s / 1.5 s / 0.4 heat vents 29 % of steady fire (its cap was 20 %) → 8 s / 1.2 s / 0.25 =
+  17 %; S-47 named `deeprun` for a haul cost it can't measure → new `haulrun`; Undertow 70 px/s cost a level-0 core
+  37 % upstream → 30–55. S-46b2 absorbs the audit 89 site-helper Debt; Ring 90 / 110 dev buttons.
+- Play-test screenshots d 100 / d 115 of a live 256 New World viewed: minimap window keeps Nexus + core; no errors.
+- Smoke: see PR (docs only; +0 checks).

@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 91** · **Version: v1.4.31** (session 91: Build; rotation: 92 Design, 93 Build, 94 Audit, 95 Build).
+_Last updated: 2026-11-25_ · **Session counter: 92** · **Version: v1.4.32** (session 92: Design; rotation: 93 Build, 94 Audit, 95 Build, 96 Build).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -46,7 +46,7 @@ _Last updated: 2026-11-25_ · **Session counter: 91** · **Version: v1.4.31** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-12`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-45 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`** (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-45 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, S-46b2 / S-47 / S-48 refined in `-9` (D-124) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 91** · **Version: v1.4.31** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 92 (Design): play-test, then refine S-46b2 (`07-Build-Specs-8.md`, D-123: perf budget checks, then
-`WORLD_SIZE_NEW` = 256) and S-47/48 specs. Pass `world.w` to every site helper (Debt).
+Session 93 (Build): S-46b2 (`07-Build-Specs-9.md`, D-124): site helpers lose their 160 default, perf budget checks,
+Ring 90 / 110 dev buttons, then `WORLD_SIZE_NEW` = 256.

@@ -8,10 +8,11 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-45** World size as saved data (v1.4.28, format 18; old saves stay 160, pinned hash). Spec in `07-Build-Specs-8.md`.
 - ✅ **S-46a** Shoal / Kiln rings, palettes, appended vaults (d 86–118) + Anomalies at 256, dev-only (v1.4.30, D-122).
 - ✅ **S-46b1** Minimap 160-cell window round the core, ending overview frames the explored area (v1.4.31, D-123).
-- **S-46b2** The 256 world goes live: perf budget checks, then `WORLD_SIZE_NEW` = 256.
+- **S-46b2** The 256 world goes live: site helpers lose their 160 default (audit 89 Debt), perf budget checks, then
+  `WORLD_SIZE_NEW` = 256. S-46b2 / S-47 / S-48 refined in `07-Build-Specs-9.md` (Design 92, D-124).
   (Moved from "Later": *Larger world with lazy chunk generation*; eager generation measured enough, Q-025.)
-- **S-47** Shoal: brittle glass (a break cracks one neighbour) + Undertow currents + its music progression.
-- **S-48** Kiln: beam heat that vents + flare vents + its music progression.
+- **S-47** Shoal: brittle glass (a break cracks one neighbour) + Undertow currents (30–55 px/s) + its music + `haulrun`.
+- **S-48** Kiln: beam heat that vents (8 s, 17 % steady) + flare vents + its music progression.
 
 ## M11 — Economy
 - One resource per biome (Shoal / Kiln ore cells, own glyph shape + colour, pass `colours.cjs`), counted in bank / cargo
