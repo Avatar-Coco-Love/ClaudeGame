@@ -4,6 +4,10 @@ Per-system detail of what is built, moved word for word from `02` in audit 69 (s
 update the line here when a system changes. Decisions live in `06`, specs in `07`.
 
 ## Systems
+- Rift (S-57a, D-156, `rift.js`): event k at the sum of k + 1 gaps 240 + rand × 120 s (`rng['rift']`, a start in weather waits
+  for its end), 45 s: a 3 × 3 all-rock pocket 8–12 cells out in the core's ring (`rng['rift-site']`, 40 tries, no Anomaly /
+  vent / Nexus) turns to ore (`RIFT_ORE`, `RIFT_MAJOR` [6,6,6,3,3]), each cell 2 yield rolls; standing cells revert at the
+  close (`world.retype`). Unsaved: a reload mid-rift skips it; a Wake / the ending cancels. Bots: `runBot({ rift })`, gate `eventrun.mjs` (16 seeds).
 - Lumen (S-10, D-033): gold ● at d ≥ 55 (~141 per world). Research tab (S-11, D-034) spends it: Scanner (10●) = F / ◎ ping, ore + unopened vault caches (S-12, D-040) within 12 cells for 6 s, 20 s cooldown.
   Beam modes (`src/beam.js`, Q / ⟂ cycles): Wide (25●, D-041) 3 rays 0.45× each, 0.75× reach; Pulse (40●, D-052) charge → burst, pierce 3, 1.5× reach; a full charge waits for a target in reach (S-21, D-059); Arc (35●, S-55, D-151, `arc.js`) 0.8× ray + 2 jumps × 0.5 to the same kind ≤ 2 cells (most cracked ore first; creatures, never bolts).
   Echo (30●, S-42, D-112, `src/echo.js`): follows down a 24-cell BFS field, blinks beside the core when > 10 cells / sealed off / stuck 1.5 s; Gathers exposed ore ≤ 5 cells from the core at 0.5× beam dps. `tools/echobot.mjs`. Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp bolt / 0.8 s at the foe nearest the core ≤ 140 px, clear line); saved `echoOrder`.

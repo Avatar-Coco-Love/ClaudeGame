@@ -38,7 +38,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   twice). A generic Swarm / Burrower outside the biomes is not planned (Q-029 holds Glitch tiers past 3).
 
 ## M13 — Events and puzzles (specced, `07-Build-Specs-14.md`, D-152)
-- **S-57a** Rift: every 240–360 s a 3 × 3 pocket of the ring's best ore opens 8–12 cells out for 45 s; gate `eventrun.mjs`.
+- ✅ **S-57a** Rift: every 240–360 s a 3 × 3 ore pocket 8–12 cells out for 45 s, double yield; gate PASS on 16 seeds (v1.7.61, D-156).
 - **S-57b** Rift pointer (edge chevron) + open / close tones.
 - **S-58** Flare Lock: a Kiln outer vault's shell cuts only in a 2 s soft window of its 8 s cycle.
 - **S-59** Tide Lock: a Shoal outer vault's shell cuts only against the current. M13 done → v1.8.

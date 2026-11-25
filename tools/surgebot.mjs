@@ -58,10 +58,11 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
 
 // S-53b: `setup(g)` runs once before the clock (biomefoe: start in a biome, place a Relay); `ore(i)` replaces the mine
 // route's ore test (cell index -> bool). A surfaced Burrower counts as a foe in both modes (a player beams it).
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', echo = false, onTick = null, setup = null, ore = null }) {
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', rift = 'off', echo = false, onTick = null, setup = null, ore = null }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
   for (const s of g.anomaly.sites) if (anomaly !== 'on' && s.kind !== anomaly) s.void = true; // S-36: off / one kind only
   if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
+  if (rift !== 'on') g.rift.force = 'off'; // S-57a (D-156): rifts only when asked (eventrun), so older gates keep their numbers
   for (const u of UPGRADES) g.upgrades[u.id] = LEVELS[build] ? (LEVELS[build][u.id] || 0) : u.max;
   g.player.integrity = g.stat('hull');
   if (route === 'spire') g.bank.prism = bank;

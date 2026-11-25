@@ -8,6 +8,7 @@ import { drawAnomalyMarks } from './anomaly.js';
 import { drawSinkMarks } from './heatsink.js';
 import { drawWardMarks } from './ward.js';
 import { drawChartMarks } from './chart.js';
+import { drawRiftMark } from './rift.js';
 
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44],
@@ -67,6 +68,7 @@ export function drawMinimap(r) {
   drawSinkMarks(m, g, sc); // S-51: placed Heat Sinks, a lilac pentagon, always shown
   drawWardMarks(m, g, sc); // S-56: placed Wards, a lime ring, always shown
   drawAnomalyMarks(m, g, sc); // S-37: seen sites, filled when charged, hollow while recharging
+  drawRiftMark(m, g, sc); // S-57a: an open rift's pocket
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();

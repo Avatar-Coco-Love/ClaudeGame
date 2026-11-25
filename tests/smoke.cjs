@@ -80,6 +80,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./surgebot.cjs').nodeChecks(check).catch(e => check('S-30 surge bot checks ran', false, e.message));
   await require('./spitter.cjs').nodeChecks(check).catch(e => check('S-32 spitter checks ran', false, e.message));
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
+  await require('./rift.cjs').nodeChecks(check).catch(e => check('S-57a rift checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
   await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
@@ -391,6 +392,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./ward.cjs').browserChecks(browser, url, check, errors, process.env.WARD_SHOT).catch(e => check('S-56 ward browser checks ran', false, e.message));
     await require('./burrower.cjs').browserChecks(browser, url, check, errors, process.env.BURROW_SHOT).catch(e => check('S-53 burrower browser checks ran', false, e.message));
     await require('./mote.cjs').browserChecks(browser, url, check, errors, process.env.MOTE_SHOT).catch(e => check('S-54 mote browser checks ran', false, e.message));
+    await require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message));
     await require('./audit99.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 99 browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
     await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));

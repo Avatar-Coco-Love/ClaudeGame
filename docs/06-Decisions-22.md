@@ -47,3 +47,16 @@ alternatives). D-152 on.
   seeds), Shoal (`mote.cjs`). `audit119.cjs` checks the default and the no-verdict guard.
 - Rejected: 16 seeds as the gate (closer to converged, but doubles ~75 s of smoke time already over budget); keeping 4 as
   a quick default with a note (the next session read a FAIL as a regression, twice: sessions 118 and this lead).
+
+### D-156 — S-57a Rift: double-yield pockets, Shoal / Kiln 3 + 6, a 16-seed gate (session 120, build)
+- As specced (6 + 3, one yield roll), `eventrun.mjs` read Deep 1.026 / 0.965, Kiln 1.034 / 1.053 (8 seeds): under the
+  1.04–1.12 band; ~1.3 rifts per 10 min, the bot mines ~75 % of the cells. Tuned the pocket's ore first, as the spec says:
+  every rift cell rolls its yield twice (`RIFT_BONUS` 1, `riftBonus`), and the Shoal / Kiln pocket is 3 ≈ / ⬟ + 6 ▲
+  (`RIFT_MAJOR` [6, 6, 6, 3, 3]): at 6 ⬟ + 3 ▲ doubled Kiln read 1.116 / 1.130 (16 seeds), undoubled 1.037 / 1.050.
+- The gate is defined on 16 seeds, not D-155's 8: a rift moves the haul 5–12 %, less than one Surge run's swing (±10 %,
+  one seed 1080 vs 1419). 8 seeds put Deep Surge at 1.034 with the final numbers; 16: Deep 1.092 / 1.089, Kiln 1.079 /
+  1.078 PASS; 24: Deep 1.073 / 1.077, Kiln 1.094 / 1.097. Fewer seeds = no verdict. Smoke cost ~45 s (`rift.cjs`).
+- Bots: `runBot` takes `rift` ('off' by default), so older gates keep their numbers; `eventrun.mjs` turns creatures and
+  weather off to measure the rift alone. A pocket needs all 9 cells rock / dense (stricter than the spec's list).
+- Rejected: shorter gaps (more events, not a better one); 3 × 3 → 4 × 4 (the shape is the read); a gate on 8 seeds with
+  a wider band (would pass a rift worth nothing in one mode); keeping 6 ⬟ undoubled in the Kiln only (two rules by ring).
