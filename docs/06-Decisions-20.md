@@ -21,3 +21,20 @@ alternatives). D-137 on.
   places?) and acts on it through its PRs (note in `02`). Standing: every Audit session adds a short workflow review to
   the code audit, findings in `09`, changes as D-xxx (`CLAUDE.md`). Kept apart from D-136 (merged; never edited).
 - Rejected: a separate "Retro" session type (a sixth slot in the rotation costs a build PR every cycle).
+
+### D-139 — Workflow review of PRs #101–#112 (session 105, D-138 one-off, orchestrator)
+- Mix: 6 builds, 2 design, 3 audits, 1 test-tooling, 1 rules-only docs PR (#112). Too much: meta / rules-only PRs (a
+  whole PR for one owner rule) and per-PR record churn. Too little: player-usable results per slice (S-49 shipped ores
+  that stayed unspendable until S-50: a dead currency for a PR).
+- Rules: (1) an owner rule or process change rides in the next content PR, never a PR of its own (`CLAUDE.md` made
+  explicit). (2) When a spec is split, each slice leaves the player something usable end to end; a Design session that
+  splits a spec checks this (`CLAUDE.md`).
+- Rejected: a Retro session type (costs a build slot; already rejected in D-138); dropping record steps (they are the memory).
+
+### D-140 — S-50 Overdrive: a profile flag and a load clamp (session 105, build)
+- "256 world only" is `WORLD_PROFILES[size].overdrive` (false for 160), read by `Game.topLevel(u)` = max + `over`; the
+  sheet, `canAfford` and the save load all use it. `matrixCost(u, l)` = the old curve below max, `OVERDRIVE_COST` past it;
+  a buy charges every kind in `KINDS`. A saved level loads as an integer ≥ 0 clamped to `topLevel` (B-037 rule).
+- Rejected: testing `world.w === 256` (a size literal in game code; profiles hold what differs by size); a separate
+  `overdrive{}` save field (spec: none new, the level just passes max); dev `maxAll` to the top (stays at base max, so
+  dev tools still reach the Overdrive rows the way a player does).

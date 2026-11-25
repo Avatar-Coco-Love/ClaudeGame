@@ -55,3 +55,14 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
 - B-090 (watch): first full smoke 488/489, `bigworld.cjs` draw ratio 2.08× once; alone 1.02× ×2; rerun 489/489.
 - Smoke 489/489 (+6: B-089 phones).
 - Follow-up docs PR (v1.5.45, D-138): owner rule, a workflow self-assessment (one-off note in `02`; every Audit, `CLAUDE.md`).
+
+## Session 105 — Build: S-50 Core Matrix Overdrive (v1.5.46, D-139, D-140)
+- `over: 2` on all six `UPGRADES`, `OVERDRIVE_COST`, `matrixCost()`, `WORLD_PROFILES[].overdrive`, `Game.topLevel()`;
+  `canAfford` / `buy` work over every kind; the sheet adds hollow `.od` pips once a row hits max; saved levels clamp on load.
+- Observed: stats at max + 2 match the spec exactly (6.5 dps, 288, 398, 170, 288, 340); the three-price button fits at
+  320×568, 360×640 and 640×360 (no overflow, no page scroll; scratch probe). 1000×700 and 320 sheet shots viewed: two
+  hollow pips after the 8 / 6 filled ones, `◆120 ≈5 ⬟5` on the button, unmaxed rows unchanged.
+- `tests/overdrive.cjs` (6 checks): needs `matrixCost` / `topLevel`, so it fails on the old code.
+- Workflow review (D-138 one-off, done by the orchestrator over PRs #101–#112) recorded as D-139: owner rules ride in
+  content PRs; a split spec's slices each stay usable. `CLAUDE.md` +1 line, `02` one-off note removed.
+- `05` v1.4.23–v1.4.29 archived word for word (`archive/changelog-v1.4.23-v1.4.29.md`, cap).

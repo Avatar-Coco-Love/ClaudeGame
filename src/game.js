@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
+import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, matrixCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -144,17 +144,19 @@ export class Game {
   /** Where cargo banks: the Nexus ring or a Relay's (S-22). Healing, the Matrix and Glitch repel stay the Nexus's alone. */
   atDeposit() { return this.inNexus() || !!relayAt(this); }
 
+  /** S-50: the highest level of a Core Matrix upgrade here: max, + its Overdrive levels in a 256 world. */
+  topLevel(u) { return u.max + (this.world.profile.overdrive ? u.over : 0); }
   canAfford(id) {
     const lvl = this.upgrades[id];
     const u = UPGRADES.find(u => u.id === id);
-    if (lvl >= u.max) return false;
-    const c = upgradeCost(lvl);
-    return this.bank.shard >= c.shard && this.bank.prism >= c.prism;
+    if (lvl >= this.topLevel(u)) return false;
+    const c = matrixCost(u, lvl);
+    return KINDS.every(k => this.bank[k] >= (c[k] || 0));
   }
   buy(id) {
     if (!this.canAfford(id)) return false;
-    const c = upgradeCost(this.upgrades[id]);
-    this.bank.shard -= c.shard; this.bank.prism -= c.prism;
+    const c = matrixCost(UPGRADES.find(u => u.id === id), this.upgrades[id]);
+    for (const k of KINDS) this.bank[k] -= c[k] || 0;
     this.upgrades[id]++;
     this.stats.upgrades++;
     if (id === 'hull') this.player.integrity = this.stat('hull');
@@ -457,7 +459,7 @@ export class Game {
     for (let i = 0; i < n; i++) if (w.broken[i]) w.cells[i] = T.EMPTY;
     Object.assign(this.bank, s.bank);
     Object.assign(this.cargo, s.cargo);
-    for (const k of Object.keys(this.upgrades)) if (s.upgrades && s.upgrades[k] != null) this.upgrades[k] = s.upgrades[k];
+    for (const u of UPGRADES) { const v = s.upgrades && s.upgrades[u.id]; if (Number.isInteger(v) && v >= 0) this.upgrades[u.id] = Math.min(v, this.topLevel(u)); } // S-50: clamped to the top level (B-037)
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     Object.assign(this.stats, s.stats || {});
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
