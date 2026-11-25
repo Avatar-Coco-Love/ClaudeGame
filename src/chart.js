@@ -21,7 +21,7 @@ function chunkKnown(game, c, i) {
 /** Explored, flowing chunk indices in the cell box [x0, x1) × [y0, y1); `fresh` re-checks the unknown ones. */
 export function chartedChunks(game, x0, y0, x1, y1, fresh = true) {
   const w = game.world, u = game.undertow, out = [];
-  if (!u) return out;
+  if (!u || u.off) return out; // audit 109: the dev Undertow toggle hides the arrows too (vents already honour `off`)
   const c = game.chart || (game.chart = { known: new Uint8Array(w.chunksW * w.chunksH), at: -Infinity });
   const cx0 = Math.max(0, Math.floor(x0 / CHUNK)), cy0 = Math.max(0, Math.floor(y0 / CHUNK));
   const cx1 = Math.min(w.chunksW - 1, Math.floor((x1 - 1) / CHUNK)), cy1 = Math.min(w.chunksH - 1, Math.floor((y1 - 1) / CHUNK));

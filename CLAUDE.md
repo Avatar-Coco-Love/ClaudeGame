@@ -3,7 +3,7 @@
 This repo is a game designed, built, reviewed, merged, and deployed **entirely by Claude**. The owner gives feedback (chat or
 `docs/inbox/`); Claude decides what gets built and how (D-119). Don't wait for replies: ship one PR, leave clean notes for the next session.
 
-Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/workflows/pages.yml` on every push to `main`).
+Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `pages.yml` on every push to `main`).
 
 ## Session loop (every session)
 0. **Unattended runs:** a scheduled task may start a session with nobody present. It does exactly one PR, then stops, with a
@@ -19,7 +19,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
    update `docs/02` (increment the session counter, set exactly one next task), add an entry to `docs/09` (what changed, what you observed, bugs as B-xxx).
    Log any decision in `docs/06` (D-xxx, with rejected alternatives). Move roadmap items in `docs/04`. Add open questions to `docs/03` (Q-xxx).
 6. **Ship:** commit, push to the session's designated branch, open a PR against `main` (body: what/why/verification), merge it yourself
-   (the owner explicitly authorized self-merge), then confirm the Pages deploy run succeeded with the GitHub Actions tools.
+   (owner-authorized), then confirm the Pages deploy run succeeded with the GitHub Actions tools.
    If the branch is behind `main`, merge `main` into it. **Never force-push.** Never rewrite `main` history.
 
 ## Session types (rotate by the counter in docs/02)
@@ -31,10 +31,11 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
   docs drift vs code). Verify each finding yourself before acting on it. Fix the top issues in one PR and log the rest in `docs/04` under "Debt".
   Also: archive `09` entries older than the last audit into `docs/archive/` (word for word), and check every D-xxx in `06` still matches the code.
   Plus a short workflow review (D-138): too much of what, too little of what? Findings in `09`, changes as D-xxx.
+  No subagent tool? Sweep in-session, newest code first; fix debt two audits carried first (D-144).
 
 ## Context discipline
-- Don't read whole files you don't need: Grep, or read line ranges. Read only the tail of `docs/09`.
-- Delegate broad exploration, reviews, and audits to subagents and keep only their conclusions. Run independent subagents in parallel.
+- Don't read whole files: Grep or read line ranges (`docs/09`: the tail only).
+- Delegate broad exploration, reviews and audits to subagents (in parallel when independent); keep only their conclusions.
 - One PR per session is the norm. If you notice your context getting large, wrap up: ship what works and write the handoff in `docs/02`.
 - **Hard cap: at most 3 PRs per conversation (D-095).** You can't see your token count, so count PRs. After the 3rd,
   update `docs/02` and stop, even if more were asked for: tell the user to continue in a new conversation.
@@ -48,7 +49,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - **No account memory tools** (`mcp__memory__*`) in this project: the repo docs are the memory (owner's ask, keeps context small).
 - **Verify cheaply:** iterate with one test file (`node tests/<x>.cjs`); run the full smoke once before the PR (again
   after a fix), printing only FAIL lines + the count. One screenshot per visual change. Never print whole files or long output.
-- Keep `docs/02` under ~60 lines: the handoff note, not a history (that is `09`).
+- Keep `docs/02` under ~60 lines: a handoff note, not a history (`09`).
 - A file past ~600 lines gets split in that session's work.
 
 ## Tracking across versions
@@ -75,5 +76,5 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - Saves: when the save shape changes, bump `SAVE_FORMAT` and add an upgrade step in `src/save.js` plus a smoke check (D-005). Never strand an existing player's save.
 - No new runtime dependencies or build steps without a design-session decision recorded in `docs/03`. The game is static files.
 - Vanilla JS ES modules, no frameworks. Keep tuning numbers in `src/config.js`.
-- Debug handle: `window.__lumen` (`game`, `renderer`, `input`). Tests rely on it.
-- Do not create original-game recreations or use other games' names/art/levels. This game's identity is its own.
+- Debug handle `window.__lumen` (`game`, `renderer`, `input`): tests rely on it.
+- No recreations of other games and none of their names / art / levels: this game's identity is its own.

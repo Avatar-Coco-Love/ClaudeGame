@@ -11,7 +11,7 @@ async function nodeChecks(check) {
   const { ventSites, ventPhase } = await import('../src/vent.js');
   const { chooseSpires, SPIRE_HALF } = await import('../src/spire.js');
   const { vaultSites } = await import('../src/world.js');
-  const { CELL, T, KILN_RING, VAULT_HALF, HURT_KNOCKBACK, VENT_GAP, VENT_PER_CELLS, VENT_PERIOD_S, VENT_FLARE_S, VENT_HEAT, VENT_R } = await import('../src/config.js');
+  const { CELL, T, KILN_RING, VAULT_HALF, HURT_KNOCKBACK, VENT_GAP, VENT_PER_CELLS, VENT_PERIOD_S, VENT_FLARE_S, VENT_HEAT, VENT_R, VENT_TELL_S } = await import('../src/config.js');
   const make = (mode = 'drift', seed = 4242) => { const g = new Game({ seed, mode, audio: quiet }); g.undertow.off = true; return g; };
   const hash = a => { let h = 2166136261; for (let i = 0; i < a.length; i++) h = Math.imul(h ^ a[i], 16777619); return h >>> 0; };
 
@@ -71,6 +71,17 @@ async function nodeChecks(check) {
     const o = atFlare('drift', VENT_R + 0.1).g, log = step(o, 40);
     check('S-48b vents: +0.4 heat can trigger an overheat; a core outside 2.5 cells is untouched',
       g.heatState.over > 0 && log.every(e => e.vx === 0 && e.heat === 0), JSON.stringify({ over: g.heatState.over, outside: log[0] }));
+  }
+  { // audit 109: a vent within VENT_HEAR_R cells sounds its tell once per cycle; farther: silent; modes equal
+    const tells = (mode, off, k = 9 * 60) => {
+      const { g, s } = atFlare(mode, off);
+      g.stats.time -= VENT_TELL_S + 0.1;
+      for (let i = 0; i < k; i++) { g.player.x = (s.x + 0.5 + off) * CELL; g.player.y = (s.y + 0.5) * CELL; g.player.vx = g.player.vy = 0; step(g); }
+      return g.vents.tells;
+    };
+    const r = { drift: tells('drift', 4), surge: tells('surge', 4), one: tells('drift', 4, 90), far: tells('drift', 5.6) };
+    check('audit 109 vents: a vent ≤ 5 cells away sounds its tell once per cycle (equal in Drift and Surge); 5.6 cells away: silent',
+      r.drift === 2 && r.surge === 2 && r.one === 1 && r.far === 0, JSON.stringify(r));
   }
   {
     const { g } = atFlare('drift', 1.5); step(g);
