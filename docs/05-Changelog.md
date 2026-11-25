@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.5.42 — 2026-11-25
+- **Nothing changes on screen yet.** The next update's plan is written: the Shoal and the Kiln each get their own ore
+  (Tide ≈ and Calx ⬟), spent on two Overdrive levels past every Core Matrix max, a Kiln Heat Sink you can craft, and a
+  Nexus Chart that maps currents and flare vents.
+
 ## v1.5.41 — 2026-11-25
 - **Nothing changes on screen.** Behind the scenes, every test now shares one small web server instead of eleven
   copies of it, so the checks that keep each release playable are simpler to maintain.

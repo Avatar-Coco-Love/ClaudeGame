@@ -20,3 +20,12 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
 - Observed: the copies had drifted (some lacked `decodeURIComponent`, the root guard, or `.json` / `.svg` types); the
   shared one has all, plus a 404 for directories. Ran each file alone: all pass (heat / undertow / vent `--browser`).
 - Smoke 476/476 (+1: the pasted-server guard).
+
+## Session 102 — Design: M11 Economy specs S-49…S-52 (v1.5.42, D-134)
+- Play-test (Playwright, `?dev`, 256 world, upgrades 4): Ring 90 and Ring 110, 5 s of digging each. Kiln screenshot
+  viewed: dark ember / rose rock, the heat hint shows, heat 0.62 after ~5 s; the ore on screen is the same ◆▲● as the
+  Deep. 0 page errors.
+- Supply (scratch Node probe over `World`, 40 seeds × 256): ROCK + DENSE Shoal ~5470, Kiln ~11270; crystal ~3380,
+  prism ~3170, Lumen ~500 cells. Candidate re-types at x/5 noise: Shoal 0.76 → 266 (174–359), Kiln 0.79 → 328
+  (211–477, 194 inside d 128). ΔE probe on candidate colours: '#d8fff0' and '#c8a0ff' chosen (≥ 33 vs ring edges).
+- Docs: `07-Build-Specs-11.md` (new), `04-Roadmap-3` M11 rewritten (Anchor cut), Q-028 added, D-134. No code.

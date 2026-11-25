@@ -44,3 +44,17 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
 - A rule broken twice gets a check: `docs.cjs` fails if any other `tests/*.cjs` calls `http.createServer`.
 - Rejected: leave the copies (they drifted: MIME maps, decode, `startsWith` guard differed); route standalone runs through
   `smoke.cjs --only` (the full smoke's setup is minutes; one file must stay seconds).
+
+### D-134 — M11 Economy design: two biome ores, four specs, two cuts (session 102, Design; Q-028)
+- Play-test (256, teleport + mine at Ring 90 / 110, mid build): the Shoal and Kiln differ only in rock, flow and heat;
+  their ore is the same ◆▲● as the Deep, so the outer rings give no reason to *mine* there. Hence one ore each:
+  Tide ≈ (Shoal, cut 0.76) and Calx ⬟ (Kiln, cut 0.79), re-typed last on ROCK / DENSE (D-033's pattern), measured
+  over 40 seeds: ≈ 266 (174–359), ⬟ 328 (211–477). Sinks priced so all of M11 ≤ 70 % of the poorest seed.
+- Specs S-49 (ores, format 19), S-50 (Overdrive: +2 levels on every Core Matrix row), S-51 (Heat Sink, format 20),
+  S-52 (Nexus Chart, format 21; closes M11 at v1.6) in `07-Build-Specs-11.md`. Colours picked by measuring ΔE under
+  `colours.cjs`'s four visions: both clear every Shoal / Kiln edge (≥ 33); vs ◆ / ▲ they rely on shape (wave, pentagon).
+- Nexus Chart is paid in ≈ / ⬟ + ▲, superseding D-009's "Prisms only" for that row alone. Radiance is unchanged.
+- Rejected: the Current Anchor (haulrun measured the Undertow at ×1.00 per round trip, D-127/D-130: calming it buys
+  nothing); an M11 Research row (no new kind of thing needs one; ~400● spare waits for M12's beam mode); biome ore
+  from Glitch kills (Q-028, leaning no); a converter between ores (would make the biomes interchangeable); scaling
+  ore hp by ring (D-033 kept ore hp fixed); Overdrive in a 160 world (no biome ore there: hidden, never stranded).
