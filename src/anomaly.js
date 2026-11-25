@@ -3,7 +3,7 @@
 // Matrix stat (`game.stat()` asks `buffMul`) until the next deposit that banks ≥ 1 item (Nexus or Relay); not a death, not
 // a mode switch, not a timer. A taken site recharges ANOMALY_RECHARGE_S of `stats.time` later.
 // Saved: `anomalies` (site index -> recharge time, taken ones only) and `buffs` (active kind ids).
-import { CELL, T, VAULT_HALF, BORDER, ANOMALY_COUNTS, ANOMALY_D, ANOMALY_GAP, ANOMALY_CLEAR, ANOMALY_TRIES, ANOMALY_TAKE, ANOMALY_RECHARGE_S,
+import { CELL, T, VAULT_HALF, BORDER, ANOMALY_D, ANOMALY_GAP, ANOMALY_CLEAR, ANOMALY_TRIES, ANOMALY_TAKE, ANOMALY_RECHARGE_S,
   ANOMALY_KINDS, LIGHT_RADIUS } from './config.js';
 import { seededStream, vaultSites } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
@@ -17,7 +17,7 @@ export function anomalySites(world) {
   const blocks = [...vaultSites(seed, w, h).map(v => ({ x: v.x, y: v.y, r: VAULT_HALF + ANOMALY_CLEAR })),
     ...chooseSpires(seed, null, null, w, h).map(s => ({ x: s.x, y: s.y, r: SPIRE_HALF + ANOMALY_CLEAR }))];
   const out = [];
-  ANOMALY_COUNTS.forEach((count, ring) => {
+  world.profile.anomalies.forEach((count, ring) => {
     const [d0, d1] = ANOMALY_D[ring];
     for (let t = 0, n = 0; t < ANOMALY_TRIES && n < count; t++) {
       const a = rand() * Math.PI * 2, d = d0 + rand() * (d1 - d0);

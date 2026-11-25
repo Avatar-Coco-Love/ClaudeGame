@@ -6,9 +6,9 @@
 // Saves written before formats were tracked have no `v`; they are format 1.
 import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
-import { WORLD_W, WORLD_H } from './config.js';
+import { WORLD_SIZE_OLD, WORLD_PROFILES } from './config.js';
 
-export const SAVE_FORMAT = 17;
+export const SAVE_FORMAT = 18;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -28,11 +28,12 @@ export const STEPS = [
   s => ({ ...s, anomalies: {}, buffs: [] }), // 14 -> 15: S-35 Anomalies: none taken, no buff active
   s => ({ ...s, echoOrder: 'gather' }), // 15 -> 16: S-43 Echo orders; Gather was the only one
   s => ({ ...s, weatherCancel: -1 }), // 16 -> 17: B-081 a Wake-cancelled weather event stays cancelled; none recorded before
+  s => ({ ...s, size: WORLD_SIZE_OLD }), // 17 -> 18: S-45 (D-120) world size is saved; every world so far was 160×160
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.
 function seenVaults(s) {
-  const sites = vaultSites(s.seed), n = WORLD_W * WORLD_H;
+  const sites = vaultSites(s.seed, WORLD_SIZE_OLD), n = WORLD_SIZE_OLD * WORLD_SIZE_OLD; // format 3 predates size
   const ex = unpackBits(s.explored, n), br = unpackBits(s.broken, n);
   return sites.map((v, i) => v.cells.some(c => ex[c] || br[c]) ? i : -1).filter(i => i >= 0);
 }
@@ -48,10 +49,16 @@ export function upgradeSave(save) {
 const B64_RE = /^[A-Za-z0-9+/]*={0,2}$/;
 const count = x => (Number.isFinite(x) && x >= 0 ? Math.floor(x) : 0);
 /** Audit 79 (B-066, B-067; B-037: never trust a save): a save without a seed or a readable map is no save (title shows
- *  no Continue rather than throwing); bank and cargo become whole non-negative counts of the known resources. */
+ *  no Continue rather than throwing); bank and cargo become whole non-negative counts of the known resources.
+ *  S-45: `size` must be a known world size and each bitset must hold exactly size² bits (packBits' byte count). */
 function saneSave(s) {
   if (!Number.isInteger(s.seed)) return null;
-  for (const k of ['explored', 'broken']) if (typeof s[k] !== 'string' || !B64_RE.test(s[k])) return null;
+  if (!Number.isInteger(s.size) || !Object.hasOwn(WORLD_PROFILES, s.size)) return null;
+  const bytes = Math.ceil(s.size * s.size / 8);
+  for (const k of ['explored', 'broken']) {
+    if (typeof s[k] !== 'string' || !B64_RE.test(s[k])) return null;
+    try { if (atob(s[k]).length !== bytes) return null; } catch { return null; }
+  }
   for (const k of ['bank', 'cargo']) {
     const o = s[k] && typeof s[k] === 'object' ? s[k] : {};
     s[k] = { shard: count(o.shard), prism: count(o.prism), lumen: count(o.lumen) };
