@@ -13,6 +13,7 @@ import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
 import { drawUndertow } from './undertow.js';
 import { drawShatter } from './shatter.js';
+import { drawHeat } from './heat.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawEcho } from './echo.js';
 
@@ -455,6 +456,7 @@ export class Renderer {
       ctx.beginPath(); ctx.arc(0, 0, 20 + k * 70, 0, Math.PI * 2); ctx.stroke();
       ctx.globalAlpha = 1; ctx.shadowBlur = 0;
     }
+    drawHeat(ctx, g); // S-48a: the Kiln heat arc
     ctx.rotate(p.angle);
     const col = p.hurtFlash > 0 ? '#ff5a2e' : '#d8fbff';
     ctx.shadowColor = p.hurtFlash > 0 ? '#ff5a2e' : '#2ef2ff';

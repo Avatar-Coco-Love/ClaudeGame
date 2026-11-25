@@ -6,6 +6,7 @@ import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE
 import { UNBREAKABLE } from './world.js';
 import { facetAt, toggleFacet } from './spire.js';
 import { beamFoes } from './spitter.js';
+import { heatHit } from './heat.js';
 
 const NOSE = 12; // px from the core's centre to its nose; rays are cast from the centre so the wall at the nose is hit first
 
@@ -57,6 +58,7 @@ export function castBeam(game, dt) {
   }
   for (const { hit, rays } of cells.values()) {
     const res = game.world.hit(hit.x, hit.y, dps * dt);
+    if (res) heatHit(game, hit.x, hit.y, dps * dt); // S-48a: Kiln rock heats the core's beam
     const target = { x: hit.x, y: hit.y, frac: res && !res.broken ? res.frac : 0 };
     for (const r of rays) r.target = target;
     if (Math.random() < dt * 45) {
@@ -143,6 +145,7 @@ export function releasePulse(game) {
     const dist = Math.max(0, h.dist - NOSE), type = w.get(h.x, h.y), i = h.y * w.w + h.x;
     const left = w.hpAt(h.x, h.y, type) - w.damage[i];
     const res = w.hit(h.x, h.y, amount);
+    if (res) heatHit(game, h.x, h.y, Math.min(amount, left)); // S-48a
     cells++;
     if (!res || !res.broken) { // unbreakable, or cracked but standing: the burst ends on its face
       end = dist; foe = null; amount = 0;
