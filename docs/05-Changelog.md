@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.26 — 2026-11-25
+- **Phones held sideways:** the Core Matrix fits twice as many upgrades on screen (the tabs, your bank and ✕ share
+  one row), and Settings shows every option at once in two columns, no scrolling.
+
 ## v1.4.25 — 2026-11-25
 - **Fix:** a storm or aurora that a Wake cut short no longer comes back when you reload the page in the next few
   seconds; the next one still arrives on time. (Saves upgrade automatically.)

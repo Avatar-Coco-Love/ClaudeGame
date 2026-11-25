@@ -70,3 +70,9 @@ Continues `06-Decisions-15.md` (same rules: supersede, never edit; list rejected
   uncancelled event still resumes mid-way.
 - Rejected: skip any event that started before the load (audit 84's note): a reload would end a storm early (a
   Surge exploit) and drop the D-097 resume; deriving it from Wake state (a Wake isn't saved mid-way).
+
+## D-118 — Short landscape touch sheets (audit 84 leftover, session 86)
+- At ≤ 480 px tall on a coarse pointer: sheet margins 8 px; the Matrix title is visually hidden (still read out; the
+  selected tab names the page) and the bank + ✕ join the tab row, wrapping under it when long; upgrade rows put the
+  value beside the name; Settings runs in two columns. 568×320: Matrix rows 2 → 4 (3 at Large + full bank), Settings 4 → 7 of 7.
+- Rejected: a sticky header (no extra rows); hiding row descriptions (they explain the stat); scrolling only (the audit's complaint).

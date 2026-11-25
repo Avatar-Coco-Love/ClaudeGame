@@ -221,3 +221,26 @@ body.ending-seq #hud { opacity: 0; pointer-events: none; transition: opacity .4s
 #new-cycle small { display: block; font-size: calc(12px * var(--ts)); opacity: .7; }
 @media (max-height: 340px) { #ending .sheet { padding-top: 10px; padding-bottom: 10px; } #ending-stats { gap: 2px 14px; margin-bottom: 8px; font-size: calc(13px * var(--ts)); }
   .end-lead { display: none; } #ending .sheet header { margin-bottom: 4px; } .end-btns .big { padding-top: 8px; padding-bottom: 8px; } } /* B-054: landscape phones, no scroll */
+/* Audit 84 leftover (S-45 note, D-118): short landscape phones. The Matrix showed 2 rows under its header + tabs and Settings
+   hid 3 of 7 rows below the fold at 568×320. Here: thinner margins, the title moves off screen (still named for readers),
+   the bank + ✕ join the tab row (they wrap under it when the bank is long), rows put the value beside the name, and
+   Settings runs in two columns. tests/touch.cjs measures 568×320 and 667×375. */
+@media (max-height: 480px) and (pointer: coarse) {
+  #matrix, #settings { padding: 8px; }
+  .sheet { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 10px 14px; }
+  #matrix .sheet { display: flex; flex-wrap: wrap; align-items: center; align-content: flex-start; column-gap: 10px; }
+  #matrix .sheet > * { flex: 0 0 100%; order: 4; }
+  #matrix header { display: contents; }
+  #matrix h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #matrix .tabs { flex: 1 1 300px; order: 1; margin: 0; }
+  #matrix .tabs button { padding: 0 6px; letter-spacing: .04em; }
+  #matrix-bank { flex: 0 0 auto; order: 2; margin-left: auto; } #matrix-close { flex: 0 0 auto; order: 3; }
+  #upgrade-list { margin-top: 4px; }
+  .upgrade { padding: 6px 0; }
+  .u-main { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; }
+  .u-name { order: 0; } .u-val { order: 1; margin-top: 0; } .u-desc { order: 2; flex-basis: 100%; } .u-main .pips { order: 3; flex-basis: 100%; margin-top: 3px; }
+  #settings .sheet { width: min(680px, 100%); display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; align-content: start; }
+  #settings .sheet > header, #settings .sheet > #keys-view, #settings .sheet > :not(.set-row) { grid-column: 1 / -1; }
+  #settings header { margin-bottom: 4px; }
+  #settings .set-row { min-height: 50px; }
+}

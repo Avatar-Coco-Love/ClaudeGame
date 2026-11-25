@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 85** · **Version: v1.4.25** (session 85: Build; rotation: 86 Build, 87 Design, 88 Build, 89 Audit, 90 Build).
+_Last updated: 2026-11-25_ · **Session counter: 86** · **Version: v1.4.26** (session 86: Build; rotation: 87 Design, 88 Build, 89 Audit, 90 Build, 91 Build).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), all ✅ as of v1.4.23 (M8 last). VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -24,6 +24,7 @@ _Last updated: 2026-11-25_ · **Session counter: 85** · **Version: v1.4.25** (s
 - Music (S-44, D-115, `music.js`): synthesized pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
   Ending fades out; own PRNG (seed + 'music'); Music slider (`settings.music`, default 50). `tests/music.cjs` (11 checks).
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020).
+  Short landscape phones (D-118): Matrix tabs + bank + ✕ share a row, Settings in two columns.
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
 - Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast once per session, lower hum.
 - Lumen ● (S-10) buys Research (S-11): Scanner ping (S-12), beam modes Wide / Pulse (S-13, S-14, S-21). Detail: `08`.
@@ -55,5 +56,5 @@ _Last updated: 2026-11-25_ · **Session counter: 85** · **Version: v1.4.25** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 86 (Build): next in `04-…-2` "Audit 84 leftovers": the touch layout at 568×320 (Matrix shows ~1.5 rows under
-its header; Settings hides 3 rows below the fold); measure first, then a `touch.cjs` check that fails on the old CSS.
+Session 87 (Design): play-test with Playwright (desktop + 568×320 / 320×568 touch, Drift and Surge), then write specs
+S-45+ in `07` for the next 3–5 build items, drawing on `04-…-2` "Audit 84 leftovers" (GC churn, config numbers, D-107 drift).

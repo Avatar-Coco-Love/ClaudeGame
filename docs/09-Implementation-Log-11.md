@@ -45,3 +45,11 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
 - Config: `BORDER` (2) and `VAULT_HALF` (3) now live in `config.js`; world / spire / anomaly / craft read them
   (craft's `- 4` is `SPIRE_HALF`). Same comparisons, so every seed's world is unchanged (`world.cjs` passes).
 - Smoke: 417/417 (was 416; +1 B-081 check). No visual change, so no screenshot.
+
+## Session 86 — Build: short landscape sheets (v1.4.26, D-118)
+- Measured at 568×320 (Pixel 7 touch): Matrix header + tabs ended at y 131, rows 82 px, 2 whole rows; Settings rows
+  ended at 347/399/451 past the sheet's 304. New `@media (max-height: 480px) and (pointer: coarse)` block in `style.css`
+  (D-118): Matrix 4 rows (5 at 667×375), rows 57 px; Settings 2 columns, all 7 rows. Large + 2750◆ 1470▲ 141●: the
+  bank wraps under the tabs, 3 rows. Screenshots viewed (Core, Research Large, Settings).
+- New `touch.cjs` check at 568×320 + 667×375 (rows, ✕/tabs ≥ 44 px inside the sheet, Settings rows above the fold):
+  FAILS on the old CSS, passes now.
