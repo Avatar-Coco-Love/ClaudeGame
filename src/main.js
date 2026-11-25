@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { orderLabel } from './echo.js';
 import { canResearch, buyResearch } from './research.js';
@@ -294,11 +294,12 @@ function researchRow(r) {
   });
   return row;
 }
-function upgradeRow(u, lvl, cost, affordable, onBuy) {
-  const maxed = lvl >= u.max;
+function upgradeRow(u, lvl, cost, affordable, onBuy, top = u.max) {
+  const maxed = lvl >= top;
   const row = document.createElement('div');
   row.className = 'upgrade';
-  const pips = Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
+  // S-50: Overdrive pips (hollow, a thin inner line) join the row only once its base max is reached
+  const pips = Array.from({ length: lvl >= u.max ? top : u.max }, (_, i) => `<i class="${[i >= u.max ? 'od' : '', i < lvl ? 'on' : ''].join(' ').trim()}"></i>`).join('');
   const now = u.fmt(u.value(lvl)), next = maxed ? '' : ` → <b>${u.fmt(u.value(lvl + 1))}</b>`;
   row.innerHTML = `
     <div class="u-main"><div class="u-name">${u.name}</div><div class="u-desc">${u.desc}</div>
@@ -347,7 +348,8 @@ function renderPanel() {
     for (const u of UPGRADES) {
       if (u.id === 'hull' && g.mode !== 'surge' && g.upgrades.hull === 0) continue;
       const lvl = g.upgrades[u.id];
-      list.appendChild(upgradeRow(u, lvl, upgradeCost(lvl), g.canAfford(u.id), () => g.buy(u.id)));
+      const top = g.topLevel(u);
+      list.appendChild(upgradeRow(u, lvl, lvl < top ? matrixCost(u, lvl) : null, g.canAfford(u.id), () => g.buy(u.id), top));
     }
   }
   document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.classList.toggle('selected', b.dataset.mode === g.mode));

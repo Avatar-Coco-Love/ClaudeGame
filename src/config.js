@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.5.45';
+export const VERSION = '1.5.46';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -23,8 +23,8 @@ export const MINIMAP_WINDOW_CELLS = 160; // S-46b: the minimap shows this many c
 // 160 = the pre-M10 numbers word for word (tests/worldsize.cjs pins the result). 256 (S-46a, D-122): 5 rings, 4 more vaults
 // (outerVaults, VAULT_D_OUTER) and Anomalies in Shoal / Kiln, both drawn after the old lists with their own salts.
 export const WORLD_PROFILES = {
-  160: { rings: 3, vaults: 6, outerVaults: 0, anomalies: [3, 5, 8] },
-  256: { rings: 5, vaults: 6, outerVaults: 4, anomalies: [3, 5, 8, 6, 6] },
+  160: { rings: 3, vaults: 6, outerVaults: 0, anomalies: [3, 5, 8], overdrive: false },
+  256: { rings: 5, vaults: 6, outerVaults: 4, anomalies: [3, 5, 8, 6, 6], overdrive: true }, // S-50: Overdrive needs ≈ / ⬟, 256 only
 };
 export const worldProfile = size => WORLD_PROFILES[size] || WORLD_PROFILES[WORLD_SIZE_OLD];
 export const CHUNK = 16; // cells per render chunk edge
@@ -181,17 +181,17 @@ export const ORE_KIND = { [T.CRYSTAL]: 'shard', [T.PRISM]: 'prism', [T.LUMEN]: '
 
 // Core Matrix upgrades. value(level) gives the live stat; cost(level) the price of the NEXT level.
 export const UPGRADES = [
-  { id: 'beam',   name: 'Beam Power',  desc: 'Mining + combat damage per second', max: 8,
+  { id: 'beam',   name: 'Beam Power',  desc: 'Mining + combat damage per second', max: 8, over: 2,
     value: l => 1 + 0.55 * l, fmt: v => v.toFixed(2) + ' dps' },
-  { id: 'range',  name: 'Beam Range',  desc: 'How far the beam reaches', max: 6,
+  { id: 'range',  name: 'Beam Range',  desc: 'How far the beam reaches', max: 6, over: 2,
     value: l => 96 + 24 * l, fmt: v => Math.round(v) + ' px' },
-  { id: 'thrust', name: 'Thrusters',   desc: 'Top speed of the core', max: 6,
+  { id: 'thrust', name: 'Thrusters',   desc: 'Top speed of the core', max: 6, over: 2,
     value: l => 190 + 26 * l, fmt: v => Math.round(v) + ' px/s' },
-  { id: 'cargo',  name: 'Cargo Lattice', desc: 'Resources carried before returning', max: 8,
+  { id: 'cargo',  name: 'Cargo Lattice', desc: 'Resources carried before returning', max: 8, over: 2,
     value: l => 20 + 15 * l, fmt: v => Math.round(v) + ' slots' },
-  { id: 'magnet', name: 'Attractor',   desc: 'Pickup pull radius', max: 6,
+  { id: 'magnet', name: 'Attractor',   desc: 'Pickup pull radius', max: 6, over: 2,
     value: l => 64 + 28 * l, fmt: v => Math.round(v) + ' px' },
-  { id: 'hull',   name: 'Integrity',   desc: 'Hit points (matters in Surge)', max: 6,
+  { id: 'hull',   name: 'Integrity',   desc: 'Hit points (matters in Surge)', max: 6, over: 2,
     value: l => 100 + 30 * l, fmt: v => Math.round(v) + ' hp' },
 ];
 
@@ -201,6 +201,11 @@ export function upgradeCost(level) {
     prism: level >= 2 ? (level - 1) * 3 : 0,
   };
 }
+// S-50 (D-140): Overdrive, `over` levels past each `max` (value() keeps its formula), 256 worlds only (profile.overdrive).
+// Step k's price; all 12 steps = 1920◆ 84≈ 84⬟ (≈ 48 % / ⬟ 40 % of the poorest seed, 07-Build-Specs-11).
+export const OVERDRIVE_COST = [{ shard: 120, tide: 5, calx: 5 }, { shard: 200, tide: 9, calx: 9 }];
+/** The price of the NEXT level of upgrade `u` from `level`: the base curve up to max, then the overdrive step. */
+export const matrixCost = (u, level) => level < u.max ? upgradeCost(level) : OVERDRIVE_COST[level - u.max];
 
 // Nexus Development (S-1, D-009): upgrades to the base itself, paid in Prisms only. cost(level) is the NEXT level's price.
 // Radiance only widens the Nexus light + explored disc; deposit and Glitch-repel radii stay fixed (D-002: no Surge-only safety buff).
