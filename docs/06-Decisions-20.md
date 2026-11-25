@@ -31,6 +31,15 @@ alternatives). D-137 on.
   splits a spec checks this (`CLAUDE.md`).
 - Rejected: a Retro session type (costs a build slot; already rejected in D-138); dropping record steps (they are the memory).
 
+### D-141 — S-51 Heat Sink: own module, save keys `sink` / `sinks`, pick up on the Sink (session 106, build)
+- `src/heatsink.js` holds craft, refusal, pick-up, load, `sinkMul` (heat.js multiplies only the *gain*) and both draws;
+  `craft.js` keeps one `tryPlace` path and `PLACE_KINDS` (B / ✦ places the last crafted kind still carried, else the
+  first carried). Save format 20: `craft.sink` + `sinks: [cell…]` (spec said `heatsink` / `heatSinks`; renamed so a
+  save never holds the word "heat", which `heat.cjs` asserts for the unsaved heat state). Load: open Kiln cells only.
+- Pick-up is within 1.5 cells of the Sink (`HEATSINK_PICK_R`), not its 5-cell field, so a Beacon can still go inside it.
+  Gated by `world.profile.rings > KILN_RING` (no size literal, D-140's rule). No light of its own (spec gives none).
+- Rejected: pick-up anywhere in the field (blocks placing a Beacon there); loosening `heat.cjs`'s regex for the keys.
+
 ### D-140 — S-50 Overdrive: a profile flag and a load clamp (session 105, build)
 - "256 world only" is `WORLD_PROFILES[size].overdrive` (false for 160), read by `Game.topLevel(u)` = max + `over`; the
   sheet, `canAfford` and the save load all use it. `matrixCost(u, l)` = the old curve below max, `OVERDRIVE_COST` past it;

@@ -2,6 +2,7 @@
 // `game.heat` 0..1 rises with the share of the core's beam damage that lands on Kiln-ring cells (by the hit cell's own ring),
 // capped at 1 a frame, so Wide's extra cells and an Overclock Anomaly heat no faster than Focus. Never saved (like `damage`).
 // The Echo's beam and Shoal cracks call world.hit directly, so they add none.
+import { sinkMul } from './heatsink.js';
 import { KILN_RING, KILN_HEAT_S, KILN_OVERHEAT_S, KILN_HEAT_RESTART, KILN_COOL_MUL, KILN_ARC_FROM, HEAT_RGB } from './config.js';
 
 export function makeHeat() { return { kiln: 0, over: 0, flash: 0, taught: false, off: false, overheats: 0 }; }
@@ -26,7 +27,7 @@ export function updateHeat(game, dt) {
     return;
   }
   const share = dt > 0 ? Math.min(1, kiln / (game.stat('beam') * dt)) : 0;
-  if (share > 0) game.heat = Math.min(1, game.heat + share * dt / KILN_HEAT_S);
+  if (share > 0) game.heat = Math.min(1, game.heat + share * sinkMul(game) * dt / KILN_HEAT_S); // S-51: a Heat Sink nearby × 0.4
   else game.heat = Math.max(0, game.heat - KILN_COOL_MUL * dt / KILN_HEAT_S);
   if (game.heat >= 1 - 1e-9) overheat(game);
 }

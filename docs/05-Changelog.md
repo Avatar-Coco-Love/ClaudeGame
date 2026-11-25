@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.5.47 — 2026-11-25
+- **New: Heat Sinks (Craft tab, new worlds).** Craft one for ⬟6 ◆20 (carry 2, place up to 6) and set it down with B / ✦
+  on Kiln floor: a lilac pentagon. Within 5 cells your beam heats 60 % slower, so you can mine the Kiln with far fewer
+  overheats. Off Kiln floor the place button greys out and says why; press it on a placed Sink to pick it back up, free.
+
 ## v1.5.46 — 2026-11-25
 - **New: Core Matrix Overdrive.** In a new (256) world, once a Core Matrix row is maxed it shows two more hollow pips:
   each costs Shards plus the Shoal's Tide ≈ and the Kiln's Calx ⬟ (◆120 ≈5 ⬟5, then ◆200 ≈9 ⬟9), so the biome ores

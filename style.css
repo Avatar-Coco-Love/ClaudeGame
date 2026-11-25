@@ -47,6 +47,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #scan-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--gold); background: rgba(40, 30, 8, .85); color: var(--gold);
   font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(255,201,79,.3); transition: opacity .2s; }
 #scan-btn.cooling { opacity: .35; box-shadow: none; }
+#beacon-btn.off { opacity: .4; } /* S-51: a Heat Sink can't go here (off Kiln floor); the title says why */
 #mode-btn .mode-name { font-size: calc(14px * var(--ts)); font-weight: 600; letter-spacing: .04em; margin-left: 5px; }
 #mode-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid var(--cyan); background: rgba(10, 40, 60, .85); color: var(--cyan);
   font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(46,242,255,.3); } /* S-13 beam mode switch */
