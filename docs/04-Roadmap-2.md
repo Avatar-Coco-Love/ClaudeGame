@@ -4,7 +4,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
-- **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits). Watch for S-46: site helpers
+- **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits). Scheduled as S-46b2's first bullet (D-124): site helpers
   (`vaultSites`, `spireCandidates`, `chooseSpires`, `loadSpires`, `spireFootprint`, `isBroken`) default `w` to 160, so
   a caller that forgets the world's size silently gets 160 geometry in a 256 world; pass `world.w` everywhere.
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in

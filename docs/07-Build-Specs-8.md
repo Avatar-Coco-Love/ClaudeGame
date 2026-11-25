@@ -1,6 +1,7 @@
 # 07 — Build Specs, part 8
 
 Continues `07-Build-Specs-7.md` (same rules). Written in Design 87 for **M10 World and biomes** (D-119, D-120).
+**Design 92 (D-124): S-46b2, S-47, S-48 refined in `07-Build-Specs-9.md`; that text wins.**
 Build order: S-45 → S-46 → S-47 → S-48. **Sink:** none (M11 adds the biome resources). **Layer:** none.
 Measured basis (session 87, 4× CPU): `new World` 160 / 256 = 36 / 65 ms median (65 / 112 max); save 9.5 / 22.8 KB.
 
