@@ -284,6 +284,42 @@ async function browserChecks(browser, url, check, errors, shots) {
       /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length && !large.hits.length, JSON.stringify({ death: death.hits, mode: mode.hits, large: large.hits, t: large.t }));
     await ctx.close();
   }
+  // ---- B-089 (audit 104): with ≈ / ⬟ held (S-49) the five-chip bank ran under the minimap (portrait, 12–315 vs 212 at
+  // 320 px) and under ◎ ⟂ ◇ (568–844 landscape). Phones lay it out 3 + 2. Surge, Echo + 3 buffs, every button shown,
+  // plain and Large: the panel overlaps no button or the minimap (portrait: ≥ 6 px clear of it), and the death toast
+  // covers neither the panel, a button, ⊕ nor the hint. Large 740×360 also failed before with any 4-digit bank (21.6 px bank font).
+  for (const vp of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 568, height: 320 }, { width: 667, height: 375 }, { width: 740, height: 360 }, { width: 844, height: 390 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage(), bad = [];
+    pg.on('pageerror', e => errors.push(`touch ores ${vp.width}: ` + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.research.echo = true;
+      g.buffs = ['overclock', 'lodestone', 'ballast']; Object.assign(g.bank, { shard: 2750, prism: 1470, lumen: 141, tide: 359, calx: 477 }); g.stats.lumen = g.stats.tide = g.stats.calx = 1;
+      document.getElementById('integrity-row').classList.remove('hidden'); g.notify('destabilized'); });
+    for (const large of [false, true]) {
+      await pg.evaluate(l => document.documentElement.classList.toggle('text-large', l), large);
+      await pg.waitForTimeout(450);
+      const r = await pg.evaluate(() => {
+        const out = {};
+        for (const s of ['.top-left', '#toast', '#minimap', '#scan-btn', '#mode-btn', '#echo-btn', '#beacon-btn', '#mute-btn', '#menu-btn', '#matrix-btn', '#hint']) {
+          const q = document.querySelector(s).getBoundingClientRect(); if (q.width > 0) out[s] = { l: q.left, t: q.top, r: q.right, b: q.bottom };
+        }
+        out.rows = new Set([...document.querySelectorAll('.bank > span:not(.hidden)')].map(e => Math.round(e.getBoundingClientRect().top))).size;
+        return out;
+      });
+      const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b, pan = r['.top-left'];
+      for (const k of Object.keys(r).filter(k => k[0] === '#' && k !== '#toast')) {
+        if (!/matrix|hint/.test(k) && hit(pan, r[k])) bad.push(`${large ? 'L ' : ''}panel×${k}`);
+        if (r['#toast'] && hit(r['#toast'], r[k])) bad.push(`${large ? 'L ' : ''}toast×${k}`);
+      }
+      if (hit(r['#toast'], pan)) bad.push(`${large ? 'L ' : ''}toast×panel`);
+      if (vp.height > 480 && r['#minimap'].l - pan.r < 6) bad.push(`${large ? 'L ' : ''}minimap gap ${Math.round(r['#minimap'].l - pan.r)}`);
+      if (r.rows !== 2) bad.push(`${large ? 'L ' : ''}bank rows ${r.rows}`);
+      if (shots && vp.width === 320 && !large) await pg.screenshot({ path: `${shots}/ores-320x568.png` });
+    }
+    check(`${vp.width}×${vp.height} Surge, ◆ ▲ ● ≈ ⬟ banked: the bank goes 3 + 2 and clears the minimap, buttons and toast, also Large (B-089)`, !bad.length, bad.join(', '));
+    await ctx.close();
+  }
 }
 
 module.exports = { browserChecks };

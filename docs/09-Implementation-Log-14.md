@@ -40,3 +40,17 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
 - `saveformat.cjs` B-037 check extended to the two new kinds. Screenshot (`ORE_SHOT`) viewed: ≈ reads as two mint
   strokes, ⬟ as a lilac pentagon, both distinct from ◆ ▲ ● and the Shoal edges; chips ≈ 3 ⬟ 2 in the bank row.
 - Smoke 483/483 (+7: `ore.cjs`).
+
+## Session 104 — Audit: five-kind phone bank, "continue" rule, 09 archive (v1.5.44, D-136, D-137)
+- No subagent tool in this session: sweeps done in-session (correctness on S-49 / vents / heat, touch, docs drift).
+- **B-089** (fixed): with ≈ / ⬟ held the phone bank ran under the minimap (portrait 320–412: panel to 315 / 347 vs 212–304)
+  and under ◎ ⟂ ◇ (568, 640, 740, 844 landscape). Phones now wrap it 3 + 2 (`html.ores`), the landscape toast moves down
+  and, ≤ 700 px, narrows (it first met ⊕ at 568×320). Also found: Large text at 740×360 put any 4-digit bank under ◎
+  (pre-S-49), and Large Echo + 3 buff chips sat 0 px from the 320 px minimap. `touch.cjs` B-089 over 6 phones, plain +
+  Large: all 6 fail on the old CSS (proved: checkout), pass now. 320×568 and 568×320 shots viewed: two clean rows.
+- Correctness read: S-49 kinds flow through `KINDS` everywhere (bank, cargo, save, stats, costs); shatter / aurora stay
+  rock / crystal-only by spec. D-131…D-135 match the code. Baseline smoke on `main` 483/483.
+- Owner rule recorded: a bare "continue" runs 3 orchestrated PRs (`CLAUDE.md`, `docs/10-Orchestration.md`, D-136).
+- `09` sessions 94–98 archived word for word (part 12 removed). New parts: `06-Decisions-20`, `04-Roadmap-4` (Debt).
+- B-090 (watch): first full smoke 488/489, `bigworld.cjs` draw ratio 2.08× once; alone 1.02× ×2; rerun 489/489.
+- Smoke 489/489 (+6: B-089 phones).
