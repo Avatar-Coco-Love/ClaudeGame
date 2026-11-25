@@ -12,6 +12,7 @@ import { paintChunk } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
 import { drawUndertow } from './undertow.js';
+import { drawShatter } from './shatter.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawEcho } from './echo.js';
 
@@ -163,6 +164,7 @@ export class Renderer {
     drawBeacons(this, ctx, left, top, vw, vh); // S-16
     drawRelays(this, ctx, left, top, vw, vh); // S-22
     this.drawCrack(ctx);
+    drawShatter(this, ctx); // S-47b: a faint line from a broken Shoal cell into the one it cracked
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
     this.drawBeam(ctx);

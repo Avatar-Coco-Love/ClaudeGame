@@ -4,7 +4,7 @@
 // notes scheduled MUSIC_LOOKAHEAD_S ahead, so timing doesn't depend on the frame rate and a hidden page schedules nothing.
 import { seededStream } from './world.js';
 import {
-  RING_PITCH_STEP, MUSIC_GAIN, MUSIC_ROOT_HZ, MUSIC_SCALES, MUSIC_PROGRESSIONS, MUSIC_CHORD_S, MUSIC_ATTACK_S,
+  RING_PITCH_STEP, MUSIC_RING_MAX, MUSIC_GAIN, MUSIC_ROOT_HZ, MUSIC_SCALES, MUSIC_PROGRESSIONS, MUSIC_CHORD_S, MUSIC_ATTACK_S,
   MUSIC_RELEASE_S, MUSIC_PAD, MUSIC_BELL, MUSIC_PULSE, MUSIC_XFADE_S, MUSIC_END_FADE_S, MUSIC_LOOKAHEAD_S,
 } from './config.js';
 
@@ -68,7 +68,7 @@ export class Music {
     }
     const want = state.wake || state.mode === 'surge' ? 'pulse' : 'bell';
     if (state.wake !== this.wake && this.layer) this.setLayer(want, now); // a Wake starts/ends now, not at the next chord
-    this.wake = !!state.wake; this.ring = Math.max(0, Math.min(2, state.ring | 0)); this.want = want;
+    this.wake = !!state.wake; this.ring = Math.max(0, Math.min(MUSIC_RING_MAX, state.ring | 0)); this.want = want;
     const until = now + MUSIC_LOOKAHEAD_S;
     // After a hidden page the clock jumped: start again from now instead of catching up a burst of notes.
     if (this.nextChord < now - 1) this.nextChord = now;
