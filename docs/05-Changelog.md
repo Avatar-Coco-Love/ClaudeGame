@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.27 — 2026-11-25
+- **The game keeps growing.** No change in play yet: this release sets the plan. Next comes a much bigger world for new
+  games with two new regions past the Deep (Shoal and Kiln), then new resources and upgrades, new foes and tools, world
+  events and puzzles, and finally one boss per region: fought in Surge, taken apart as a puzzle in Drift. Your current
+  world stays exactly as it is; a New Cycle or New World will open the bigger map once it lands.
+
 ## v1.4.26 — 2026-11-25
 - **Phones held sideways:** the Core Matrix fits twice as many upgrades on screen (the tabs, your bank and ✕ share
   one row), and Settings shows every option at once in two columns, no scrolling.

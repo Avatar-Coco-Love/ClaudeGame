@@ -1,11 +1,14 @@
 # Lumen Core — operating manual for autonomous sessions
 
-This repo is a game designed, built, reviewed, merged, and deployed **entirely by Claude**. The owner does not make
-design decisions and is not expected to respond. Nobody is waiting on you. Do good work, ship one PR, and leave clean notes for the next session.
+This repo is a game designed, built, reviewed, merged, and deployed **entirely by Claude**. The owner gives feedback (chat or
+`docs/inbox/`); Claude decides what gets built and how (D-119). Don't wait for replies: ship one PR, leave clean notes for the next session.
 
 Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/workflows/pages.yml` on every push to `main`).
 
 ## Session loop (every session)
+0. **Unattended runs:** a scheduled task may start a session with nobody present. It does exactly one PR, then stops, with a
+   final reply ≤ 10 lines. First check for open PRs against `main` from another session: if one is open, don't start a
+   competing one; finish/merge it only if it passes smoke and is clearly abandoned, else stop and log nothing.
 1. **Orient (cheap):** read `docs/02-Current-Status-and-Next-Step.md` only. It holds the session counter, the session type due, and the next task.
    Open other docs only when the task needs them: `01` for pillars, `04` for the roadmap, `03` for open decisions, `07` for build-ready specs, `09` for history (read the tail only).
 2. **Check inbox:** if `docs/inbox/` contains anything besides `README.md`, processing it *is* this session's task (see the inbox README).
@@ -33,25 +36,25 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - One PR per session is the norm. If you notice your context getting large, wrap up: ship what works and write the handoff in `docs/02`.
 - **Hard cap: at most 3 PRs per conversation (D-095).** You can't see your token count, so count PRs. After the 3rd,
   update `docs/02` and stop, even if more were asked for: tell the user to continue in a new conversation.
-- **Many PRs asked for? Orchestrate, don't do them inline.** Give each PR to a fresh subagent (or a new session) with
-  this brief: read `CLAUDE.md` + `docs/02`, do the next task, ship it, reply in ≤ 10 lines (PR #, what, smoke count,
-  next step). Keep only that reply. The cap above counts PRs you build yourself.
-- **Verify cheaply:** while iterating, run only the test file you're changing (`node tests/<x>.cjs`); run the full smoke
-  once before the PR (and again only after a fix), and print only its FAIL lines + the count. View one screenshot per
-  visual change, not every size. Never print whole files or long tool output into the conversation.
+- **Many PRs asked for? Orchestrate:** give each PR to a fresh subagent or session (brief: read `CLAUDE.md` + `docs/02`,
+  do the next task, ship, reply ≤ 10 lines: PR #, what, smoke count, next step). The cap counts PRs you build yourself.
+- **No account memory tools** (`mcp__memory__*`) in this project: the repo docs are the memory (owner's ask, keeps context small).
+- **Verify cheaply:** iterate with one test file (`node tests/<x>.cjs`); run the full smoke once before the PR (again only
+  after a fix), printing only FAIL lines + the count. One screenshot per visual change. Never print whole files or long output.
 - Keep `docs/02` short (under ~60 lines). It is the handoff note, not a history. History goes in `09`.
 - If a file passes ~600 lines, split it as part of that session's work.
 
 ## Tracking across versions
-- `src/config.js` `VERSION` = `<major>.<minor>.<PR count>`, shown on the title screen (D-046): minor = milestones shipped in a row (M1…MN all ✅);
-  **1.0 = M5 shipped** (the v1.0 scope, `01` + D-045); after 1.0, M6 → 1.1, M7 → 1.2, M8 → 1.3, M9 → 1.4 (D-108). The patch digit counts PRs since v1.0.0 and never resets again (D-105; it restarted once, at 1.0, superseding D-046). `docs/05-Changelog.md` gets one player-facing entry per PR.
+- `src/config.js` `VERSION` = `<major>.<minor>.<patch>`, on the title screen (D-046): **1.0 = M5 shipped**; each later
+  milestone adds 1 to the minor (M9 → 1.4, M10 → 1.5 … M14 → 1.9; D-108, D-119). The patch counts PRs since v1.0.0 and
+  never resets (D-105). `docs/05-Changelog.md` gets one player-facing entry per PR.
 - `docs/06-Decisions.md` is the only place a decision is settled. Supersede, never silently edit. Bugs get B-xxx IDs in `09`.
 - `tests/docs.cjs` (run inside smoke) enforces: docs ≤ 8 KB, `02` ≤ 60 lines with one Next step, VERSION = top changelog entry, inbox empty.
 - A rule asked for or learned goes into the docs **in the same PR**. A rule broken twice gets a check (test or tool), not more words.
 
 ## Verification habits (from Gloamdeep, `docs/archive/2026-11-23-Gloamdeep-insights.md`)
-- **Measure before deciding:** real viewport sizes, text width at the narrowest phone, odds over many seeds, frame time on a throttled CPU.
-- **A new test must fail on the old code.** Prove it once (stash the fix, run it) before trusting it; for random bugs, run many seeds.
+- **Measure before deciding:** viewport sizes, text width at the narrowest phone, odds over many seeds, throttled-CPU frame time.
+- **A new test must fail on the old code:** prove it once (stash the fix, run it); for random bugs, run many seeds.
 - **Seeded randomness with a separate salt per draw** for anything gameplay-relevant, so draws don't secretly depend on each other.
 - **You can't hear, so measure audio:** render it offline (`tests/audio.cjs`: RMS, peak, > 2 kHz share, how long it stays loud).
   A sound that plays continuously needs a level ceiling check. The owner judges by ear only by picking among options (D-037).
