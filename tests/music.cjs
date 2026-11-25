@@ -142,22 +142,4 @@ async function browserChecks(browser, url, check, errors) {
 
 module.exports = { browserChecks, renderMusic };
 
-if (require.main === module) {
-  (async () => {
-    const http = require('http'), fs = require('fs'), path = require('path'), { chromium } = require('playwright');
-    const ROOT = path.resolve(__dirname, '..');
-    const srv = http.createServer((req, res) => {
-      const p = path.join(ROOT, req.url.split('?')[0].replace(/\/$/, '/index.html'));
-      if (!p.startsWith(ROOT) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
-      res.writeHead(200, { 'content-type': p.endsWith('.js') ? 'text/javascript' : 'text/html' }); fs.createReadStream(p).pipe(res);
-    });
-    await new Promise(r => srv.listen(0, r));
-    const b = await chromium.launch(), url = `http://localhost:${srv.address().port}/`;
-    let fails = 0;
-    const errors = [], check = (name, ok, detail) => { if (!ok) fails++; console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ' — ' + detail : ''}`); };
-    await browserChecks(b, url, check, errors);
-    if (errors.length) { fails++; console.log('page errors:', errors); }
-    await b.close(); srv.close();
-    process.exit(fails ? 1 : 0);
-  })();
-}
+if (require.main === module) require('./serve.cjs').runStandalone({ browserChecks });

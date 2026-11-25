@@ -121,17 +121,10 @@ module.exports = { browserChecks, measure, renderSfx };
 
 if (require.main === module) {
   (async () => {
-    const http = require('http'), fs = require('fs'), path = require('path'), { chromium } = require('playwright');
-    const ROOT = path.resolve(__dirname, '..');
-    const srv = http.createServer((req, res) => {
-      const p = path.join(ROOT, req.url.split('?')[0].replace(/\/$/, '/index.html'));
-      if (!p.startsWith(ROOT) || !fs.existsSync(p)) { res.writeHead(404); return res.end(); }
-      res.writeHead(200, { 'content-type': p.endsWith('.js') ? 'text/javascript' : 'text/html' }); fs.createReadStream(p).pipe(res);
-    });
-    await new Promise(r => srv.listen(0, r));
-    const b = await chromium.launch(), pg = await b.newPage();
-    await pg.goto(`http://localhost:${srv.address().port}/`); await pg.waitForTimeout(150);
+    const { serve } = require('./serve.cjs'), { chromium } = require('playwright');
+    const srv = await serve(), b = await chromium.launch(), pg = await b.newPage();
+    await pg.goto(srv.url); await pg.waitForTimeout(150);
     console.log(JSON.stringify(await measure(pg)));
-    await b.close(); srv.close();
+    await b.close(); await srv.close();
   })();
 }

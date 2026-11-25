@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 100** · **Version: v1.5.40** (session 100: Build; rotation: 101 Build, 102 Design, 104 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 101** · **Version: v1.5.41** (session 101: Build; rotation: 102 Design, 103 Build, 104 Audit).
 **Scope (D-119, `01`):** M1–M10 ✅ (v1.0 = M5, v1.5 = M10 world + biomes). The game keeps growing: M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -49,11 +49,11 @@ _Last updated: 2026-11-25_ · **Session counter: 100** · **Version: v1.5.40** (
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 18, `size`); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx, part 19 from D-130), `03` questions (Q-xxx), `09` log (tail: `09-…-14`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
-- Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
+- Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); tests share one server/runner `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-48b built (M10 done). M11 needs specs (Design 102). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 101 (Build): Debt — one shared `tests/serve.cjs` for the ~11 pasted standalone test runners (`04-Roadmap-2`, audit 99 leftovers); M11 specs come in Design 102.
+Session 102 (Design): write M11 Economy specs (3–5 S-n items) in `07` from `04-Roadmap-3.md`, play-test first; no gameplay code.
