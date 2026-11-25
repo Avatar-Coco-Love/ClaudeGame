@@ -49,3 +49,20 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
   37 % upstream → 30–55. S-46b2 absorbs the audit 89 site-helper Debt; Ring 90 / 110 dev buttons.
 - Play-test screenshots d 100 / d 115 of a live 256 New World viewed: minimap window keeps Nexus + core; no errors.
 - Smoke: see PR (docs only; +0 checks).
+
+## Session 93 — Build: S-46b2 the 256 world goes live (v1.4.33, D-125)
+- `needSize` in `world.js`: `World`, `vaultSites`, `spireCandidates`, `chooseSpires`, `loadSpires`, `spireFootprint`,
+  `isBroken` throw without a size (audit 89 Debt closed). `WORLD_SIZE_NEW` = 256. Dev panel Ring 90 / Ring 110, shown
+  only when `world.profile.rings` ≥ 5 (`dev.refresh`). `tools/perf.cjs ONLY=far` (d 100).
+- Flip-first smoke: 223/246 + a timeout. Every failure was a test writing a format ≤ 17 save from a (now 256) new game,
+  or pinning 160 geometry (`new World(77)`, `* 160`). Fixed by building those from 160 games / reading `save.size`.
+  Second run: 4 browser checks read the minimap as the whole map (`x * w / (w.w * 32)`); they now map through
+  `renderer.miniWin` (craft, relay, spire, anomalyfound): B-083, latent since S-46b1.
+  Third run: `drawcost` holes 2.02× (≤ 2). Old code (stash, 160) also hit 2.02× in 1 of 3 solo runs; new code 4/4
+  pass: B-084, a flaky margin, not this change. Not loosened; Debt for audit 94.
+- New `tests/bigworld.cjs` (+6): new world 256; 7 helpers throw; save 26.9 KB (≤ 32); `new Game` 59 / 67 / 68 ms at ×4
+  (≤ 150); New World 256 + Ring 90 / 110 land in Shoal / Kiln, hidden at 3 rings; draw d 100 / d 30 = 0.45× (≤ 1.3).
+  `cycle.cjs`: New Cycle is 256. Fail on old code: size check (160) and the throw check (defaults built silently).
+- Observed: d 100 draws cheaper than d 30 (less explored light, fewer lit cells). Screenshots d 90 / d 110 of a live
+  New World viewed: Shoal reads mint; at d 110 the Kiln rose is dim outside the core's light (S-48 may want a warmer glow).
+- Smoke 441/441 (was 435; +6 bigworld). Shots: scratch only.

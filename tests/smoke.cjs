@@ -16,13 +16,21 @@ const server = http.createServer((req, res) => {
 
 // Plant a save, then reload. Always use this: a plain reload fires `pagehide`, which saves the running game over the
 // planted one (bit sessions 4 and 5). `edit(save)` runs in the page and returns the save to store (null = current save).
-async function plantSaveAndReload(page, edit) {
-  await page.evaluate(src => {
+/** `old`: the edit writes a pre-S-45 format, and every such save is a 160 world (S-46b2): the live (256) game's progress
+ *  is moved onto a 160 world of the same seed before edit() sees it. */
+async function plantSaveAndReload(page, edit, old = false) {
+  await page.evaluate(async ([src, old]) => {
     dispatchEvent(new Event('pagehide')); // flush the live game first so edit() sees current state
     window.__lumen.game.demo = true;      // ...then stop it from saving again during the reload
-    const k = 'lumencore.save.v1', cur = JSON.parse(localStorage.getItem(k));
+    const k = 'lumencore.save.v1';
+    let cur = JSON.parse(localStorage.getItem(k));
+    if (old) {
+      const { Game } = await import('/src/game.js'), au = new Proxy({}, { get: () => () => {} });
+      const small = new Game({ seed: cur.seed, mode: cur.mode, size: 160, audio: au }).toSave();
+      cur = { ...small, bank: cur.bank, upgrades: cur.upgrades, nexus: cur.nexus, stats: cur.stats, mode: cur.mode };
+    }
     localStorage.setItem(k, JSON.stringify((0, eval)(src)(cur)));
-  }, edit.toString());
+  }, [edit.toString(), old]);
   await page.reload(); await page.waitForTimeout(400);
 }
 
@@ -54,6 +62,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   for (const r of require('./colours.cjs').run()) check(r.name, r.ok, r.detail);
   await require('./world.cjs').nodeChecks(check);
   await require('./worldsize.cjs').nodeChecks(check);
+  await require('./bigworld.cjs').nodeChecks(check).catch(e => check('S-46b2 big-world node checks ran', false, e.message));
   await require('./audit89.cjs').nodeChecks(check);
   await require('./saveformat.cjs').nodeChecks(check).catch(e => check('save-format checks ran', false, e.message));
   await require('./audit49.cjs').nodeChecks(check).catch(e => check('audit 49 checks ran', false, e.message));
@@ -234,12 +243,12 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
 
     // Old saves must load: a save written before format tracking has no `v`.
     // A format-1 save has no `nexus` either.
-    await plantSaveAndReload(pg, s => { delete s.v; delete s.nexus; return s; });
+    await plantSaveAndReload(pg, s => { delete s.v; delete s.nexus; return s; }, true);
     await pg.click('#continue'); await pg.waitForTimeout(200);
     const old = await pg.evaluate(() => ({ mined: window.__lumen.game.stats.mined, radiance: window.__lumen.game.nexusLevels.radiance }));
     check('unversioned (format 1) save still loads, Radiance 0', old.mined === snap.mined && old.radiance === 0, JSON.stringify(old));
     // A format-2 save has no `pickups` (B-011).
-    await plantSaveAndReload(pg, s => { s.v = 2; delete s.pickups; return s; });
+    await plantSaveAndReload(pg, s => { s.v = 2; delete s.pickups; return s; }, true);
     await pg.click('#continue'); await pg.waitForTimeout(200);
     const f2 = await pg.evaluate(() => ({ mined: window.__lumen.game.stats.mined, pickups: window.__lumen.game.pickups.length }));
     check('format-2 save (no pickups) still loads (B-011)', f2.mined === snap.mined && f2.pickups >= 0, JSON.stringify(f2));
@@ -360,6 +369,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./hud.cjs').browserChecks(browser, url, check, errors);
     await require('./anomalyfound.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-37 anomaly-found browser checks ran', false, e.message));
     await require('./worldsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-46b world-size browser checks ran', false, e.message));
+    await require('./bigworld.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-46b2 big-world browser checks ran', false, e.message));
     await require('./hud.cjs').toastChecks(browser, url, check, errors);
     await require('./quality.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-41 graphics quality browser checks ran', false, e.message));
     await require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message));

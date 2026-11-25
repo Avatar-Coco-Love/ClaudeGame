@@ -33,7 +33,7 @@ async function nodeChecks(check) {
   const h = new Game({ seed: 77, mode: 'surge', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
   check('beacons and carried stock survive save + load (S-16)', h.beacons.map(b => b.i).join() === g.beacons.map(b => b.i).join() && h.craft.beacon === 1
     && h.beacons[1].x === g.beacons[1].x, JSON.stringify({ beacons: h.beacons.length, stock: h.craft.beacon }));
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave();
   old.v = 8; delete old.craft; delete old.beacons;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   check('a format-8 save loads with no beacons and none carried (S-16, D-005)', up.v === SAVE_FORMAT && o.beacons.length === 0 && o.craft.beacon === 0
@@ -91,8 +91,8 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload) {
     g.anomaly.sites.forEach(q => { if (!q.void && near(q.x, q.y)) { q.void = true; hid++; } });
     g.spires.forEach(q => { if (q.seen && near(q.x, q.y)) { q.seen = false; hid++; } });
     return new Promise(res => requestAnimationFrame(() => requestAnimationFrame(() => {
-      const dark = (0, eval)(f)(); const m = window.__lumen.renderer.mctx, sc = 140 / (g.world.w * 32);
-      const px = m.getImageData(Math.round(bx * sc), Math.round(by * sc), 1, 1).data;
+      const dark = (0, eval)(f)(); const m = window.__lumen.renderer.mctx, mw = window.__lumen.renderer.miniWin; // S-46b window (a 256 world, S-46b2)
+      const px = m.getImageData(Math.round((bx - mw.ox) * mw.sc), Math.round((by - mw.oy) * mw.sc), 1, 1).data;
       res({ at: dark(bx, by), off: dark(bx, by - 220), mini: [px[0], px[1], px[2]].join(','), hid });
     })));
   }, [b.x, b.y, darkAt.toString()]);

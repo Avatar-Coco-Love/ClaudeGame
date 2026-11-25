@@ -21,3 +21,12 @@ Continues `06-Decisions-17.md` (same rules: supersede, never edit; list rejected
   smoke (software raster, vsync-quantised 33 / 50 ms frames: only ratios hold); a current that scales with thrust
   level (an upgrade that makes the hazard stronger reads as a punishment); keeping 6 s heat with a shorter vent (0.8 s
   is too short to read as a vent).
+
+## D-125 — Size is required; old-format test saves are 160 worlds (session 93, S-46b2)
+- `World` and every site helper throw without a size (`needSize`), no default; the save upgrade names `WORLD_SIZE_OLD`.
+- `WORLD_SIZE_NEW` = 256. A test that writes a save of format ≤ 17 builds it from a 160 game (`size: 160`; smoke's
+  `plantSaveAndReload(…, true)` moves the live game's progress onto a 160 world of its seed): no such save was ever 256,
+  and the 17 → 18 step rightly rejects 256 bitsets. Geometry checks read `world.w` / `save.size` instead of 160.
+- Perf budget in smoke (`bigworld.cjs`): `new Game` 256 at CPU ×4 median ≤ 150 ms, full save ≤ 32 KB, draw d 100 ≤ 1.3×
+  d 30 (High, Auto off). Rejected: pinning every node test to 160 (loses 256 coverage for no reason); a `?size=` URL
+  switch for tests (a player-reachable knob for a test need); keeping the default and grepping callers (silent again).

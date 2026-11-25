@@ -57,8 +57,8 @@ async function browserChecks(browser, url, check, errors) {
       const g = window.__lumen.game, s = g.anomaly.sites[0], w = g.world;
       s.kind = 'lodestone'; w.explored[s.y * w.w + s.x] = 1;
       for (let i = 0; i < 3; i++) await new Promise(r => requestAnimationFrame(r));
-      const c = document.getElementById('minimap'), sc = c.width / (w.w * 32);
-      return [...c.getContext('2d').getImageData(Math.floor((s.x + 0.5) * 32 * sc), Math.floor((s.y + 0.5) * 32 * sc), 1, 1).data].slice(0, 3);
+      const c = document.getElementById('minimap'), mw = window.__lumen.renderer.miniWin; // S-46b window
+      return [...c.getContext('2d').getImageData(Math.floor(((s.x + 0.5) * 32 - mw.ox) * mw.sc), Math.floor(((s.y + 0.5) * 32 - mw.oy) * mw.sc), 1, 1).data].slice(0, 3);
     });
     check('S-37 minimap: a seen charged site draws a dot in its kind\'s colour (Lodestone violet)', px[2] > 200 && px[0] > 150 && px[1] < 180, px.join());
     await pg.close();

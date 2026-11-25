@@ -9,7 +9,7 @@ async function nodeChecks(check) {
   const { tryScan } = await import('../src/research.js');
 
   // B-022: kept pickups (death scatter, caches) never count toward the cap; at the cap the oldest loose pickup makes room.
-  const g = new Game({ seed: 77, mode: 'surge', audio });
+  const g = new Game({ seed: 77, mode: 'surge', audio, size: 160 }); // its v7 save is a 160 world
   for (let i = 0; i < CAP; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard', true);
   g.onCellBroken(1, 1, T.CRYSTAL); const afterKept = g.pickups.length;
   for (let i = 0; i < CAP + 20; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'prism');

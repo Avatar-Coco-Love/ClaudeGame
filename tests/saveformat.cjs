@@ -25,7 +25,7 @@ async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const audio = new Proxy({}, { get: () => () => {} });
   // The oldest save shape (format 1: no `v`, no later fields) walks every step to the current format and loads.
-  const s = new Game({ seed: 5, mode: 'drift', audio }).toSave(), old = { seed: s.seed, mode: s.mode, explored: s.explored, broken: s.broken,
+  const s = new Game({ seed: 5, mode: 'drift', audio, size: 160 }).toSave(), old = { seed: s.seed, mode: s.mode, explored: s.explored, broken: s.broken,
     bank: s.bank, cargo: s.cargo, upgrades: s.upgrades, player: s.player };
   let up = null, err = '';
   try { up = upgradeSave(JSON.parse(JSON.stringify(old))); new Game({ seed: 5, mode: 'drift', audio, save: up }); } catch (e) { err = e.message; }

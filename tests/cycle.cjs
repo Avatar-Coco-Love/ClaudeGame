@@ -9,11 +9,11 @@ async function nodeChecks(check) {
   const { Game } = await import('../src/game.js'), sp = await import('../src/spire.js');
   const { upgradeSave } = await import('../src/save.js');
   const { NEXUS_HUES } = await import('../src/config.js');
-  const g = new Game({ seed: 77, mode: 'surge', audio: quiet }); g.stats.time = 600.4;
+  const g = new Game({ seed: 77, mode: 'surge', audio: quiet, size: 160 }); g.stats.time = 600.4; // its v13 copy (audit 64) is a 160 world
   g.spires.forEach((s, i) => { s.fed = 80; sp.relightSpire(g, s, i < 3 ? 'surge' : 'drift'); });
   const rec = JSON.parse(JSON.stringify(g.records));
   const h = new Game({ seed: 77, mode: 'surge', audio: quiet, save: JSON.parse(JSON.stringify({ ...g.toSave(), cycle: 3 })) });
-  const old = JSON.parse(JSON.stringify(new Game({ seed: 5, mode: 'drift', audio: quiet }).toSave())); old.v = 13; delete old.cycle; delete old.records; // pin-ok: an old save
+  const old = JSON.parse(JSON.stringify(new Game({ seed: 5, mode: 'drift', audio: quiet, size: 160 }).toSave())); old.v = 13; delete old.cycle; delete old.records; // pin-ok: an old save
   const up = new Game({ seed: 5, mode: 'drift', audio: quiet, save: upgradeSave(old) });
   check('S-29: the ending records this cycle (time, Drift / Surge relights) and the best time; cycle + records survive a save; an old save is cycle 0',
     rec.best === 600 && rec.cycles[0].time === 600 && rec.cycles[0].surge === 3 && rec.cycles[0].drift === 2 && h.cycle === 3 && h.records.best === 600
@@ -59,12 +59,12 @@ async function browserChecks(browser, url, check, errors, shots) {
   const c = await page.evaluate(async () => {
     const L = window.__lumen, g = L.game, R = L.renderer, cfg = await import('/src/config.js'), q = R.worldToScreen(g.nexus.x + 16, g.nexus.y);
     const d = R.ctx.getImageData(Math.round(q.x * R.dpr), Math.round(q.y * R.dpr), 1, 1).data;
-    return { seed: g.world.seed, cycle: g.cycle, bank: g.bank.shard + g.bank.prism, beam: g.upgrades.beam, lit: g.spires.filter(s => s.lit).length, ended: g.ended,
+    return { seed: g.world.seed, size: g.world.w, cycle: g.cycle, bank: g.bank.shard + g.bank.prism, beam: g.upgrades.beam, lit: g.spires.filter(s => s.lit).length, ended: g.ended,
       best: g.records.best, hue: g.nexusHue(), want: cfg.NEXUS_HUES[1], px: [d[0], d[1], d[2]], card: !document.getElementById('ending').classList.contains('hidden') };
   });
   if (shots) await page.screenshot({ path: `${shots}/cycle-nexus-1280x800.png` });
-  check('S-29: New Cycle (confirmed) gives a new seed, cycle 1, empty bank + Matrix, no Spire lit, records kept, the Nexus in cycle 1\'s hue; dismissed keeps the world',
-    kept.same && kept.open && c.seed !== seed0 && c.cycle === 1 && c.bank === 0 && c.beam === 0 && c.lit === 0 && !c.ended && Number.isFinite(c.best)
+  check('S-29: New Cycle (confirmed) gives a new 256 seed (S-46b2), cycle 1, empty bank + Matrix, no Spire lit, records kept, the Nexus in cycle 1\'s hue; dismissed keeps the world',
+    kept.same && kept.open && c.seed !== seed0 && c.size === 256 && c.cycle === 1 && c.bank === 0 && c.beam === 0 && c.lit === 0 && !c.ended && Number.isFinite(c.best)
     && c.hue === c.want && !c.card && c.px[1] > c.px[2] + 10, JSON.stringify({ kept, c }));
   await page.evaluate(() => dispatchEvent(new Event('pagehide')));
   await page.reload(); await page.waitForTimeout(300);

@@ -12,11 +12,11 @@ async function nodeChecks(check) {
   // Placement over 40 seeds: 5 each, d 64–74, ≥ 12 from every vault centre (and no shared cell), ≥ 12 apart, inside the border.
   const bad = [];
   for (let seed = 1; seed <= 40; seed++) {
-    const sp = chooseSpires(seed), vaults = vaultSites(seed), vcells = new Set(vaults.flatMap(v => v.cells));
+    const sp = chooseSpires(seed, null, null, 160), vaults = vaultSites(seed, 160), vcells = new Set(vaults.flatMap(v => v.cells));
     const fail = sp.length !== 5 || sp.some(s => {
       const d = Math.hypot(s.x + 0.5 - W / 2, s.y + 0.5 - H / 2);
       return d < SPIRE_D[0] || d > SPIRE_D[1] || s.x - 4 < 2 || s.y - 4 < 2 || s.x + 4 > W - 3 || s.y + 4 > H - 3
-        || vaults.some(v => Math.hypot(v.x - s.x, v.y - s.y) < 12) || spireFootprint(s.x, s.y).some(c => vcells.has(c))
+        || vaults.some(v => Math.hypot(v.x - s.x, v.y - s.y) < 12) || spireFootprint(s.x, s.y, 160).some(c => vcells.has(c))
         || sp.some(o => o !== s && Math.hypot(o.x - s.x, o.y - s.y) < 12);
     });
     if (fail) bad.push(seed);
@@ -24,12 +24,12 @@ async function nodeChecks(check) {
   check('5 Spires on 40/40 seeds: d 64–74, ≥ 12 from vaults and each other, inside the border (S-19)', bad.length === 0, `bad seeds ${bad.join()}`);
 
   // Same seed -> same sites; the stamp changes nothing outside the footprints; the shape is 9 core, 8 facets, 20 shell.
-  const a = new Game({ seed: 77, mode: 'drift', audio }), b = new Game({ seed: 77, mode: 'surge', audio }), c = new Game({ seed: 78, mode: 'drift', audio });
+  const a = new Game({ seed: 77, mode: 'drift', audio, size: 160 }), b = new Game({ seed: 77, mode: 'surge', audio, size: 160 }), c = new Game({ seed: 78, mode: 'drift', audio, size: 160 });
   const key = g => JSON.stringify(g.spires.map(s => [s.x, s.y]));
   check('the same seed gives the same Spires, another seed others (S-19)', key(a) === key(b) && key(a) !== key(c), key(a));
-  const base = new World(77), foot = new Set(a.spires.flatMap(s => spireFootprint(s.x, s.y)));
+  const base = new World(77, [], 160), foot = new Set(a.spires.flatMap(s => spireFootprint(s.x, s.y, 160)));
   let outside = 0; for (let i = 0; i < N; i++) if (!foot.has(i) && a.world.cells[i] !== base.cells[i]) outside++;
-  const s0 = a.spires[0], count = t => spireFootprint(s0.x, s0.y).filter(i => a.world.cells[i] === t).length;
+  const s0 = a.spires[0], count = t => spireFootprint(s0.x, s0.y, 160).filter(i => a.world.cells[i] === t).length;
   const shape = { core: count(T.SPIRE), facet: count(T.FACET), shell: count(T.SPIRE_SHELL), open: count(T.EMPTY) };
   check('a Spire is a 9×9 shell with 4 gaps, 8 facets, a 3×3 core; nothing changes outside the footprints (S-19)', outside === 0
     && shape.core === 9 && shape.facet === 8 && shape.shell === 20 && shape.open === 44 && a.world.get(s0.x, s0.y) === T.SPIRE
@@ -41,8 +41,8 @@ async function nodeChecks(check) {
     && w.get(s0.x, s0.y) === T.SPIRE && shell && !shell.broken && shell.frac > 0, JSON.stringify({ core, facet, shell }));
 
   // A format-9 save that tunnelled through sector 0's first candidate: it gets a later candidate and keeps its tunnel.
-  const cand = spireCandidates(77), c0 = cand[0][0];
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
+  const cand = spireCandidates(77, 160), c0 = cand[0][0];
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave();
   const ex = new Uint8Array(N), br = new Uint8Array(N), tunnel = [];
   for (let i = -6; i <= 6; i++) { const k = c0.y * W + c0.x + i; br[k] = ex[k] = 1; tunnel.push(k); }
   Object.assign(old, { v: 9, explored: packBits(ex), broken: packBits(br) }); delete old.spires;
@@ -74,7 +74,7 @@ async function foundChecks(check) {
   for (const mode of ['drift', 'surge']) {
     let tones = 0;
     const au = new Proxy({}, { get: (_, k) => k === 'spire' ? () => tones++ : () => {} });
-    const g = new Game({ seed: 77, mode, audio: au }), s = g.spires[2];
+    const g = new Game({ seed: 77, mode, audio: au, size: 160 }), s = g.spires[2];
     const look = q => q.revealQueue.push(...q.world.reveal((s.x + 0.5) * CELL, (s.y + 5.5) * CELL, 2 * CELL)); // touches the bottom row only
     g.update(1 / 60, idle);
     const before = { ev: g.events.includes('spire'), seen: g.spires.filter(q => q.seen).length };
@@ -94,9 +94,9 @@ async function foundChecks(check) {
   // A v0.2.50 save (format 10, every `seen` false) whose explored bitset covers two footprints: both seen on load, no event.
   let tones = 0;
   const au = new Proxy({}, { get: (_, k) => k === 'spire' ? () => tones++ : () => {} });
-  const base = new Game({ seed: 77, mode: 'drift', audio: au }), sv = JSON.parse(JSON.stringify(base.toSave())), n = base.world.w * base.world.h;
+  const base = new Game({ seed: 77, mode: 'drift', audio: au, size: 160 }), sv = JSON.parse(JSON.stringify(base.toSave())), n = base.world.w * base.world.h;
   const ex = unpackBits(sv.explored, n);
-  for (const k of [0, 3]) for (const i of spireFootprint(sv.spires[k].x, sv.spires[k].y)) ex[i] = 1;
+  for (const k of [0, 3]) for (const i of spireFootprint(sv.spires[k].x, sv.spires[k].y, 160)) ex[i] = 1;
   sv.explored = packBits(ex);
   const pre = new Game({ seed: 77, mode: 'drift', audio: au, save: upgradeSave(sv) });
   for (let i = 0; i < 10; i++) pre.update(1 / 60, idle);
@@ -108,7 +108,7 @@ async function foundChecks(check) {
   check('the core hexagon breathes 0.35–0.6 over 6 s; held at 0.6 under reduced motion (S-27)',
     b[0] === 0.6 && b[2] === 0.35 && b[1] === 0.475 && still.every(v => v === 0.6), JSON.stringify({ b, still }));
   // B-060: the browser checks' pinned seed keeps every other Spire ≥ PIN_GAP cells from Spire 0, so the approach sees one.
-  const ps = new Game({ seed: PIN_SEED, mode: 'drift', audio: au }).spires;
+  const ps = new Game({ seed: PIN_SEED, mode: 'drift', audio: au, size: 160 }).spires;
   const gap = Math.min(...ps.slice(1).map(q => Math.hypot(q.x - ps[0].x, q.y - ps[0].y)));
   check(`the Spire browser checks' pinned seed has no second Spire within ${PIN_GAP} cells of Spire 0 (B-060)`, gap >= PIN_GAP, `seed ${PIN_SEED}, gap ${gap.toFixed(1)}`);
 }
@@ -188,8 +188,8 @@ async function browserChecks(browser, url, check, errors, shots) {
   // Minimap: the brightest pixel in a 9×9 box at a Spire's centre. The mark (#e4dcff, sum 703) is brighter than any
   // explored Spire cell (shell 510); an unseen Spire's box stays dark.
   const mini = await page.evaluate(() => {
-    const L = window.__lumen, g = L.game, c = L.renderer.minimap, m = c.getContext('2d'), sc = c.width / (g.world.w * 32);
-    const at = s => { const d = m.getImageData(Math.round((s.x + 0.5) * 32 * sc) - 4, Math.round((s.y + 0.5) * 32 * sc) - 4, 9, 9).data;
+    const L = window.__lumen, g = L.game, c = L.renderer.minimap, m = c.getContext('2d'), mw = L.renderer.miniWin; // S-46b window
+    const at = s => { const d = m.getImageData(Math.round(((s.x + 0.5) * 32 - mw.ox) * mw.sc) - 4, Math.round(((s.y + 0.5) * 32 - mw.oy) * mw.sc) - 4, 9, 9).data;
       let v = 0; for (let i = 0; i < d.length; i += 4) v = Math.max(v, d[i] + d[i + 1] + d[i + 2]); return v; };
     return { seen: at(g.spires[0]), unseen: at(g.spires[1]), flags: g.spires.map(s => s.seen), seed: g.world.seed, sp: g.spires.map(s => [s.x, s.y]), p: [g.player.x / 32 | 0, g.player.y / 32 | 0] };
   });

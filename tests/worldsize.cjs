@@ -15,7 +15,7 @@ function worldHash(g) {
 
 /** A format-17 save of seed `seed` (the shape every pre-S-45 build wrote): a few cells mined round the Nexus. */
 function oldSave(Game, audio, seed) {
-  const g = new Game({ seed, mode: 'drift', audio }), w = g.world;
+  const g = new Game({ seed, mode: 'drift', audio, size: 160 }), w = g.world;
   for (let i = 0; i < 12; i++) { const x = Math.floor(w.cx) + 3 + i, y = Math.floor(w.cy); w.hit(x, y, 99); }
   const s = JSON.parse(JSON.stringify(g.toSave()));
   s.v = 17; delete s.size;
@@ -43,8 +43,8 @@ async function sizeChecks() {
   const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(s) });
   check('a 256 world builds, saves its size and reloads with the same hash (S-45)', g.world.w === 256 && g.world.cells.length === 256 * 256
     && s.size === 256 && h.world.w === 256 && worldHash(h) === worldHash(g), `w ${g.world.w} → save ${s.size} → ${h.world.w}`);
-  const fresh = new Game({ seed: 77, mode: 'drift', audio });
-  check('a new world is still 160 and saves size 160 (S-45)', fresh.world.w === 160 && fresh.toSave().size === 160, `w ${fresh.world.w}`);
+  const fresh = new Game({ seed: 77, mode: 'drift', audio, size: 160 }); // a 160 world (new worlds are 256 since S-46b2: bigworld.cjs)
+  check('a 160 world builds and saves size 160 (S-45)', fresh.world.w === 160 && fresh.toSave().size === 160, `w ${fresh.world.w}`);
 
   const base = JSON.parse(JSON.stringify(fresh.toSave())), bits = packBits(new Uint8Array(256 * 256));
   const cases = { 'size 256, 160 bitsets': { size: 256 }, 'size 200 (no profile)': { size: 200 }, 'size "160"': { size: '160' },
@@ -93,7 +93,7 @@ async function windowChecks() {
   const { miniWindow } = await import('../src/hud.js');
   const { exploredBox } = await import('../src/ending.js');
   const audio = new Proxy({}, { get: () => () => {} }), C = 32, S = 180;
-  const small = new Game({ seed: 77, mode: 'drift', audio }), big = new Game({ seed: 77, mode: 'drift', audio, size: 256 });
+  const small = new Game({ seed: 77, mode: 'drift', audio, size: 160 }), big = new Game({ seed: 77, mode: 'drift', audio, size: 256 });
   const a = miniWindow(small.world, 10, 4000, S);
   check('a 160 world\'s minimap window is the whole map, wherever the core is (S-46b)',
     a.ox === 0 && a.oy === 0 && a.win === 160 * C && a.sc === S / (160 * C), JSON.stringify(a));

@@ -66,7 +66,7 @@ async function nodeChecks(check) {
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const { SPIRE_TAPS, SPIRE_LIGHT } = await import('../src/config.js');
   const { startMask, toggleMask } = sp;
-  const make = (mode = 'drift', save = null) => { const g = new Game({ seed: 77, mode, audio: quiet, save }); g.__spire = sp; g.god = true; g.spawnTimer = 1e9; return g; };
+  const make = (mode = 'drift', save = null, size) => { const g = new Game({ seed: 77, mode, audio: quiet, save, size }); g.__spire = sp; g.god = true; g.spawnTimer = 1e9; return g; };
   const prime = (g, i = 0) => { const s = g.spires[i]; s.fed = 80; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32;
     g.update(DT, { move: { x: 0, y: 0 }, aim: null, fire: false }); return s; };
   const g0 = make(), A = aims(g0, g0.spires[0]);
@@ -141,7 +141,7 @@ async function nodeChecks(check) {
   {
     const r = await solveInGame(77, 0, 'drift', A), sv = upgradeSave(JSON.parse(JSON.stringify(r.g.toSave())));
     const again = new Game({ seed: 77, mode: 'drift', audio: quiet, save: sv }), a0 = again.spires[0];
-    const old = JSON.parse(JSON.stringify(make().toSave())); old.v = 11; Object.assign(old.spires[1], { fed: 80, mask: 255, lit: true }); // the format before S-28's `mode` step (pin-ok: an old save)
+    const old = JSON.parse(JSON.stringify(make('drift', null, 160).toSave())); old.v = 11; Object.assign(old.spires[1], { fed: 80, mask: 255, lit: true }); // the format before S-28's `mode` step (pin-ok: an old save)
     const up = new Game({ seed: 77, mode: 'drift', audio: quiet, save: upgradeSave(old) });
     const junk = JSON.parse(JSON.stringify(sv)); junk.spires[0].mode = 'banana';
     const jg = new Game({ seed: 77, mode: 'drift', audio: quiet, save: upgradeSave(junk) });
@@ -153,7 +153,7 @@ async function nodeChecks(check) {
 
   // S-20's broken path gets the relit effects: mode 'broken', the light, and the tone.
   {
-    const base = JSON.parse(JSON.stringify(make().toSave())), s0 = base.spires[2]; s0.keep = [s0.y * 160 + s0.x];
+    const base = JSON.parse(JSON.stringify(make().toSave())), s0 = base.spires[2]; s0.keep = [s0.y * base.size + s0.x];
     let tone = 0; const g = new Game({ seed: 77, mode: 'surge', audio: new Proxy({}, { get: (_, k) => k === 'spireRelit' ? () => tone++ : () => {} }), save: upgradeSave(base) });
     g.god = true; g.spawnTimer = 1e9; g.bank.prism = 80;
     const s = g.spires[2]; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32;
