@@ -52,3 +52,25 @@ Continues `09-Implementation-Log-14.md` (part 14 neared the 8 KB cap at session 
   surfaced chevron (spacing widened after the first look, it read as one blob).
 - Observed: a Drift core parked 90 s ate 39 ore cells (path ore counts) — S-53b's gate must measure this.
 - Smoke 524/524 (+7 burrower).
+
+## Session 111 — Build: S-53b Burrower rumble + Kiln gate (v1.6.52, D-146)
+- Rumble: `Music.rumble(lv)` (a held drone on the bus) fed by `burrowerRumble(game)` from `main.js`. `audio.cjs` (alone,
+  Music 50): 50 ms windows −56.4…−48.2 dBFS (bed RMS −47.4), peak −42.5, 0 % > 2 kHz, silent 1 s after it leaves;
+  bed + rumble −46.1 RMS, max window −41.4 (bed ceiling −36). Wobble 0.45 dipped to −65.5: cut to 0.35.
+- **B-091** (fixed): `music.cjs` 50 ms windows at 22050 Hz were 1102.5 samples, so every other one read NaN (−999) and
+  hid itself from max / silence checks. Now rounded; every music check still passes. `burrower.cjs` +1: on within 4 cells, 0 beyond (fails on the
+  old `music.js`: proved).
+- `tools/biomefoe.mjs` (new; surgebot gains `setup` / `ore` options and beams a surfaced Burrower). 8 seeds × 10 min,
+  with / without (◆-eq; Burrowers, kills, ore eaten in the with-run):
+  | variant | Drift | Surge | note |
+  |---|---|---|---|
+  | as specced (gap 35–50, hp 6) | 1.010 | 1.003 | 67 / 73 spawned, kills 31 / 57, 0 deaths |
+  | gap 20–30 | 1.034 | 0.936 | Surge in band |
+  | gap 12–20 | 1.076 | 1.070 | more kills = more loot |
+  | gap 20–30, hp 20 (no kills) | 1.007 | 0.878 | Drift ate 617 cells: costs nothing |
+  | gap 20–30, Drift eats ore nearest the core | 1.154 | — | the bot kills it at its feet |
+  | gap 20–30, tunnels clear ore only | 1.044 | 0.898 | free tunnels are not Drift's gift |
+- Observed: the top-build bot is never ore-limited in the Kiln, so ore the Burrower eats is never missed; a drive-off
+  (belly + Glitch loot) is pure gain. Surge's cost is heal time from lunges. Numbers left as specced (Q-030, Design 112).
+- Smoke 526/526 (+2: rumble ceiling, rumble follows the Burrower); the first full run caught B-091.
+

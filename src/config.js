@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.6.51';
+export const VERSION = '1.6.52';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -330,6 +330,9 @@ export const MUSIC_CHORD_S = [10, 14], MUSIC_ATTACK_S = 3, MUSIC_RELEASE_S = 4; 
 export const MUSIC_PAD = { gain: 0.05, triMix: 0.5, lowpassHz: 900 };
 export const MUSIC_BELL = { gain: 0.12, gapS: [3, 7], decayS: 0.8, attackS: 0.03, octave: 2 };
 export const MUSIC_PULSE = { gain: 0.09, bpm: 70, noteS: 0.2, attackS: 0.02, octave: 0, wakeRate: 1.5 };
+// S-53b: the Burrower rumble, a held low drone on the music bus while a Burrower is within `cells` of the core (both modes):
+// sine `hz` + triangle at 1.5×, lowpassed, wobbling at `wobbleHz`; level 0.5…1 by closeness, ramped over `rampS`.
+export const MUSIC_RUMBLE = { gain: 0.09, hz: 52, triMix: 0.35, lowpassHz: 240, wobbleHz: 6, wobble: 0.35, cells: 4, rampS: 0.5 };
 export const MUSIC_XFADE_S = 4, MUSIC_END_FADE_S = 3, MUSIC_LOOKAHEAD_S = 0.1, MUSIC_MAX_VOICES = 6;
 // S-47 Undertow (D-124, undertow.js): each CHUNK whose centre cell is in the Shoal (ring UNDERTOW_RING) draws, from
 // seededStream(seed, 'undertow') in chunk order, calm (UNDERTOW_CALM share) or a current of UNDERTOW_SPEED[0] + r × [1] px/s

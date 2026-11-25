@@ -55,7 +55,9 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
   return null;
 }
 
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', echo = false, onTick = null }) {
+// S-53b: `setup(g)` runs once before the clock (biomefoe: start in a biome, place a Relay); `ore(i)` replaces the mine
+// route's ore test (cell index -> bool). A surfaced Burrower counts as a foe in both modes (a player beams it).
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', echo = false, onTick = null, setup = null, ore = null }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
   for (const s of g.anomaly.sites) if (anomaly !== 'on' && s.kind !== anomaly) s.void = true; // S-36: off / one kind only
   if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
@@ -63,6 +65,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   g.player.integrity = g.stat('hull');
   if (route === 'spire') g.bank.prism = bank;
   if (echo) g.research.echo = true; // S-42: echobot runs the same routes with the Echo along
+  if (setup) setup(g);
   const capT = minutes * 60, cellOf = (x, y) => Math.floor(y / CELL) * W + Math.floor(x / CELL);
   const cx = i => (i % W + 0.5) * CELL, cy = i => (((i / W) | 0) + 0.5) * CELL;
   let deaths = 0, stuck = 0, skipped = 0, t = 0; const die = g.destabilize.bind(g); g.destabilize = () => { deaths++; die(); };
@@ -72,7 +75,8 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   const setGoal = (key, fn) => { if (key !== goalKey) { goalKey = key; goalFn = fn; plan = null; replanned = false; watch = { x: g.player.x, y: g.player.y, t, mined: g.stats.mined }; } };
   // S-32: a bolt in flight inside FIGHT_PX is a foe too (a player beams it). Spitters count only inside FIGHT_PX, like any
   // Glitch: aiming at one out of beam reach stalled the dig (stuck on a spire run).
-  const foe = () => { let best = null, bd = FIGHT_PX; for (const e of g.enemies.concat(g.bolts)) { if (e.fade !== undefined) continue;
+  const foe = () => { let best = null, bd = FIGHT_PX; const bu = g.burrow && g.burrow.b && g.burrow.b.state === 'up' ? [g.burrow.b] : [];
+    for (const e of g.enemies.concat(g.bolts, bu)) { if (e.fade !== undefined) continue;
     const d = Math.hypot(e.x - g.player.x, e.y - g.player.y); if (d < bd) { bd = d; best = e; } } return best; };
   /** One frame toward the current goal. Returns 'arrived' | 'moving' | 'skip' (stuck twice, or no path). */
   const drive = () => {
@@ -92,7 +96,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     return 'moving';
   };
   const tick = (to, dig = null) => {
-    const p = g.player, e = mode === 'surge' ? foe() : null, m = Math.hypot(to.x - p.x, to.y - p.y);
+    const p = g.player, e = foe(), m = Math.hypot(to.x - p.x, to.y - p.y);
     const move = m < 2 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (to.x - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (to.y - p.y) / m * 2)) };
     const aimAt = e || dig || (m >= 2 ? to : { x: p.x + Math.cos(p.angle), y: p.y + Math.sin(p.angle) });
     g.update(dt, { move, fire: !!(e || dig), aim: { x: aimAt.x - p.x, y: aimAt.y - p.y } });
@@ -145,7 +149,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
           continue;
         }
         const far = route === 'deep' ? SPITTER_TIER * GLITCH_TIER_PX : 0;
-        setGoal('ore', i => ORE.has(w.cells[i]) && !bad.has(i) && Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) >= far);
+        setGoal('ore', i => (ore ? ore(i) : ORE.has(w.cells[i])) && !bad.has(i) && Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) >= far);
         const r = drive();
         if (r === 'skip') { if (!plan) break; bad.add(plan.end); skipped++; setGoal('', null); }
         else if (r === 'arrived') { for (let k = 0; k < 50 && t < capT; k++) tick(g.player); setGoal('', null); } // let the Attractor pull

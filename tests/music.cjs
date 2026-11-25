@@ -11,8 +11,9 @@ async function renderMusic([states, secs, { music = 50, volume = 70, seed = 4242
   const a = new Audio(); a.ctx = ctx; a.master = ctx.createGain(); a.setVolume(volume / 100); a.master.connect(ctx.destination);
   let now = 0; Object.defineProperty(ctx, 'currentTime', { get: () => now });
   const m = new Music(a); m.setSeed(seed); m.setLevel(music / 100);
-  const C = await import('/src/config.js'), padGain = C.MUSIC_PAD.gain;
-  if (only === 'layer') C.MUSIC_PAD.gain = 0; // measure a mode layer alone (restored below)
+  const C = await import('/src/config.js'), padGain = C.MUSIC_PAD.gain, bellGain = C.MUSIC_BELL.gain, pulseGain = C.MUSIC_PULSE.gain;
+  if (only === 'layer' || only === 'rumble') C.MUSIC_PAD.gain = 0; // measure a mode layer alone (restored below)
+  if (only === 'rumble') C.MUSIC_BELL.gain = C.MUSIC_PULSE.gain = 0; // S-53b: the Burrower rumble alone
   let maxVoices = 0, built = 0;
   const orig = ctx.createOscillator.bind(ctx); ctx.createOscillator = () => { built++; return orig(); };
   const stateAt = t => { let s = null; for (const [from, st] of states) if (t >= from) s = st; return s; };
@@ -21,13 +22,13 @@ async function renderMusic([states, secs, { music = 50, volume = 70, seed = 4242
     maxVoices = Math.max(maxVoices, m.voicesAt(now), m.voicesAt(now + 0.05));
   }
   const scheduled = m.notes.length, endedBy = m.notes.filter(x => x.stop < secs - 0.05).length;
-  C.MUSIC_PAD.gain = padGain;
+  C.MUSIC_PAD.gain = padGain; C.MUSIC_BELL.gain = bellGain; C.MUSIC_PULSE.gain = pulseGain;
   const buf = (await ctx.startRendering()).getChannelData(0);
   await new Promise(r => setTimeout(r, 50)); // 'ended' events are dispatched after rendering
   const db = x => x > 0 ? 20 * Math.log10(x) : -999, r1 = x => Math.round(x * 10) / 10;
   const rms = (s, e) => { let q = 0; for (let i = s; i < e; i++) q += buf[i] * buf[i]; return Math.sqrt(q / Math.max(1, e - s)); };
   let peak = 0; for (const v of buf) peak = Math.max(peak, Math.abs(v));
-  const W = sr / 20, win = [];
+  const W = Math.round(sr / 20), win = []; // B-091: 22050 / 20 is fractional; odd windows read NaN (-999) before
   for (let s = 0; s + W <= n; s += W) win.push(db(rms(s, s + W)));
   // Spectrum share above 2 kHz: Hann-windowed 2048-point FFT frames over the whole render.
   const N = 2048, re = new Float64Array(N), im = new Float64Array(N);
