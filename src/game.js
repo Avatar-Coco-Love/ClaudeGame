@@ -20,6 +20,7 @@ import { makeSwarm, updateSwarm, clearSwarm } from './mote.js';
 import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
+import { makeLocks, updateLocks } from './lock.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
 import { loadWards, updateWards } from './ward.js';
@@ -50,6 +51,7 @@ export class Game {
     this.spires = (save && loadSpires(save.spires, W, W)) || chooseSpires(seed, save && save.explored, save && save.broken, W, W);
     this.anomaly = makeAnomalies(this.world, this.spires); // S-35: sites from the generated terrain, before the stamp (seed-only)
     this.vents = makeVents(this.world, this.anomaly.sites); // S-48b: Kiln flare vents (seed-only, never saved)
+    makeLocks(this); // S-58: Kiln outer vaults are Flare Locks (seed-only, never saved; hooks world.hitMul)
     this.buffs = [];       // S-35: active Anomaly buff ids (saved); they end at the next deposit that banks ≥ 1 item
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
@@ -237,6 +239,7 @@ export class Game {
     this.updateBeam(dt, intent);
     updateWards(this, dt); // S-56: after the beam, before the creatures' passes, so a Ward kill pays this frame
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
+    updateLocks(this); // S-58: the same, for a Flare Lock's window flare
     updateBurrower(this, dt); // S-53: after the beam, so a kill on its last surfaced frame pays
     updateSwarm(this, dt); // S-54: after the beam, so a mote beamed this frame pays before it touches anything
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining

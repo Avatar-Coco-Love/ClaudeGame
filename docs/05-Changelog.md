@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.7.64 — 2026-11-25
+- **Flare Locks.** A vault deep in the Kiln's outer reaches is quenched: your beam only sparks grey on its shell. Watch its
+  edge: it warms orange, then flares (a shove and a burst of heat if you stand close) and for 3 s the shell cuts fast.
+  Beam from a few cells out, in time with the cycle. Once opened it stays open.
+
 ## v1.7.63 — 2026-11-25
 - **Nothing changes on screen yet.** The boss update is planned: the Kiln's Crucible and the Shoal's Gyre, each a core
   ringed by eight plates. In Drift you take one apart by its rule; in Surge you fight it. Same reward either way.

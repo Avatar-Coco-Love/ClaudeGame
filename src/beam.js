@@ -2,7 +2,8 @@
 // frame ({ ox, oy, ex, ey, target, enemy }). `beam.ex/ey/target/enemy` stay the centre ray's, so the darkness, crack overlay
 // and older checks keep working. Every mode scales from the Core Matrix Beam Power and Range stats; none adds a stat.
 import { T, BEAM_MODES, PULSE_CHARGE_S, PULSE_RANGE, PULSE_MIN, PULSE_MUL, PULSE_PIERCE, PULSE_GLITCH, PULSE_RECOVER_S,
-  PULSE_FLASH_S, BEAM_GLITCH_MUL, CELL, ARC_MUL } from './config.js';
+  PULSE_FLASH_S, BEAM_GLITCH_MUL, CELL, ARC_MUL, LOCK_SPARK } from './config.js';
+import { quenched } from './lock.js';
 import { UNBREAKABLE } from './world.js';
 import { facetAt, toggleFacet } from './spire.js';
 import { beamFoes } from './spitter.js';
@@ -67,7 +68,7 @@ export function castBeam(game, dt) {
     for (const r of rays) r.target = target;
     if (Math.random() < dt * 45) {
       const ty = res ? res.type : game.world.get(hit.x, hit.y); // C2: an unbreakable cell (Spire core, facet) sparks its own colour
-      const col = game.world.look(hit.x, hit.y, ty === T.EMPTY ? T.ROCK : ty).edge, r = rays[0];
+      const col = quenched(game, hit.x, hit.y) ? LOCK_SPARK : game.world.look(hit.x, hit.y, ty === T.EMPTY ? T.ROCK : ty).edge, r = rays[0]; // S-58: a quenched lock sparks grey
       game.particle(r.ex, r.ey, (-dx + (Math.random() - 0.5) * 1.6) * 110, (-dy + (Math.random() - 0.5) * 1.6) * 110, 0.35, col, 2);
     }
     if (res && res.broken) game.onCellBroken(hit.x, hit.y, res.type);

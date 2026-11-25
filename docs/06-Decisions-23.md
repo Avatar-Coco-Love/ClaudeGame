@@ -24,3 +24,14 @@ alternatives). D-158 on.
   biome (D-134: calming the Undertow buys nothing); bosses required for the ending (a 160 world could never finish);
   Glitch spawns from the Crucible (Surge's Glitches already come anyway; the embers are its own voice); a Gyre rule
   "cut only against the current" (that is S-59's Tide Lock).
+
+### D-159 — Flare Lock: a 3 s window at × 2, one damage hook for every cutter (session 123, build; S-58)
+- **Numbers:** S-58's 2 s at × 1.5 missed its own probe (top build, Focus, 3.5 cells out, mean over 32 phases: 2.48× a
+  plain vault). 3 s × 1.5: 2.04×; 3 s × 2: **1.94× (kept)**; 3 s × 2.5: 1.78× (cut: a low build would open a lock almost
+  as fast as a plain vault, 8 / 7.5). Low builds tend to 8 / (3 × 2) = 1.33×, so the cycle still matters.
+- **Hook:** `world.hitMul` (lock.js) scales every `world.hit` (beam, Arc, Pulse, Echo, shatter), so no cutter skips the
+  rule. The Kiln heat from a quenched beam still counts (beaming at the wrong time has a cost). Opened = the cache is gone
+  (read from the cells, so an old save needs no field). The flare fires only in the window's first 0.25 s, once per cycle,
+  measured from the 7 × 7 footprint's edge.
+- Rejected: a lock-only shorter cycle (S-58 ties it to the vents' 8 s, one rhythm per biome); a saved "opened" flag (the
+  cache cell already says it); excusing the Echo (one rule for every cutter reads as a rule).
