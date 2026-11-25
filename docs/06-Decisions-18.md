@@ -58,3 +58,18 @@ Continues `06-Decisions-17.md` (same rules: supersede, never edit; list rejected
 - Rejected: one `'shatter'` stream drawn in break order (picks would depend on what was mined first); cracking from
   inside `world.hit` (World has no game, and Echo / Wake-lane clears would need their own guards); a chain with decay
   (the spec says none, and it would make Shoal tunnels runaway).
+
+### D-129 — Q-027 settled (no d 100 Undertow leg); S-48 split into heat + flare vents (session 97, Design)
+- **Q-027: no.** `haulrun` at d 100 (scratch copy) still reads median ×1.000 (level 3: 18/20 pairs, max ×1.30;
+  level 0: 19/20, max ×1.31), and an open-corridor probe (5-wide, radial d 82–102 and tangential at d 92, no
+  tunnelling) reads ×1.00 (max ×1.05): a round trip cancels a current, and half the chunks are calm. The Undertow is
+  felt one way (±29 % at 55 px/s), which is its point; its cost bar stays met. The deeper leg goes into `haulrun` in
+  S-48a for the Kiln (`D` arg, 116), where heat slows the digging that dominates a haul.
+- **S-48 split** like S-47 (D-127): S-48a heat + phrygian music + probe, S-48b flare vents + the v1.5 close-out.
+  Specs in `07-Build-Specs-10.md`. Refinements: heat counts damage share on Kiln cells (by the cell's ring, not the
+  chunk's) capped at 1, so Wide / Overclock don't heat faster; the Echo adds none; the beam event is "overheat" so it
+  can't be confused with a flare vent; vents don't change terrain (256 saves keep their layout) and only near sites are
+  stepped (~126 sites a world).
+- Rejected: a d 100 Undertow leg (measured to say nothing); one S-48 PR (two systems + music + probe + close-out is
+  past one PR's checks); heat per frame "while the beam touches Kiln" (Wide's 3 cells and Overclock would heat
+  faster); carving vents into open floor (moves an existing 256 save's terrain).

@@ -7,7 +7,9 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 - **Audit 94 leftovers** (sweeps in-session; B-084 fixed in #101: glow blit unsmoothed, D-126). Touch: the ring toast
   ("Entering the Kiln") draws over lit terrain just under the core on a phone, no backing plate. Kiln reads dim outside
   the core's light (session 93; S-48 may warm it). Perf: holes frame still +2.3 ms for the light holes themselves. **B-085** `glow.cjs` "outside" floor read 3.7 once in a
-  full smoke (usual 3.2, 285 isolated seeds never): find what lights it (not the glow: off = on).
+  full smoke (usual 3.2, 285 isolated seeds never): find what lights it (not the glow: off = on). **B-086** (design 97,
+  unconfirmed): one d 110 dev-teleport shot after 6 s of beam showed no terrain or light disc within 2 cells while
+  `world.get` had crystal / prism there; 7 reruns (other seeds) drew fine. Recheck, fixed seed, audit 99.
 - ✅ **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits; the site helpers' 160 default went in
   S-46b2, v1.4.33: a missing size now throws, D-125).
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in

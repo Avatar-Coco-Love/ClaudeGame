@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 96** · **Version: v1.4.36** (session 96: Build; rotation: 97 Design, 98 Build, 99 Audit, 100 Build).
+_Last updated: 2026-11-25_ · **Session counter: 97** · **Version: v1.4.37** (session 97: Design; rotation: 98 Build, 99 Audit, 100 Build, 101 Build).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -48,11 +48,11 @@ _Last updated: 2026-11-25_ · **Session counter: 96** · **Version: v1.4.36** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-13`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-46b2 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, S-46b2 / S-47 / S-48 refined in `-9` (D-124) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-46b2 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, refined in `-9` (D-124); S-48 split into S-48a / S-48b in `-10` (D-129) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - Per-session checks: `archive/2026-11-24-09-sessions-49-53.md` (each lives on in smoke).
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 97 (Design): play-test the Shoal (Undertow + glass) with screenshots; settle Q-027; refine S-48 in `07` (built in 98).
+Session 98 (Build): S-48a Kiln beam heat + overheat + phrygian music + `haulrun` d 116 leg (`07-Build-Specs-10.md`, D-129).

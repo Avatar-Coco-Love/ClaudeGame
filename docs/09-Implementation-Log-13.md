@@ -24,3 +24,18 @@ Continues `09-Implementation-Log-12.md` (part 12 neared the 8 KB cap at session 
   old clamp 2: proved). Screenshot at d 90 viewed: lines read as faint mint cracks next to the crack overlay.
 - Observed: the first beam pass in the shot hit a Prism cluster, so no crack (correct: ore never shatters).
 - Smoke 455/455 (was 449; +5 shatter, +1 music). Shot: scratch only.
+
+## Session 97 — Design: Shoal play-test, Q-027 settled, S-48 split (v1.4.37, D-129)
+- Probes (scratch copies, not committed): `haulrun` at d 100 → median ×1.000 at levels 3 and 0 (18 / 19 of 20
+  pairs, max ×1.30 / ×1.31); an open 5-wide corridor through the Shoal (radial d 82–102, tangential at d 92) → ×1.00,
+  max ×1.05. A round trip cancels a current; the Undertow is a one-way feel. Q-027: no d 100 leg (D-129).
+- Counted over 8 seeds: Shoal ~13.9k cells (40.8 % flowing), Kiln ~31.5k (2.1 % under a Shoal-centred chunk's
+  current, so the seam flows a few cells into the Kiln; heat goes by the cell's ring). 1 vent / 250 cells ≈ 126 sites.
+- Play-test (Playwright, Drift + Surge, d 90 flowing chunk, then d 110): idle drift 48–68 px over 2 s matches
+  30–55 px/s with the ease; dashes faint but readable; Surge = Drift push; no page errors. Shots viewed.
+- Observed: dev teleport to d 110 often lands in a big open cave (3 of 6 had no solid cell within 4). **B-086**
+  (unconfirmed): one shot after 6 s of beam drew no terrain / light within 2 cells while `world.get` had ore there;
+  7 reruns drew fine. Logged in Debt for audit 99.
+- Specs: `07-Build-Specs-10.md` S-48a (heat by damage share ≤ 1, overheat 1.2 s, phrygian, haulrun d 116 ≤ 1.20×) and
+  S-48b (flare vents, no terrain change, near sites only, v1.5 close-out).
+- Smoke: see PR (docs only; +0 checks).
