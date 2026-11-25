@@ -50,3 +50,14 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
 - Chimes rendered: open peak −33.1 dBFS (as loud as the Anomaly take), close −38.0, 0 % > 2 kHz, loud ≤ 0.15 s.
 - `rift.cjs` +2 (node: chimes once each + Scanner 9 marks; browser: chevron only off screen, points at the pocket,
   gone at the close), stash-proved failing on the old code; `audio.cjs` +1 row. Smoke 577/577 (+3).
+
+## Session 122 — Design: M14 boss specs S-60a…S-62 (v1.7.63, D-158)
+- Play-test (1280 × 800, `rift.cjs` shot + an off-screen probe): the Hearth pocket reads at the light's edge with its
+  toast; off screen, the violet-white chevron sits beside the cyan Nexus arrow in the bottom-left corner, no overlap,
+  though it is the dimmer of the two (fine: the toast and chime carry the open). No change.
+- Re-checked S-58 / S-59 against `config.js` (`VENT_PERIOD_S` 8, `VENT_R` 2.5, `VENT_HEAT` 0.4, Undertow 30–55 px/s,
+  thrust 190): numbers hold, specs unchanged; S-58 is next.
+- Lair probe (30 seeds, 256 world, 9 × 9 all in ring, ≥ 2 cells clear of vault footprints, ≥ 3 from vents and
+  Anomalies, ≥ 6 from Spires): Shoal d 88–100 found on 30 / 30 by draw 2; Kiln d 108–118 on 30 / 30 by draw 11.
+- Specs S-60a / S-60b (`07-Build-Specs-15`), S-61a / S-61b / S-62 (`-16`); Q-026 settled (no); Q-032 opened.
+- `05` split: v1.5.43–v1.6.58 moved word for word to `archive/changelog-v1.5.43-v1.6.58.md`.

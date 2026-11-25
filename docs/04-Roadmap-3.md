@@ -45,6 +45,10 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - One face in both modes (D-152). Cut: cave-in (a tax, no choice), Lumen bloom (in the rift), roaming elites /
   wandering lode (two unequal faces; Q-029), new Spire puzzles (M14's bosses bring the take-apart puzzle).
 
-## M14 — Bosses (two forms, D-119)
-- One boss per biome. Surge: a fight. Drift: take it apart as a puzzle (cut its shell in the right order). Same reward.
-- Whether the ending should ask for the bosses is open (Q-026).
+## M14 — Bosses (two forms, specced, `07-Build-Specs-15/16`, D-158)
+- **S-60a** Crucible (Kiln): lair, core + 8 plates, take-apart (the lit plate jumps across), loot, save (format 23).
+- **S-60b** Crucible awake in Surge (flare damage, embers) + `tools/bossrun.mjs` gate (Surge / Drift 0.8–1.25).
+- **S-61a** Gyre (Shoal): lair, whirlpool, take-apart (ride round with the stepping key plate).
+- **S-61b** Gyre awake in Surge (inward pull, touch damage, mote swarms) + gate.
+- **S-62** Lairs on the Chart L2, boss sting, ending line "Bosses n / 2". M14 done → v1.9.
+- The ending does not ask for the bosses (Q-026 → D-158). Cut: one boss per ring, a roaming boss, unlock rewards.

@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 121** · **Version: v1.7.62** (session 121: Build; rotation: 122 Design, 123 Build, 124 Audit).
-**Scope (D-119, `01`):** M1–M12 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy, v1.7 = M12 creatures + tools). Next: M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-25_ · **Session counter: 122** · **Version: v1.7.63** (session 122: Design; rotation: 123 Build, 124 Audit, 125 Build).
+**Scope (D-119, `01`):** M1–M12 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy, v1.7 = M12 creatures + tools). Next: M13 events + puzzles, M14 two-form bosses (1.9, specced: D-158); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -41,12 +41,12 @@ _Last updated: 2026-11-25_ · **Session counter: 121** · **Version: v1.7.62** (
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 22); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 22 from D-152; last D-157), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 109–113 archived in audit 119), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 23 from D-158; last D-158), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 109–113 archived in audit 119), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-57b built (M12 done, `07-…-12/13`). M13 left: S-58, S-59 (`07-…-14`, D-152). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-57b built (M12 done, `07-…-12/13`). M13 left: S-58, S-59 (`07-…-14`, D-152). M14: S-60a…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`, `rift.cjs`).
 
 ## Next step (one thing)
-Session 122 (Design): play-test the rift (chevron, chimes) and re-check S-58 / S-59 in `07-Build-Specs-14.md`; spec the first M14 items (S-60+). `05` is 7.8 KB: split it before the next entry (`docs.cjs` reads `05`'s top for VERSION).
+Session 123 (Build): S-58 Flare Lock (`07-Build-Specs-14.md`): a Kiln outer vault's shell cuts only in its 2 s soft window.
