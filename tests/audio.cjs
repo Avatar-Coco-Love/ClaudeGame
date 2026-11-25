@@ -61,9 +61,22 @@ async function renderSfx([script, secs]) {
   let peak = 0, loud = 0, tot = 0, hi = 0, hi2 = 0;
   for (const v of buf) peak = Math.max(peak, Math.abs(v));
   for (let s = 0; s + W <= n; s += W) { let e = 0; for (let i = s; i < s + W; i++) e += buf[i] * buf[i]; if (Math.sqrt(e / W) > 10 ** (-45 / 20)) loud++; }
-  for (let s = 0; s + N <= n; s += N) for (let k = 1; k < N / 2; k++) { // plain DFT bins (short sounds, cheap enough)
-    let re = 0, im = 0; for (let i = 0; i < N; i++) { const w = buf[s + i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1))), ph = 2 * Math.PI * k * i / N; re += w * Math.cos(ph); im -= w * Math.sin(ph); }
-    const p = re * re + im * im; tot += p; if (k * sr / N > 4000) hi += p; if (k * sr / N > 2000) hi2 += p;
+  // Audit 119: a radix-2 FFT per 1024-sample frame (was a plain DFT: 74 s of the smoke for 28 sounds; same bins, same powers).
+  const re = new Float64Array(N), im = new Float64Array(N);
+  for (let s = 0; s + N <= n; s += N) {
+    for (let i = 0; i < N; i++) { re[i] = buf[s + i] * (0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1))); im[i] = 0; }
+    for (let i = 1, j = 0; i < N; i++) { let b = N >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+    for (let len = 2; len <= N; len <<= 1) {
+      const h = len / 2;
+      for (let i = 0; i < N; i += len) for (let k = 0; k < h; k++) {
+        const ang = -2 * Math.PI * k / len, cr = Math.cos(ang), ci = Math.sin(ang), u = i + k, v = u + h;
+        const ar = re[v] * cr - im[v] * ci, ai = re[v] * ci + im[v] * cr;
+        re[v] = re[u] - ar; im[v] = im[u] - ai; re[u] += ar; im[u] += ai;
+      }
+    }
+    for (let k = 1; k < N / 2; k++) {
+      const p = re[k] * re[k] + im[k] * im[k]; tot += p; if (k * sr / N > 4000) hi += p; if (k * sr / N > 2000) hi2 += p;
+    }
   }
   const r1 = x => Math.round(x * 10) / 10;
   return { peakDb: r1(20 * Math.log10(peak || 1e-50)), loudS: loud / 20, above4k: r1(100 * hi / (tot || 1)), above2k: r1(100 * hi2 / (tot || 1)) };

@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.7.60 — 2026-11-25
+- **Health check (no gameplay change).** The creature balance checks now always measure on enough worlds to be fair, and
+  the Kiln's Burrower balance is checked on every update, like the Shoal's motes and the Wards already were.
+
 ## v1.7.59 — 2026-11-25
 - **Wards: the creature update is complete (v1.7).** Craft a Ward at the Nexus (▲8 ◆30, carry 2, place up to 4, 6 cells
   apart, anywhere but the Nexus disc). It bolts the nearest creature within 4 cells that it can see, every 0.8 s:

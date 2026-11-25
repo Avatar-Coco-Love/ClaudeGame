@@ -56,6 +56,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./worldsize.cjs').nodeChecks(check);
   await require('./bigworld.cjs').nodeChecks(check).catch(e => check('S-46b2 big-world node checks ran', false, e.message));
   await require('./audit89.cjs').nodeChecks(check);
+  await require('./audit119.cjs').nodeChecks(check).catch(e => check('audit 119 checks ran', false, e.message));
   await require('./saveformat.cjs').nodeChecks(check).catch(e => check('save-format checks ran', false, e.message));
   await require('./audit49.cjs').nodeChecks(check).catch(e => check('audit 49 checks ran', false, e.message));
   await require('./audit54.cjs').nodeChecks(check).catch(e => check('audit 54 checks ran', false, e.message));

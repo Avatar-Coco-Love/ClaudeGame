@@ -38,3 +38,12 @@ alternatives). D-152 on.
 - Rejected: halving Ward damage (a Ward too weak to finish a mote swarm does nothing for a player who isn't beaming);
   Wards ignore the Burrower (one creature exempt is a rule to learn, and the Burrower is the one that hurts most);
   loot for Glitches only (the Shoal / Kiln creatures and Glitches would follow two rules).
+
+### D-155 — A bot gate is defined on its tool's default seed count, and the smoke runs it there (session 119, audit)
+- B-092: `biomefoe.mjs` gates were measured and specced on 8 seeds, but the tool defaulted to 4, where the Kiln reads
+  0.800 / 0.916 and the Shoal fails too (both FAIL by sample noise; 8 / 12 / 16 seeds all PASS, Kiln 16: 0.883 / 0.885).
+  Rule: a gate's seed count is the tool's default (`GATE_SEEDS = 8`); a run on fewer seeds prints its ratios but no
+  verdict. The smoke runs each gate at that default: Kiln (new in `burrower.cjs`), Kiln + 2 Wards (`ward.cjs`, was 4
+  seeds), Shoal (`mote.cjs`). `audit119.cjs` checks the default and the no-verdict guard.
+- Rejected: 16 seeds as the gate (closer to converged, but doubles ~75 s of smoke time already over budget); keeping 4 as
+  a quick default with a note (the next session read a FAIL as a regression, twice: sessions 118 and this lead).
