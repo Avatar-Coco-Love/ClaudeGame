@@ -22,3 +22,15 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
   Drift bite needs its own cue (cargo bar flash + crunch, specced).
 - Docs: S-53c in new `07-Build-Specs-13.md` (part 12 would pass 8 KB); `05` v1.4.30–37 archived word for word;
   Q-030 closed; `02` trimmed (8062 B at start). Smoke run once before the PR.
+
+## Session 113 — Build: S-53c Burrower retune (v1.6.54, D-148)
+- `burrower.js`: both modes hunt the core (2-cell tell, 1.5-cell dodge); Drift undodged = `bite()` takes 4 cargo items in
+  `BITE_ORDER` (≈ ⬟ ▲ ● ◆), gone; no re-bite while up; empty hold = nothing, no event. Tunnel ore: yield lost (`lost`
+  counter); the belly = only the cell it breaks out of. `BURROW_EVERY_S` [20, 10]; `BURROW_ORE_R` / `findOre` removed.
+- Feel: `audio.crunch()` (lowpassed seeded noise, 0.14 s: peak -30.7 dBFS, 0 % > 2 kHz, loud 0.05 s); `#cargo-fill.bit`
+  lilac flash 0.6 s; first bite of a session toasts "A Burrower bit your hold". Screenshot viewed: bar lilac, toast set.
+- Gate `node tools/biomefoe.mjs --seeds=8` (10 min, 24 s wall): Drift 0.866, Surge 0.906, gap 0.040: **PASS**. Drift:
+  124 Burrowers, 108 kills, 503 items bitten, tunnel ore lost 263; Surge 95 lunges, 0 deaths either way.
+- `burrower.cjs` +5 checks (gap 20–30; Drift tell → bite 4 most valuable first, once, no damage; dodged / empty hold = 0;
+  tunnel ore pays nothing in both modes); old "Drift eats ore near the core" check removed (behaviour superseded).
+  `audio.cjs` +1 row (crunch). No new bugs.

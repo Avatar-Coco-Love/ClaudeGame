@@ -1,4 +1,4 @@
-// Tiny synthesized sound kit. No asset files; everything is oscillators.
+// Tiny synthesized sound kit. No asset files; everything is oscillators (and one seeded noise burst, S-53c crunch, D-148).
 import { DEFAULT_VOLUME, MASTER_GAIN_MAX, RING_PITCH_STEP, BEAM_HUM, DEPOSIT_TICK } from './config.js';
 
 export class Audio {
@@ -131,6 +131,16 @@ export class Audio {
   // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.
   hurt() { this.tone(160, 0.25, { type: 'triangle', vol: 0.16, slide: -90 }); }
   spit() { this.tone(520, 0.12, { type: 'triangle', vol: 0.07, slide: 260, throttle: 0.3, key: 'spit' }); } // S-32: a Spitter fires
+  /** S-53c: a Burrower bites the hold: a short low noise burst (lowpassed noise, seeded so it renders the same each time). */
+  crunch() {
+    if (!this.ctx || this.muted) return;
+    const c = this.ctx, now = c.currentTime, n = Math.floor(c.sampleRate * 0.14), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    let r = 12345; for (let i = 0; i < n; i++) { r = (r * 1103515245 + 12345) & 0x7fffffff; d[i] = r / 0x3fffffff - 1; }
+    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = 'lowpass'; f.frequency.value = 260; f.Q.value = 0.7;
+    g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.5, now + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+    src.buffer = buf; src.connect(f); f.connect(g); g.connect(this.master); src.start(now); src.stop(now + 0.16);
+  }
   enemyDie() { this.tone(420, 0.2, { type: 'triangle', vol: 0.11, slide: -300 }); }
   full() { this.tone(300, 0.18, { type: 'triangle', vol: 0.12, throttle: 1.2, key: 'full' }); }
 }
