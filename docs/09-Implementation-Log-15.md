@@ -40,3 +40,15 @@ Continues `09-Implementation-Log-14.md` (part 14 neared the 8 KB cap at session 
   sound waited two audits, so `CLAUDE.md` says how to sweep in-session and to fix twice-carried debt first (D-144).
   Too much: the full smoke now runs > 10 min (logged as debt). Too little: perf re-measures (none since audit 94).
 - Smoke 517/517 (+2: vent tell, its `audio.cjs` ceiling). A first full run read B-090; baseline on `main` 515 checks.
+
+## Session 110 — Build: S-53a Burrower (v1.6.51, D-145)
+- S-53 split (D-145): this slice is the creature in both modes; the rumble and `biomefoe.mjs` gate are S-53b.
+- `src/burrower.js` (new): spawner in the Kiln (20 s, then 35–50 s), cell steps through rock / ore / floor clearing
+  via `world.destroy` (tunnels persist as broken cells), tell, surface, lunge / eat, away 12, return; `beamFoes` adds it
+  only surfaced; cleared on mode switch, death, Wake, Ending, > 24 cells. Wired in `game.js`, `render.js`.
+- `tests/burrower.cjs` (7 checks, smoke): Kiln-only / 256-only / 20 s; Drift tunnels = rock or ore cleared, no
+  pickups, no hurt, eats ore; Surge hit 22 at frame 47 after the tell; 2-cell dodge = 0; kill = drive-off loot;
+  beam only surfaced; mode switch clears; nothing saved. Screenshots viewed: tell (lilac cell + cracks in the dark) and
+  surfaced chevron (spacing widened after the first look, it read as one blob).
+- Observed: a Drift core parked 90 s ate 39 ore cells (path ore counts) — S-53b's gate must measure this.
+- Smoke 524/524 (+7 burrower).

@@ -18,6 +18,7 @@ import { drawHeat } from './heat.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawVents } from './vent.js';
 import { drawEcho } from './echo.js';
+import { drawBurrower, drawBurrowerTell } from './burrower.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48; // at k = 1; audit 84: scaled by 1/k² (chunk canvases are pre-scaled), never under what one view needs
@@ -172,6 +173,7 @@ export class Renderer {
     drawShatter(this, ctx); // S-47b: a faint line from a broken Shoal cell into the one it cracked
     this.drawPickups(ctx, left, top, vw, vh);
     this.drawEnemies(ctx, false);
+    drawBurrower(this, ctx); // S-53
     this.drawBeam(ctx);
     drawSpireFeed(this, ctx, left, top, vw, vh); // S-20: primed facets + the fed / 80 arc
     drawEcho(this, ctx); // S-42
@@ -186,6 +188,7 @@ export class Renderer {
     ctx.translate(this.w / 2 + shx, this.h / 2 + shy); ctx.scale(s, s); ctx.translate(-this.cam.x, -this.cam.y);
     this.drawEnemies(ctx, true);
     drawSpitterTells(this, ctx); // S-32: the shot tell and bolts read through the dark
+    drawBurrowerTell(this, ctx); // S-53: the surfacing tell reads through the dark
     this.drawScan(ctx);
     ctx.restore();
 
