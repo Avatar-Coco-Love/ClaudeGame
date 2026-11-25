@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.7.65 — 2026-11-25
+- **Smoother Scanner ping on phones.** The ping's sweeping ring keeps its amber glow but no longer slows the frame rate
+  while it crosses the screen.
+
 ## v1.7.64 — 2026-11-25
 - **Flare Locks.** A vault deep in the Kiln's outer reaches is quenched: your beam only sparks grey on its shell. Watch its
   edge: it warms orange, then flares (a shove and a burst of heat if you stand close) and for 3 s the shell cuts fast.

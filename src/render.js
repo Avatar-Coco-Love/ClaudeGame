@@ -1,7 +1,7 @@
 // World drawing (terrain chunk cache, entities, beam, Scanner). Screen-space HUD drawing (minimap, Nexus pointer, touch
 // sticks) is in hud.js; darkness, light holes and floor glow in light.js; painting one terrain chunk in terrain.js (S-26).
 // Terrain is cached per chunk and only redrawn when mined.
-import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS, PICKUP_FRAMES } from './config.js';
+import { CELL, CHUNK, T, RESOURCE, ORE_KIND, NEXUS_RADIUS, LIGHT_RADIUS, GLITCH_FADE_S, GLITCH_R, GLITCH_COLORS, SCAN_RADIUS, SCAN_SPEED, SCAN_RING_GLOW, PULSE_RANGE, BEACON_GLOW, WAKE_FRAME_PX, ANOMALY_KINDS, PICKUP_FRAMES } from './config.js';
 import { markAlpha } from './research.js';
 import { paintMiniCell, drawMinimap, drawNexusPointer, drawRiftPointer, drawSticks } from './hud.js';
 import { drawBeacons, drawRelays } from './craft.js';
@@ -524,14 +524,13 @@ export class Renderer {
     ctx.globalCompositeOperation = 'lighter';
     const r = sc.age * SCAN_SPEED, R = SCAN_RADIUS * CELL;
     if (sc.ring && r < R + 40) {
-      ctx.strokeStyle = '#ffc94f'; ctx.lineWidth = 3; ctx.shadowColor = '#ffc94f'; ctx.shadowBlur = 14;
-      ctx.globalAlpha = Math.max(0, 1 - r / (R + 40)) * 0.8;
-      const rr = Math.min(r, R + 40), m = rr + this.glowPad(14); // B-091: a blur in 'lighter' is clipped to its reach
-      ctx.save(); ctx.beginPath(); ctx.rect(sc.x - m, sc.y - m, m * 2, m * 2); ctx.clip();
-      ctx.beginPath(); ctx.arc(sc.x, sc.y, rr, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
+      // Audit 124 (D-160): the glow is two wide faint strokes under the 3 px line, not a shadowBlur. A full-size ring's blur
+      // box covered a phone's whole screen: ×1.7 frame time while it swept (tools/perf.cjs VP=phone ONLY=scan).
+      const a = Math.max(0, 1 - r / (R + 40)) * 0.8, rr = Math.min(r, R + 40);
+      ctx.strokeStyle = '#ffc94f';
+      ctx.beginPath(); ctx.arc(sc.x, sc.y, rr, 0, Math.PI * 2);
+      for (const [lw, k] of SCAN_RING_GLOW) { ctx.lineWidth = lw; ctx.globalAlpha = a * k; ctx.stroke(); }
     }
-    ctx.shadowBlur = 0;
     for (const m of sc.marks) { // B-027: glyphs are glow sprites (scanSprite), not shadowBlur text
       const a = markAlpha(this.game, m);
       if (a <= 0) continue;

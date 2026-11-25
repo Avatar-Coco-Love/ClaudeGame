@@ -13,15 +13,15 @@ async function browserChecks(browser, url, check, errors) {
     const { game: g, renderer: R } = window.__lumen, P = CanvasRenderingContext2D.prototype;
     g.demo = true; // never saved
     // Count, on the main canvas only, the draws made while shadowBlur > 0 and the drawImage calls, per draw step.
-    const ops = ['fill', 'stroke', 'fillText', 'fillRect', 'strokeRect'], orig = {}, n = { shadowed: 0, images: 0 };
+    const ops = ['fill', 'stroke', 'fillText', 'fillRect', 'strokeRect'], orig = {}, n = { shadowed: 0, images: 0, all: 0 };
     for (const k of [...ops, 'drawImage']) {
       orig[k] = P[k];
       P[k] = function (...a) {
-        if (this === R.ctx) { if (k === 'drawImage') n.images++; else if (this.shadowBlur > 0) n.shadowed++; }
+        if (this === R.ctx) { n.all++; if (k === 'drawImage') n.images++; else if (this.shadowBlur > 0) n.shadowed++; }
         return orig[k].apply(this, a);
       };
     }
-    const measure = fn => { n.shadowed = 0; n.images = 0; fn(); return { ...n }; };
+    const measure = fn => { n.shadowed = 0; n.images = 0; n.all = 0; fn(); return { ...n }; };
     const ctx = R.ctx, vw = R.w / R.zoom, vh = R.h / R.zoom, left = R.cam.x - vw / 2, top = R.cam.y - vh / 2;
     const inWorld = fn => { ctx.save(); ctx.translate(R.w / 2, R.h / 2); ctx.scale(R.zoom, R.zoom); ctx.translate(-R.cam.x, -R.cam.y); fn(); ctx.restore(); };
     // 120 pickups of all three kinds, all on screen.
@@ -37,13 +37,17 @@ async function browserChecks(browser, url, check, errors) {
     }
     g.scan = { cooldown: 20, age: 1, x: R.cam.x, y: R.cam.y, ring: false, marks, end: 6 };
     const scan = measure(() => inWorld(() => R.drawScan(ctx)));
+    g.scan = { cooldown: 20, age: 0.5, x: R.cam.x, y: R.cam.y, ring: true, marks: [], end: 6 }; // audit 124: the ring mid-sweep (300 px)
+    const ring = measure(() => inWorld(() => R.drawScan(ctx)));
     for (const k of Object.keys(orig)) P[k] = orig[k];
-    return { pick, scan, cell: 32 === (await import('./src/config.js')).CELL };
+    return { pick, scan, ring, cell: 32 === (await import('./src/config.js')).CELL };
   });
   check('120 on-screen pickups: no shadowBlur draws, one sprite each (B-027)',
     r.cell && r.pick.shadowed === 0 && r.pick.images >= 120, JSON.stringify(r.pick));
   check('a 40-glyph Scanner ping: no shadowBlur draws, one sprite per glyph (B-027)',
     r.cell && r.scan.shadowed === 0 && r.scan.images >= 40, JSON.stringify(r.scan));
+  check('the Scanner ring sweeps with no shadowBlur draw (audit 124, D-160: its blur box filled a phone screen)',
+    r.cell && r.ring.all > 0 && r.ring.shadowed === 0, JSON.stringify(r.ring));
   await pg.close();
 }
 

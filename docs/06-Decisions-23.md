@@ -35,3 +35,23 @@ alternatives). D-158 on.
   measured from the 7 × 7 footprint's edge.
 - Rejected: a lock-only shorter cycle (S-58 ties it to the vents' 8 s, one rhythm per biome); a saved "opened" flag (the
   cache cell already says it); excusing the Echo (one rule for every cutter reads as a rule).
+
+### D-160 — Big glows that sweep the screen are drawn as stacked strokes, not shadowBlur (session 124, audit)
+- Debt carried by audits 114 and 119: the Scanner ring's cost on phones was never measured. `tools/perf.cjs` now takes
+  `VP=phone` (390 × 844, DSF 3, dpr capped at 2) and a `scan` run (a fresh ring every 0.7 s). Measured at CPU × 4:
+  base 42.6 ms mean, scan 73.5 ms (**1.73×**): B-091's clip box grows with the ring, so at full size the blur covers
+  the whole phone screen. Now three strokes (12 / 7 / 3 px at alpha × 0.15 / 0.3 / 1, `SCAN_RING_GLOW`): 39.2 vs
+  44.1 ms (**1.12×**). Viewed at 1280 × 800: the ring still reads as a glowing amber line. `audit34.cjs` checks the
+  ring makes no shadowBlur draw (fails on the old code).
+- Rule: a glow whose shape can grow past ~200 px (rings, sweeps) uses stacked strokes; shadowBlur stays for small shapes
+  and sprites (B-027 / B-091 as before).
+- Rejected: dropping the glow only on L1 / L2 (Auto starts at L0, where the phone paid); a pre-rendered ring sprite
+  (a ~900 px canvas rescaled every frame; not tried, the strokes already reach 1.12×); a shorter ring (the sweep is the ping's read).
+
+### D-161 — The standard run's cut-back on compaction is taken, and noted (session 124, audit; D-136)
+- The orchestrating conversation of this standard run was summarized after PR 1 (that PR's subagent used ~156k tokens
+  and ~30 min), so per `docs/10` it ran 2 PRs instead of 3. Rule kept: a compaction is the cut-back signal; the
+  orchestrator stops after the PR in flight and says so in its per-PR list (no catch-up PR in the same conversation).
+- Rejected: pushing on to 3 after the summary (the 200k cap is the owner's, D-136, and the summary hides how close it
+  is); asking subagents for shorter replies only (the cost was the subagent's own context, not its reply); lowering the
+  standard run to 2 PRs for good (most runs do not compact; one data point).

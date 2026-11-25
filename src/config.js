@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.7.64';
+export const VERSION = '1.7.65';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -226,6 +226,7 @@ export const SCAN_RADIUS = 12;     // cells
 export const SCAN_COOLDOWN_S = 20;
 export const SCAN_SHOW_S = 6;
 export const SCAN_SPEED = 600;     // px/s, the ring's growth
+export const SCAN_RING_GLOW = [[12, 0.15], [7, 0.3], [3, 1]]; // [lineWidth px, alpha ×] strokes of the ring, widest first (audit 124, D-160: no shadowBlur)
 export const RESEARCH = [
   { id: 'scanner', name: 'Scanner', desc: `Ping: shows ore and vault caches within ${SCAN_RADIUS} cells for a few seconds`, cost: 10 },
   { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },

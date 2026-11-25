@@ -1,19 +1,6 @@
 # 09 — Implementation Log, part 17
 
-Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 117). Newest at the bottom; read the tail only.
-
-## Session 118 — Build: S-56 Ward, M12 done (v1.7.59, D-154)
-- `ward.js` (craft / place / pick up / `updateWards` / draw / minimap); `craft.js` place kind `ward` (⌖), Craft row,
-  pick-up hint, save `craft.ward` + `wards` (format 22). `updateWards` runs after the beam, before the creatures'
-  passes, so a Ward kill is processed the same frame. Lime sight ring + range ring near the core + shot line.
-- As specced, `biomefoe.mjs --wards=2` (new flag: Wards hop to stay round the dig site) failed in the Kiln: Surge 1.066
-  (a Ward finished each surfaced Burrower, its loot made the creature income). D-154: a Ward's kill pays no loot, only
-  what was carried / eaten. After (8 seeds): Kiln 0.833 / 0.876, Shoal 0.889 / 0.883: PASS (≤ 1.00 each).
-- Seen: the base Kiln gate on 4 seeds reads 0.800 / 0.916 (FAIL) on `main` too; the gate is defined on 8 seeds, where it
-  still passes 0.866 / 0.905. The 4-seed Kiln sample is too small to gate on (not a bug; Ward test uses ≤ 1.00 only).
-- Screenshot viewed: ⌖ sight in lime with its 4-cell dashed ring, a shot line to a mote, "Ward placed" toast.
-- Smoke 562/562 (+15, `ward.cjs`: price, placement, refund, save + format, rate, range / line, nearest,
-  bolt one-shot, Ward kill no loot, 160 world, Kiln Ward gate, Craft row, live place + shot; `relay.cjs` row list adds `ward`).
+Continues part 16 (sessions 114–118 archived word for word in audit 124: `archive/2026-11-25-09-sessions-114-118.md`, part 16 removed; 118 came from this part). Newest at the bottom; read the tail only.
 
 ## Session 119 — Audit: seed-fragile bot gate (B-092), audio test 50× faster, 09 archive (v1.7.60, D-155)
 - No subagent tool: sweeps in-session, newest code first (`ward.js`, D-154 `warded` in glitch / burrower / mote: match).
@@ -69,3 +56,15 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
   2 s × 1.5 gave 2.48×, so tuned (D-159). Screenshot of the tell viewed: orange shell edge reads in the core's light,
   dimmer past it (same layer as the vents; fine, the cycle is learned up close).
 - `tests/lock.cjs` (6 node + 1 browser checks), failing on the old code (no `lock.js`). Smoke 584/584 (+7).
+
+## Session 124 — Audit: Scanner ring off shadowBlur, phone sweep, 09 archive (v1.7.65, D-160, D-161)
+- No subagent tool: sweeps in-session, newest code first (`lock.js`, `rift.js`: edge cases on save / reload / New
+  Cycle / mode match their headers; D-155…D-159 numbers match `config.js`). No new bug found there.
+- Debt two audits carried, done: Scanner ring cost on phones. `perf.cjs` `VP=phone ONLY=scan`: 1.73× base before,
+  1.12× after (D-160). Ring screenshot viewed (1280 × 800): still a glowing amber line. Phone sweep (6 sizes, Large
+  text on two, Kiln, 5 banks, Echo, 3 buffs): no overlaps, nothing off screen, buttons ≥ 44 px; 320 and 568 viewed.
+- Still open (third audit): the smoke's browser phase; `04` Debt says to time each browser file next audit.
+- Workflow review: the standard run was summarized after PR 1 (subagent ~156k tokens, ~30 min) and ran 2 PRs (D-161).
+  Too much: a subagent PR's own context; too little: nothing new (sweeps in-session stay the norm with no subagent tool).
+- `09` sessions 114–118 archived word for word (`archive/2026-11-25-09-sessions-114-118.md`, part 16 removed).
+- Smoke 585/585 (+1, `audit34.cjs` ring check), 567 s.

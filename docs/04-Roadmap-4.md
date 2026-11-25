@@ -4,6 +4,11 @@ Continues the Debt list of `04-Roadmap-2.md` (near the 8 KB cap at audit 104). A
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 124 leftovers** (sweeps in-session; fixed: Scanner ring glow as strokes, ×1.73 → ×1.12 on a phone, D-160;
+  phone sweep at 320 / 360 / 412 portrait and 568 / 640 / 844 landscape with 5 banks, Echo, 3 buffs: no overlap, nothing
+  off screen, buttons ≥ 44 px; `09` sessions 114–118 archived). Still open (third audit): the full smoke's browser phase
+  (~460 s); next audit should time each browser file and split or parallelize the slowest. Checked: the other blurred rings
+  stay small (Anomaly ≤ 3 cells), under D-160's ~200 px line.
 - **Audit 119 leftovers** (sweeps in-session; fixed: B-092 seed-fragile `biomefoe.mjs` default, one-shot sound spectra
   via FFT (−71 s), D-155; `09` sessions 109–113 archived). The > 10 min smoke of audits 109 / 114 is done (497 s, was 565). Still open: the browser phase (~460 s: Spire / Wake /
   toast viewport loops, S-41 quality runs); no phone sweep since audit 109; Scanner ring box cost on phones unmeasured.
