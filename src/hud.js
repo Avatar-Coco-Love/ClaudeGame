@@ -6,6 +6,7 @@ import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
 import { drawAnomalyMarks } from './anomaly.js';
 import { drawSinkMarks } from './heatsink.js';
+import { drawChartMarks } from './chart.js';
 
 const MINI_COLORS = {
   [T.EMPTY]: [10, 16, 44],
@@ -57,6 +58,7 @@ export function drawMinimap(r) {
     m.fillRect((q.x + 0.5) * CELL * sc - rr, (q.y + 0.5) * CELL * sc - rr, rr * 2, rr * 2);
   }
   m.globalAlpha = 1;
+  drawChartMarks(m, g, sc, r.miniWin); // S-52: charted currents / seen vents (Nexus Chart), under the placed marks
   m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
   m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown

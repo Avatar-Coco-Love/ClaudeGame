@@ -14,3 +14,12 @@ Continues `09-Implementation-Log-14.md` (part 14 neared the 8 KB cap at session 
   pentagon under the core with its dashed 5-cell ring, 288 px beam down a 9-cell tunnel, Calx ⬟ cells clearly lilac.
 - Specs: `07-Build-Specs-12.md` (S-53 Burrower, S-54 Mote swarm, S-55 Arc beam, S-56 Ward node; M12 → v1.7), `04-Roadmap-3`
   M12 rewritten, Q-029 added. No spec split (D-139 rule 2: each is usable alone). Next: S-52 (session 108, Build).
+
+## Session 108 — Build: S-52 Nexus Chart, M11 done (v1.6.49, format 21, D-143)
+- `src/chart.js` (new, 86 lines): `drawChartMarks` from `hud.js` under the placed marks; Chart row in `NEXUS_UPGRADES`
+  (`kiln` flag), `buyNexus` charges every kind, save step 20 → 21 (`nexus.chart: 0`), load clamp.
+- `tests/chart.cjs` (7 checks, smoke): exact prices / no third / 160 refuses; arrows = explored flowing Shoal chunks in
+  the window, along the flow, length ∝ speed, re-check after 0.5 s; vents only seen, tell dots larger; ≤ 3 draw calls;
+  format 20 → 21 + clamp; browser: row in 256 (buy charges ≈24 ▲10), none in 160, charted minimap draws in play.
+- Screenshot viewed (minimap ×3 at d 102): mint arrows in the Shoal band were faint at 0.85 alpha on its mint rock tint;
+  raised to full alpha, 1.5 px. Warm vent dots read on the Kiln's brown. No bugs found.

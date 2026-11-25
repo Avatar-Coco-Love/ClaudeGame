@@ -19,11 +19,11 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   (v1.4.38, D-130).
 - ✅ **S-48b** Kiln flare vents (126 seed sites at 256, 8 s cycle, shove + 0.4 heat, no damage) (v1.5.40, D-132). **M10 done.**
 
-## M11 — Economy (specced, `07-Build-Specs-11.md`, D-134)
+## M11 — Economy ✅ ( `07-Build-Specs-11.md`, D-134)
 - ✅ **S-49** Biome ores: Tide ≈ (Shoal) and Calx ⬟ (Kiln); bank / cargo (v1.5.43, format 19, D-135).
 - ✅ **S-50** Core Matrix Overdrive: two levels past every max, paid in ◆ + ≈ + ⬟ (v1.5.46, D-140).
 - ✅ **S-51** Heat Sink (Crafting, Kiln): heat gain × 0.4 within 5 cells (format 20; v1.5.47, D-141).
-- **S-52** Nexus Chart (Nexus Development): currents, then flare vents, on the minimap (format 21). M11 done → v1.6.
+- ✅ **S-52** Nexus Chart (Nexus Development): currents, then flare vents, on the minimap (format 21; v1.6.49, D-143). **M11 done.**
 - Cut (D-134): the Current Anchor (the Undertow costs a haul ×1.00, so calming it buys nothing) and an M11 Research
   row (no new *kind* of thing needs one; Lumen's surplus waits for M12's beam mode).
 

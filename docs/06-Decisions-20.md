@@ -31,6 +31,16 @@ alternatives). D-137 on.
   splits a spec checks this (`CLAUDE.md`).
 - Rejected: a Retro session type (costs a build slot; already rejected in D-138); dropping record steps (they are the memory).
 
+### D-143 — S-52 Nexus Chart: a `kiln` row flag, a growing chunk cache, 3 draw calls (session 108, build)
+- The row is `NEXUS_UPGRADES[1]` with `kiln: true`; `chartOn(game)` = `world.profile.rings > KILN_RING` (D-140's rule:
+  no size literal) hides it in the sheet, refuses `canAffordNexus` and loads a saved level as 0. Nexus buys now charge
+  every kind in `KINDS` (Radiance still ▲ only); only Radiance reveals / sweeps. Load clamps `chart` to an integer 0–2.
+- "Explored chunk" = any explored cell in it, cached in `game.chart.known` (explored only grows; a New Cycle is a new
+  Game); unknown flowing chunks in the minimap window are re-checked every `CHART_RECHECK_S` 0.5 s of game time. "Seen
+  vent" = its cell explored (drawVents' rule). All arrows = one stroke; vents = one fill idle + one fill in the tell.
+- Rejected: chunk explored by its centre cell only (a tunnel along a chunk's edge would chart nothing); scanning every
+  chunk each frame (65k reads); a dot per vent with its own alpha (a draw call each, `drawcost` budget).
+
 ### D-142 — M12 plan: one creature, two appetites; four specs (session 107, design; Q-029)
 - Play-test: a max (and max + 2) build takes 0 Surge damage in 120 s anywhere (Glitch tier caps at d 84), so M12's foes
   live in the Shoal / Kiln and are tuned against the top build. Each biome creature exists in both modes: Surge it hunts

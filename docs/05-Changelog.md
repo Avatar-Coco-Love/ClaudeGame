@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.49 — 2026-11-25
+- **New: Nexus Chart (Nexus tab, new worlds). The economy milestone is complete: v1.6.** Level 1 (≈24 ▲10) draws the
+  Shoal's currents on the minimap as arrows (longer = faster) wherever you have explored; level 2 (⬟24 ▲10) marks the
+  Kiln's flare vents you have seen, and a vent about to flare brightens. Knowledge only: no light, no stat. Same in
+  Drift and Surge. Older (smaller) worlds have no Shoal or Kiln, so the row stays hidden there.
+
 ## v1.5.48 — 2026-11-25
 - **Design pass, no gameplay change.** The Kiln was play-tested with Heat Sinks and Overdrive, and the next milestone
   is planned: creatures native to the Shoal and the Kiln (a Burrower that tunnels through rock, a swarm of motes that

@@ -19,6 +19,7 @@ import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
+import { chartOn } from './chart.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
@@ -123,18 +124,20 @@ export class Game {
   canAffordNexus(id) {
     const u = NEXUS_UPGRADES.find(u => u.id === id), lvl = this.nexusLevels[id];
     if (lvl >= u.max) return false;
+    if (u.kiln && !chartOn(this)) return false; // S-52: the Chart row exists only in a world with a Kiln
     const c = u.cost(lvl);
-    return this.bank.shard >= c.shard && this.bank.prism >= c.prism;
+    return KINDS.every(k => this.bank[k] >= (c[k] || 0));
   }
   buyNexus(id) {
     if (!this.canAffordNexus(id)) return false;
     const u = NEXUS_UPGRADES.find(u => u.id === id), c = u.cost(this.nexusLevels[id]);
-    this.bank.shard -= c.shard; this.bank.prism -= c.prism;
+    for (const k of KINDS) this.bank[k] -= c[k] || 0;
     this.nexusLevels[id]++;
     this.stats.upgrades++;
-    this.revealQueue.push(...this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()));
     this.audio.upgrade();
     this.burst(this.nexus.x, this.nexus.y, 70, '#ffffff', 420);
+    if (id !== 'radiance') return true; // S-52 Chart: no light, no sweep
+    this.revealQueue.push(...this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()));
     this.nexusPulse = 1;
     return true;
   }
@@ -463,6 +466,7 @@ export class Game {
     Object.assign(this.cargo, s.cargo);
     for (const u of UPGRADES) { const v = s.upgrades && s.upgrades[u.id]; if (Number.isInteger(v) && v >= 0) this.upgrades[u.id] = Math.min(v, this.topLevel(u)); } // S-50: clamped to the top level (B-037)
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
+    { const c = Math.floor(Number(this.nexusLevels.chart)); this.nexusLevels.chart = chartOn(this) && c > 0 ? Math.min(2, c) : 0; } // S-52: 0–2, 0 without a Kiln
     Object.assign(this.stats, s.stats || {});
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
     this.records = cleanRecords(s.records); // B-057: a save is never trusted
