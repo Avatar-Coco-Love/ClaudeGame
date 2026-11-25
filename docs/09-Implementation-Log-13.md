@@ -12,3 +12,4 @@ Continues `09-Implementation-Log-12.md` (part 12 neared the 8 KB cap at session 
 - Observed: haulrun median ×1.000 — the d 90 tunnel crosses only 10 Shoal cells, mostly one chunk, often calm, and
   tunnelling dominates the trip. The probe passes easily but says little; S-47b or a design session may want a
   d 100 leg. First screenshot showed all dashes on one row (a weak slot hash): fixed, re-shot, viewed.
+- Smoke 449/449 (was 442; +7 undertow). Shots: scratch only.
