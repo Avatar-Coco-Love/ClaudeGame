@@ -24,3 +24,16 @@ alternatives). D-145 on.
   in `09` (D-139: this slice still plays end to end). Rejected: retuning by build-session guess (each knob moved the
   two modes apart); banking instantly (Relay is what a top-build player uses); a rumble as an Audio one-shot (it is held).
 
+
+### D-147 — Q-030: the Burrower bites the hold in Drift; S-53c (session 112, design)
+- Play-test (`biomefoe.mjs` with temporary, unshipped switches, 8 seeds × 10 min, top build): the gate is only moved by
+  a cost taken *unrefunded at the strike*. The bot is never ore-limited (eaten ore is never missed) and kills a surfaced
+  Burrower fast (a refunded loss comes back; Glitch loot is pure gain). Surge already has such a cost: the lunge.
+- So Drift mirrors it: the Burrower heads for the core in both modes (same tell, same dodge); undodged, Surge takes 22
+  hull, Drift loses 4 cargo items, most valuable first. Tunnel ore no longer fills the belly; gap 20–30 s. Result: Drift
+  0.885 / Surge 0.906 (8 seeds), 0.928 / 0.889 (16): PASS. Spec S-53c (`07-Build-Specs-13.md`).
+- Supersedes D-142's "in Drift it hunts ore (never touches the core)" for the Burrower: it still never damages or pushes
+  the core in Drift; its appetite is the ore the core carries. Drift stays free of hostiles in the sense of D-002: no hull loss.
+- Rejected (measured): gap only (Drift 1.03); no Glitch loot (Drift 1.00, breaks D-142's equal loot); bite refunded on
+  drive-off (1.03, the bot always drives it off); bite near its ore target (0.99, the core is rarely within reach);
+  ongoing bite while up (×0.81 with 3 + drip, harsher than Surge); heat on surfacing (a second vent, D-129's job).

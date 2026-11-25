@@ -1,7 +1,7 @@
 # 07 — Build Specs, part 12: M12 Enemies and tools
 
 Continues `07-Build-Specs-11.md` (same rules: one spec = one PR, numbers go in `src/config.js`). Design 107 (D-142).
-Build order: **S-52 (part 11) → S-53 → S-54 → S-55 → S-56** (M12 done = v1.7 with S-56). Each spec is usable alone (D-139).
+Build order: **S-52 (part 11) → S-53 (a, b; c in part 13) → S-54 → S-55 → S-56** (M12 done = v1.7 with S-56). Each spec is usable alone (D-139).
 **Measured basis (session 107, `09`):** an auto-aim bot standing in the open for 120 s in Surge takes **0 damage** at the
 base max build and at max + 2, in the Deep and in the Kiln (4 seeds; mid build 32–184). Glitch tier stops at 3 (d 84),
 so the Shoal / Kiln add no Surge threat today. M12's foes live in the two biomes and are tuned against the top build.

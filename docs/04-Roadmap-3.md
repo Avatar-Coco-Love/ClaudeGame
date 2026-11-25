@@ -30,7 +30,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 ## M12 — Enemies and tools (specced, `07-Build-Specs-12.md`, D-142)
 - ✅ **S-53a** Burrower (Kiln creature): tunnels, tell, Surge lunge / Drift eats ore, equal loot (v1.6.51, D-145).
 - ✅ **S-53b** Burrower rumble (music, `audio.cjs` row) + `tools/biomefoe.mjs` Kiln gate (v1.6.52, D-146): fails as specced.
-- **S-53c** Burrower retune to the gate (0.85–0.95, modes within 0.05): Design 112 picks it (Q-030).
+- **S-53c** Burrower retune (D-147, `07-…-13`): gap 20–30, tunnels pay nothing, Drift bites 4 from the hold.
 - **S-54** Mote swarm (Shoal creature): 6 motes ride the Undertow, Surge darts at the core, Drift steals floor pickups.
 - **S-55** Arc beam mode (Research, 35 ●): the hit arcs to 2 more of the same kind (creatures, or an ore vein).
 - **S-56** Ward node (Crafting, ▲ + ◆): bolts creatures within 4 cells in both modes. M12 done → v1.7.

@@ -1,7 +1,7 @@
 # 03 — Open Questions
 
 Undecided only. Once a question is settled, remove it here and record the answer as a D-xxx entry in `06-Decisions.md` (cite the Q number).
-New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129.
+New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147.
 
 | ID | Question | Notes |
 |----|----------|-------|
@@ -15,4 +15,3 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-026 | Should the ending (relight every Spire) also ask for the M14 bosses? | D-119. Leaning **no**: the v1.0 arc stays whole; bosses pay their own reward. Decide in M14's design. |
 | Q-028 | Should Glitch kills in the Shoal / Kiln drop Tide / Calx (a renewable biome income for Surge, as ◆▲ are now)? | Design 102 (D-134). Leaning **no**: biome ore stays finite in both modes; revisit with Q-007 if a late 256 world runs dry. |
 | Q-029 | Surge at the base max build takes 0 damage anywhere (Glitch tier stops at 3, d 84). Should Glitch tiers go past 3 in the Shoal / Kiln? | Design 107 probe (auto-aim bot, 120 s, 4 seeds). Leaning **no**: M12 biome creatures (D-142) carry the outer threat; revisit after `biomefoe.mjs` at S-54 if Hearth–Deep Surge still feels empty late. |
-| Q-030 | The Burrower costs a top-build haul nothing (`biomefoe.mjs`: Drift 1.01, Surge 1.00; band 0.85–0.95). What makes Drift cost? | Session 111 table in `09`: eating ore in the ore-rich Kiln costs ×1.00 even unkillable; a drive-off pays, so more Burrowers = more haul. Surge moves with lunges (gap 20–30 s: 0.94). Design 112. |
