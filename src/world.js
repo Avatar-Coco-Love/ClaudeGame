@@ -217,6 +217,15 @@ export class World {
     for (const fn of this.listeners) fn(x, y);
   }
 
+  /** S-57a: change a solid cell's type in place (a Rift's ore and its revert): no crack, not broken; repaints like a break. */
+  retype(x, y, type) {
+    const i = this.idx(x, y);
+    this.cells[i] = type;
+    this.damage[i] = 0;
+    this.markDirty(x, y);
+    for (const fn of this.listeners) fn(x, y);
+  }
+
   damageFrac(x, y) {
     const type = this.get(x, y);
     if (type === T.EMPTY || UNBREAKABLE.has(type)) return 0;

@@ -13,6 +13,7 @@ import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
+import { makeRift, updateRift, riftBonus } from './rift.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
 import { makeBurrow, updateBurrower, clearBurrower } from './burrower.js';
 import { makeSwarm, updateSwarm, clearSwarm } from './mote.js';
@@ -105,6 +106,7 @@ export class Game {
     this.swarm = makeSwarm(); // S-54: the Shoal mote swarm (never saved)
     this.heat = 0; this.heatState = makeHeat(); // S-48a: Kiln beam heat (heat.js); never saved
     this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); only `cancel` is saved (B-081)
+    this.rift = makeRift(seed); // S-57a: schedule from seed + stats.time (rift.js); never saved, a reload mid-rift skips it
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
     this.player.integrity = this.stat('hull');
@@ -244,6 +246,7 @@ export class Game {
     updateSpireFeed(this, dt); // S-20: ▲ into a dormant Spire's interior, cargo then bank (D-070)
     updateWake(this, dt); // S-23: Surge's Spire Wake (starts, clock, waves, end)
     updateWeather(this, dt); // S-33: after the Wake, so a Wake starting this frame cancels the event at once
+    updateRift(this); // S-57a: likewise after the Wake
     if (this.mode === 'surge') this.updateEnemies(dt); else if (this.enemies.length || this.bolts.length) { this.enemies = []; this.bolts = []; }
     this.updateParticles(dt);
 
@@ -312,7 +315,7 @@ export class Game {
       if (this.motionOn()) { this.hitstop = HITSTOP_S * 2; this.lastHitstop = this.stats.time; }
       this.notify('cache');
     } else if (MATERIAL[type].yield) {
-      this.dropYield(x, y, type);
+      for (let i = 1 + riftBonus(this, x, y); i > 0; i--) this.dropYield(x, y, type); // S-57a: a rift cell rolls its yield twice
       for (let i = auroraBonus(this, cx, cy, type); i > 0; i--) this.spawnPickup(cx, cy, MATERIAL[type].yield.kind); // S-33
       this.audio.break(MATERIAL[type].yield.kind);
       if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }

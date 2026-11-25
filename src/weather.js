@@ -6,7 +6,8 @@
 import { WEATHER_EVERY_S, WEATHER_S, WEATHER_EASE_S, WEATHER_TINT, AURORA_BONUS, AURORA_CHANCE, LIGHT_RADIUS, CELL, T, MATERIAL } from './config.js';
 import { seededStream } from './world.js';
 
-const gap = rng => WEATHER_EVERY_S[0] + rng() * WEATHER_EVERY_S[1];
+export const weatherGap = rng => WEATHER_EVERY_S[0] + rng() * WEATHER_EVERY_S[1];
+const gap = weatherGap;
 
 export function makeWeather(seed) {
   const rng = seededStream(seed, 'weather');

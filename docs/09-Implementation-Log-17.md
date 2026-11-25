@@ -30,3 +30,14 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
 - Workflow review: too much trust in a tool's default output (two sessions read a 4-seed FAIL as a regression); too
   little: the smoke measured per phase only now. Change: D-155 (a gate's seed count lives in the tool and the smoke).
 - Smoke 565/565 (+3: `audit119.cjs` ×2, Kiln gate in `burrower.cjs`) in 497 s (was 562 in 565 s).
+
+## Session 120 — Build: S-57a Rift (v1.7.61, D-156)
+- `src/rift.js` (schedule cursor over `rng['rift']` + the weather draws, site, open / close, shimmer, minimap dot);
+  `world.retype` (type change without a crack, repaints the chunk + minimap); toast in `main.js`; `game.js` hooks
+  `updateRift` after the weather and rolls `riftBonus` in `onCellBroken`. Nothing saved (no format bump).
+- Gate `tools/eventrun.mjs` (biomefoe's pad + Relay, top build, creatures / weather off, detour to rift cells ≤ 12 cells):
+  as specced Deep 1.026 / 0.965, Kiln 1.034 / 1.053 (8 seeds) → D-156 (double yield, Shoal / Kiln 3 + 6, 16-seed gate).
+  Final, 16 seeds: Deep 1.092 / 1.089, Kiln 1.079 / 1.078: PASS (24: 1.073 / 1.077, 1.094 / 1.097). ~1.6 rifts / 10 min.
+- Observed: Surge runs swing ±10 % from any change to the path (one seed 1080 vs 1419), so 8 seeds can't see a 5–10 %
+  effect. Screenshot (1280 × 800): the Hearth pocket (● + ◆) outlined violet-white beside the Nexus, toast on top: reads.
+- `tests/rift.cjs` (8 node checks incl. the gate, 1 browser). Smoke 574/574 (+9).

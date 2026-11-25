@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.7.60';
+export const VERSION = '1.7.61';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -298,6 +298,13 @@ export const MODES = {
 export const WEATHER_EVERY_S = [300, 120], WEATHER_S = 40, WEATHER_EASE_S = 2;
 export const STORM_SPAWN_MUL = 0.75, STORM_CAP_ADD = 2, AURORA_BONUS = 1, AURORA_CHANCE = 0.4;
 export const WEATHER_TINT = { storm: [14, 4, 26], aurora: [3, 13, 13] }; // darkness RGB at full strength (base 2, 3, 10)
+// S-57a Rift (D-152, D-156, rift.js): event k opens at the sum of k + 1 gaps RIFT_EVERY_S[0] + rand × [1] s of play
+// (rng['rift']; a start inside a weather event waits for its end), RIFT_S open: a 3 × 3 rock pocket RIFT_R cells from the
+// core in its own ring turns to ore (RIFT_ORE[ring]: RIFT_MAJOR[ring] of the first ore, the rest the second) and reverts unmined at the close. Never saved.
+export const RIFT_EVERY_S = [240, 120], RIFT_S = 45, RIFT_R = [8, 12], RIFT_TRIES = 40;
+export const RIFT_ORE = [[T.LUMEN, T.CRYSTAL], [T.CRYSTAL, T.LUMEN], [T.PRISM, T.LUMEN], [T.TIDE, T.PRISM], [T.CALX, T.PRISM]]; // [major, minor] by ring
+export const RIFT_MAJOR = [6, 6, 6, 3, 3], RIFT_BONUS = 1; // RIFT_MAJOR[ring]: cells of the first ore (≈ / ⬟ are worth 12, so 3 of 9); RIFT_BONUS: extra yield rolls per rift cell (D-156: the gate's tuning)
+export const RIFT_RGB = '226, 208, 255'; // violet-white: the pocket's shimmer and its minimap dot
 // S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep; + Shoal / Kiln at 256), seed-only
 // (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre
 // distance ANOMALY_D[ring] cells, ≥ ANOMALY_GAP cells apart, clear of vault footprints and Spire footprints by ANOMALY_CLEAR

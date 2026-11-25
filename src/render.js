@@ -13,6 +13,7 @@ import { endingView, drawOverview } from './ending.js';
 import { paintChunk, waves, pentagon } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
+import { drawRift } from './rift.js';
 import { drawUndertow } from './undertow.js';
 import { drawShatter } from './shatter.js';
 import { drawHeat } from './heat.js';
@@ -165,6 +166,7 @@ export class Renderer {
 
     drawUndertow(this, ctx, left, top, vw, vh); // S-47: dashes moving with the Shoal currents
     drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
+    drawRift(this, ctx); // S-57a: an open rift's pocket shimmers
     drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
     drawVents(this, ctx, left, top, vw, vh); // S-48b: Kiln flare vents
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
