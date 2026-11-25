@@ -37,6 +37,8 @@ export function createDev(ui) {
     },
     /** S-42: grant the Echo (it appears beside the core next frame). */
     echo() { g().research.echo = true; ui.persist(); return true; },
+    /** S-47: Undertow on / off (tools and by-hand comparison; not saved). */
+    undertow(on = g().undertow.off) { g().undertow.off = !on; return on; },
     god(on = !g().god) { g().god = on; return on; },
     setMode(mode = g().mode === 'surge' ? 'drift' : 'surge') { g().setMode(mode); ui.modeChanged(); ui.persist(); return mode; },
     maxAll() {

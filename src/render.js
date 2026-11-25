@@ -11,6 +11,7 @@ import { endingView, drawOverview } from './ending.js';
 import { paintChunk } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
+import { drawUndertow } from './undertow.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawEcho } from './echo.js';
 
@@ -154,6 +155,7 @@ export class Renderer {
     }
     ctx.restore();
 
+    drawUndertow(this, ctx, left, top, vw, vh); // S-47: dashes moving with the Shoal currents
     drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
     drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)

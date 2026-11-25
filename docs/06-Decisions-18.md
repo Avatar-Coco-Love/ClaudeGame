@@ -38,3 +38,13 @@ Continues `06-Decisions-17.md` (same rules: supersede, never edit; list rejected
 - Rejected: loosening the 2× check (the check was right: S-25 was built against it with no margin); GLOW_DOWN 2
   smoothed (3.9 ms, the cost is the smoothed scale, not the layer size); a full-res layer (1:1 blit 0.9 ms, but 20
   full-res disc draws into it cost what D-061 already measured at 2.2×).
+
+## D-127 — S-47 ships in two slices; Undertow first (session 95, build)
+- S-47a = Undertow + `haulrun` (`undertow.js`); S-47b = brittle glass + Shoal music. One field per world from
+  `seededStream(seed, 'undertow')` in chunk order (every chunk draws, so the Shoal's never shift with the profile). The
+  ease is linear from the old current to the new over 0.5 s; the wall stop keeps the core's own velocity apart from the
+  current, so a current into a wall never charges or flips it. Pickups take half their chunk's flow with no ease.
+  Dashes: 6 slots per flowing chunk in view, open cells only, hashed (not gameplay) positions, cap 30 / 15 at Low.
+- Measured: haulrun 20 seeds, level 3: median ×1.000, max ×1.012 (level 0: max ×1.16); 17 / 20 pairs (3 hit Spires).
+- Rejected: one PR for all of S-47 (two systems + music + probe); an exponential ease (never "takes 0.5 s"); applying
+  the current to the target velocity (the intent would see it, pillar 5); per-chunk streams (more state, same result).
