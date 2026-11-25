@@ -31,7 +31,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-53a** Burrower (Kiln creature): tunnels, tell, Surge lunge / Drift eats ore, equal loot (v1.6.51, D-145).
 - ✅ **S-53b** Burrower rumble (music, `audio.cjs` row) + `tools/biomefoe.mjs` Kiln gate (v1.6.52, D-146): fails as specced.
 - ✅ **S-53c** Burrower retune (D-147, D-148): gap 20–30, tunnels pay nothing, Drift bites 4 from the hold; gate PASS (v1.6.54).
-- **S-54** Mote swarm (Shoal creature): 6 motes ride the Undertow, Surge darts at the core, Drift steals floor pickups.
+- ✅ **S-54** Mote swarm (Shoal creature): rides the Undertow, a touch takes 1 item, hp 2 to meet the gate; gate PASS (v1.6.56, D-150).
 - **S-55** Arc beam mode (Research, 35 ●): the hit arcs to 2 more of the same kind (creatures, or an ore vein).
 - **S-56** Ward node (Crafting, ▲ + ◆): bolts creatures within 4 cells in both modes. M12 done → v1.7.
 - One creature, two appetites (D-142) replaces "a Drift twin hazard"; the shield pylon / lens is cut (a beam buff

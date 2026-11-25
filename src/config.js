@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.6.55';
+export const VERSION = '1.6.56';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -369,3 +369,16 @@ export const VENT_RGB = '255, 232, 205'; // warm white: the vent hexagon and its
 export const BURROW_FIRST_S = 20, BURROW_EVERY_S = [20, 10], BURROW_SPAWN_R = [10, 14], BURROW_STEP_S = 0.5, BURROW_TELL_CELLS = 2;
 export const BURROW_TELL_S = 0.8, BURROW_UP_S = 2, BURROW_HP = 6, BURROW_DMG = 22, BURROW_DODGE = 1.5, BURROW_BITE = 4;
 export const BURROW_AWAY = 12, BURROW_TRIP_S = 25, BURROW_LEASH = 24, BURROW_R = 11, BURROW_RGB = '200, 160, 255'; // Calx lilac
+// S-54 Mote swarm (D-142, D-150, mote.js): the Shoal creature, 256 worlds only, one swarm of SWARM_N at a time while the core
+// is in the Shoal. First SWARM_FIRST_S in the Shoal, then SWARM_EVERY_S [min, + span] after the last one ended, SWARM_SPAWN_R
+// cells out on open floor the core can be reached from. Motes: r MOTE_R, hp MOTE_HP (S-54 said 0.5; 2 meets the gate, D-150),
+// MOTE_SPEED px/s toward their prey (straight with a clear line, else down a BFS field of MOTE_FIELD cells), steered at
+// MOTE_STEER /s, pulled to the swarm centre (MOTE_COHESION /s per px), plus their chunk's full Undertow flow. Surge: contact MOTE_DMG (knockback, re-hit
+// GLITCH_HIT_CD_S); Drift: a loose pickup within MOTE_PREY_R cells of the core, outside the Attractor's reach, is carried
+// (one each, dropped when beamed); with none, the hold. A touch of the hold (both modes) takes MOTE_TAKE items for good. After
+// a touch it scatters MOTE_SCATTER cells and returns. Each mote beamed: MOTE_LOOT ◆; the whole swarm: the Glitch loot once.
+// Leash SWARM_LEASH cells from the core. Never saved.
+export const SWARM_N = 6, SWARM_FIRST_S = 20, SWARM_EVERY_S = [40, 20], SWARM_SPAWN_R = [10, 12], SWARM_LEASH = 24;
+export const MOTE_R = 4, MOTE_HP = 2, MOTE_SPEED = 150, MOTE_STEER = 4, MOTE_COHESION = 0.6, MOTE_DMG = 4, MOTE_PREY_R = 6;
+export const MOTE_FIELD = 20; // cells: the BFS field the swarm flies in by (and spawns on)
+export const MOTE_TAKE = 1, MOTE_SCATTER = 3, MOTE_SCATTER_S = 1.2, MOTE_LOOT = 1, MOTE_TRAIL = 5, MOTE_RGB = '150, 255, 200'; // mint

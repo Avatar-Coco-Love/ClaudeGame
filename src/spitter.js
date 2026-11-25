@@ -60,13 +60,13 @@ export function updateBolts(game, dt) {
 
 function boltPop(game, b, n) { game.burst(b.x, b.y, n, SPITTER_COLORS[1], 120); }
 
-/** What the beam can hit: live Glitches, then bolts, then a surfaced S-53 Burrower (either mode). */
+/** What the beam can hit: live Glitches, then bolts, then a surfaced S-53 Burrower, then S-54 motes (either mode). */
 export function beamFoes(game) {
-  const b = game.burrow && game.burrow.b, up = b && b.state === 'up' ? b : null;
-  if (!game.bolts.length && !up) return game.enemies;
+  const b = game.burrow && game.burrow.b, up = b && b.state === 'up' ? b : null, motes = game.swarm ? game.swarm.motes : [];
+  if (!game.bolts.length && !up && !motes.length) return game.enemies;
   const out = game.enemies.concat(game.bolts);
   if (up) out.push(up);
-  return out;
+  return motes.length ? out.concat(motes) : out;
 }
 
 // ---------- drawing (render.js calls these; sprites are cached glow canvases, D-051) ----------

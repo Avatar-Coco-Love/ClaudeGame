@@ -3,13 +3,18 @@
 // on a cleared 3×3 pad mid-ring with a Relay placed there (a top-build player banks in the biome), mines only that ring's
 // ore, and beams a surfaced Burrower like any foe. Haul = ◆-equivalent banked + still carried (◆ 1, ▲ ● 4, ≈ ⬟ 12;
 // D-146). Gate: with / without in 0.85–0.95 for each mode, and Drift within 0.05 of Surge.
-// Usage: node tools/biomefoe.mjs [--biome=kiln] [--seeds=4] [--minutes=10] [--mode=drift,surge] [--v]
+// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=4] [--minutes=10] [--mode=drift,surge] [--v]
 import { runBot } from './surgebot.mjs';
-import { CELL, KILN_RING, ORE_KIND } from '../src/config.js';
+import { CELL, KILN_RING, UNDERTOW_RING, ORE_KIND } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
-const BIOMES = { kiln: { ring: KILN_RING, ore: new Set(['shard', 'prism', 'calx']), off: g => { g.burrow.off = true; } } };
+const BIOMES = { // S-54: shoal = the mote swarm
+  kiln: { ring: KILN_RING, ore: new Set(['shard', 'prism', 'calx']), off: g => { g.burrow.off = true; },
+    stats: g => { const s = g.burrow; return { spawned: s.spawned, lunges: s.lunges, kills: s.kills, eaten: s.eaten, bitten: s.bitten, lost: s.lost }; } },
+  shoal: { ring: UNDERTOW_RING, ore: new Set(['shard', 'prism', 'tide']), off: g => { g.swarm.off = true; },
+    stats: g => { const s = g.swarm; return { spawned: s.spawned, touches: s.touches, hits: s.hits, kills: s.kills, taken: s.taken, carried: s.carried, cleared: s.cleared }; } },
+};
 const biome = BIOMES[arg('biome', 'kiln')], seeds = Number(arg('seeds', 4)), minutes = Number(arg('minutes', 10));
 const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v');
 export const WEIGHT = { shard: 1, prism: 4, lumen: 4, tide: 12, calx: 12 };
@@ -37,8 +42,7 @@ function run(seed, mode, creature) {
   const ore = i => game.world.rings[i] === biome.ring && biome.ore.has(ORE_KIND[game.world.cells[i]]);
   const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', setup, ore });
   const banked = {}; for (const k in game.bank) banked[k] = game.bank[k] - (game.bank0[k] || 0);
-  const s = game.burrow;
-  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, spawned: s.spawned, lunges: s.lunges, kills: s.kills, eaten: s.eaten, bitten: s.bitten, lost: s.lost };
+  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, foe: biome.stats(game) };
 }
 
 const med = v => { const s = [...v].sort((a, b) => a - b); return s.length % 2 ? s[s.length >> 1] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
@@ -53,7 +57,7 @@ for (const mode of modes) {
   const sum = (rows, f) => rows.reduce((x, y) => x + f(y), 0);
   ratios[mode] = sum(on, r => r.haul) / Math.max(1e-9, sum(off, r => r.haul));
   console.log(`${mode}: haul with/without ${ratios[mode].toFixed(3)} (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
-    `Burrowers ${sum(on, r => r.spawned)}, lunges ${sum(on, r => r.lunges)}, kills ${sum(on, r => r.kills)}, bitten ${sum(on, r => r.bitten)}, tunnel ore lost ${sum(on, r => r.lost)}, ` +
+    `${Object.keys(on[0].foe).map(k => `${k} ${sum(on, r => r.foe[k])}`).join(', ')}, ` +
     `deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, relay ${sum(on, r => r.relay)}/${seeds}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}, med haul ${med(on.map(r => r.haul)).toFixed(0)}/${med(off.map(r => r.haul)).toFixed(0)}`);
 }
 if (ratios.drift !== undefined && ratios.surge !== undefined) {

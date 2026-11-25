@@ -53,3 +53,15 @@ alternatives). D-145 on.
 - `tools/perf.cjs` has a run per biome scene with its creatures (`kiln`); a new biome or foe adds one in its build PR.
 - Rejected: glow sprites for vents / sites (their alpha and radius animate every frame: many sprite sizes); dropping
   the blur in 'lighter' (changes the look); a source check by regex (misses blur state set elsewhere, e.g. the Scanner).
+
+### D-150 — S-54 motes: a touch takes 1 item, hp 2, a BFS way in (session 115, build)
+- As specced (hp 0.5, no take) the Shoal gate fails the other way: Drift 1.08 / Surge 1.04 (8 seeds). The swarm is pure
+  loot: the top-build bot beams ~95 % of motes before they touch (0.5 hp dies in 4 frames of an 8.6 dps beam).
+- Per S-53c's lesson, a touch of the hold takes `MOTE_TAKE` = 1 item for good (most valuable first, `BITE_ORDER`), in
+  both modes; Drift still never damages. Take alone barely moves it (take 1…5: 0.97–1.06, touches ~0.3 / min), so
+  `MOTE_HP` 0.5 → **2** (~0.23 s of beam each): Drift 0.907 / Surge 0.896 (8 seeds), 0.910 / 0.899 (16): PASS.
+- Motes fly in by a BFS field over open floor (`MOTE_FIELD` 20 cells, as the Echo's) and spawn only on cells it reaches;
+  a beeline left them stuck on rock (touches ~0). The gate runs in smoke (`mote.cjs`, ~15 s, seeds fixed so it is
+  deterministic; it guards the balance against unrelated changes). Bots aim at `beamFoes` (one list of hittables).
+- Rejected: a side-to-side jink to beat a thin ray (no more touches: the bot still won); a shorter gap (more loot, the
+  ratio rose); take 3+ at hp 0.5 (a 4 px mote emptying a quarter of a stack reads wrong, and still noisy).

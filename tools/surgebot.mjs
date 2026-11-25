@@ -12,6 +12,7 @@ import { Game } from '../src/game.js';
 import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS, SPITTER_TIER, GLITCH_TIER_PX } from '../src/config.js';
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
 import { siteCharged } from '../src/anomaly.js';
+import { beamFoes } from '../src/spitter.js';
 
 /** S-23 guard helpers (one copy for surgebot, wakeprobe and tests/wake.cjs, audit 59): the live Glitch nearest the
  *  Spire core, the spot between the core and a target 3.2 cells out (clamped inside the interior), and the move toward it. */
@@ -75,8 +76,8 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   const setGoal = (key, fn) => { if (key !== goalKey) { goalKey = key; goalFn = fn; plan = null; replanned = false; watch = { x: g.player.x, y: g.player.y, t, mined: g.stats.mined }; } };
   // S-32: a bolt in flight inside FIGHT_PX is a foe too (a player beams it). Spitters count only inside FIGHT_PX, like any
   // Glitch: aiming at one out of beam reach stalled the dig (stuck on a spire run).
-  const foe = () => { let best = null, bd = FIGHT_PX; const bu = g.burrow && g.burrow.b && g.burrow.b.state === 'up' ? [g.burrow.b] : [];
-    for (const e of g.enemies.concat(g.bolts, bu)) { if (e.fade !== undefined) continue;
+  const foe = () => { let best = null, bd = FIGHT_PX;
+    for (const e of beamFoes(g)) { if (e.fade !== undefined) continue; // S-54: what the beam can hit (Glitches, bolts, a surfaced Burrower, motes)
     const d = Math.hypot(e.x - g.player.x, e.y - g.player.y); if (d < bd) { bd = d; best = e; } } return best; };
   /** One frame toward the current goal. Returns 'arrived' | 'moving' | 'skip' (stuck twice, or no path). */
   const drive = () => {

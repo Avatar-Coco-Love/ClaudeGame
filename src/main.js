@@ -41,7 +41,7 @@ let game = null;
 let paused = true;
 let panelOpen = false;
 let saveTimer = 0;
-let toastTimer = 0, bitToasted = false; // S-53c: the bite toast shows once per session
+let toastTimer = 0, bitToasted = false, moteToasted = false; // S-53c / S-54: the bite and snatch toasts show once per session
 let selectedMode = 'drift';
 let lastHud = ''; // updateHud's change key (S-39: cleared when a key is rebound)
 
@@ -229,6 +229,10 @@ function updateHud() {
     if (ev === 'burrow-bite') { // S-53c: the cargo bar flashes lilac; the first bite of a session also says why
       const bar = $('cargo-fill'); bar.classList.remove('bit'); void bar.offsetWidth; bar.classList.add('bit');
       if (!bitToasted) { bitToasted = true; toast('A Burrower bit your hold', 2600, KEEP); }
+    }
+    if (ev === 'mote-take') { // S-54: a mint flash; the first of a session says why
+      const bar = $('cargo-fill'); bar.classList.remove('mote'); void bar.offsetWidth; bar.classList.add('mote');
+      if (!moteToasted) { moteToasted = true; toast('A mote snatched from your hold', 2600, KEEP); }
     }
     if (ev === 'destabilized') toast('Core destabilized — your cargo scattered where you fell', 3800, KEEP);
   }

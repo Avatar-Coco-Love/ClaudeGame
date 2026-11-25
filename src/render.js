@@ -19,6 +19,7 @@ import { drawAnomalies } from './anomaly.js';
 import { drawVents } from './vent.js';
 import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
+import { drawMotes } from './mote.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48; // at k = 1; audit 84: scaled by 1/k² (chunk canvases are pre-scaled), never under what one view needs
@@ -189,6 +190,7 @@ export class Renderer {
     this.drawEnemies(ctx, true);
     drawSpitterTells(this, ctx); // S-32: the shot tell and bolts read through the dark
     drawBurrowerTell(this, ctx); // S-53: the surfacing tell reads through the dark
+    drawMotes(this, ctx); // S-54: motes glow, so they read through the dark
     this.drawScan(ctx);
     ctx.restore();
 
