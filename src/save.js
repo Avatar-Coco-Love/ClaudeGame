@@ -20,7 +20,7 @@ export const STEPS = [
   s => ({ ...s, beamMode: 'focus' }),      // 6 -> 7: beam modes (S-13)
   s => ({ ...s, pickups: (s.pickups || []).map(q => [q[0], q[1], q[2], 1]) }), // 7 -> 8: `kept` tags (B-022); an old floor may hold scattered cargo, so all of it is kept
   s => ({ ...s, craft: { beacon: 0 }, beacons: [] }), // 8 -> 9: Beacons (S-16): none crafted, none placed
-  s => ({ ...s, spires: chooseSpires(s.seed, s.explored, s.broken) }), // 9 -> 10: Spires (S-19) only where this save hasn't looked (D-024)
+  s => ({ ...s, spires: chooseSpires(s.seed, s.explored, s.broken, WORLD_SIZE_OLD) }), // 9 -> 10: Spires (S-19) only where this save hasn't looked (D-024)
   s => ({ ...s, craft: { ...s.craft, relay: 0, last: 'beacon' }, relays: [] }), // 10 -> 11: Relays (S-22): none crafted, none placed
   s => ({ ...s, spires: Array.isArray(s.spires) ? s.spires.map(q => q && q.lit && !q.mode ? { ...q, mode: 'broken' } : q) : s.spires }), // 11 -> 12: S-28 `mode` (D-081): only broken Spires could relight before
   s => ({ ...s, ended: false, endedAt: null }), // 12 -> 13: S-24 ending; a save with every Spire already lit gets its ending on load (game.js)

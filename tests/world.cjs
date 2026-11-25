@@ -10,7 +10,7 @@ async function lootChecks() {
   const { upgradeSave } = await import('../src/save.js');
   const { PICKUP_CAP } = await import('../src/config.js');
   const audio = new Proxy({}, { get: () => () => {} });
-  const g = new Game({ seed: 77, mode: 'surge', audio });
+  const g = new Game({ seed: 77, mode: 'surge', audio, size: 160 });
   for (let i = 0; i < PICKUP_CAP; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard');
   const floor = g.pickups.length;
   g.cargo = { shard: 7, prism: 3 };
@@ -29,7 +29,7 @@ async function lootChecks() {
 async function ringChecks() {
   const { World } = await import('../src/world.js');
   const { Game } = await import('../src/game.js');
-  const w = new World(77), cx = w.w / 2, cy = w.h / 2;
+  const w = new World(77, [], 160), cx = w.w / 2, cy = w.h / 2;
   const rs = [10, 30, 60].map(d => w.ring(cx + d, cy));
   check('ring() at d 10/30/60 = Hearth/Veil/Deep (S-8)', rs.join() === '0,1,2', rs.join());
   const beamTime = (x, y) => { let n = 0; while (!(w.hit(x, y, 0.01) || {}).broken && n < 1e4) n++; return n + 1; };
@@ -41,7 +41,7 @@ async function ringChecks() {
   // Base generator with every vault skipped (S-9 stamps on top; vaultChecks covers that). Hashes of seed 77 (D-023):
   // `lay` = empty/solid bitset as generated before S-8; `ore` = cell types with DENSE and LUMEN folded into ROCK, as generated
   // before S-10 (so Lumen only re-typed plain rock); `typ` = full cell types, pinned at S-10 (3824047980 before it).
-  const g0 = new World(77, [0, 1, 2, 3, 4, 5]); let lay = 0x811c9dc5, typ = 0x811c9dc5, ore = 0x811c9dc5;
+  const g0 = new World(77, [0, 1, 2, 3, 4, 5], 160); let lay = 0x811c9dc5, typ = 0x811c9dc5, ore = 0x811c9dc5;
   for (let i = 0; i < g0.cells.length; i++) { const c = g0.cells[i];
     lay = Math.imul(lay ^ (c ? 1 : 0), 0x01000193) >>> 0; typ = Math.imul(typ ^ c, 0x01000193) >>> 0;
     ore = Math.imul(ore ^ (c === 2 || c === 8 ? 1 : c), 0x01000193) >>> 0; }
@@ -49,7 +49,7 @@ async function ringChecks() {
     `${lay} / ${ore} / ${typ}`);
   const pitches = [];
   const audio = new Proxy({}, { get: (_, k) => k === 'setRing' ? r => pitches.push(r) : () => {} });
-  const g = new Game({ seed: 77, mode: 'drift', audio });
+  const g = new Game({ seed: 77, mode: 'drift', audio, size: 160 });
   const toasts = [], go = d => { g.player.x = g.nexus.x + d * 32; g.player.y = g.nexus.y; g.player.vx = g.player.vy = 0;
     g.update(1 / 60, { move: { x: 0, y: 0 } }); toasts.push(...g.events.filter(e => e === 'ring').map(() => g.ringName())); g.events.length = 0; };
   for (const d of [30, 10, 30, 60, 30, 60]) go(d);
@@ -66,12 +66,12 @@ async function vaultChecks() {
   const { T } = await import('../src/config.js');
   const audio = new Proxy({}, { get: () => () => {} });
   const seeds = Array.from({ length: 40 }, (_, i) => (i + 1) * 7919);
-  const counts = seeds.map(s => new World(s).vaults.length);
-  const w = new World(77), base = new World(77, [0, 1, 2, 3, 4, 5]), foot = new Set(w.vaults.flatMap(v => v.cells));
+  const counts = seeds.map(s => new World(s, [], 160).vaults.length);
+  const w = new World(77, [], 160), base = new World(77, [0, 1, 2, 3, 4, 5], 160), foot = new Set(w.vaults.flatMap(v => v.cells));
   let outside = 0; for (let i = 0; i < w.cells.length; i++) if (!foot.has(i) && w.cells[i] !== base.cells[i]) outside++;
   check('6 vaults on every one of 40 seeds; only their footprints differ from the base world (S-9)', counts.every(n => n === 6) && outside === 0
     && w.vaults.every(v => w.cells[v.y * w.w + v.x] === T.CACHE), `min ${Math.min(...counts)}, ${outside} cells changed outside`);
-  const g = new Game({ seed: 77, mode: 'drift', audio }), v = g.world.vaults[0];
+  const g = new Game({ seed: 77, mode: 'drift', audio, size: 160 }), v = g.world.vaults[0];
   const before = g.pickups.length;
   while (!(g.world.hit(v.x, v.y, 0.5) || {}).broken);
   g.onCellBroken(v.x, v.y, T.CACHE);
@@ -80,7 +80,7 @@ async function vaultChecks() {
   check('breaking a cache bursts 20◆ + 6▲; it stays open after reload (S-9)', n('shard') === 20 && n('prism') === 6
     && h.world.get(v.x, v.y) === T.EMPTY && h.world.vaults.length === 6, `${n('shard')}◆ ${n('prism')}▲, after reload ${h.world.get(v.x, v.y)}`);
   // A format-3 save (no vaultSkip) that explored one cell of vault 2 and tunnelled through the base world where vault 4 sits.
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave(), sites = vaultSites(77), N = w.w * w.h;
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave(), sites = vaultSites(77, 160), N = w.w * w.h;
   const ex = new Uint8Array(N), br = new Uint8Array(N);
   ex[sites[2].cells[0]] = 1;
   const tunnel = sites[4].cells.filter(c => base.cells[c] !== T.EMPTY).slice(0, 3); for (const c of tunnel) br[c] = ex[c] = 1;
@@ -90,7 +90,7 @@ async function vaultChecks() {
   check('a format-3 save skips the vaults it has seen and keeps its tunnels (S-9, D-023)', up.v === SAVE_FORMAT && up.vaultSkip.join() === '2,4'
     && o.world.vaults.length === 4 && tunnel.every(c => o.world.cells[c] === T.EMPTY) && o.world.get(vs.x, vs.y) !== T.CACHE
     && JSON.stringify(o.toSave().vaultSkip) === '[2,4]', `skip ${up.vaultSkip}, ${o.world.vaults.length} vaults`);
-  check('a new world saves vaultSkip: [] (S-9)', JSON.stringify(new Game({ seed: 5, mode: 'drift', audio }).toSave().vaultSkip) === '[]');
+  check('a new world saves vaultSkip: [] (S-9)', JSON.stringify(new Game({ seed: 5, mode: 'drift', audio, size: 160 }).toSave().vaultSkip) === '[]');
 }
 
 // S-10 Lumen: Deep only (d >= 55) on 40 seeds; one Lumen cell banks exactly 1● through pickup + deposit; a floor ● and the
@@ -103,13 +103,13 @@ async function lumenChecks() {
   const audio = new Proxy({}, { get: () => () => {} });
   let total = 0, minD = Infinity, empty = 0;
   for (let k = 1; k <= 40; k++) {
-    const w = new World(k * 7919); let n = 0;
+    const w = new World(k * 7919, [], 160); let n = 0;
     for (let y = 0; y < w.h; y++) for (let x = 0; x < w.w; x++) if (w.cells[y * w.w + x] === T.LUMEN) { n++; minD = Math.min(minD, Math.hypot(x + 0.5 - w.cx, y + 0.5 - w.cy)); }
     total += n; if (!n) empty++;
   }
   check('Lumen only at d ≥ 55, ~141 cells per world on 40 seeds (S-10)', minD >= LUMEN_D && empty === 0 && total / 40 > 120 && total / 40 < 160,
     `mean ${(total / 40).toFixed(1)}, nearest d ${minD.toFixed(2)}, ${empty} worlds without`);
-  const g = new Game({ seed: 77, mode: 'drift', audio }), w = g.world;
+  const g = new Game({ seed: 77, mode: 'drift', audio, size: 160 }), w = g.world;
   let cell = null; for (let i = 0; i < w.cells.length && !cell; i++) if (w.cells[i] === T.LUMEN) cell = [i % w.w, Math.floor(i / w.w)];
   let ticks = 0; while (!(w.hit(cell[0], cell[1], 0.05) || {}).broken) ticks++;
   g.onCellBroken(cell[0], cell[1], T.LUMEN);
@@ -122,7 +122,7 @@ async function lumenChecks() {
   const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
   check('banked ● and a floor ● survive save + load (S-10)', h.bank.lumen === 1 && h.stats.lumen === 1 && h.pickups.filter(q => q.kind === 'lumen').length === 1,
     `bank ${h.bank.lumen}, floor ${h.pickups.map(q => q.kind).join()}`);
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave();
   Object.assign(old, { v: 4, bank: { shard: 5, prism: 2 }, cargo: { shard: 1, prism: 0 }, pickups: [[1, 3000, 3000], [0, 3010, 3000]] });
   delete old.stats.lumen;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
@@ -135,7 +135,7 @@ async function rngChecks() {
   const audio = new Proxy({}, { get: () => () => {} });
   const play = async (extraYieldDraws = 0) => {
     await new Promise(r => setTimeout(r, 3));
-    const g = new Game({ seed: 4242, mode: 'surge', audio });
+    const g = new Game({ seed: 4242, mode: 'surge', audio, size: 160 });
     for (let i = 0; i < extraYieldDraws; i++) g.rng.yield();
     g.player.integrity = 1e9;
     const spawns = [], pickups = [], push = g.enemies.push;

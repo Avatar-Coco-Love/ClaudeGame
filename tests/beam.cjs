@@ -59,7 +59,7 @@ async function nodeChecks(check) {
 
   // Save: Wide survives reload; a format-6 save loads as Focus; a saved mode that isn't unlocked loads as Focus.
   const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave(); old.v = 6; delete old.beamMode;
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave(); old.v = 6; delete old.beamMode;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   const bad = new Game({ seed: 77, mode: 'drift', audio }).toSave(); bad.beamMode = 'wide';
   const b = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(bad) });

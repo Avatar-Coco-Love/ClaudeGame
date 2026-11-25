@@ -64,7 +64,7 @@ async function nodeChecks(check) {
   // D-069: a planted broken Spire (keep over its core centre) relights at 80 instead; the stats count it.
   {
     const base = new Game({ seed: 77, mode: 'drift', audio: new Proxy({}, { get: () => () => {} }) }).toSave(), sv = JSON.parse(JSON.stringify(base));
-    const s0 = sv.spires[1], W = 160; s0.keep = [s0.y * W + s0.x, (s0.y - 4) * W + s0.x + 2]; // core centre + one facet
+    const s0 = sv.spires[1], W = sv.size; s0.keep = [s0.y * W + s0.x, (s0.y - 4) * W + s0.x + 2]; // core centre + one facet
     const { g, s } = make('surge', 1, upgradeSave(sv));
     g.bank.prism = 90; run(g, 11);
     check('a broken Spire (keep over its core) relights at 80 in either mode: lit, "spire-relit" (S-20, D-069)', s.fed === 80 && s.lit

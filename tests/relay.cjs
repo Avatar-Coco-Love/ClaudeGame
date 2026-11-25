@@ -81,7 +81,7 @@ async function nodeChecks(check) {
   const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
   check('Relays, carried stock and craft.last survive save + load (S-22)', h.relays.map(r => r.i).join() === g.relays.map(r => r.i).join()
     && h.craft.relay === 1 && h.craft.last === 'relay' && h.relays[0].x === g.relays[0].x, JSON.stringify({ relays: h.relays.length, craft: h.craft }));
-  const old = fresh().toSave();
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave(); // a format-17 save is 160 (S-46b2)
   old.v = SAVE_FORMAT - 1; old.craft = { beacon: 2 }; delete old.relays;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   check('the previous save format loads with no Relays, its beacons kept (S-22, D-005)', up.v === SAVE_FORMAT && o.relays.length === 0 && o.craft.relay === 0
@@ -135,7 +135,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload, sh
   const look = await pg.evaluate(() => {
     const { game: g, renderer: R } = window.__lumen, q = g.relays[0], frames = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     const dark = (x, y) => { const p = R.worldToScreen(x, y); return R.lctx.getImageData(Math.round(p.x / 2), Math.round(p.y / 2), 1, 1).data[3]; };
-    const sc = 140 / (g.world.w * 32), box = () => R.mctx.getImageData(Math.round(q.x * sc) - 5, Math.round(q.y * sc) - 5, 11, 11).data;
+    const mw = () => R.miniWin, box = () => R.mctx.getImageData(Math.round((q.x - mw().ox) * mw().sc) - 5, Math.round((q.y - mw().oy) * mw().sc) - 5, 11, 11).data; // S-46b window
     return frames().then(() => {
       const on = box(), out = { lights: R.lightSets.map(s => s.length).join(), at: dark(q.x, q.y), off: dark(q.x, q.y - 220) };
       const kept = g.relays.splice(0); // the same map without the Relay: the ring is what differs, and it is cyan

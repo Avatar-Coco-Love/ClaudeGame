@@ -1,11 +1,11 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 92** · **Version: v1.4.32** (session 92: Design; rotation: 93 Build, 94 Audit, 95 Build, 96 Build).
+_Last updated: 2026-11-25_ · **Session counter: 93** · **Version: v1.4.33** (session 93: Build; rotation: 94 Audit, 95 Build, 96 Build, 97 Design).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
-- 160×160-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` / `_OLD` both 160 (256 dev-only via `new Game({ size })`). Rings (S-46a, D-122): Hearth / Veil / Deep; a 256 world (dev-only) adds Shoal (d 80, ×2.2) / Kiln (d 104, ×2.6), 4 outer vaults, Anomalies [3,5,8,6,6]. Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), vault shell + cache, Spire shell / core / facet, and a bedrock border.
+- 256×256-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` 256 (S-46b2), old saves `_OLD` 160; size is required everywhere (D-125). Rings (S-46a, D-122): Hearth / Veil / Deep; a 256 world adds Shoal (d 80, ×2.2) / Kiln (d 104, ×2.6), 4 outer vaults, Anomalies [3,5,8,6,6]. Perf budget: `bigworld.cjs`. Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), vault shell + cache, Spire shell / core / facet, and a bedrock border.
 - Core movement: analog intent → target velocity → acceleration → axis-separated collision → realized velocity, plus corner assist so the core slides into 1-cell tunnels.
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
@@ -46,7 +46,7 @@ _Last updated: 2026-11-25_ · **Session counter: 92** · **Version: v1.4.32** (s
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-12`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-45 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, S-46b2 / S-47 / S-48 refined in `-9` (D-124) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-46b2 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, S-46b2 / S-47 / S-48 refined in `-9` (D-124) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified
 - Per-session checks (sessions 10–48) moved word for word to `09-…-5` (audit 49), now `archive/2026-11-24-09-sessions-49-53.md` (audit 59); each lives on in the smoke suite.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 92** · **Version: v1.4.32** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 93 (Build): S-46b2 (`07-Build-Specs-9.md`, D-124): site helpers lose their 160 default, perf budget checks,
-Ring 90 / 110 dev buttons, then `WORLD_SIZE_NEW` = 256.
+Session 94 (Audit): parallel sweeps (correctness, perf, mobile, code health, docs drift) of the live 256 world; fix
+the top issues, Debt the rest, archive `09` entries older than audit 89, check each D-xxx. Then S-47 (Build).

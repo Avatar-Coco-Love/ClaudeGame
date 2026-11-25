@@ -4,9 +4,10 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
-- **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits). Scheduled as S-46b2's first bullet (D-124): site helpers
-  (`vaultSites`, `spireCandidates`, `chooseSpires`, `loadSpires`, `spireFootprint`, `isBroken`) default `w` to 160, so
-  a caller that forgets the world's size silently gets 160 geometry in a 256 world; pass `world.w` everywhere.
+- **B-084** `drawcost.cjs` "20 light holes ≤ 2×" reads 1.9–2.02× in headless runs (old code too): find why the
+  holes frame costs ~2× (measure, don't loosen) in audit 94.
+- ✅ **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits; the site helpers' 160 default went in
+  S-46b2, v1.4.33: a missing size now throws, D-125).
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
   #92 (B-081, D-117). Perf:
   `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,

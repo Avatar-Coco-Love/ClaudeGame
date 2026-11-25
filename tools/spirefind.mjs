@@ -9,7 +9,7 @@ import { WORLD_SIZE_OLD as WORLD_W, WORLD_SIZE_OLD as WORLD_H } from '../src/con
 const [SEEDS = 40, FIRST = 1] = process.argv.slice(2, 4).map(Number);
 let short = 0, minCand = Infinity, minVault = Infinity, minGap = Infinity, dMin = Infinity, dMax = 0, notFirst = 0;
 for (let seed = FIRST; seed < FIRST + SEEDS; seed++) {
-  const cands = spireCandidates(seed), sp = chooseSpires(seed), vaults = vaultSites(seed);
+  const cands = spireCandidates(seed, 160), sp = chooseSpires(seed, null, null, 160), vaults = vaultSites(seed, 160);
   if (sp.length < 5) short++;
   minCand = Math.min(minCand, ...cands.map(l => l.length));
   sp.forEach((s, k) => {
@@ -19,7 +19,7 @@ for (let seed = FIRST; seed < FIRST + SEEDS; seed++) {
     for (const o of sp) if (o !== s) minGap = Math.min(minGap, Math.hypot(o.x - s.x, o.y - s.y));
   });
 }
-const all = packBits(new Uint8Array(WORLD_W * WORLD_H).fill(1)), fb = chooseSpires(FIRST, all, all);
+const all = packBits(new Uint8Array(WORLD_W * WORLD_H).fill(1)), fb = chooseSpires(FIRST, all, all, 160);
 console.log(JSON.stringify({ seeds: SEEDS, fewerThan5: short, minValidCandidatesPerSector: minCand, fresh_notFirstCandidate: notFirst,
   d: [dMin.toFixed(1), dMax.toFixed(1)], minVaultGap: minVault.toFixed(1), minSpireGap: minGap.toFixed(1),
   fullyExploredFallback: fb.map(s => s.keep ? s.keep.length : 0) }));

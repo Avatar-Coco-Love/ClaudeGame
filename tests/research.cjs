@@ -45,7 +45,7 @@ async function nodeChecks(check) {
   const h = new Game({ seed: 77, mode: 'drift', audio, save: upgradeSave(JSON.parse(JSON.stringify(g.toSave()))) });
   check('the Scanner survives save + load; the live ping is never saved (S-11)', h.research.scanner === true && !('scan' in g.toSave()) && h.scan.marks.length === 0,
     JSON.stringify(h.research));
-  const old = new Game({ seed: 77, mode: 'drift', audio }).toSave();
+  const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave();
   old.v = 5; delete old.research;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   check('a format-5 save loads with research: {} (S-11)', up.v === SAVE_FORMAT && JSON.stringify(up.research) === '{}' && !o.research.scanner,

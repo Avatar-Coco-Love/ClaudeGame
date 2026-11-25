@@ -60,9 +60,16 @@ export function createDev(ui) {
   const buttons = [
     ['+100◆', () => dev.addShards()], ['+50▲', () => dev.addPrisms()], ['+20●', () => dev.addLumen()],
     ['Ring 0', () => dev.teleport(0)], ['Ring 30', () => dev.teleport(30)], ['Ring 60', () => dev.teleport(60)],
+    ['Ring 90', () => dev.teleport(90)], ['Ring 110', () => dev.teleport(110)], // S-46b2: Shoal / Kiln, 5-ring worlds only
     ['God', () => dev.god()], ['Drift/Surge', () => dev.setMode()], ['Max all', () => dev.maxAll()], ['Relight all', () => dev.relightAll()],
   ];
-  function refresh() { if (panel) panel.querySelector('[data-dev="God"]').classList.toggle('on', !!g().god); }
+  function refresh() {
+    if (!panel) return;
+    panel.querySelector('[data-dev="God"]').classList.toggle('on', !!g().god);
+    const outer = g().world.profile.rings >= 5; // S-46b2: Ring 90 / 110 only where the Shoal and Kiln exist
+    for (const k of ['Ring 90', 'Ring 110']) panel.querySelector(`[data-dev="${k}"]`).classList.toggle('hidden', !outer);
+  }
+  dev.refresh = refresh;
   dev.showPanel = (show = !panel || panel.classList.contains('hidden')) => {
     if (!panel) {
       panel = document.createElement('div');

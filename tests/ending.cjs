@@ -12,7 +12,7 @@ async function nodeChecks(check) {
   const { Game } = await import('../src/game.js'), sp = await import('../src/spire.js'), en = await import('../src/ending.js');
   const { upgradeSave } = await import('../src/save.js');
   const { DARK_ALPHA, ENDING_S } = await import('../src/config.js');
-  const make = (save = null, settings = null) => { const g = new Game({ seed: 77, mode: 'drift', audio: quiet, save, settings });
+  const make = (save = null, settings = null, size) => { const g = new Game({ seed: 77, mode: 'drift', audio: quiet, save, settings, size });
     const ev = []; const n = g.notify.bind(g); g.notify = e => { ev.push(e); n(e); }; g.ev = ev; return g; };
   const relight = (g, modes) => g.spires.forEach((s, i) => { if (!s.lit) { s.fed = 80; sp.relightSpire(g, s, modes[i]); } });
 
@@ -33,11 +33,11 @@ async function nodeChecks(check) {
       JSON.stringify({ ended: h.ended, at: h.endedAt, seq: !!h.endSeq }));
   }
   {
-    const g = make(); relight(g, ['drift', 'drift', 'drift', 'drift', 'drift']);
+    const g = make(null, null, 160); relight(g, ['drift', 'drift', 'drift', 'drift', 'drift']); // v12 saves are 160
     const old = JSON.parse(JSON.stringify(g.toSave())); old.v = 12; delete old.ended; delete old.endedAt;
     const up = upgradeSave(JSON.parse(JSON.stringify(old)));
     const h = make(up);
-    const part = JSON.parse(JSON.stringify(make().toSave())); part.v = 12; delete part.ended; delete part.endedAt;
+    const part = JSON.parse(JSON.stringify(make(null, null, 160).toSave())); part.v = 12; delete part.ended; delete part.endedAt;
     const k = make(upgradeSave(part));
     check('S-24: a format-12 save loads ended false; one that already lit every Spire gets its ending on load',
       up.ended === false && h.ended && !!h.endSeq && h.events.includes('ending') && !k.ended && !k.endSeq,

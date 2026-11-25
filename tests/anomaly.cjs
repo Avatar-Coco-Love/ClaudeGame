@@ -15,7 +15,7 @@ async function nodeChecks(check) {
   const { upgradeSave } = await import('../src/save.js');
   const C = await import('../src/config.js');
   const { CELL, T, WORLD_PROFILES, ANOMALY_GAP, ANOMALY_RECHARGE_S, ANOMALY_BEAM_MUL, NEXUS_RADIUS, DEPOSIT_TICK_S } = C;
-  const make = (seed = 4242, mode = 'drift', save) => new Game({ seed, mode, audio: quiet, save });
+  const make = (seed = 4242, mode = 'drift', save, size) => new Game({ seed, mode, audio: quiet, save, size });
   const key = s => s.map(q => `${q.x},${q.y},${q.ring}`).join(' ');
   const step = (g, n = 1, dt = 1 / 60) => { for (let i = 0; i < n; i++) g.update(dt, { move: { x: 0, y: 0 }, aim: null, fire: false }); g.events.length = 0; };
   /** Open site i's cell and put the core on its centre. */
@@ -24,7 +24,7 @@ async function nodeChecks(check) {
 
   // Same seed -> same 16 sites (fresh worlds, and a Game whose save already explored/broke ground).
   {
-    const a = anomalySites(new World(4242)), b = anomalySites(new World(4242)), g = make(4242);
+    const a = anomalySites(new World(4242, [], 160)), b = anomalySites(new World(4242, [], 160)), g = make(4242, 'drift', undefined, 160);
     check('S-35 anomalies: the same seed gives the same 16 sites (seed-only, like vaultSites)',
       a.length === 16 && key(a) === key(b) && key(g.anomaly.sites) === key(a), `${a.length} sites; ${key(a).slice(0, 60)}…`);
   }
@@ -32,7 +32,7 @@ async function nodeChecks(check) {
   {
     const bad = [];
     for (let k = 1; k <= 20; k++) {
-      const seed = k * 104729, w = new World(seed), s = anomalySites(w), vs = vaultSites(seed), sp = chooseSpires(seed);
+      const seed = k * 104729, w = new World(seed, [], 160), s = anomalySites(w), vs = vaultSites(seed, 160), sp = chooseSpires(seed, null, null, 160);
       const counts = [0, 1, 2].map(r => s.filter(q => q.ring === r).length);
       if (counts.join() !== WORLD_PROFILES[160].anomalies.join()) bad.push(`${seed} counts ${counts}`);
       s.forEach((q, i) => {
@@ -104,7 +104,7 @@ async function nodeChecks(check) {
   }
   // Saves: a v14 save upgrades with none taken / no buff; a reload keeps the buff and the taken sites; junk loads empty.
   {
-    const g = make(); open(g, 3); g.stats.time = 20; updateAnomalies(g, 0.01);
+    const g = make(4242, 'drift', undefined, 160); open(g, 3); g.stats.time = 20; updateAnomalies(g, 0.01); // v14 saves are 160
     const s14 = { ...JSON.parse(JSON.stringify(g.toSave())), v: 14 }; delete s14.anomalies; delete s14.buffs;
     const up = upgradeSave(s14), old = make(4242, 'drift', up);
     const back = make(4242, 'drift', JSON.parse(JSON.stringify(g.toSave())));
@@ -119,7 +119,7 @@ async function nodeChecks(check) {
   // Kinds: seed-only (same seed, same kinds; own salt, so placement is unchanged), about 1/3 each over 20 seeds.
   {
     const n = { overclock: 0, lodestone: 0, ballast: 0 }; let same = true;
-    for (let k = 1; k <= 20; k++) { const a = anomalySites(new World(k * 104729)), b = anomalySites(new World(k * 104729));
+    for (let k = 1; k <= 20; k++) { const a = anomalySites(new World(k * 104729, [], 160)), b = anomalySites(new World(k * 104729, [], 160));
       a.forEach((q, i) => { n[q.kind]++; if (b[i].kind !== q.kind) same = false; }); }
     check('S-36 kinds: the same seed gives the same kinds; over 20 seeds (320 sites) each kind is 1/3 ± 6 %',
       same && Object.keys(n).length === 3 && Object.values(n).every(c => Math.abs(c / 320 - 1 / 3) < 0.06), JSON.stringify(n));

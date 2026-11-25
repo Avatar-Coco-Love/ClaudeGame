@@ -84,7 +84,8 @@ async function nodeChecks(check) {
     const { g } = lab('guard');
     const s = JSON.parse(JSON.stringify(g.toSave()));
     const back = new Game({ seed: 4242, mode: 'surge', audio, save: s }).echoOrder;
-    const old = { ...s, v: SAVE_FORMAT - 1 }; delete old.echoOrder;
+    const old = { ...JSON.parse(JSON.stringify(new Game({ seed: 4242, mode: 'surge', audio, size: 160 }).toSave())), v: SAVE_FORMAT - 1 }; // a format-17 save is 160 (S-46b2)
+    delete old.echoOrder;
     const up = upgradeSave(JSON.parse(JSON.stringify(old)));
     const fromOld = up && new Game({ seed: 4242, mode: 'surge', audio, save: up }).echoOrder;
     const bad = new Game({ seed: 4242, mode: 'surge', audio, save: { ...s, echoOrder: 'attack' } }).echoOrder;

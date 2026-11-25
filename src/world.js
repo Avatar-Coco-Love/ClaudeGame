@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_SIZE_OLD, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_D_OUTER, VAULT_GAP, VAULT_TRIES } from './config.js';
+import { CELL, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_D_OUTER, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -44,9 +44,16 @@ const VAULT_TEMPLATES = [
   ['  ###  ', '  #.#  ', '###.###', '#..C..#', '###.###', '  #.#  ', '  ###  '], // cross
 ];
 
+/** S-46b2 (D-124): every site helper takes the world's size and throws without one, so a forgotten caller fails a
+ *  check instead of building 160 geometry in a 256 world. */
+export function needSize(w, who) {
+  if (!Number.isInteger(w) || w <= 0) throw new Error(`${who}: world size required (got ${w})`);
+}
+
 /** S-9: where a seed's vaults go. Depends on the seed alone (not on terrain), so the save upgrade can find them too.
  *  Returns [{ x, y, kind, cells: [cell index, ...] }] where cells are the indices the template writes. */
-export function vaultSites(seed, w = WORLD_SIZE_OLD, h = w) {
+export function vaultSites(seed, w, h = w) {
+  needSize(w, 'vaultSites');
   const prof = worldProfile(w), sites = [];
   // S-46a (D-122): a 256 world's outer vaults come after the first list from their own salt, so the first list is unchanged
   for (const [salt, count, [d0, d1]] of [['vault', prof.vaults, VAULT_D], ['vault-outer', prof.outerVaults, VAULT_D_OUTER]]) {
@@ -73,8 +80,9 @@ export const UNBREAKABLE = new Set([T.BEDROCK, T.SPIRE, T.FACET]);
 
 export class World {
   /** `vaultSkip`: indices into vaultSites(seed) never stamped (D-023: an old save had already seen that ground).
-   *  `size`: cells per side (S-45, a key of WORLD_PROFILES); the default is the pre-M10 size every old save has. */
-  constructor(seed, vaultSkip = [], size = WORLD_SIZE_OLD) {
+   *  `size`: cells per side (S-45, a key of WORLD_PROFILES); required (S-46b2: no default, so a forgotten caller throws). */
+  constructor(seed, vaultSkip = [], size) {
+    needSize(size, 'World');
     this.seed = seed;
     this.w = size;
     this.h = size;
