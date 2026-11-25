@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, WORLD_SIZE_OLD, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_GAP, VAULT_TRIES } from './config.js';
+import { CELL, WORLD_SIZE_OLD, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_D_OUTER, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -47,16 +47,20 @@ const VAULT_TEMPLATES = [
 /** S-9: where a seed's vaults go. Depends on the seed alone (not on terrain), so the save upgrade can find them too.
  *  Returns [{ x, y, kind, cells: [cell index, ...] }] where cells are the indices the template writes. */
 export function vaultSites(seed, w = WORLD_SIZE_OLD, h = w) {
-  const rand = seededStream(seed, 'vault'), sites = [], count = worldProfile(w).vaults;
-  for (let t = 0; t < VAULT_TRIES && sites.length < count; t++) {
-    const a = rand() * Math.PI * 2, d = VAULT_D[0] + rand() * (VAULT_D[1] - VAULT_D[0]), kind = Math.floor(rand() * VAULT_TEMPLATES.length);
-    const x = Math.floor(w / 2 + Math.cos(a) * d), y = Math.floor(h / 2 + Math.sin(a) * d);
-    const H = VAULT_HALF;
-    if (!insideBorder(x, y, H, w, h)) continue;
-    if (sites.some(v => Math.hypot(v.x - x, v.y - y) < VAULT_GAP)) continue;
-    const cells = [];
-    VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - H + j) * w + (x - H + i)); }));
-    sites.push({ x, y, kind, cells });
+  const prof = worldProfile(w), sites = [];
+  // S-46a (D-122): a 256 world's outer vaults come after the first list from their own salt, so the first list is unchanged
+  for (const [salt, count, [d0, d1]] of [['vault', prof.vaults, VAULT_D], ['vault-outer', prof.outerVaults, VAULT_D_OUTER]]) {
+    const rand = seededStream(seed, salt), goal = sites.length + count;
+    for (let t = 0; t < VAULT_TRIES && sites.length < goal; t++) {
+      const a = rand() * Math.PI * 2, d = d0 + rand() * (d1 - d0), kind = Math.floor(rand() * VAULT_TEMPLATES.length);
+      const x = Math.floor(w / 2 + Math.cos(a) * d), y = Math.floor(h / 2 + Math.sin(a) * d);
+      const H = VAULT_HALF;
+      if (!insideBorder(x, y, H, w, h)) continue;
+      if (sites.some(v => Math.hypot(v.x - x, v.y - y) < VAULT_GAP)) continue;
+      const cells = [];
+      VAULT_TEMPLATES[kind].forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ' ') cells.push((y - H + j) * w + (x - H + i)); }));
+      sites.push({ x, y, kind, cells });
+    }
   }
   return sites;
 }
@@ -105,7 +109,7 @@ export class World {
     }
   }
 
-  /** S-8: depth ring index (0 Hearth, 1 Veil, 2 Deep) of a cell; out-of-bounds counts as the outermost ring. */
+  /** S-8: depth ring index (0 Hearth, 1 Veil, 2 Deep; S-46a 3 Shoal, 4 Kiln in a 256 world) of a cell; out-of-bounds counts as the outermost ring. */
   ring(x, y) { return this.inBounds(x, y) ? this.rings[y * this.w + x] : this.profile.rings - 1; }
   /** Hit points of a cell type at (x, y): rings toughen only ROCK and DENSE (D-022). */
   hpAt(x, y, type) {

@@ -53,9 +53,44 @@ async function sizeChecks() {
     wrong.length === 0 && upgradeSave(JSON.parse(JSON.stringify(base))) !== null, wrong.join(', ') || `${Object.keys(cases).length} rejected`);
 }
 
+// S-46a (D-122): the 256 profile's two new rings and appended sites.
+async function ringChecks() {
+  const { Game } = await import('../src/game.js');
+  const { RINGS, VAULT_D_OUTER, ANOMALY_D, WORLD_PROFILES } = await import('../src/config.js');
+  const audio = new Proxy({}, { get: () => () => {} });
+  const big = new Game({ seed: 77, mode: 'drift', audio, size: 256 }), w = big.world, small = new Game({ seed: 77, mode: 'drift', audio, size: 160 });
+  const ringAt = (wo, d) => wo.ring(Math.floor(wo.cx + d), Math.floor(wo.cy)); // d cells east of the centre
+  const want = [[10, 0], [30, 1], [60, 2], [90, 3], [110, 4], [125, 4]], got = want.map(([d]) => ringAt(w, d));
+  check('a 256 world has 5 rings: Shoal from d 80, Kiln from d 104, each tougher than the last (S-46a)',
+    RINGS[3].name === 'Shoal' && RINGS[4].name === 'Kiln' && RINGS[3].r0 === 80 && RINGS[4].r0 === 104
+    && want.every(([, r], i) => got[i] === r) && RINGS.every((r, i) => !i || r.hpMul > RINGS[i - 1].hpMul), `rings at ${want.map(x => x[0])}: ${got}`);
+  const smallMax = Math.max(...small.world.rings);
+  check('a 160 world keeps 3 rings (its corners are Deep) (S-46a)', smallMax === 2 && ringAt(small.world, 79) === 2, `max ring ${smallMax}`);
+  const prof = WORLD_PROFILES[256], first = big.world.vaults.slice(0, prof.vaults), outer = big.world.vaults.slice(prof.vaults);
+  const dist = v => Math.hypot(v.x - w.cx, v.y - w.cy);
+  check('a 256 world adds 4 outer vaults at d 86–118 after the first 6 (S-46a)', first.length === 6 && outer.length === prof.outerVaults
+    && outer.every(v => dist(v) >= VAULT_D_OUTER[0] - 1 && dist(v) <= VAULT_D_OUTER[1] + 1) && first.every(v => dist(v) < 74),
+    `outer at ${outer.map(v => Math.round(dist(v)))}`);
+  const { SPIRE_D, SPIRE_VAULT_GAP } = await import('../src/config.js');
+  check('outer vaults start a full Spire gap past the Spire band, so they never move a Spire (S-46a, D-122)', VAULT_D_OUTER[0] >= SPIRE_D[1] + SPIRE_VAULT_GAP);
+  const per = [0, 1, 2, 3, 4].map(r => big.anomaly.sites.filter(s => s.ring === r));
+  const inBand = per.every((l, r) => l.every(s => { const d = Math.hypot(s.x + 0.5 - w.cx, s.y + 0.5 - w.cy); return d >= ANOMALY_D[r][0] && d <= ANOMALY_D[r][1]; }));
+  check('a 256 world has Anomalies [3, 5, 8, 6, 6], each in its ring\'s band (S-46a)',
+    per.map(l => l.length).join() === prof.anomalies.join() && inBand, per.map(l => l.length).join());
+  // the new rings draw from their own salts: dropping them leaves the inner sites exactly as they were
+  const saved = prof.anomalies, savedV = prof.outerVaults;
+  prof.anomalies = [3, 5, 8]; prof.outerVaults = 0;
+  const inner = new Game({ seed: 77, mode: 'drift', audio, size: 256 });
+  prof.anomalies = saved; prof.outerVaults = savedV;
+  const key = l => JSON.stringify(l.map(s => [s.x, s.y, s.kind]));
+  check('the Shoal / Kiln sites are appended: vaults, Spires and inner Anomalies match a 256 world without them (S-46a)',
+    key(inner.world.vaults) === key(first) && key(inner.spires) === key(big.spires) && key(inner.anomaly.sites) === key(big.anomaly.sites.filter(s => s.ring < 3)));
+}
+
 async function nodeChecks(c) {
   check = c;
   await sizeChecks().catch(e => check('S-45 world-size checks ran', false, e.message));
+  await ringChecks().catch(e => check('S-46a ring checks ran', false, e.message));
 }
 
 module.exports = { nodeChecks };

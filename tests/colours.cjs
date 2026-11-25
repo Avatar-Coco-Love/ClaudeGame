@@ -54,13 +54,23 @@ function groups() {
   const all = g => { for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) pairs.push([g[i], g[j]]); };
   all(anomaly); all(res);
   for (const g of glitch) pairs.push([g, spitter]);
-  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length } };
+  // S-46a: Shoal / Kiln rock + dense edges (a cell outline, shape 'cell': no shape exemption, so colour alone must hold)
+  // vs each pickup, Overclock amber, and the other new ring's edges.
+  const ring = [];
+  for (const m of src.matchAll(/name: '(Shoal|Kiln)',.*?rockEdge: '(#[0-9a-f]{6})'.*?denseEdge: '(#[0-9a-f]{6})'/g))
+    ring.push({ id: `${m[1]} rock`, c: m[2], shape: 'cell', r: m[1] }, { id: `${m[1]} dense`, c: m[3], shape: 'cell', r: m[1] });
+  const amber = anomaly.find(a => a.id === 'overclock');
+  for (const e of ring) {
+    for (const o of [...res, amber]) pairs.push([e, { ...o, shape: 'cell' }]);
+    for (const o of ring) if (o.r > e.r) pairs.push([e, o]); // Kiln < Shoal alphabetically: each cross pair once
+  }
+  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length, ring: ring.length } };
 }
 
 function run() {
   const out = [], { pairs, shapes, counts } = groups();
-  out.push({ name: 'colours: read 3 Anomaly kinds, 3 pickups, 4 Glitch tiers + Spitter from config.js',
-    ok: counts.anomaly === 3 && counts.res === 3 && counts.glitch === 4, detail: JSON.stringify(counts) });
+  out.push({ name: 'colours: read 3 Anomaly kinds, 3 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges from config.js',
+    ok: counts.anomaly === 3 && counts.res === 3 && counts.glitch === 4 && counts.ring === 4, detail: JSON.stringify(counts) });
   const missing = Object.keys(shapes).filter(k => !shapes[k]);
   out.push({ name: 'colours: each claimed shape is still in the draw code (hexagram, ◆ ▲ ● pickups, Glitch star, Spitter rhombus)',
     ok: !missing.length, detail: missing.join(', ') });

@@ -11,14 +11,16 @@ import { chooseSpires, SPIRE_HALF } from './spire.js';
 const KIND_IDS = Object.keys(ANOMALY_KINDS); // overclock, lodestone, ballast
 
 /** Sites for a freshly generated World (call before Spires are stamped or a save is applied): [{ x, y, ring, kind }] in
- *  draw order (Hearth, Veil, Deep). Depends on the seed alone: the generated terrain, vaultSites and the save-less Spire choice. */
+ *  draw order (Hearth, Veil, Deep, then Shoal, Kiln in a 256 world). Depends on the seed alone: the generated terrain, vaultSites and the save-less Spire choice. */
 export function anomalySites(world) {
-  const { w, h, seed } = world, rand = seededStream(seed, 'anomaly'), kindRand = seededStream(seed, 'anomaly-kind'), cx = w / 2, cy = h / 2;
+  const { w, h, seed } = world, rand0 = seededStream(seed, 'anomaly'), kindRand0 = seededStream(seed, 'anomaly-kind'), cx = w / 2, cy = h / 2;
   const blocks = [...vaultSites(seed, w, h).map(v => ({ x: v.x, y: v.y, r: VAULT_HALF + ANOMALY_CLEAR })),
     ...chooseSpires(seed, null, null, w, h).map(s => ({ x: s.x, y: s.y, r: SPIRE_HALF + ANOMALY_CLEAR }))];
-  const out = [];
+  const out = [], outer = [seededStream(seed, 'anomaly-outer'), seededStream(seed, 'anomaly-outer-kind')];
   world.profile.anomalies.forEach((count, ring) => {
     const [d0, d1] = ANOMALY_D[ring];
+    // S-46a (D-122): Shoal / Kiln sites (a 256 world) draw from their own salts, after the old rings' lists
+    const [rand, kindRand] = ring >= 3 ? outer : [rand0, kindRand0];
     for (let t = 0, n = 0; t < ANOMALY_TRIES && n < count; t++) {
       const a = rand() * Math.PI * 2, d = d0 + rand() * (d1 - d0);
       const x = Math.floor(cx + Math.cos(a) * d), y = Math.floor(cy + Math.sin(a) * d);

@@ -17,3 +17,14 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
 - Watch for S-46 (Debt): site helpers default `w` to 160. `09` sessions 79–83 archived word for word
   (`archive/2026-11-25-09-sessions-79-83.md`); `09-Implementation-Log-10.md` removed (all of it archived).
 - Smoke: 425/425 (was 423; +2 `audit89.cjs`).
+
+## Session 90 — Build: S-46a Shoal / Kiln rings + appended sites (v1.4.30, D-122)
+- S-46 split (D-122): this slice adds the rings and sites; minimap window, ending map, perf budget and the flip to 256
+  are S-46b. New worlds are still 160 (unchanged pinned hashes).
+- `RINGS` + Shoal / Kiln; profile 256 = rings 5, `outerVaults` 4 (`VAULT_D_OUTER` 86–118, salt `vault-outer`),
+  Anomalies `[3, 5, 8, 6, 6]` (`ANOMALY_D` + 82–102 / 106–124, salts `anomaly-outer(-kind)`). Music clamps ring ≤ 2
+  until S-47/48. Palette from a seeded search: edges ΔE ≥ 25 (lowest 26, Shoal dense / Prism, deuteranopia).
+- Observed: at the spec's d 82, one seed in 40 had an outer vault move its Spires (and so inner Anomalies); 86 fixes it.
+- Checks: `worldsize.cjs` +6 (5 rings at the right d, 160 keeps 3, outer vaults, Anomaly counts / bands, gap rule,
+  appended = inner lists unchanged); `colours.cjs` reads 4 new edges, 30 pairs. Fail on old code (no Shoal in RINGS).
+- Screenshots at d 90 / 110 of a dev 256 world viewed: "Entering the Shoal" / "Kiln" toasts, mint / rose rock reads.
