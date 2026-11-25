@@ -29,6 +29,7 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
 - **Audit / health check** (counter % 5 == 4): use subagents in parallel (correctness bug hunt, performance, mobile/touch UX, code health/dead code,
   docs drift vs code). Verify each finding yourself before acting on it. Fix the top issues in one PR and log the rest in `docs/04` under "Debt".
   Also: archive `09` entries older than the last audit into `docs/archive/` (word for word), and check every D-xxx in `06` still matches the code.
+  Plus a short workflow review (D-138): too much of what, too little of what? Findings in `09`, changes as D-xxx.
 
 ## Context discipline
 - Don't read whole files you don't need. Use Grep, or read line ranges. `docs/09` grows forever, so only read its tail.

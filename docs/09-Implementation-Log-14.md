@@ -54,3 +54,4 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
 - `09` sessions 94–98 archived word for word (part 12 removed). New parts: `06-Decisions-20`, `04-Roadmap-4` (Debt).
 - B-090 (watch): first full smoke 488/489, `bigworld.cjs` draw ratio 2.08× once; alone 1.02× ×2; rerun 489/489.
 - Smoke 489/489 (+6: B-089 phones).
+- Follow-up docs PR (v1.5.45, D-138): owner rule, a workflow self-assessment (one-off note in `02`; every Audit, `CLAUDE.md`).

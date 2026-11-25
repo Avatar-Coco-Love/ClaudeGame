@@ -48,12 +48,12 @@ _Last updated: 2026-11-25_ · **Session counter: 104** · **Version: v1.5.44** (
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 19); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx, part 20 from D-137), `03` questions (Q-xxx), `09` log (tail: `09-…-14`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
-- Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
-- Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); tests share one server/runner `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
+- Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-49 built (M10 done). M11: S-50…S-52 in `07-Build-Specs-11.md` (D-134). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs` caps / version / inbox, `audio.cjs`).
+- One-off (D-138): the next orchestrating run first reviews the workflow (`09` tail, recent PRs) and acts on it.
 
 ## Next step (one thing)
 Session 105 (Build): S-50 per `07-Build-Specs-11.md`.

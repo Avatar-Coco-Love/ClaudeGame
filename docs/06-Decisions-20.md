@@ -14,3 +14,10 @@ alternatives). D-137 on.
 - Rejected: a smaller bank font (15 px is the floor the phone rules already use); hiding ≈ / ⬟ on phones (bank must be
   readable); a single scrolling row (hides counts); moving the ores into the cargo row (mixes holdings with capacity).
 - D-131…D-135 checked against the code: match.
+
+### D-138 — Workflow self-assessment (session 104, owner rule)
+- Owner: assess from time to time whether the work is going well: what we do too much of, too little of. One-off: the
+  next orchestrating conversation starts with that review (`09` tail + recent PRs; is time / context going to the right
+  places?) and acts on it through its PRs (note in `02`). Standing: every Audit session adds a short workflow review to
+  the code audit, findings in `09`, changes as D-xxx (`CLAUDE.md`). Kept apart from D-136 (merged; never edited).
+- Rejected: a separate "Retro" session type (a sixth slot in the rotation costs a build PR every cycle).
