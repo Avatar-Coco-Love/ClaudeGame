@@ -6,6 +6,7 @@ import { canResearch, buyResearch } from './research.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, placeRefusal, relayAt, PLACE_GLYPH } from './craft.js';
 import { sinksOn, canCraftSink, craftSink, sinkAt } from './heatsink.js';
+import { chartOn } from './chart.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { tickEnding, endingSummary, fmtTime } from './ending.js';
 import { upgradeSave } from './save.js';
@@ -348,6 +349,7 @@ function renderPanel() {
     }
   } else if (panelTab === 'nexus') {
     for (const u of NEXUS_UPGRADES) {
+      if (u.kiln && !chartOn(g)) continue; // S-52: no Chart row in a 160 world
       const lvl = g.nexusLevels[u.id];
       list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => g.buyNexus(u.id)));
     }

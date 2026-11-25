@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.5.48';
+export const VERSION = '1.6.49';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -213,7 +213,12 @@ export const NEXUS_UPGRADES = [
   { id: 'radiance', name: 'Radiance', desc: 'How far the Nexus lights the caves', max: 5,
     value: l => 320 + 96 * l, fmt: v => Math.round(v) + ' px',
     cost: l => ({ shard: 0, prism: [6, 12, 20, 30, 45][l] }) },
+  // S-52 (D-143, supersedes D-009's "Prisms only" for this row): minimap knowledge only; a world with a Kiln only (chart.js).
+  { id: 'chart', name: 'Chart', desc: 'The minimap marks Shoal currents, then Kiln vents', max: 2, kiln: true,
+    value: l => l, fmt: v => ['Uncharted', 'Currents', 'Currents + vents'][v],
+    cost: l => [{ tide: 24, prism: 10 }, { calx: 24, prism: 10 }][l] },
 ];
+export const CHART_RECHECK_S = 0.5; // s of game time between re-checks of unexplored flowing chunks in the minimap window
 
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen. The Scanner ping shows CRYSTAL/PRISM/LUMEN cells within
 // SCAN_RADIUS cells for SCAN_SHOW_S as a ring sweeps out at SCAN_SPEED; nothing is marked explored or saved.

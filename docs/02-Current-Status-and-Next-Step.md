@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 107** · **Version: v1.5.48** (session 107: Design; rotation: 108 Build, 109 Audit, 110 Build).
-**Scope (D-119, `01`):** M1–M10 ✅ (v1.0 = M5, v1.5 = M10 world + biomes). The game keeps growing: M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-25_ · **Session counter: 108** · **Version: v1.6.49** (session 108: Build; rotation: 109 Audit, 110 Build, 111 Build).
+**Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -10,7 +10,7 @@ _Last updated: 2026-11-25_ · **Session counter: 107** · **Version: v1.5.48** (
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
   Overdrive (S-50, D-140): a 256 world adds 2 levels past each max (`over`, `OVERDRIVE_COST` ◆ + ≈ + ⬟, `Game.topLevel`).
-- Nexus Development v1: a **Nexus** tab in the Matrix sheet sells Radiance (5 levels, Prisms only, D-009): +96 px Nexus light per level and a wider explored disc.
+- Nexus tab: Radiance (5 levels, ▲, D-009): +96 px light / level. Chart (S-52, D-143, `chart.js`, 256 only): L1 ≈24 ▲10 minimap current arrows (explored Shoal chunks), L2 ⬟24 ▲10 seen vents, bright in the tell.
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch stuck 6 s fades out (D-017); kills drop a Prism half the time (D-018).
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
@@ -47,13 +47,13 @@ _Last updated: 2026-11-25_ · **Session counter: 107** · **Version: v1.5.48** (
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
-- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 20); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 21); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx, part 20 from D-137), `03` questions (Q-xxx), `09` log (tail: `09-…-15`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-51 built (M10 done). M11: S-52 left (`07-…-11`); M12: S-53…S-56 (`07-…-12`, D-142). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, D-142). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
-- `node tests/smoke.cjs`: all passing (incl. `docs.cjs` caps / version / inbox, `audio.cjs`).
+- `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 108 (Build): S-52 Nexus Chart (`07-Build-Specs-11.md`), format 21; closes M11 → v1.6 (D-108).
+Session 109 (Audit): per `CLAUDE.md` (subagents, archive old `09`, D-xxx vs code, D-138 review); then S-53 (`07-…-12`).
