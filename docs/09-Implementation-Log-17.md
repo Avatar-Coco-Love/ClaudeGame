@@ -61,3 +61,11 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
   Anomalies, ≥ 6 from Spires): Shoal d 88–100 found on 30 / 30 by draw 2; Kiln d 108–118 on 30 / 30 by draw 11.
 - Specs S-60a / S-60b (`07-Build-Specs-15`), S-61a / S-61b / S-62 (`-16`); Q-026 settled (no); Q-032 opened.
 - `05` split: v1.5.43–v1.6.58 moved word for word to `archive/changelog-v1.5.43-v1.6.58.md`.
+
+## Session 123 — Build: S-58 Flare Lock (v1.7.64, D-159)
+- `lock.js`: outer vaults centred in the Kiln (seeds 4242 / 7 / 99 / 5: one each; 31337: none; 8 locks on 8 seeds).
+  `world.hitMul` hook: shell × 0, × 2 in the last 3 s of the 8 s cycle; tell edge orange; grey sparks; window flare.
+- Probe (`lock.cjs`, top build): plain vault 1.50 s, lock 2.91 s mean over 32 phases = **1.94×** (≤ 2× PASS). The spec's
+  2 s × 1.5 gave 2.48×, so tuned (D-159). Screenshot of the tell viewed: orange shell edge reads in the core's light,
+  dimmer past it (same layer as the vents; fine, the cycle is learned up close).
+- `tests/lock.cjs` (6 node + 1 browser checks), failing on the old code (no `lock.js`). Smoke 584/584 (+7).

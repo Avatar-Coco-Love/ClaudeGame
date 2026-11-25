@@ -106,6 +106,7 @@ export class World {
     this.generate();
     this.vaults = vaultSites(seed, this.w, this.h).filter((_, i) => !vaultSkip.includes(i));
     for (const v of this.vaults) this.stampVault(v);
+    this.hitMul = null; // S-58: set by lock.js when the world has Flare Locks
   }
 
   stampVault(v) {
@@ -198,6 +199,7 @@ export class World {
     const type = this.get(x, y);
     if (type === T.EMPTY || UNBREAKABLE.has(type)) return null;
     const i = this.idx(x, y);
+    if (this.hitMul) amount *= this.hitMul(x, y, type); // S-58: a Flare Lock's shell (lock.js); null in plain worlds
     this.damage[i] += amount;
     const hp = this.hpAt(x, y, type);
     if (this.damage[i] >= hp) {
