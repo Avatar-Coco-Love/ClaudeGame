@@ -66,3 +66,4 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
 - Workflow review (D-138 one-off, done by the orchestrator over PRs #101–#112) recorded as D-139: owner rules ride in
   content PRs; a split spec's slices each stay usable. `CLAUDE.md` +1 line, `02` one-off note removed.
 - `05` v1.4.23–v1.4.29 archived word for word (`archive/changelog-v1.4.23-v1.4.29.md`, cap).
+- Smoke 495/495 (+6: `overdrive.cjs`).
