@@ -103,7 +103,8 @@ export function drawVents(r, ctx, left, top, vw, vh) {
   ctx.stroke();
   ctx.shadowBlur = 12;
   for (const [s, ph] of live) {
-    const x = (s.x + 0.5) * CELL, y = (s.y + 0.5) * CELL;
+    const x = (s.x + 0.5) * CELL, y = (s.y + 0.5) * CELL, m = VENT_R * CELL + r.glowPad(12);
+    ctx.save(); ctx.beginPath(); ctx.rect(x - m, y - m, m * 2, m * 2); ctx.clip(); // B-091: a blur in 'lighter' is clipped to its reach
     const pulse = ph.tell > 0 && !still ? 0.5 + 0.5 * Math.sin(ph.u * Math.PI * 8) : 1;
     ctx.globalAlpha = ph.flare > 0 ? 0.95 : 0.45 + 0.5 * ph.tell * pulse; ctx.lineWidth = 1.6;
     ctx.beginPath(); hex(x, y); ctx.stroke();
@@ -113,6 +114,7 @@ export function drawVents(r, ctx, left, top, vw, vh) {
       ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
       ctx.globalAlpha = 0.7 * k; ctx.lineWidth = 2; ctx.stroke();
     }
+    ctx.restore();
   }
   ctx.restore();
 }

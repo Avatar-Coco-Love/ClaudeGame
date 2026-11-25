@@ -201,6 +201,10 @@ export function drawBurrowerTell(R, ctx) {
   const k = 1 - Math.max(0, b.t) / BURROW_TELL_S, still = g.settings && g.settings.reducedMotion;
   const x = b.cx * CELL, y = b.cy * CELL, cx = x + CELL / 2, cy = y + CELL / 2;
   ctx.save();
+  // B-091 (audit 114, as drawNexus S-15): a shadowBlur draw in 'lighter' blurs and composites a layer as big as the clip, ~6 ms
+  // a frame on a software canvas unclipped; so clip to the cell plus the blur's reach.
+  const m = CELL / 2 + R.glowPad(14);
+  ctx.beginPath(); ctx.rect(cx - m, cy - m, m * 2, m * 2); ctx.clip();
   ctx.globalCompositeOperation = 'lighter';
   ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = `rgb(${BURROW_RGB})`; ctx.shadowBlur = 14;
   ctx.globalAlpha = (0.25 + 0.45 * k) * (still ? 1 : 0.8 + 0.2 * Math.sin(k * Math.PI * 10));
