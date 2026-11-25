@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.34';
+export const VERSION = '1.4.35';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -310,3 +310,9 @@ export const MUSIC_PAD = { gain: 0.05, triMix: 0.5, lowpassHz: 900 };
 export const MUSIC_BELL = { gain: 0.12, gapS: [3, 7], decayS: 0.8, attackS: 0.03, octave: 2 };
 export const MUSIC_PULSE = { gain: 0.09, bpm: 70, noteS: 0.2, attackS: 0.02, octave: 0, wakeRate: 1.5 };
 export const MUSIC_XFADE_S = 4, MUSIC_END_FADE_S = 3, MUSIC_LOOKAHEAD_S = 0.1, MUSIC_MAX_VOICES = 6;
+// S-47 Undertow (D-124, undertow.js): each CHUNK whose centre cell is in the Shoal (ring UNDERTOW_RING) draws, from
+// seededStream(seed, 'undertow') in chunk order, calm (UNDERTOW_CALM share) or a current of UNDERTOW_SPEED[0] + r × [1] px/s
+// in one of 8 directions. The core's current eases to its chunk's over UNDERTOW_EASE_S and adds to the realized velocity;
+// pickups drift at UNDERTOW_PICKUP of their chunk's. Dashes on screen ≤ UNDERTOW_DASHES[0] (graphics Low: [1]). Not saved.
+export const UNDERTOW_RING = 3, UNDERTOW_CALM = 0.5, UNDERTOW_SPEED = [30, 25], UNDERTOW_EASE_S = 0.5, UNDERTOW_PICKUP = 0.5;
+export const UNDERTOW_DASHES = [30, 15], UNDERTOW_RGB = '150, 240, 220';

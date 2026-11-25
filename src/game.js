@@ -13,6 +13,7 @@ import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
+import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
@@ -88,6 +89,7 @@ export class Game {
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
     this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot'].map(k => [k, seededStream(seed, k)]));
+    this.undertow = makeUndertow(this.world); // S-47: Shoal currents from the seed (never saved)
     this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); only `cancel` is saved (B-081)
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
@@ -175,11 +177,13 @@ export class Game {
     const k = Math.min(1, PLAYER_ACCEL * dt);
     p.vx += (p.targetVx - p.vx) * k;
     p.vy += (p.targetVy - p.vy) * k;
-    const moved = moveBody(this.world, p, p.vx * dt, p.vy * dt, true);
+    const u = updateUndertow(this, dt); // S-47: the Shoal current joins the realized move only (intent untouched)
+    const moved = moveBody(this.world, p, (p.vx + u.vx) * dt, (p.vy + u.vy) * dt, true);
     p.realizedVx = moved.x / dt; p.realizedVy = moved.y / dt;
-    // Kill velocity into walls so we don't "charge up" against them.
-    if (Math.abs(p.realizedVx) < Math.abs(p.vx) * 0.5) p.vx = p.realizedVx;
-    if (Math.abs(p.realizedVy) < Math.abs(p.vy) * 0.5) p.vy = p.realizedVy;
+    // Kill velocity into walls so we don't "charge up" against them (the core's own part; never flipped by a current).
+    const ownX = p.realizedVx - u.vx, ownY = p.realizedVy - u.vy;
+    if (Math.abs(p.realizedVx) < Math.abs(p.vx + u.vx) * 0.5) p.vx = u.vx && p.vx * ownX <= 0 ? 0 : ownX;
+    if (Math.abs(p.realizedVy) < Math.abs(p.vy + u.vy) * 0.5) p.vy = u.vy && p.vy * ownY <= 0 ? 0 : ownY;
     if (Math.hypot(p.realizedVx, p.realizedVy) > 40 && Math.random() < dt * 30) {
       const a = Math.atan2(-p.realizedVy, -p.realizedVx) + (Math.random() - 0.5) * 0.6;
       this.particle(p.x, p.y, Math.cos(a) * 60, Math.sin(a) * 60, 0.35, '#5ad8ff', 2);
@@ -318,7 +322,8 @@ export class Game {
         it.vx *= Math.pow(0.04, dt); it.vy *= Math.pow(0.04, dt);
       }
       // Pickups respect walls but are allowed to drift on top of the core.
-      const nx = it.x + it.vx * dt, ny = it.y + it.vy * dt;
+      const [ux, uy] = pickupDrift(this, it.x, it.y); // S-47: Shoal pickups drift at half the current
+      const nx = it.x + (it.vx + ux) * dt, ny = it.y + (it.vy + uy) * dt;
       if (!this.world.solidAtPx(nx, it.y)) it.x = nx; else it.vx *= -0.4;
       if (!this.world.solidAtPx(it.x, ny)) it.y = ny; else it.vy *= -0.4;
       if (d < p.r + 6 && it.age > PICKUP_SETTLE_S) {

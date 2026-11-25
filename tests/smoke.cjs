@@ -91,6 +91,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
   await require('./echo.cjs').nodeChecks(check).catch(e => check('S-42 echo checks ran', false, e.message));
   await require('./echoorder.cjs').nodeChecks(check).catch(e => check('S-43 echo order checks ran', false, e.message));
+  await require('./undertow.cjs').nodeChecks(check).catch(e => check('S-47 undertow checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
@@ -375,6 +376,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message));
     await require('./echo.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_SHOT).catch(e => check('S-42 echo browser checks ran', false, e.message));
     await require('./echoorder.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_ORDER_SHOT).catch(e => check('S-43 echo order browser checks ran', false, e.message));
+    await require('./undertow.cjs').browserChecks(browser, url, check, errors, process.env.UNDERTOW_SHOT).catch(e => check('S-47 undertow browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
     await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));
 
