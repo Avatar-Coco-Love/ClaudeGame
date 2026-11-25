@@ -1,11 +1,11 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 102** · **Version: v1.5.42** (session 102: Design; rotation: 103 Build, 104 Audit, 105 Build).
+_Last updated: 2026-11-25_ · **Session counter: 103** · **Version: v1.5.43** (session 103: Build; rotation: 104 Audit, 105 Build, 106 Build).
 **Scope (D-119, `01`):** M1–M10 ✅ (v1.0 = M5, v1.5 = M10 world + biomes). The game keeps growing: M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
-- 256×256-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` 256 (S-46b2), old saves `_OLD` 160; size is required everywhere (D-125). Rings (S-46a, D-122): Hearth / Veil / Deep; a 256 world adds Shoal (d 80, ×2.2) / Kiln (d 104, ×2.6), 4 outer vaults, Anomalies [3,5,8,6,6]. Perf budget: `bigworld.cjs`. Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), vault shell + cache, Spire shell / core / facet, and a bedrock border.
+- 256×256-cell procedurally generated world (seeded). Size is saved data (S-45, D-120): `World(seed, skip, size)`, `WORLD_PROFILES[size]` = rings / vaults / Anomaly counts; `WORLD_SIZE_NEW` 256 (S-46b2), old saves `_OLD` 160; size is required everywhere (D-125). Rings (S-46a, D-122): Hearth / Veil / Deep; a 256 world adds Shoal (d 80, ×2.2) / Kiln (d 104, ×2.6), 4 outer vaults, Anomalies [3,5,8,6,6]. Perf budget: `bigworld.cjs`. Cell types: rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), Tide ≈ / Calx ⬟ (Shoal / Kiln, S-49, D-135, unspent until S-50), vault shell + cache, Spire shell / core / facet, and a bedrock border.
 - Core movement: analog intent → target velocity → acceleration → axis-separated collision → realized velocity, plus corner assist so the core slides into 1-cell tunnels.
 - Mining beam: grid raycast from the core's centre, damage over time, crack overlay, particles, and pickups that the Attractor pulls in.
 - Cargo limit, auto-deposit inside the Nexus ring, and a Core Matrix with 6 upgrades (beam, range, thrust, cargo, attractor, integrity).
@@ -37,7 +37,7 @@ _Last updated: 2026-11-25_ · **Session counter: 102** · **Version: v1.5.42** (
   `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
 - Crafting (S-16): Beacons (light, S-25 glow) and Relays (remote deposit, S-22; reclaim S-34), `craft.js`. Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
-- Darkness/light overlay, minimap (S-46b1: a 160-cell window round the core, D-123), Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
+- Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
 - Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
   D-110: a step down that doesn't beat 0.85 × its p90 is undone and Auto stops stepping down (30 Hz caps); DPR ≤ 1 skips L1.
@@ -46,14 +46,14 @@ _Last updated: 2026-11-25_ · **Session counter: 102** · **Version: v1.5.42** (
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 18, `size`); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 19); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx, part 19 from D-130), `03` questions (Q-xxx), `09` log (tail: `09-…-14`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); tests share one server/runner `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-48b built (M10 done). M11: S-49…S-52 in `07-Build-Specs-11.md` (D-134). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-49 built (M10 done). M11: S-50…S-52 in `07-Build-Specs-11.md` (D-134). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 103 (Build): S-49 biome ores Tide ≈ / Calx ⬟ (`07-Build-Specs-11.md`; save format 19).
+Session 104 (Audit): parallel health check per CLAUDE.md; archive old `09` entries; fix the top issues. Then S-50.

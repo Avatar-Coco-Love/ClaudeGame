@@ -11,7 +11,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 canvas#game { position: fixed; inset: 0; width: 100%; height: 100%; /* audit 74: not 100vw/vh, which iOS Safari sizes past innerHeight */ display: block; cursor: crosshair; }
 .hidden { display: none !important; }
 button { font: inherit; color: inherit; cursor: pointer; }
-.shard { color: var(--cyan); } .prism { color: var(--magenta); } .lumen { color: var(--gold); }
+.shard { color: var(--cyan); } .prism { color: var(--magenta); } .lumen { color: var(--gold); } .tide { color: #d8fff0; } .calx { color: #c8a0ff; }
 
 #hud { position: fixed; inset: 0; pointer-events: none; }
 #hud button { pointer-events: auto; }

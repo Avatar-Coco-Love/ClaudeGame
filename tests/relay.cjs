@@ -51,7 +51,7 @@ async function nodeChecks(check) {
   s.craft.relay = 1; Object.assign(s.player, { x: (sx + 0.5) * CELL, y: (sy + 0.5) * CELL });
   s.update(1 / 60, idle(true));
   s.player.x += RELAY_R - 12; // inside the bank radius, off the Relay's own cell
-  s.cargo = { shard: 4, prism: 3, lumen: 2 }; s.player.integrity = 1; s.player.invuln = 99;
+  s.cargo = { ...s.cargo, shard: 4, prism: 3, lumen: 2 }; s.player.integrity = 1; s.player.invuln = 99;
   calls.length = 0;
   let streakOk = true;
   for (let i = 0; i < 120; i++) {

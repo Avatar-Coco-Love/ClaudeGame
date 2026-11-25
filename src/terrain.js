@@ -68,6 +68,12 @@ export function paintChunk(w, c, cx, cy, k = 1) {
       g.globalAlpha = 0.6; g.beginPath(); g.arc(px, py, 9, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
       continue;
     }
+    if (t === T.TIDE || t === T.CALX) { // S-49: upright, so the shape alone tells them from ◆ / ▲ (tests/colours.cjs)
+      g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge;
+      if (t === T.TIDE) { g.lineWidth = 2; g.lineCap = 'round'; waves(g, px, py, 7, 3, 2.5); g.stroke(); }
+      else { g.globalAlpha = 0.85; pentagon(g, px, py, 7); g.fill(); g.globalAlpha = 1; }
+      continue;
+    }
     const h = (((x0 + x) * 73856093) ^ ((y0 + y) * 19349663)) >>> 0;
     const rot = (h % 628) / 100, sz = 5 + (h % 4);
     g.shadowColor = m.edge; g.fillStyle = m.edge; g.strokeStyle = m.edge;
@@ -95,4 +101,18 @@ export function paintChunk(w, c, cx, cy, k = 1) {
     g.stroke();
   }
   g.shadowBlur = 0;
+}
+
+/** S-49 Tide ≈: two wave strokes, half-width `hw`, amplitude `amp`, rows `gap` above and below the centre (path only). */
+export function waves(g, cx, cy, hw, gap, amp) {
+  g.beginPath();
+  for (const dy of [-gap, gap]) {
+    for (let k = 0; k <= 8; k++) { const t = k / 8, x = cx - hw + 2 * hw * t, y = cy + dy - Math.sin(t * Math.PI * 2) * amp * 0.5; g[k ? 'lineTo' : 'moveTo'](x, y); }
+  }
+}
+/** S-49 Calx ⬟: an upright regular pentagon of radius r (path only). */
+export function pentagon(g, cx, cy, r) {
+  g.beginPath();
+  for (let j = 0; j < 5; j++) { const a = -Math.PI / 2 + j * Math.PI * 2 / 5; g[j ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+  g.closePath();
 }

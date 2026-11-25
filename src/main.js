@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { orderLabel } from './echo.js';
 import { canResearch, buyResearch } from './research.js';
@@ -58,7 +58,7 @@ function showTitle() {
   $('continue').classList.toggle('hidden', !save);
   if (save) {
     $('continue').querySelector('small').textContent =
-      `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph}${save.bank.lumen ? ` ${save.bank.lumen}${RESOURCE.lumen.glyph}` : ''} banked`;
+      `${MODES[save.mode]?.name ?? 'Drift'} · ${save.bank.shard}${RESOURCE.shard.glyph} ${save.bank.prism}${RESOURCE.prism.glyph}${['lumen', 'tide', 'calx'].map(k => save.bank[k] ? ` ${save.bank[k]}${RESOURCE[k].glyph}` : '').join('')} banked`;
   }
   selectMode(save?.mode || 'drift');
   // S-29: once a world has ended its New Cycle waits on the title too; from cycle 1 the title names the cycle and the best time.
@@ -160,9 +160,10 @@ function hint() {
 function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
-  const lumenSeen = g.stats.lumen > 0 || g.bank.lumen > 0; // S-10: ● appears once you have held one
+  const lumenSeen = seen(g, 'lumen'); // S-10: ● appears once you have held one
+  const oreSeen = [seen(g, 'tide'), seen(g, 'calx')]; // S-49: ≈ / ⬟ the same way (never in a 160 world: none there)
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught].join('|'); // S-28: the primed hint
+  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, g.bank.tide, g.bank.calx, oreSeen.join(), total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.last, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -170,6 +171,7 @@ function updateHud() {
     $('bank-lumen').textContent = g.bank.lumen;
     if (panelOpen) renderBank(); // B-025: a deposit streams for up to ~5 s while the sheet is open
     $('bank-lumen').parentElement.classList.toggle('hidden', !lumenSeen);
+    ['tide', 'calx'].forEach((k, i) => { $('bank-' + k).textContent = g.bank[k]; $('bank-' + k).parentElement.classList.toggle('hidden', !oreSeen[i]); });
     $('cargo-text').textContent = `${total}/${cap}`;
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
     $('cargo-fill').classList.toggle('full', total >= cap);
@@ -246,7 +248,8 @@ function closePanel() {
   persist();
 }
 let panelTab = 'core'; // last Matrix tab, remembered for this page session (S-1)
-const costHtml = c => ['shard', 'prism', 'lumen'].filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
+function seen(g, k) { return g.stats[k] > 0 || g.bank[k] > 0; } // a later ore's chip shows once it was ever held (Lumen's rule, S-10)
+const costHtml = c => KINDS.filter(k => c[k]).map(k => `<span class="${k}">${RESOURCE[k].glyph}${c[k]}</span>`).join(' ');
 // S-16, S-22: placement outcomes, short so they read mid-run (D-060).
 const PLACE_NAME = { beacon: 'Beacon', relay: 'Relay' };
 const PLACE_MAX = { beacon: BEACON_MAX, relay: RELAY_MAX };
@@ -312,7 +315,7 @@ function upgradeRow(u, lvl, cost, affordable, onBuy) {
 function renderBank() {
   const g = game;
   $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>` +
-    (g.stats.lumen > 0 || g.bank.lumen > 0 ? `<span class="lumen">${RESOURCE.lumen.glyph} ${g.bank.lumen}</span>` : '');
+    ['lumen', 'tide', 'calx'].filter(k => seen(g, k)).map(k => `<span class="${k}">${RESOURCE[k].glyph} ${g.bank[k]}</span>`).join('');
 }
 function renderPanel() {
   const g = game;

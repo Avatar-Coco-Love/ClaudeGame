@@ -30,7 +30,7 @@ for (let s = 1; s <= SEEDS; s++) {
     const clamp = v => Math.max(-1, Math.min(1, v));
     g.update(dt, { move: { x: clamp((home.x - p.x) / 60), y: clamp((home.y - p.y) / 60) },
       fire: !!best && best.d < g.stat('range') + 20, aim: best ? { x: best.e.x - p.x, y: best.e.y - p.y } : null });
-    g.cargo = { shard: 0, prism: 0 }; // count drops, not carrying
+    g.cargo = { ...g.cargo, shard: 0, prism: 0 }; // count drops, not carrying
     if (SECS - t < 4 + dt && SECS - t >= 4) last = new Map(g.enemies.map(e => [e, Math.hypot(e.x - p.x, e.y - p.y)]));
   }
   kills += g.stats.glitches;
