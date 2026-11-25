@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 90** · **Version: v1.4.30** (session 90: Build; rotation: 91 Build, 92 Design, 93 Build, 94 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 91** · **Version: v1.4.31** (session 91: Build; rotation: 92 Design, 93 Build, 94 Audit, 95 Build).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -33,7 +33,7 @@ _Last updated: 2026-11-25_ · **Session counter: 90** · **Version: v1.4.30** (s
   `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
 - Crafting (S-16): Beacons (light, S-25 glow) and Relays (remote deposit, S-22; reclaim S-34), `craft.js`. Detail: `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
-- Darkness/light overlay, minimap, Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
+- Darkness/light overlay, minimap (S-46b1: a 160-cell window round the core, D-123), Nexus pointer, queued toasts, synthesized audio held to `tests/audio.cjs` ceilings. Detail: `08`.
 - Graphics (S-41, D-109, `quality.js`): Settings → Auto / High / Low; Auto samples the frame gap (p90 over 3 s): > 24 ms
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
   D-110: a step down that doesn't beat 0.85 × its p90 is undone and Auto stops stepping down (30 Hz caps); DPR ≤ 1 skips L1.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-25_ · **Session counter: 90** · **Version: v1.4.30** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 91 (Build): S-46b (`07-Build-Specs-8.md`, D-122): minimap 160-cell window + Nexus edge arrow, ending map frames
-the explored area, perf budget checks, then `WORLD_SIZE_NEW` = 256. Pass `world.w` to every site helper (Debt).
+Session 92 (Design): play-test, then refine S-46b2 (`07-Build-Specs-8.md`, D-123: perf budget checks, then
+`WORLD_SIZE_NEW` = 256) and S-47/48 specs. Pass `world.w` to every site helper (Debt).

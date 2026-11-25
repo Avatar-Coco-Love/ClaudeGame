@@ -1,4 +1,5 @@
-// S-45 (D-120): world size is saved data. Node-side; smoke.cjs calls nodeChecks.
+// S-45 (D-120): world size is saved data. S-46b: the minimap's 160-cell window and the ending's explored-area frame.
+// smoke.cjs calls nodeChecks + browserChecks.
 let check = () => {};
 
 /** FNV-1a over the cells and the site lists (vaults, Spires, Anomaly sites) of a Game's world. */
@@ -87,10 +88,62 @@ async function ringChecks() {
     key(inner.world.vaults) === key(first) && key(inner.spires) === key(big.spires) && key(inner.anomaly.sites) === key(big.anomaly.sites.filter(s => s.ring < 3)));
 }
 
+async function windowChecks() {
+  const { Game } = await import('../src/game.js');
+  const { miniWindow } = await import('../src/hud.js');
+  const { exploredBox } = await import('../src/ending.js');
+  const audio = new Proxy({}, { get: () => () => {} }), C = 32, S = 180;
+  const small = new Game({ seed: 77, mode: 'drift', audio }), big = new Game({ seed: 77, mode: 'drift', audio, size: 256 });
+  const a = miniWindow(small.world, 10, 4000, S);
+  check('a 160 world\'s minimap window is the whole map, wherever the core is (S-46b)',
+    a.ox === 0 && a.oy === 0 && a.win === 160 * C && a.sc === S / (160 * C), JSON.stringify(a));
+  // Every core position on a 2-cell grid: the core and the Nexus are inside the window, which stays inside the world.
+  let bad = 0, n = 0;
+  for (let y = 1; y < 256; y += 2) for (let x = 1; x < 256; x += 2) {
+    const px = x * C, py = y * C, q = miniWindow(big.world, px, py, S), inside = (u, v) => u >= q.ox && u <= q.ox + q.win && v >= q.oy && v <= q.oy + q.win;
+    n++; if (!inside(px, py) || !inside(big.nexus.x, big.nexus.y) || q.ox < 0 || q.oy < 0 || q.ox + q.win > 256 * C || q.oy + q.win > 256 * C) bad++;
+  }
+  const mid = miniWindow(big.world, 128 * C, 128 * C, S);
+  check('a 256 world\'s minimap is a 160-cell window: centred on the core mid-world, clamped at the edge, and the core and the Nexus are always inside it (S-46b, D-123)',
+    bad === 0 && mid.win === 160 * C && mid.ox === 48 * C && miniWindow(big.world, 250 * C, 3 * C, S).ox === 96 * C, `${bad}/${n} bad`);
+  const w = big.world;
+  w.explored.fill(0);
+  for (const [x, y] of [[40, 128], [210, 30]]) w.explored[y * w.w + x] = 1;
+  const b = exploredBox(big), sp = big.spires;
+  const holds = (x, y) => x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1;
+  check('the ending frames the explored area: its box holds every explored cell, every Spire and the Nexus, and no more (S-46b)',
+    b.x0 === Math.min(40, ...sp.map(s => s.x)) * C && b.x1 === Math.max(211, ...sp.map(s => s.x + 1)) * C && b.y0 === Math.min(30, ...sp.map(s => s.y)) * C
+      && holds(big.nexus.x, big.nexus.y) && sp.every(s => holds(s.x * C, s.y * C)), JSON.stringify(b));
+}
+
+/** Browser: a 256 world attached to the live renderer, the core far out: the minimap draws the core and the Nexus where
+ *  miniWindow puts them (one synchronous evaluate, so no frame of the 160 game runs in between). */
+async function browserChecks(browser, url, c, errors) {
+  check = c;
+  const pg = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  pg.on('pageerror', e => errors.push('worldsize: ' + e.message));
+  await pg.goto(url); await pg.waitForTimeout(200);
+  const r = await pg.evaluate(async () => {
+    const L = window.__lumen, { Game } = await import('/src/game.js'), hud = await import('/src/hud.js');
+    const old = L.renderer.game, g = new Game({ seed: 77, mode: 'drift', size: 256, audio: new Proxy({}, { get: () => () => {} }) });
+    g.player.x = 230 * 32; g.player.y = 60 * 32;
+    L.renderer.attach(g); hud.drawMinimap(L.renderer);
+    const c = L.renderer.minimap, m = c.getContext('2d'), q = L.renderer.miniWin;
+    const at = (x, y) => [...m.getImageData(Math.floor((x - q.ox) * q.sc), Math.floor((y - q.oy) * q.sc), 1, 1).data].slice(0, 3);
+    const out = { core: at(g.player.x, g.player.y), nexus: at(g.nexus.x, g.nexus.y), ox: q.ox / 32, oy: q.oy / 32 };
+    L.renderer.attach(old);
+    return out;
+  });
+  check('a 256 world\'s minimap draws the core (gold) and the Nexus (white) inside its window when the core is far out (S-46b)',
+    r.ox === 96 && r.oy === 0 && r.core[0] > 200 && r.core[1] > 160 && r.core[2] < 120 && r.nexus.every(v => v > 200), JSON.stringify(r));
+  await pg.close();
+}
+
 async function nodeChecks(c) {
   check = c;
   await sizeChecks().catch(e => check('S-45 world-size checks ran', false, e.message));
   await ringChecks().catch(e => check('S-46a ring checks ran', false, e.message));
+  await windowChecks().catch(e => check('S-46b window checks ran', false, e.message));
 }
 
-module.exports = { nodeChecks };
+module.exports = { nodeChecks, browserChecks };
