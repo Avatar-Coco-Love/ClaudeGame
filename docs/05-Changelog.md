@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.58 — 2026-11-25
+- **Design pass: events and puzzles are planned (next updates).** After the Ward node closes the creature update, rifts
+  will open now and then: a short-lived pocket of rich ore near you that closes again after 45 s. Two kinds of outer
+  vault get locks: the Kiln's only cracks in time with its heat pulse, the Shoal's only when you cut against the
+  current. Same rules in Drift and Surge. No change in play yet.
+
 ## v1.6.57 — 2026-11-25
 - **Arc Beam (Research, 35 ●).** A fourth beam mode after Pulse (Q / ⟂, a ↯ zigzag on the button). Its ray is a bit
   weaker (0.8×), but what it hits jumps to up to 2 more of the same kind within 2 cells: crystals of the same colour
@@ -80,28 +86,3 @@ One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D
 - **Two new ores in the outer rings.** The Shoal now holds pale mint **Tide ≈** (two wave strokes) and the Kiln lilac
   **Calx ⬟** (a pentagon). Mine them like any ore; each gets its own bank counter once you first hold one. The Scanner
   and the Echo find them too. Nothing spends them yet: that comes next (Overdrive). The smaller old worlds have none.
-
-## v1.5.42 — 2026-11-25
-- **Nothing changes on screen yet.** The next update's plan is written: the Shoal and the Kiln each get their own ore
-  (Tide ≈ and Calx ⬟), spent on two Overdrive levels past every Core Matrix max, a Kiln Heat Sink you can craft, and a
-  Nexus Chart that maps currents and flare vents.
-
-## v1.5.41 — 2026-11-25
-- **Nothing changes on screen.** Behind the scenes, every test now shares one small web server instead of eleven
-  copies of it, so the checks that keep each release playable are simpler to maintain.
-
-## v1.5.40 — 2026-11-25 (M10 done: world and biomes)
-- **Flare vents in the Kiln.** Small warm-white hexagons dot the Kiln floor. Every 8 s each one brightens and pulses
-  for a second, then flares: a core caught inside is shoved out and its beam gains heat (enough to overheat a hot
-  beam). No damage, no lost cargo, the same in Drift and Surge. Read the pulse and step aside.
-
-## v1.4.39 — 2026-11-25
-- **A core that falls in the Kiln comes back cool.** Respawning at the Nexus no longer keeps the beam's heat, so it
-  fires straight away.
-- **Messages are easier to read:** pop-up messages such as "Entering the Kiln" now sit on a dark plate.
-
-## v1.4.38 — 2026-11-25
-- **Kiln rock heats your beam.** Mining in the Kiln builds heat: a warm white arc grows round the core, and after
-  about 8 s of steady fire the beam overheats and stays off for a moment (a soft hiss) before it works again.
-  Mining elsewhere, or letting go, cools it. Same in Drift and Surge.
-- **The Kiln has its own music:** a dark phrygian pad, a step below the Shoal.

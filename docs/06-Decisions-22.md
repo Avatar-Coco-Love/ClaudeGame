@@ -1,0 +1,27 @@
+# 06 — Decisions log, part 22
+
+Continues `06-Decisions-21.md` (part 21 neared the 8 KB cap at D-151; same rules: supersede, never edit; list rejected
+alternatives). D-152 on.
+
+### D-152 — M13 plan: one rift event and two biome vault locks, one face in both modes (session 117, design)
+- M13 = **S-57a** Rift (a 45 s pocket of the ring's best ore, 8–12 cells out, every 240–360 s), **S-57b** its pointer
+  and tone, **S-58** Flare Lock (Kiln outer vault: cut only in a timed soft window), **S-59** Tide Lock (Shoal outer
+  vault: cut only against the current). Specs: `07-Build-Specs-14.md`. M13 done = v1.8 with S-59.
+- Every M13 event and lock has the **same rules in both modes** (no Surge face / Drift face as weather has): the rift is
+  ore that leaves; the locks are rules on a shell. Surge's extra cost is the Glitches on the way. `tools/eventrun.mjs`
+  (S-57a) checks the rift pays 1.04–1.12× in each mode, gap ≤ 0.05.
+- Locks are seed-only on the 4 existing outer vaults (by ring): no save change, no new sites, an opened vault stays open.
+- Measured (Design 117): 27 / 30 seeds have outer vaults in both rings; base thrust 190 px/s beats the 55 px/s top
+  current, so the Tide Lock tests reading the flow, not the build.
+- Rejected: **cave-in** (a tax with no choice: rubble to re-dig, no decision); **Lumen bloom** as its own event (folded
+  into the rift's Hearth / Veil ore); **roaming elites (Surge) / wandering lode (Drift)** (two faces of unequal weight,
+  and elites are Glitch tiers past 3, which Q-029 leans against); **new Spire puzzle types** in M13 (the Spires are the
+  ending's arc; M14's bosses already bring a take-it-apart puzzle); a saved rift (a reload skipping one open rift
+  costs at most 45 s of a bonus; a save format bump for that is not worth it).
+
+### D-153 — S-56 Ward guards the core in both modes (session 117, design)
+- S-56 said a Ward "guards the core in Surge and ore in Drift". Since S-53c (D-147) and S-54 (D-150) every biome
+  creature goes for the core's hold in both modes, so the Ward's job is the same in both: guard the core. Numbers
+  unchanged. Added gate: `biomefoe.mjs` with 2 Wards at the dig site stays ≤ 1.00 in each mode.
+- Rejected: a Drift-only "ore guard" range (no creature hunts loose ore alone any more, except motes carrying
+  pickups, which the same 4-cell bolt already covers).

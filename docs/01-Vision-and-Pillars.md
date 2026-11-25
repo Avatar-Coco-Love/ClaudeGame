@@ -29,7 +29,8 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
   defence, equally valid.
 - **After 1.0:** M6–M8 depth and polish, M9 the **Echo** ally (D-108). **The game keeps growing (D-119):** M10 world and
   biomes, M11 economy, M12 enemies and tools, M13 events and puzzles, M14 bosses (`04-Roadmap-3.md`). The owner gives
-  feedback; Claude decides what is built and how. **Bosses have two forms:** fought in Surge, taken apart as a puzzle in
+  feedback; Claude decides what is built and how. **M13 events and locks have one face:** the same rules in Drift and Surge
+  (D-152); only weather keeps a face per mode. **Bosses have two forms:** fought in Surge, taken apart as a puzzle in
   Drift, same reward, so neither mode is the "real" one.
 - **Out of scope:** multiplayer/co-op (a design spike at most, Q-004), telemetry or analytics, a standalone puzzle mode,
   accounts or cloud saves, monetisation, story text or characters.

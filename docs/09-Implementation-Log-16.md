@@ -68,3 +68,15 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
 - As specced (× 0.35, joined vein) clusters ran 1.06–1.25× Focus; retuned (D-151) to 1.36–1.45×, rock 0.79×.
 - Screenshot viewed: jagged cyan-white jumps from the hit to two crystals of a 3×5 vein; button reads "↯ Arc".
 - Smoke 547/547 (+6, `arc.cjs`: research + cycle, × 0.8 / × 0.5, own-type ≤ 2 cells, creatures not bolts, rates, UI).
+
+## Session 117 — Design: M13 specced (v1.6.58, D-152, D-153)
+- Play-test (Playwright, `?dev`, Max all, god, still core): Kiln Surge 23 s: a Burrower up 181 frames, 0 damage taken
+  (god); Shoal Drift 48 s: a swarm round the core 1681 frames (~28 s) with an empty hold: motes cling but take nothing.
+  Arc shot (`ARC_SHOT`): jagged jumps from the hit to two crystals, readable. Screenshots viewed; 0 page errors.
+- Seen: after a fast teleport the ring toast lagged ("Entering the Kiln" shown in the Shoal): an artefact of
+  simulating many frames in one evaluate (toasts run on real time), not a bug in play.
+- Measured: outer vault rings over 30 seeds (both rings on 27, one ring on 3); base thrust 190 px/s vs top current 55.
+- Specs: S-57a/b Rift, S-58 Flare Lock, S-59 Tide Lock (`07-Build-Specs-14.md`); S-56 note (Ward guards the core in
+  both modes, ≤ 1.00 gate). Cut: cave-in, Lumen bloom (folded in), elites / wandering lode, new Spire puzzles. Q-031.
+- `05` v1.4.38–v1.5.42 archived word for word (`archive/changelog-v1.4.38-v1.5.42.md`); `06` part 22 started.
+- Smoke 547/547 (docs only; no new checks: no code changed).
