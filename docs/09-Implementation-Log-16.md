@@ -79,3 +79,4 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
 - Specs: S-57a/b Rift, S-58 Flare Lock, S-59 Tide Lock (`07-Build-Specs-14.md`); S-56 note (Ward guards the core in
   both modes, ≤ 1.00 gate). Cut: cave-in, Lumen bloom (folded in), elites / wandering lode, new Spire puzzles. Q-031.
 - `05` v1.4.38–v1.5.42 archived word for word (`archive/changelog-v1.4.38-v1.5.42.md`); `06` part 22 started.
+- Smoke 547/547 (docs only; no new checks: no code changed).
