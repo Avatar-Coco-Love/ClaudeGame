@@ -2,7 +2,7 @@
 // Focus on Kiln rock overheats; heat cools at 2× when the beam is off or on Deep rock; during the 1.2 s the intent is on
 // but no cell takes damage; heat restarts at 0.25; 60 s of steady fire is overheated 17 % ± 2; Wide and Overclock heat no
 // faster; Drift = Surge; the Echo / other world.hit callers add none; nothing saved; the Kiln leg haul ≤ 1.20×.
-// Browser: the arc is drawn round the core in the Kiln. Usage: node tests/heat.cjs [--browser]   (HEAT_SHOT=path.png)
+// B-087: a destabilize resets heat. Browser: the arc is drawn round the core in the Kiln. Usage: node tests/heat.cjs [--browser]   (HEAT_SHOT=path.png)
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -38,6 +38,7 @@ async function nodeChecks(check) {
     }
     return log;
   };
+  const overheatedNow = g => g.heatState.over > 0;
   const firstOver = log => { const e = log.find(x => x.over); return e ? e.t : Infinity; };
 
   const a = make(), ra = park(a, KILN_RING), la = run(a, ra, 10), t0 = firstOver(la);
@@ -89,6 +90,13 @@ async function nodeChecks(check) {
     const keys = g => JSON.stringify(Object.keys(g.toSave()));
     check('S-48a heat: nothing saved (toSave keys unchanged, no heat field)', hot.heat > 0.3 && keys(hot) === keys(make()) && !/heat/i.test(JSON.stringify(hot.toSave())),
       `heat ${hot.heat.toFixed(2)}`);
+  }
+  {
+    const g = make('surge'), room = park(g, KILN_RING); g.god = false; run(g, room, t0 + 1 / 120);
+    const was = { heat: g.heat, over: g.heatState.over > 0 };
+    g.player.integrity = 0.001; g.player.invuln = 0; g.destabilize();
+    check('B-087 heat: a destabilize resets heat and any overheat (the respawn at the Nexus fires at once)',
+      was.over && g.heat === 0 && !overheatedNow(g), JSON.stringify({ was, now: { heat: g.heat, over: g.heatState.over } }));
   }
   {
     const r = haulProbe(20, 3, 116);
