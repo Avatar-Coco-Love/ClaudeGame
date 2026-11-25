@@ -19,19 +19,20 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   (v1.4.38, D-130).
 - ✅ **S-48b** Kiln flare vents (126 seed sites at 256, 8 s cycle, shove + 0.4 heat, no damage) (v1.5.40, D-132). **M10 done.**
 
-## M11 — Economy
-- One resource per biome (Shoal / Kiln ore cells, own glyph shape + colour, pass `colours.cjs`), counted in bank / cargo
-  (save format bump), supply measured over 40 seeds before any price is set (the `07` header rule).
-- A new Core Matrix tier (levels past today's max, paid in the biome resources) and one Nexus Development item.
-- New Crafting items paid in biome resources (e.g. a Current Anchor that calms Undertow nearby; a Heat Sink Beacon).
-- At most one Research row, only for a new *kind* of thing (chosen in M11's design); never a second path to an unlock.
+## M11 — Economy (specced, `07-Build-Specs-11.md`, D-134)
+- **S-49** Biome ores: Tide ≈ (Shoal) and Calx ⬟ (Kiln), measured over 40 seeds; bank / cargo (format 19).
+- **S-50** Core Matrix Overdrive: two levels past every max, paid in ◆ + ≈ + ⬟.
+- **S-51** Heat Sink (Crafting, Kiln): heat gain × 0.4 within 5 cells (format 20).
+- **S-52** Nexus Chart (Nexus Development): currents, then flare vents, on the minimap (format 21). M11 done → v1.6.
+- Cut (D-134): the Current Anchor (the Undertow costs a haul ×1.00, so calming it buys nothing) and an M11 Research
+  row (no new *kind* of thing needs one; Lumen's surplus waits for M12's beam mode).
 
 ## M12 — Enemies and tools
 - **Swarm** (tiny, many, weak; moved from "Later") and **Burrower** (moves through rock, leaves a tunnel; moved from "Later").
 - One native foe per biome (Surge), each with a Drift twin hazard of equal weight (pillar 2).
 - New tools: a beam mode (Research) and placeable neon nodes in Crafting: a turret-like node (Surge use) and a shield
   pylon (blocks foes and bolts; in Drift, a lens that speeds mining in its radius), costed so neither mode's tool is "the"
-  one. Calming Undertow / flares stays M11's Anchor alone (no double unlock).
+  one. Heat relief stays M11's Heat Sink alone (no double unlock).
 
 ## M13 — Events and puzzles
 - World events beyond weather, seeded on `stats.time` like D-097: cave-in, Lumen bloom, a rift that opens for ~30 s
