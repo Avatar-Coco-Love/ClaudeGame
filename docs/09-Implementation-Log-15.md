@@ -51,3 +51,4 @@ Continues `09-Implementation-Log-14.md` (part 14 neared the 8 KB cap at session 
   beam only surfaced; mode switch clears; nothing saved. Screenshots viewed: tell (lilac cell + cracks in the dark) and
   surfaced chevron (spacing widened after the first look, it read as one blob).
 - Observed: a Drift core parked 90 s ate 39 ore cells (path ore counts) — S-53b's gate must measure this.
+- Smoke 524/524 (+7 burrower).
