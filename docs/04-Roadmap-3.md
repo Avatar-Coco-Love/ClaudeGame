@@ -15,7 +15,8 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   dashes ≤ 30 / 15, `tools/haulrun.mjs` (median ×1.00 ≤ 1.15) (v1.4.35, D-127).
 - ✅ **S-47b** Shoal brittle glass (a rock break cracks one seeded neighbour for 60 % hp, no chains) + lydian Shoal
   music (clamp → ring 3; Kiln plays it until S-48) (v1.4.36, D-128).
-- **S-48** Kiln: beam heat that vents (8 s, 17 % steady) + flare vents + its music progression.
+- **S-48a** Kiln beam heat (8 s → 1.2 s overheat, 17 % steady) + phrygian music + `haulrun` d 116 leg (≤ 1.20×).
+- **S-48b** Kiln flare vents (seed sites, 8 s cycle, shove + heat, no damage) → M10 done, v1.5. Specs: `07-Build-Specs-10.md` (D-129).
 
 ## M11 — Economy
 - One resource per biome (Shoal / Kiln ore cells, own glyph shape + colour, pass `colours.cjs`), counted in bank / cargo

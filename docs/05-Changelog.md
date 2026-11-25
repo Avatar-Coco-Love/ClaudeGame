@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.37 — 2026-11-25
+- **Planning the Kiln.** No change in play: the Shoal was play-tested (its currents cost a round trip almost
+  nothing, as intended) and the Kiln's beam heat and flare vents were planned as two steps.
+
 ## v1.4.36 — 2026-11-25
 - **Shoal glass is brittle.** Breaking rock in the Shoal cracks one of its neighbours (a faint line flashes), so
   tunnels there open faster. Cracks never set off more cracks.
