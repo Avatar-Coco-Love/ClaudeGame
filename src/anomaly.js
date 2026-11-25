@@ -28,7 +28,7 @@ export function anomalySites(world) {
       const dc = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
       if (dc < d0 || dc > d1 || world.ring(x, y) !== ring) continue;
       const c = world.cells[y * w + x];
-      if (c !== T.ROCK && c !== T.DENSE) continue;
+      if (c !== T.ROCK && c !== T.DENSE && c !== T.TIDE && c !== T.CALX) continue; // S-49: ore re-typed rock still counts, so no site moves
       if (blocks.some(b => Math.max(Math.abs(b.x - x), Math.abs(b.y - y)) <= b.r)) continue;
       if (out.some(s => Math.hypot(s.x - x, s.y - y) < ANOMALY_GAP)) continue;
       out.push({ x, y, ring, kind: KIND_IDS[Math.floor(kindRand() * KIND_IDS.length)] }); n++; // S-36: own salt, 1/3 each

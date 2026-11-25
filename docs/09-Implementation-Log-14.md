@@ -29,3 +29,14 @@ Continues `09-Implementation-Log-13.md` (part 13 neared the 8 KB cap at session 
   prism ~3170, Lumen ~500 cells. Candidate re-types at x/5 noise: Shoal 0.76 → 266 (174–359), Kiln 0.79 → 328
   (211–477, 194 inside d 128). ΔE probe on candidate colours: '#d8fff0' and '#c8a0ff' chosen (≥ 33 vs ring edges).
 - Docs: `07-Build-Specs-11.md` (new), `04-Roadmap-3` M11 rewritten (Anchor cut), Q-028 added, D-134. No code.
+
+## Session 103 — Build: S-49 biome ores Tide ≈ / Calx ⬟ (v1.5.43, D-135)
+- `T.TIDE` 12 / `T.CALX` 13, `World.biomeOres()`, `KINDS` + `emptyKinds()`, format 19, HUD / title / sheet chips,
+  terrain + pickup glyphs (upright waves / pentagon), minimap colours, break / pickup tones, `colours.cjs` shapes.
+- Observed: 40-seed counts reproduce the spec exactly (≈ 174/266/359, ⬟ 211/328/477); none in a 160 world.
+- B-088 (caught before merge): `anomalySites` only accepted ROCK / DENSE, so a re-typed cell would have moved Shoal /
+  Kiln Anomalies and every vent after them. Fixed (D-135); masked terrain + site hashes pinned from the stashed old code
+  and matched on all 4 seeds.
+- `saveformat.cjs` B-037 check extended to the two new kinds. Screenshot (`ORE_SHOT`) viewed: ≈ reads as two mint
+  strokes, ⬟ as a lilac pentagon, both distinct from ◆ ▲ ● and the Shoal edges; chips ≈ 3 ⬟ 2 in the bank row.
+- Smoke 483/483 (+7: `ore.cjs`).

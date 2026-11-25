@@ -33,7 +33,7 @@ const deltaE = (a, b, vision) => { const A = lab(sim(a, vision)), B = lab(sim(b,
 // MIN_DE (S-40: "a pair that fails gets a shape difference, not a new colour"). Each shape is proved from the draw code.
 function groups() {
   const read = f => fs.readFileSync(path.join(__dirname, '..', 'src', f), 'utf8');
-  const src = read('config.js'), render = read('render.js'), spit = read('spitter.js'), anom = read('anomaly.js');
+  const src = read('config.js'), render = read('render.js'), spit = read('spitter.js'), anom = read('anomaly.js'), terr = read('terrain.js');
   const list = name => JSON.parse(src.match(new RegExp(`${name} = (\\[[^\\]]*\\])`))[1].replace(/'/g, '"'));
   const shapes = {
     // world: every Anomaly site is the same hexagram (two triangles), so the kinds rest on colour alone
@@ -41,13 +41,16 @@ function groups() {
     diamond: /kind === 'shard'\) \{ g\.moveTo\(0, -5\); g\.lineTo\(3, 0\); g\.lineTo\(0, 5\); g\.lineTo\(-3, 0\)/.test(render),
     triangle: /else \{ g\.moveTo\(0, -5\); g\.lineTo\(4\.5, 3\); g\.lineTo\(-4\.5, 3\); \}/.test(render),
     circle: /kind === 'lumen'\) g\.arc\(/.test(render),
+    // S-49: Tide ≈ two wave strokes, Calx ⬟ a pentagon, both upright in the pickup sprite and the terrain glyph
+    wave: /kind === 'tide'\) \{[^}]*waves\(g,/.test(render) && /t === T\.TIDE\) \{[^}]*waves\(g,/.test(terr),
+    pentagon: /kind === 'calx'\) \{ pentagon\(g,/.test(render) && /else \{[^}]*pentagon\(g,/.test(terr),
     star: /const spikes = 3 \+ tier;/.test(render), // tier t: a (3 + t)-point star
     rhombus: /g\.moveTo\(r \* 1\.3, 0\); g\.lineTo\(0, r \* 0\.75\); g\.lineTo\(-r \* 1\.3, 0\)/.test(spit), // Spitter body
   };
   const anomaly = [];
   for (const m of src.matchAll(/(\w+): \{ name: '[^']+', glyph: '[^']+', fx: .*?rgb: '([^']+)' \}/g)) anomaly.push({ id: m[1], c: m[2], shape: 'hexagram' });
-  const SHAPE = { shard: 'diamond', prism: 'triangle', lumen: 'circle' }, res = [];
-  for (const m of src.matchAll(/(shard|prism|lumen): \{ color: '(#[0-9a-f]{6})'/g)) res.push({ id: m[1], c: m[2], shape: SHAPE[m[1]] });
+  const SHAPE = { shard: 'diamond', prism: 'triangle', lumen: 'circle', tide: 'wave', calx: 'pentagon' }, res = [];
+  for (const m of src.matchAll(/(shard|prism|lumen|tide|calx): \{ color: '(#[0-9a-f]{6})'/g)) res.push({ id: m[1], c: m[2], shape: SHAPE[m[1]] });
   const glitch = list('GLITCH_COLORS').map((c, t) => ({ id: `glitch tier ${t}`, c, shape: `star${3 + t}` }));
   const spitter = { id: 'spitter', c: list('SPITTER_COLORS')[0], shape: 'rhombus' };
   const pairs = [];
@@ -69,10 +72,10 @@ function groups() {
 
 function run() {
   const out = [], { pairs, shapes, counts } = groups();
-  out.push({ name: 'colours: read 3 Anomaly kinds, 3 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges from config.js',
-    ok: counts.anomaly === 3 && counts.res === 3 && counts.glitch === 4 && counts.ring === 4, detail: JSON.stringify(counts) });
+  out.push({ name: 'colours: read 3 Anomaly kinds, 5 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges from config.js',
+    ok: counts.anomaly === 3 && counts.res === 5 && counts.glitch === 4 && counts.ring === 4, detail: JSON.stringify(counts) });
   const missing = Object.keys(shapes).filter(k => !shapes[k]);
-  out.push({ name: 'colours: each claimed shape is still in the draw code (hexagram, ◆ ▲ ● pickups, Glitch star, Spitter rhombus)',
+  out.push({ name: 'colours: each claimed shape is still in the draw code (hexagram, ◆ ▲ ● ≈ ⬟ pickups, Glitch star, Spitter rhombus)',
     ok: !missing.length, detail: missing.join(', ') });
   const byShape = (a, b) => a.shape !== b.shape && shapes[a.shape.replace(/\d+$/, '')] && shapes[b.shape.replace(/\d+$/, '')];
   for (const vision of ['normal', 'deuteranopia', 'protanopia', 'tritanopia']) {

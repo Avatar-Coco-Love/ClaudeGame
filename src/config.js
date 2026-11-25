@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.5.42';
+export const VERSION = '1.5.43';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -80,7 +80,7 @@ export const DEPOSIT_TICK_S = 0.035; // one cargo item banked per tick inside th
 export const HURT_INVULN_S = 0.5, HURT_KNOCKBACK = 320; // after a hit: grace seconds, push speed (px/s)
 export const RESPAWN_INVULN_S = 2, RESPAWN_CLEAR_PX = 900; // after a death: grace seconds; Glitches within this of the Nexus vanish
 
-export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8, SPIRE_SHELL: 9, SPIRE: 10, FACET: 11 };
+export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8, SPIRE_SHELL: 9, SPIRE: 10, FACET: 11, TIDE: 12, CALX: 13 };
 
 export const MATERIAL = {
   [T.ROCK]:    { hp: 0.55, yield: null }, // ROCK/DENSE colours come from their depth ring (RINGS, world.look)
@@ -94,6 +94,8 @@ export const MATERIAL = {
   [T.SPIRE_SHELL]: { hp: 6, fill: '#1a1a3e', edge: '#c9c2ff', yield: null }, // S-19 Spire shell: tough like a vault shell, no yield
   [T.SPIRE]:   { hp: Infinity, fill: '#120c2a', edge: '#8f80d8', yield: null }, // S-19 Spire core: unmineable (D-049)
   [T.FACET]:   { hp: Infinity, fill: '#18123a', edge: '#a89cf0', yield: null }, // S-19 facet in the shell: unmineable (S-28 toggles it)
+  [T.TIDE]:    { hp: 3.0,  fill: '#10302a', edge: '#d8fff0', yield: { kind: 'tide', min: 1, max: 1 } }, // S-49, Shoal only; hp not ring-scaled
+  [T.CALX]:    { hp: 4.2,  fill: '#24163a', edge: '#c8a0ff', yield: { kind: 'calx', min: 1, max: 1 } }, // S-49, Kiln only (Kiln rock for heat)
 };
 
 // S-10 Lumen (D-033): re-types ROCK/DENSE at d >= LUMEN_D cells where its own noise (seed ^ LUMEN_SALT, at x/5, y/5) > LUMEN_CUT.
@@ -101,6 +103,10 @@ export const MATERIAL = {
 export const LUMEN_D = 55;
 export const LUMEN_CUT = 0.8;
 export const LUMEN_SALT = 0x27d4eb2f;
+// S-49 biome ores (D-134): re-typed last in generate(), ROCK/DENSE only, each from its own noise at x/5, y/5, in one ring.
+// Only a 256 world has the Shoal (ring 3) and Kiln (ring 4), so a 160 world has none. ~266 ≈ and ~328 ⬟ over 40 seeds.
+export const TIDE_RING = 3, TIDE_CUT = 0.76, TIDE_SALT = 0x3c6ef372;
+export const CALX_RING = 4, CALX_CUT = 0.79, CALX_SALT = 0xa54ff53a;
 
 // S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
 export const VAULT_HALF = 3; // vault footprints are (2·3 + 1)² = 7×7 cells (world.js templates; anomaly.js clearance)
@@ -163,11 +169,15 @@ export const RESOURCE = {
   shard: { color: '#2ef2ff', glyph: '◆', name: 'Shards' },
   prism: { color: '#ff4fd8', glyph: '▲', name: 'Prisms' },
   lumen: { color: '#ffc94f', glyph: '●', name: 'Lumen' },
+  tide: { color: '#d8fff0', glyph: '≈', name: 'Tide' },  // S-49: pale mint, two wave strokes (Shoal)
+  calx: { color: '#c8a0ff', glyph: '⬟', name: 'Calx' },  // S-49: lilac pentagon (Kiln)
 };
-// Resource kinds in deposit / scatter / save order. A saved floor pickup stores its index here (0 shard, 1 prism, 2 lumen).
-export const KINDS = ['shard', 'prism', 'lumen'];
+// Resource kinds in deposit / scatter / save order. A saved floor pickup stores its index here (0 shard, 1 prism, 2 lumen,
+// S-49: 3 tide, 4 calx). Append only: an index never changes meaning.
+export const KINDS = ['shard', 'prism', 'lumen', 'tide', 'calx'];
+export const emptyKinds = () => Object.fromEntries(KINDS.map(k => [k, 0])); // a bank / cargo with every kind at 0
 // Ore cell type -> the resource it yields: the one ore set the Scanner (research.js) and the glyph drawing (render.js) share.
-export const ORE_KIND = { [T.CRYSTAL]: 'shard', [T.PRISM]: 'prism', [T.LUMEN]: 'lumen' };
+export const ORE_KIND = { [T.CRYSTAL]: 'shard', [T.PRISM]: 'prism', [T.LUMEN]: 'lumen', [T.TIDE]: 'tide', [T.CALX]: 'calx' };
 
 // Core Matrix upgrades. value(level) gives the live stat; cost(level) the price of the NEXT level.
 export const UPGRADES = [

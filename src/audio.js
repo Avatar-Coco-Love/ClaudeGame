@@ -77,11 +77,11 @@ export class Audio {
     b.g.gain.setTargetAtTime(c ? BEAM_HUM.contactGain : BEAM_HUM.bedGain, at, BEAM_HUM.settleS);
   }
   break(kind) {
-    const base = kind === 'lumen' ? 1047 : kind === 'prism' ? 880 : kind === 'shard' ? 660 : 220;
+    const base = kind === 'lumen' ? 1047 : kind === 'tide' ? 784 : kind === 'calx' ? 587 : kind === 'prism' ? 880 : kind === 'shard' ? 660 : 220;
     this.tone(base, 0.12, { type: 'triangle', vol: 0.18, slide: -base * 0.4, throttle: 0.04, key: 'break' });
   }
   pickup(kind) {
-    this.tone(kind === 'lumen' ? 1568 : kind === 'prism' ? 1320 : 990, 0.07, { type: 'sine', vol: 0.12, throttle: 0.03, key: 'pickup' });
+    this.tone(kind === 'lumen' ? 1568 : kind === 'tide' ? 1175 : kind === 'calx' ? 880 : kind === 'prism' ? 1320 : 990, 0.07, { type: 'sine', vol: 0.12, throttle: 0.03, key: 'pickup' });
   }
   // B-017: a full hold (up to 140 items, one every 35 ms) used to beep ~14 times a second for ~5 s. Now each tick of one
   // deposit run is quieter than the last and the run goes silent after ~10 ticks; the closing arpeggio still plays.

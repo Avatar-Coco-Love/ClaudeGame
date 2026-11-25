@@ -13,7 +13,7 @@ async function lootChecks() {
   const g = new Game({ seed: 77, mode: 'surge', audio, size: 160 });
   for (let i = 0; i < PICKUP_CAP; i++) g.spawnPickup(g.nexus.x + 200, g.nexus.y, 'shard');
   const floor = g.pickups.length;
-  g.cargo = { shard: 7, prism: 3 };
+  g.cargo = { ...g.cargo, shard: 7, prism: 3 };
   g.player.integrity = 1; g.hurtPlayer(5, 1, 0);
   const kept = g.pickups.slice(floor);
   check('death on a full floor keeps every cargo item (B-005)', floor === PICKUP_CAP && kept.length === 10 && kept.filter(q => q.kind === 'prism').length === 3,

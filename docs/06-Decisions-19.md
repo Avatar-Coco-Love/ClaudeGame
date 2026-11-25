@@ -58,3 +58,15 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
   nothing); an M11 Research row (no new kind of thing needs one; ~400● spare waits for M12's beam mode); biome ore
   from Glitch kills (Q-028, leaning no); a converter between ores (would make the biomes interchangeable); scaling
   ore hp by ring (D-033 kept ore hp fixed); Overdrive in a 160 world (no biome ore there: hidden, never stranded).
+
+### D-135 — Biome ores as built (session 103, S-49)
+- Tide ≈ / Calx ⬟ are re-typed in `World.biomeOres()`, called last in `generate()`, exactly per S-49 (cuts 0.76 /
+  0.79, own salts). Measured: the 4 smoke seeds land at 189–294≈ and 266–347⬟; the 40-seed spread matches D-134.
+- **Anomaly sites count a re-typed ore cell as rock** (`anomalySites` accepts ROCK / DENSE / TIDE / CALX). Without it a
+  Shoal / Kiln site on a cell that became ore would move, and with it every later site and vent: an old 256 save's
+  taken indices would point at other sites. Smoke pins the masked terrain + Anomaly + vent hashes from the pre-S-49 code.
+  A site may therefore sit on an ore cell (breaking it yields the ore and takes the site).
+- `KINDS` is the one list of resource kinds: `emptyKinds()` builds bank / cargo, `cargoTotal`, `saneSave` and
+  `costHtml` iterate it, so S-50+ add no hand-written key lists. Glyphs upright (their shape is the tell, D-107).
+- Rejected: skipping ore on Anomaly cells (keeps sites but makes ore placement depend on the site list); a separate
+  ore pass after site selection (two passes over 65k cells for one rare overlap).

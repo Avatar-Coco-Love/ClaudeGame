@@ -6,9 +6,9 @@
 // Saves written before formats were tracked have no `v`; they are format 1.
 import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
-import { WORLD_SIZE_OLD, WORLD_PROFILES } from './config.js';
+import { WORLD_SIZE_OLD, WORLD_PROFILES, KINDS } from './config.js';
 
-export const SAVE_FORMAT = 18;
+export const SAVE_FORMAT = 19;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -29,6 +29,7 @@ export const STEPS = [
   s => ({ ...s, echoOrder: 'gather' }), // 15 -> 16: S-43 Echo orders; Gather was the only one
   s => ({ ...s, weatherCancel: -1 }), // 16 -> 17: B-081 a Wake-cancelled weather event stays cancelled; none recorded before
   s => ({ ...s, size: WORLD_SIZE_OLD }), // 17 -> 18: S-45 (D-120) world size is saved; every world so far was 160×160
+  s => ({ ...s, bank: { ...s.bank, tide: 0, calx: 0 }, cargo: { ...s.cargo, tide: 0, calx: 0 } }), // 18 -> 19: S-49 biome ores Tide / Calx
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.
@@ -61,7 +62,7 @@ function saneSave(s) {
   }
   for (const k of ['bank', 'cargo']) {
     const o = s[k] && typeof s[k] === 'object' ? s[k] : {};
-    s[k] = { shard: count(o.shard), prism: count(o.prism), lumen: count(o.lumen) };
+    s[k] = Object.fromEntries(KINDS.map(r => [r, count(o[r])]));
   }
   return s;
 }

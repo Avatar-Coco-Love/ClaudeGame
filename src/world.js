@@ -1,5 +1,5 @@
 // Terrain grid: generation, damage, and destruction. Pure data — rendering lives in render.js.
-import { CELL, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_D_OUTER, VAULT_GAP, VAULT_TRIES } from './config.js';
+import { CELL, worldProfile, CHUNK, T, MATERIAL, RINGS, LUMEN_D, LUMEN_CUT, LUMEN_SALT, TIDE_RING, TIDE_CUT, TIDE_SALT, CALX_RING, CALX_CUT, CALX_SALT, VAULT_HALF, BORDER, VAULT_D, VAULT_D_OUTER, VAULT_GAP, VAULT_TRIES } from './config.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -161,6 +161,19 @@ export class World {
         if ((type === T.ROCK || type === T.DENSE) && d >= LUMEN_D && lumen(x / 5, y / 5) > LUMEN_CUT) type = T.LUMEN;
         this.cells[i] = type;
       }
+    }
+    this.biomeOres();
+  }
+
+  /** S-49 (D-134): Tide ≈ in the Shoal and Calx ⬟ in the Kiln, re-typed last from their own noise on ROCK / DENSE only,
+   *  so layout, crystal, prism and Lumen never move (D-033's pattern). A 160 world has neither ring, so neither ore. */
+  biomeOres() {
+    if (this.profile.rings <= TIDE_RING) return;
+    const ores = [[TIDE_RING, makeNoise(this.seed ^ TIDE_SALT), TIDE_CUT, T.TIDE], [CALX_RING, makeNoise(this.seed ^ CALX_SALT), CALX_CUT, T.CALX]];
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+      const i = y * this.w + x, t = this.cells[i];
+      if (t !== T.ROCK && t !== T.DENSE) continue;
+      for (const [ring, noise, cut, ore] of ores) if (this.rings[i] === ring && noise(x / 5, y / 5) > cut) this.cells[i] = ore;
     }
   }
 

@@ -20,7 +20,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-48b** Kiln flare vents (126 seed sites at 256, 8 s cycle, shove + 0.4 heat, no damage) (v1.5.40, D-132). **M10 done.**
 
 ## M11 — Economy (specced, `07-Build-Specs-11.md`, D-134)
-- **S-49** Biome ores: Tide ≈ (Shoal) and Calx ⬟ (Kiln), measured over 40 seeds; bank / cargo (format 19).
+- ✅ **S-49** Biome ores: Tide ≈ (Shoal) and Calx ⬟ (Kiln); bank / cargo (v1.5.43, format 19, D-135).
 - **S-50** Core Matrix Overdrive: two levels past every max, paid in ◆ + ≈ + ⬟.
 - **S-51** Heat Sink (Crafting, Kiln): heat gain × 0.4 within 5 cells (format 20).
 - **S-52** Nexus Chart (Nexus Development): currents, then flare vents, on the minimap (format 21). M11 done → v1.6.

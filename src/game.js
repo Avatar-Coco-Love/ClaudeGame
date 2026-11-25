@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
+import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -53,11 +53,11 @@ export class Game {
     this.facetAim = null; // S-28: { s, k, t, done } while the aim ray rests on a primed facet (spire.js)
     const c = this.world.centerPx;
     this.nexus = { x: c.x, y: c.y };
-    this.bank = { shard: 0, prism: 0, lumen: 0 };
+    this.bank = emptyKinds();
     this.upgrades = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
     this.nexusLevels = Object.fromEntries(NEXUS_UPGRADES.map(u => [u.id, 0]));
-    this.cargo = { shard: 0, prism: 0, lumen: 0 };
-    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0 }; // lumen: ever picked up (S-10 shows ● after the first)
+    this.cargo = emptyKinds();
+    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0, tide: 0, calx: 0 }; // lumen / tide / calx: ever picked up (the HUD shows a chip after the first)
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
     this.craft = { beacon: 0, relay: 0, last: 'beacon' }; // S-16, S-22: crafted, not yet placed; `last` = what B / ✦ places
@@ -138,7 +138,7 @@ export class Game {
   }
 
   stat(id) { const u = UPGRADES.find(u => u.id === id), v = u.value(this.upgrades[id]) * buffMul(this, id); return id === 'cargo' ? Math.floor(v) : v; } // S-35: × active buffs; S-36: Ballast's cargo rounds down
-  cargoTotal() { return this.cargo.shard + this.cargo.prism + this.cargo.lumen; }
+  cargoTotal() { let n = 0; for (const k of KINDS) n += this.cargo[k]; return n; }
   cargoRoom() { return this.stat('cargo') - this.cargoTotal(); }
   inNexus() { return Math.hypot(this.player.x - this.nexus.x, this.player.y - this.nexus.y) < NEXUS_RADIUS; }
   /** Where cargo banks: the Nexus ring or a Relay's (S-22). Healing, the Matrix and Glitch repel stay the Nexus's alone. */
@@ -346,7 +346,7 @@ export class Game {
       if (d < p.r + 6 && it.age > PICKUP_SETTLE_S) {
         if (room) {
           this.cargo[it.kind]++;
-          if (it.kind === 'lumen') this.stats.lumen++;
+          if (it.kind in this.stats) this.stats[it.kind]++; // lumen / tide / calx: ever held (shard / prism aren't stats keys)
           this.audio.pickup(it.kind);
           this.pickups.splice(i, 1);
         } else if (!this.atDeposit()) { // B-033: at a deposit (Nexus ring or Relay, `atDeposit`) the deposit makes room this frame; no "return to the Nexus"
@@ -392,7 +392,7 @@ export class Game {
     const p = this.player;
     // Cargo isn't destroyed — it scatters where you fell, so a retrieval run is possible.
     for (const kind of KINDS) for (let i = 0; i < this.cargo[kind]; i++) this.spawnPickup(p.x, p.y, kind, true);
-    this.cargo = { shard: 0, prism: 0, lumen: 0 };
+    this.cargo = emptyKinds();
     this.burst(p.x, p.y, 50, '#ffffff', 300);
     p.x = this.nexus.x; p.y = this.nexus.y + SPAWN_OFFSET; p.vx = p.vy = 0;
     p.integrity = this.stat('hull'); p.invuln = RESPAWN_INVULN_S; this.beam.charge = 0;

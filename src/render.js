@@ -8,7 +8,7 @@ import { drawBeacons, drawRelays } from './craft.js';
 import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { endingView, drawOverview } from './ending.js';
-import { paintChunk } from './terrain.js';
+import { paintChunk, waves, pentagon } from './terrain.js';
 import { spitterSprite, drawSpitterTells } from './spitter.js';
 import { drawAurora } from './weather.js';
 import { drawUndertow } from './undertow.js';
@@ -291,12 +291,14 @@ export class Renderer {
   // Audit 74: the spin is baked into PICKUP_FRAMES sprites (one turn), so drawing one is an axis-aligned drawImage with
   // no save / rotate / restore (300 on screen: 137 → 94 ms at a 4× CPU throttle). Lumen ● looks the same at any angle.
   pickupSprite(kind, frame = 0) {
-    if (kind === 'lumen') frame = 0;
+    if (kind === 'lumen' || kind === 'tide' || kind === 'calx') frame = 0; // S-49: ≈ / ⬟ stay upright (their shape is the tell)
     const glow = this.quality < 2; // S-41: L2 draws the bare shape in a small sprite (far fewer pixels per pickup)
     return this.glowSprite((glow ? 'p-' : 'pn-') + kind + '-' + frame, glow ? 5 + 16 / (this.zoom * this.dpr) : 6, g => {
       const col = RESOURCE[kind].color;
       g.rotate(frame * Math.PI * 2 / PICKUP_FRAMES);
       g.fillStyle = col; if (glow) { g.shadowColor = col; g.shadowBlur = 10; }
+      if (kind === 'tide') { g.strokeStyle = col; g.lineWidth = 1.6; g.lineCap = 'round'; waves(g, 0, 0, 4.5, 2, 2); g.stroke(); return; }
+      if (kind === 'calx') { pentagon(g, 0, 0, 4.5); g.fill(); return; }
       g.beginPath();
       if (kind === 'shard') { g.moveTo(0, -5); g.lineTo(3, 0); g.lineTo(0, 5); g.lineTo(-3, 0); }
       else if (kind === 'lumen') g.arc(0, 0, 3.5, 0, Math.PI * 2);
