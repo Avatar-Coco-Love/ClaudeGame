@@ -44,3 +44,9 @@ Continues `06-Decisions-16.md` (same rules: supersede, never edit; list rejected
   the old map wouldn't match anyway); **384+** (151 ms at 320 already; long empty hauls before M11 gives them a
   purpose); **biomes as angular sectors** (would cut through Veil/Deep and the Spire band; rings reuse `world.rings`, the
   ring toast, hp and music by ring).
+
+### D-121 — D-107's "every font size scales" has two exceptions (audit 89, docs drift; amends D-107)
+- The title `h1` (`clamp(28px, 10.5vw, 76px)`, landscape `clamp(24px, 6.3vw, 46px)`) scales with the viewport, not
+  `--ts`: it is already ≥ 24 px, so Large text adds nothing to readability there. The phone `.bank` stays 15 px
+  (D-107 already says so). Every other `font-size` in `style.css` is `calc(Npx * var(--ts))`.
+- Rejected: scaling the title too (a wider wordmark on small screens for no reading gain); rewording D-107 in place (supersede, never edit).

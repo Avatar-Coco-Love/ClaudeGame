@@ -1,9 +1,9 @@
 // S-19 Spires v1a (D-049, D-068): where the 5 dormant Spires go, their 9×9 shape, and the saved record.
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
-import { WORLD_SIZE_OLD, BORDER, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
+import { WORLD_SIZE_OLD, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
   SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, SPIRE_WAKE_RGB, RESOURCE } from './config.js';
-import { seededStream, vaultSites, unpackBits } from './world.js';
+import { seededStream, vaultSites, unpackBits, insideBorder } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
 import { checkEnding } from './ending.js';
 
@@ -42,7 +42,7 @@ export function spireCandidates(seed, w = WORLD_SIZE_OLD, h = w) {
       const a = a0 + (k + rand()) * step, d = SPIRE_D[0] + rand() * (SPIRE_D[1] - SPIRE_D[0]);
       const x = Math.floor(cx + Math.cos(a) * d), y = Math.floor(cy + Math.sin(a) * d), dc = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
       if (dc < SPIRE_D[0] || dc > SPIRE_D[1]) continue;
-      if (x - H < BORDER || y - H < BORDER || x + H > w - BORDER - 1 || y + H > h - BORDER - 1) continue; // footprint stays inside the bedrock border
+      if (!insideBorder(x, y, H, w, h)) continue;
       if (vaults.some(v => Math.hypot(v.x - x, v.y - y) < SPIRE_VAULT_GAP)) continue;
       list.push({ x, y, t });
     }
@@ -81,7 +81,7 @@ export function chooseSpires(seed, explored, broken, w = WORLD_SIZE_OLD, h = w) 
 export function loadSpires(raw, w = WORLD_SIZE_OLD, h = w) {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > SPIRE_COUNT) return null;
   const H = SPIRE_HALF, int = v => Number.isInteger(v);
-  const ok = raw.every(s => s && int(s.x) && int(s.y) && s.x - H >= 2 && s.y - H >= 2 && s.x + H <= w - 3 && s.y + H <= h - 3
+  const ok = raw.every(s => s && int(s.x) && int(s.y) && insideBorder(s.x, s.y, H, w, h)
     && (s.keep === undefined || (Array.isArray(s.keep) && s.keep.every(int))));
   if (!ok) return null;
   return raw.map(s => {

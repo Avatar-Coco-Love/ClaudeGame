@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.4.29 — 2026-11-25
+- **Health check.** No change in play: tidier code under the hood before the bigger world arrives, with new checks that
+  every vault, Spire and Anomaly stays clear of the world's edge.
+
 ## v1.4.28 — 2026-11-25
 - **Groundwork for the bigger world.** Saves now remember how big their world is. Nothing changes in play: every world
   is still the same size, and your current world loads exactly as before. (Saves upgrade automatically.)

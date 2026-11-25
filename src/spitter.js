@@ -3,7 +3,7 @@
 // it moves and when it fires, and runs its bolts (`game.bolts`). A bolt flies straight, stops at the first solid cell,
 // hurts the core once, and the beam can pop it (beam.js aims at `beamFoes`). Wake Glitches never become Spitters.
 import {
-  CELL, GLITCH_R as GLITCH_SIZE, SPITTER_HP, SPITTER_HOLD_PX, SPITTER_EASE_PX, SPITTER_BACK, SPITTER_FIRE_PX, SPITTER_SHOT_S, SPITTER_TELL_S, SPITTER_COLORS,
+  CELL, GLITCH_R, SPITTER_HP, SPITTER_HOLD_PX, SPITTER_EASE_PX, SPITTER_BACK, SPITTER_FIRE_PX, SPITTER_SHOT_S, SPITTER_TELL_S, SPITTER_COLORS,
   BOLT_SPEED, BOLT_DMG, BOLT_HP, BOLT_R, BOLT_LIFE_S,
 } from './config.js';
 
@@ -66,7 +66,7 @@ export function beamFoes(game) { return game.bolts.length ? game.enemies.concat(
 // ---------- drawing (render.js calls these; sprites are cached glow canvases, D-051) ----------
 /** A Spitter's body: a violet diamond with an orange core line, no limbs (D-002 / pillars). */
 export function spitterSprite(R, white) {
-  const r = GLITCH_SIZE;
+  const r = GLITCH_R;
   return R.glowSprite(`sp-${white ? 1 : 0}`, r * 1.3 + 2 + 18 / (R.zoom * R.dpr), g => {
     g.shadowBlur = 14; g.lineWidth = 2;
     g.strokeStyle = g.fillStyle = g.shadowColor = white ? '#ffffff' : SPITTER_COLORS[0];

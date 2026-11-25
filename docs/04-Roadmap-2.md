@@ -4,15 +4,17 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 89 leftovers** (fixed: H3 `insideBorder`, audit 84's code/doc nits). Watch for S-46: site helpers
+  (`vaultSites`, `spireCandidates`, `chooseSpires`, `loadSpires`, `spireFootprint`, `isBroken`) default `w` to 160, so
+  a caller that forgets the world's size silently gets 160 geometry in a 256 world; pass `world.w` everywhere.
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
   #92 (B-081, D-117). Perf:
   `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,
   `castBeam` Map/Set); Echo field rebuilds on any break anywhere (≤ 0.3 ms ×4). Touch: short landscape sheets done in #93
-  (D-118); Keys-view buttons 40 px on a coarse pointer (hidden on touch).
+  (D-118).
   Code: numbers to config (`VAULT_HALF`, `BORDER`, craft `SPIRE_HALF` done in #92): quality 1000 / 0.98 / 0.9, Glitch steer 3 / 0.4 / 0.9 / 12 tries, "moving > 20"
   ×3, autosave 10 s, DPR max 2, beam hit pad 4, music ramp/resync constants; `echo.js` repeats the core's steer step
-  (`game.js` 173–190: a shared helper); `makeEcho`/`fieldAt` exported but file-local; `spitter.js` `GLITCH_R as
-  GLITCH_SIZE`. Docs: D-107 says every font size scales; the title `clamp` and phone `.bank` 15 px don't.
+  (`game.js` 173–190: a shared helper). (Exports, `GLITCH_SIZE`, D-107 drift: #96, D-121.)
 - **Audit 74 leftovers** (5 sweeps; fixed in #80: SW `?query` offline launch, Anomaly take during a Relay deposit,
   pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` unsmoothed blit done at L2 (S-41, #85); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
   repaints a whole chunk per broken cell (~10 ms; Wide → 20–30 ms spikes: repaint a 3×3 clip); `touch.cjs` 65 s, ~25 s
@@ -54,7 +56,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
   T2 minimap Spire hexagon ~5 CSS px / 0.86 px line on the 96 px phone minimap (blobs into violet cells; make it bigger/brighter);
   T1b the pointer now slides inward, so its NEXUS label can cross a toast at top 30 % (568×320, seen; phone toasts moved in audit 54, B-047: re-check); T4 `tools/perf.cjs`
   leaves `drawLightGlow` / `drawSpireBreath` untimed; H2 hexagon path in `spire.js` ×2 + `terrain.js` `hexPath` → one export;
-  H3 "inside the bedrock border" in `spire.js` ×2, `world.js`, `dev.js` → one `insideBorder`;
+  (H3 `insideBorder` ✅ #96);
 - **Audit 54 leftovers:** (C1–C3, T1, T2 ✅ #59: B-043…B-047) H1 `craft.js`: `loadRelays` ≈ `loadBeacons` → one `loadPlaced(list, max, make)`;
   `drawRelays` ≈ `drawBeacons` (cull + setup); `placeRefusal`/`tryPlace` core cell → one helper. H2 `spire.js` `updateSpireFeed` copies
   `game.js` `updateDeposit`'s tick loop → shared `tickTransfer`; `main.js` `craftRow` is a 4th near-copy of the panel click handler
