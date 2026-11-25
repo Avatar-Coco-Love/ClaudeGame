@@ -5,20 +5,23 @@
 // D-146). Gate: with / without in 0.85–0.95 for each mode, and Drift within 0.05 of Surge.
 // S-56 (D-153) `--wards=2`: both runs keep that many Wards at the dig site (every 5 s, if the core is > 3 cells from all of
 // them, they hop to open cells 2–4 cells round it, ≥ WARD_GAP apart, like a player re-placing them). Ward gate: ≤ 1.00 each.
-// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=4] [--minutes=10] [--mode=drift,surge] [--wards=0] [--v]
+// B-092 (D-155): the gates are defined on GATE_SEEDS (8) seeds; 4 seeds swing ±0.06 (Kiln 0.800 / 0.916, Shoal FAIL too), so a
+// run with fewer seeds prints its ratios but no verdict. 8 / 12 / 16 seeds all PASS and converge (Kiln 16: 0.883 / 0.885).
+// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--wards=0] [--v]
 import { runBot } from './surgebot.mjs';
 import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, WARD_GAP } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
 import { makeWard } from '../src/ward.js';
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
+export const GATE_SEEDS = 8; // B-092: the seed count every gate verdict is defined on
 const BIOMES = { // S-54: shoal = the mote swarm
   kiln: { ring: KILN_RING, ore: new Set(['shard', 'prism', 'calx']), off: g => { g.burrow.off = true; },
     stats: g => { const s = g.burrow; return { spawned: s.spawned, lunges: s.lunges, kills: s.kills, eaten: s.eaten, bitten: s.bitten, lost: s.lost }; } },
   shoal: { ring: UNDERTOW_RING, ore: new Set(['shard', 'prism', 'tide']), off: g => { g.swarm.off = true; },
     stats: g => { const s = g.swarm; return { spawned: s.spawned, touches: s.touches, hits: s.hits, kills: s.kills, taken: s.taken, carried: s.carried, cleared: s.cleared }; } },
 };
-const biome = BIOMES[arg('biome', 'kiln')], seeds = Number(arg('seeds', 4)), minutes = Number(arg('minutes', 10));
+const biome = BIOMES[arg('biome', 'kiln')], seeds = Number(arg('seeds', GATE_SEEDS)), minutes = Number(arg('minutes', 10));
 const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v'), WARDS = Number(arg('wards', 0));
 /** S-56: keep WARDS Wards within 3 cells of the core: re-placed round it when it has moved on. */
 function keepWards(g) {
@@ -80,5 +83,6 @@ for (const mode of modes) {
 }
 if (ratios.drift !== undefined && ratios.surge !== undefined) {
   const ok = WARDS ? Object.values(ratios).every(r => r <= 1) : Object.values(ratios).every(r => r >= 0.85 && r <= 0.95) && Math.abs(ratios.drift - ratios.surge) <= 0.05;
-  console.log(`gate (${WARDS ? `${WARDS} Wards: ≤ 1.00 each` : '0.85–0.95 each, modes within 0.05'}): ${ok ? 'PASS' : 'FAIL'} (gap ${Math.abs(ratios.drift - ratios.surge).toFixed(3)})`);
+  if (seeds < GATE_SEEDS) console.log(`gate: no verdict (${seeds} seeds < ${GATE_SEEDS}: too few to gate on, B-092)`);
+  else console.log(`gate (${WARDS ? `${WARDS} Wards: ≤ 1.00 each` : '0.85–0.95 each, modes within 0.05'}): ${ok ? 'PASS' : 'FAIL'} (gap ${Math.abs(ratios.drift - ratios.surge).toFixed(3)})`);
 }

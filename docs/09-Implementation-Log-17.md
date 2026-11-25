@@ -14,3 +14,19 @@ Continues `09-Implementation-Log-16.md` (part 16 neared the 8 KB cap at session 
 - Screenshot viewed: ⌖ sight in lime with its 4-cell dashed ring, a shot line to a mote, "Ward placed" toast.
 - Smoke 562/562 (+15, `ward.cjs`: price, placement, refund, save + format, rate, range / line, nearest,
   bolt one-shot, Ward kill no loot, 160 world, Kiln Ward gate, Craft row, live place + shot; `relay.cjs` row list adds `ward`).
+
+## Session 119 — Audit: seed-fragile bot gate (B-092), audio test 50× faster, 09 archive (v1.7.60, D-155)
+- No subagent tool: sweeps in-session, newest code first (`ward.js`, D-154 `warded` in glitch / burrower / mote: match).
+- **B-092** (fixed): `biomefoe.mjs` defaulted to 4 seeds while every gate was defined on 8. On 4 seeds both biome gates
+  FAIL by noise (Kiln 0.800 / 0.916, Shoal FAIL); 8 / 12 / 16 seeds PASS and converge (Kiln 0.866 / 0.905, 0.869 /
+  0.888, 0.883 / 0.885; Shoal PASS at 8 and 16). D-155: `GATE_SEEDS = 8` is the default, fewer seeds print no verdict;
+  the base Kiln gate (never in the smoke) now runs in `burrower.cjs`; the Ward gate runs at 8 (was 4). `audit119.cjs`
+  fails on the old tool (stash-proved).
+- Smoke time (debt carried by audits 109 + 114): baseline 565 s; node phase 74 s (three bot gates ~25 s each), browser
+  490 s. The one-shot sound check rendered spectra with a plain DFT (74 s); now an FFT: same 28 results bit for bit,
+  1.5 s. Next costs: Spire / Wake / toast viewport loops (~7 s each), S-41 quality runs (13–15 s).
+- `09` sessions 109–113 archived word for word (`archive/2026-11-25-09-sessions-109-113.md`; part 15 removed).
+- D-150…D-154 checked against `config.js` / code: match. No phone sweep again (last: audit 109).
+- Workflow review: too much trust in a tool's default output (two sessions read a 4-seed FAIL as a regression); too
+  little: the smoke measured per phase only now. Change: D-155 (a gate's seed count lives in the tool and the smoke).
+- Smoke 565/565 (+3: `audit119.cjs` ×2, Kiln gate in `burrower.cjs`) in 497 s (was 562 in 565 s).

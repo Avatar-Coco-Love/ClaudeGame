@@ -130,6 +130,12 @@ async function nodeChecks(check) {
     check('S-53 burrower: a mode switch clears it; nothing saved (no burrow field, toSave keys unchanged)',
       had && !g.burrow.b && !/burrow/i.test(save) && keys(g) === keys(make('surge')));
   }
+  { // the weight gate (D-146, D-148): tools/biomefoe.mjs Kiln, no Wards, at its default GATE_SEEDS (8) seeds (B-092, audit 119)
+    const out = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, '../tools/biomefoe.mjs'), '--biome=kiln'], { encoding: 'utf8' });
+    const line = out.split('\n').find(l => l.startsWith('gate')) || '';
+    check('S-53 burrower: the biomefoe.mjs Kiln gate passes on 8 seeds (haul with / without 0.85–0.95 each mode, modes within 0.05; B-092)',
+      /PASS/.test(line), out.trim().split('\n').map(l => l.slice(0, 50)).join(' | '));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
