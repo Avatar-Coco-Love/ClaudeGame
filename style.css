@@ -25,6 +25,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bar { flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
 #cargo-fill { height: 100%; width: 0; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); transition: width .1s; }
 #cargo-fill.full { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+#cargo-fill.bit { animation: bit .6s ease-out; } /* S-53c: a Burrower bite flashes the bar Calx lilac */
+@keyframes bit { 0%, 30% { background: rgb(200, 160, 255); box-shadow: 0 0 14px rgb(200, 160, 255); } }
 /* S-35: one chip per active Anomaly buff under the cargo bar (glyph only ≤ 700 px wide); a short flash as a deposit ends it. */
 /* S-43: the Echo order chip leads the S-35 buff chips in one wrapping row */
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }

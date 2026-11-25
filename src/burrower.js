@@ -1,16 +1,17 @@
 // S-53 Burrower (D-142, D-145): the Kiln creature. 256 worlds only (no Kiln elsewhere), one at a time while the core is in
 // the Kiln ring. It lives in the rock: one cell per BURROW_STEP_S through ROCK / DENSE / ore (or open floor), never vault,
-// Spire, bedrock or the Nexus disc, clearing each cell it leaves (a free tunnel, no pickups: it eats the yield). From
-// BURROW_TELL_CELLS of its goal it shows a BURROW_TELL_S tell (its cell glows Calx lilac with cracks, drawn over the dark),
-// then surfaces for BURROW_UP_S: the only time the beam can hit it (`beamFoes` in spitter.js adds it). Both modes have it:
-// Surge hunts the core (a BURROW_DMG lunge unless the core moved BURROW_DODGE cells during the tell), Drift hunts ore near
-// the core and eats it (never the core). Then it burrows BURROW_AWAY cells off and comes back. Killed or driven off it
-// drops what it ate this trip plus the Glitch loot of its tier, equal in both modes. Seeded (`rng.burrower`,
+// Spire, bedrock or the Nexus disc, clearing each cell it leaves (a free tunnel; S-53c: tunnel ore's yield is lost). From
+// BURROW_TELL_CELLS of the core it shows a BURROW_TELL_S tell (its cell glows Calx lilac with cracks, drawn over the dark),
+// then surfaces for BURROW_UP_S: the only time the beam can hit it (`beamFoes` in spitter.js adds it). Both modes hunt the
+// core (S-53c, D-147) and miss if it moved BURROW_DODGE cells during the tell: Surge lunges for BURROW_DMG, Drift bites
+// BURROW_BITE cargo items, most valuable first, gone for good (never damage). Then it burrows BURROW_AWAY cells off and
+// comes back. Killed or driven off it drops its belly (the cell it broke out of) plus the Glitch loot of its tier, equal in
+// both modes (a bite is never refunded). Seeded (`rng.burrower`,
 // `rng['burrower-loot']`); nothing is saved (its tunnels are ordinary broken cells). None in a Wake or the Ending.
 import {
   CELL, T, MATERIAL, NEXUS_RADIUS, KILN_RING, GLITCH_HIT_CD_S, GLITCH_LOOT_SHARDS, GLITCH_PRISM_CHANCE,
   BURROW_FIRST_S, BURROW_EVERY_S, BURROW_SPAWN_R, BURROW_STEP_S, BURROW_TELL_CELLS, BURROW_TELL_S, BURROW_UP_S, BURROW_HP,
-  BURROW_DMG, BURROW_DODGE, BURROW_ORE_R, BURROW_AWAY, BURROW_TRIP_S, BURROW_LEASH, BURROW_R, BURROW_RGB, MUSIC_RUMBLE,
+  BURROW_DMG, BURROW_DODGE, BURROW_BITE, BURROW_AWAY, BURROW_TRIP_S, BURROW_LEASH, BURROW_R, BURROW_RGB, MUSIC_RUMBLE,
 } from './config.js';
 import { glitchTier } from './glitch.js';
 
@@ -18,8 +19,12 @@ const DIG = new Set([T.EMPTY, T.ROCK, T.DENSE, T.CRYSTAL, T.PRISM, T.LUMEN, T.TI
 const isOre = t => !!(MATERIAL[t] && MATERIAL[t].yield);
 const centre = c => (c + 0.5) * CELL;
 
-/** Spawner state (never saved). Counters are for tests: spawned, lunges (hits), dodged, kills, eaten (ore cells). */
-export function makeBurrow() { return { b: null, timer: BURROW_FIRST_S, off: false, spawned: 0, lunges: 0, dodged: 0, kills: 0, eaten: 0 }; }
+/** Spawner state (never saved). Counters are for tests: spawned, lunges (hits), dodged, kills, eaten (belly ore cells),
+ *  lost (tunnel ore cells, yield gone), bites (Drift bites that took ≥ 1 item), bitten (items taken). */
+export function makeBurrow() { return { b: null, timer: BURROW_FIRST_S, off: false, spawned: 0, lunges: 0, dodged: 0, kills: 0, eaten: 0, lost: 0, bites: 0, bitten: 0 }; }
+
+/** S-53c: what a Drift bite takes first (≈ ⬟, then ▲ ●, then ◆). */
+export const BITE_ORDER = ['tide', 'calx', 'prism', 'lumen', 'shard'];
 
 const nextGap = game => BURROW_EVERY_S[0] + game.rng.burrower() * BURROW_EVERY_S[1];
 
@@ -43,16 +48,18 @@ function spawn(game, pcx, pcy) {
     const tier = glitchTier(Math.hypot(centre(x) - game.nexus.x, centre(y) - game.nexus.y));
     game.burrow.spawned++;
     return { burrower: true, cx: x, cy: y, fx: x, fy: y, prog: 1, x: centre(x), y: centre(y), r: BURROW_R, tier, state: 'dig',
-      t: 0, step: BURROW_STEP_S, trip: 0, hp: BURROW_HP, maxHp: BURROW_HP, flash: 0, hitCd: 0, ate: {}, heading: a + Math.PI, ore: null };
+      t: 0, step: BURROW_STEP_S, trip: 0, hp: BURROW_HP, maxHp: BURROW_HP, flash: 0, hitCd: 0, ate: {}, heading: a + Math.PI };
   }
   return null;
 }
 
-/** Clear the cell the Burrower is in; an ore cell's yield goes into its belly (dropped only if it is beaten). */
-function eatCell(game, x, y, b) {
+/** Clear the cell the Burrower is in. S-53c: only the cell it breaks out of (`belly`) feeds its belly (dropped only if it
+ *  is beaten); an ore cell it tunnels through loses its yield. */
+function eatCell(game, x, y, b, belly) {
   const w = game.world, t = w.get(x, y);
   if (t === T.EMPTY || !DIG.has(t)) return;
-  if (isOre(t)) {
+  if (isOre(t) && !belly) game.burrow.lost++;
+  else if (isOre(t)) {
     const y0 = MATERIAL[t].yield, kind = y0.kind;
     b.ate[kind] = (b.ate[kind] || 0) + y0.min + Math.floor(game.rng['burrower-loot']() * (y0.max - y0.min + 1));
     game.burrow.eaten++;
@@ -72,21 +79,9 @@ function stepToward(game, b, gx, gy, avoid) {
   opts.sort((a, c) => a.d - c.d);
   const here = (b.cx - gx) ** 2 + (b.cy - gy) ** 2;
   const to = opts[0].d < here ? opts[0] : opts[Math.floor(game.rng.burrower() * opts.length)];
-  eatCell(game, b.cx, b.cy, b); // the cell it leaves becomes tunnel
+  eatCell(game, b.cx, b.cy, b, false); // the cell it leaves becomes tunnel
   b.fx = b.cx; b.fy = b.cy; b.cx = to.x; b.cy = to.y; b.prog = 0;
   b.heading = Math.atan2(b.cy - b.fy, b.cx - b.fx);
-}
-
-/** Drift: the nearest (to the Burrower) ore cell within BURROW_ORE_R cells of the core, or null. */
-function findOre(game, b, pcx, pcy) {
-  const w = game.world, R = BURROW_ORE_R;
-  let best = null, bd = Infinity;
-  for (let y = pcy - R; y <= pcy + R; y++) for (let x = pcx - R; x <= pcx + R; x++) {
-    if ((x - pcx) ** 2 + (y - pcy) ** 2 > R * R || !isOre(w.get(x, y))) continue;
-    const d = (x - b.cx) ** 2 + (y - b.cy) ** 2;
-    if (d < bd) { bd = d; best = { x, y }; }
-  }
-  return best;
 }
 
 function beaten(game, b) {
@@ -98,6 +93,17 @@ function beaten(game, b) {
   for (let j = 0; j < GLITCH_LOOT_SHARDS + b.tier; j++) game.spawnPickup(b.x, b.y, 'shard');
   game.addShake(4);
   s.kills++; s.b = null; s.timer = nextGap(game);
+}
+
+/** S-53c Drift: take BURROW_BITE cargo items, most valuable first; they are gone (not in the belly). */
+function bite(game) {
+  const s = game.burrow;
+  let n = 0;
+  for (const k of BITE_ORDER) while (n < BURROW_BITE && game.cargo[k] > 0) { game.cargo[k]--; n++; }
+  if (!n) return;
+  s.bites++; s.bitten += n;
+  game.audio.crunch();
+  game.notify('burrow-bite');
 }
 
 function lunge(game, b) {
@@ -133,35 +139,26 @@ export function updateBurrower(game, dt) {
       else stepToward(game, b, b.gx, b.gy, null);
       return;
     }
-    if (surge) {
-      if (Math.max(Math.abs(b.cx - pcx), Math.abs(b.cy - pcy)) <= BURROW_TELL_CELLS) { b.state = 'tell'; b.t = BURROW_TELL_S; b.aimX = p.x; b.aimY = p.y; }
-      else stepToward(game, b, pcx, pcy, null);
-      return;
-    }
-    if (!b.ore || !isOre(w.get(b.ore.x, b.ore.y)) || (b.ore.x - pcx) ** 2 + (b.ore.y - pcy) ** 2 > BURROW_ORE_R ** 2) b.ore = findOre(game, b, pcx, pcy);
-    if (!b.ore) return; // nothing to eat near the core: it waits in the rock
-    if (Math.abs(b.cx - b.ore.x) + Math.abs(b.cy - b.ore.y) === 1) { b.state = 'tell'; b.t = BURROW_TELL_S; }
-    else stepToward(game, b, b.ore.x, b.ore.y, b.ore);
+    if (Math.max(Math.abs(b.cx - pcx), Math.abs(b.cy - pcy)) <= BURROW_TELL_CELLS) { b.state = 'tell'; b.t = BURROW_TELL_S; b.aimX = p.x; b.aimY = p.y; }
+    else stepToward(game, b, pcx, pcy, null); // S-53c: both modes hunt the core
     return;
   }
   if (b.state === 'tell') {
     if ((b.t -= dt) > 0) return;
-    eatCell(game, b.cx, b.cy, b); // it breaks out of its cell
+    eatCell(game, b.cx, b.cy, b, true); // it breaks out of its cell (its belly)
     b.state = 'up'; b.t = BURROW_UP_S; b.hp = b.maxHp;
-    if (surge) {
-      if (Math.hypot(p.x - b.aimX, p.y - b.aimY) >= BURROW_DODGE * CELL) s.dodged++; // surfaced into air
-      else lunge(game, b);
-    }
+    if (Math.hypot(p.x - b.aimX, p.y - b.aimY) >= BURROW_DODGE * CELL) s.dodged++; // surfaced into air
+    else if (surge) lunge(game, b);
+    else bite(game); // S-53c: Drift bites the hold, never the hull
     return;
   }
   // 'up': surfaced and hittable
   if (b.hp <= 0) { beaten(game, b); return; }
   if (surge && b.hitCd <= 0 && Math.hypot(p.x - b.x, p.y - b.y) < b.r + p.r) { lunge(game, b); if (s.b !== b) return; }
   if ((b.t -= dt) > 0) return;
-  if (!surge && b.ore && isOre(w.get(b.ore.x, b.ore.y))) eatCell(game, b.ore.x, b.ore.y, b); // Drift: the ore is lost
   const ax = b.cx - pcx, ay = b.cy - pcy, ad = Math.hypot(ax, ay) || 1;
   b.gx = Math.round(b.cx + ax / ad * BURROW_AWAY); b.gy = Math.round(b.cy + ay / ad * BURROW_AWAY);
-  b.state = 'away'; b.trip = 0; b.step = BURROW_STEP_S; b.ore = null;
+  b.state = 'away'; b.trip = 0; b.step = BURROW_STEP_S;
 }
 
 /** S-53b: the rumble level for music.js: 0 with no Burrower within MUSIC_RUMBLE.cells of the core, else 0.5…1 by closeness. */

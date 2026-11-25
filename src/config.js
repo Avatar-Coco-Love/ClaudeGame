@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.6.53';
+export const VERSION = '1.6.54';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -363,8 +363,9 @@ export const VENT_RGB = '255, 232, 205'; // warm white: the vent hexagon and its
 // out, moves one cell per BURROW_STEP_S through ROCK / DENSE / ore (or open floor), clearing each cell it leaves (no
 // pickups). From BURROW_TELL_CELLS of its goal a BURROW_TELL_S tell, then it surfaces for BURROW_UP_S (hp BURROW_HP, the
 // only time the beam can hit it). Surge: a BURROW_DMG lunge unless the core moved ≥ BURROW_DODGE cells in the tell; contact
-// re-hit GLITCH_HIT_CD_S. Drift: eats the ore it surfaced by (within BURROW_ORE_R of the core). Then it burrows
-// BURROW_AWAY cells off and returns. Kill / drive-off: what it ate this trip + the Glitch loot of its tier. Never saved.
-export const BURROW_FIRST_S = 20, BURROW_EVERY_S = [35, 15], BURROW_SPAWN_R = [10, 14], BURROW_STEP_S = 0.5, BURROW_TELL_CELLS = 2;
-export const BURROW_TELL_S = 0.8, BURROW_UP_S = 2, BURROW_HP = 6, BURROW_DMG = 22, BURROW_DODGE = 1.5, BURROW_ORE_R = 8;
+// re-hit GLITCH_HIT_CD_S. Drift (S-53c, D-147): the same hunt, an undodged surfacing bites BURROW_BITE cargo items (gone).
+// Tunnel ore pays nothing. Then it burrows BURROW_AWAY cells off and returns. Kill / drive-off: the cell it broke out of +
+// the Glitch loot of its tier. Never saved.
+export const BURROW_FIRST_S = 20, BURROW_EVERY_S = [20, 10], BURROW_SPAWN_R = [10, 14], BURROW_STEP_S = 0.5, BURROW_TELL_CELLS = 2;
+export const BURROW_TELL_S = 0.8, BURROW_UP_S = 2, BURROW_HP = 6, BURROW_DMG = 22, BURROW_DODGE = 1.5, BURROW_BITE = 4;
 export const BURROW_AWAY = 12, BURROW_TRIP_S = 25, BURROW_LEASH = 24, BURROW_R = 11, BURROW_RGB = '200, 160, 255'; // Calx lilac

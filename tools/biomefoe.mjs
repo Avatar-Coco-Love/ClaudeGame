@@ -38,7 +38,7 @@ function run(seed, mode, creature) {
   const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', setup, ore });
   const banked = {}; for (const k in game.bank) banked[k] = game.bank[k] - (game.bank0[k] || 0);
   const s = game.burrow;
-  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, spawned: s.spawned, lunges: s.lunges, kills: s.kills, eaten: s.eaten };
+  return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, spawned: s.spawned, lunges: s.lunges, kills: s.kills, eaten: s.eaten, bitten: s.bitten, lost: s.lost };
 }
 
 const med = v => { const s = [...v].sort((a, b) => a - b); return s.length % 2 ? s[s.length >> 1] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
@@ -53,7 +53,7 @@ for (const mode of modes) {
   const sum = (rows, f) => rows.reduce((x, y) => x + f(y), 0);
   ratios[mode] = sum(on, r => r.haul) / Math.max(1e-9, sum(off, r => r.haul));
   console.log(`${mode}: haul with/without ${ratios[mode].toFixed(3)} (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
-    `Burrowers ${sum(on, r => r.spawned)}, lunges ${sum(on, r => r.lunges)}, kills ${sum(on, r => r.kills)}, ore eaten ${sum(on, r => r.eaten)}, ` +
+    `Burrowers ${sum(on, r => r.spawned)}, lunges ${sum(on, r => r.lunges)}, kills ${sum(on, r => r.kills)}, bitten ${sum(on, r => r.bitten)}, tunnel ore lost ${sum(on, r => r.lost)}, ` +
     `deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, relay ${sum(on, r => r.relay)}/${seeds}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}, med haul ${med(on.map(r => r.haul)).toFixed(0)}/${med(off.map(r => r.haul)).toFixed(0)}`);
 }
 if (ratios.drift !== undefined && ratios.surge !== undefined) {

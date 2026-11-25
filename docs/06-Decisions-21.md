@@ -37,3 +37,10 @@ alternatives). D-145 on.
 - Rejected (measured): gap only (Drift 1.03); no Glitch loot (Drift 1.00, breaks D-142's equal loot); bite refunded on
   drive-off (1.03, the bot always drives it off); bite near its ore target (0.99, the core is rarely within reach);
   ongoing bite while up (×0.81 with 3 + drip, harsher than Surge); heat on surfacing (a second vent, D-129's job).
+
+### D-148 — S-53c build details (session 113, build)
+- The bite crunch is the first non-oscillator sound: a 0.14 s lowpassed (260 Hz) noise buffer from a fixed LCG seed, so
+  `audio.cjs` renders the same numbers each run. Rejected: a low triangle tone (reads as `hurt()`, the Surge hull hit).
+- The gate result is recorded as the tool's line in `09` (spec allowed either), not a smoke check: 8 seeds × 2 modes ×
+  2 runs add ~25 s to a 10+ min smoke and the bot route is noisier (±0.03) than a smoke check should be.
+- Bite order is a fixed list `BITE_ORDER` (≈ ⬟ ▲ ● ◆) exported from `burrower.js`; the bite never touches the belly.

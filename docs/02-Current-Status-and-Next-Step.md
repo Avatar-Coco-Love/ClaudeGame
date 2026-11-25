@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 112** · **Version: v1.6.53** (session 112: Design; rotation: 113 Build, 114 Audit, 115 Build).
+_Last updated: 2026-11-25_ · **Session counter: 113** · **Version: v1.6.54** (session 113: Build; rotation: 114 Audit, 115 Build, 116 Build).
 **Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,7 +21,7 @@ _Last updated: 2026-11-25_ · **Session counter: 112** · **Version: v1.6.53** (
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
-- Burrower (S-53a/b, D-145/146, `burrower.js`): Kiln creature, both modes; tunnels, lilac tell, Surge lunge 22 / Drift eats ore; music rumble ≤ 4 cells; unsaved. Gate `tools/biomefoe.mjs` fails today; S-53c fixes it (D-147).
+- Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core in both modes; lilac tell, Surge lunge 22 / Drift bites 4 cargo (crunch, lilac bar); tunnel ore lost; rumble ≤ 4 cells; unsaved. Gate `tools/biomefoe.mjs` PASS (0.866 / 0.906).
 - PWA (S-38), Graphics Auto / High / Low (S-41), rebindable Keys (S-39), Large text + colour-blind pairs (S-40): `08`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
   Ending fades out; Music slider (`settings.music`, default 50).
@@ -39,7 +39,7 @@ _Last updated: 2026-11-25_ · **Session counter: 112** · **Version: v1.6.53** (
   steps down, < 18 ms for 10 s up. L1 DPR 1; L2 + half the particles drawn, no pickup glow, unsmoothed light. Sim unchanged.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 21); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 21 from D-145), `03` questions (Q-xxx), `09` log (tail: `09-…-16`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 21 from D-145; last D-148), `03` questions (Q-xxx), `09` log (tail: `09-…-16`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, S-53c `07-…-13`, D-142, D-147). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
@@ -47,5 +47,6 @@ _Last updated: 2026-11-25_ · **Session counter: 112** · **Version: v1.6.53** (
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 113 (Build): S-53c Burrower retune (`07-Build-Specs-13.md`, D-147): gap 20–30, tunnel ore pays nothing, Drift
-heads for the core and bites 4 cargo items (lost); then `biomefoe.mjs` must PASS. Then S-54.
+Session 114 (Audit): health check per `CLAUDE.md` (subagents in parallel; archive `09` entries older than audit 109;
+check D-xxx vs code; workflow review). Then session 115 Build: S-54 Mote swarm (`07-Build-Specs-12.md`; gate first,
+lesson in `07-…-13`).

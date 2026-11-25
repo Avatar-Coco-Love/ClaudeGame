@@ -1,7 +1,8 @@
 // S-53 Burrower checks (D-142, D-145, burrower.js). smoke.cjs calls nodeChecks + browserChecks. Node: spawns only in the
 // Kiln of a 256 world (none in the Deep, none in a 160 world), first after 20 s; its tunnels are cleared cells of rock /
-// ore only (no pickups); Surge: the 0.8 s tell, then a 22 lunge; moving 2 cells in the tell = no hit; Drift never hurts the
-// core and eats only ore; kill (Surge) and drive-off (Drift) pay the same; the beam reaches it only surfaced; a mode
+// ore only (no pickups); Surge: the 0.8 s tell, then a 22 lunge; moving 2 cells in the tell = no hit; S-53c: gap 20–30 s,
+// tunnel ore pays nothing, Drift tells then bites 4 cargo items (most valuable first), dodged / empty hold = 0, never
+// damage; kill (Surge) and drive-off (Drift) pay the same; the beam reaches it only surfaced; a mode
 // switch clears it; nothing saved. Browser: the tell is drawn over the dark. Usage: node tests/burrower.cjs [--browser]
 // (BURROW_SHOT=path.png)
 const quiet = new Proxy({}, { get: () => () => {} });
@@ -43,24 +44,9 @@ async function nodeChecks(check) {
       kiln.burrow.spawned === 1 && first[0] >= BURROW_FIRST_S - 0.02 && first[0] < BURROW_FIRST_S + 0.1 && deep.burrow.spawned === 0 && small.burrow.spawned === 0,
       JSON.stringify({ first, kiln: kiln.burrow.spawned, deep: deep.burrow.spawned, small: small.burrow.spawned, t, d }));
   }
-  { // Drift: 90 s near ore — tunnels are cleared rock / ore cells, no pickups unless beaten, the core never hurt
-    const g = make('drift'), w = g.world, before = Uint8Array.from(w.cells);
-    for (let k = 0; k < 6; k++) w.cells[(g.room.y - 6) * w.w + g.room.x - 3 + k] = T.CRYSTAL; // ore 6 cells north
-    const ore0 = Uint8Array.from(w.cells);
-    let hurts = 0; const hp = g.hurtPlayer.bind(g); g.hurtPlayer = (...a) => { hurts++; hp(...a); };
-    g.burrow.timer = 0.01;
-    for (let i = 0; i < 90 * 60; i++) { pin(g); frame(g); }
-    const bad = [];
-    for (let i = 0; i < w.cells.length; i++) if (w.cells[i] !== ore0[i] && (w.cells[i] !== T.EMPTY || ![T.ROCK, T.DENSE, T.CRYSTAL, T.PRISM, T.LUMEN, T.TIDE, T.CALX].includes(ore0[i]))) bad.push(i);
-    let cleared = 0; for (let i = 0; i < w.cells.length; i++) if (w.cells[i] !== before[i] && w.cells[i] === T.EMPTY) cleared++;
-    const crystals = [...ore0].filter(t => t === T.CRYSTAL).length - [...w.cells].filter(t => t === T.CRYSTAL).length;
-    check('S-53 burrower: Drift tunnels are cleared rock / ore cells only, no pickups dropped, the core never hurt; it eats the ore near the core',
-      bad.length === 0 && cleared > 5 && g.pickups.length === 0 && hurts === 0 && g.burrow.lunges === 0 && g.burrow.eaten > 0,
-      JSON.stringify({ bad: bad.length, cleared, pickups: g.pickups.length, hurts, eaten: g.burrow.eaten, crystals }));
-  }
   /** Surge: run until the first tell starts (core pinned); returns the game, or null. */
-  const toTell = () => {
-    const g = make('surge'); g.burrow.timer = 0.01;
+  const toTell = (mode = 'surge', prep = null) => {
+    const g = make(mode); if (prep) prep(g); g.burrow.timer = 0.01;
     for (let i = 0; i < 40 * 60; i++) { pin(g); frame(g); if (g.burrow.b && g.burrow.b.state === 'tell') return g; }
     return null;
   };
@@ -77,6 +63,47 @@ async function nodeChecks(check) {
     if (g) { g.room.x += g.burrow.b.cx > g.room.x ? -2 : 2; for (let i = 0; i < 60; i++) { pin(g); frame(g); } }
     check('S-53 burrower: moving 2 cells during the tell = it surfaces into air, no hit',
       !!g && g.player.integrity === hull && g.burrow.dodged === 1 && g.burrow.lunges === 0, JSON.stringify(g && { hp: g.player.integrity, hull, dodged: g.burrow.dodged }));
+  }
+  { // S-53c: the gap after one ends is 20–30 s (seeded)
+    const { clearBurrower } = await import('../src/burrower.js');
+    const g = make('drift'), gaps = [];
+    for (let i = 0; i < 200; i++) { g.burrow.b = {}; clearBurrower(g); gaps.push(g.burrow.timer); }
+    check('S-53c burrower: the gap after one ends is 20–30 s', Math.min(...gaps) >= 20 && Math.max(...gaps) <= 30 && Math.max(...gaps) - Math.min(...gaps) > 8,
+      JSON.stringify({ min: Math.min(...gaps), max: Math.max(...gaps) }));
+  }
+  { // S-53c Drift: same tell, then bites 4 cargo items, most valuable first, gone; never damage; no re-bite while up
+    let hurts = 0;
+    const g = toTell('drift', x => { const hp = x.hurtPlayer.bind(x); x.hurtPlayer = (...a) => { hurts++; hp(...a); }; });
+    const log = [];
+    if (g) {
+      Object.assign(g.cargo, { shard: 5, prism: 2, lumen: 1, tide: 1, calx: 0 });
+      for (let i = 0; i < 60 * 3; i++) { pin(g); g.enemies.length = 0; g.spawnTimer = 1e9; g.update(1 / 60, still); log.push(g.events.includes('burrow-bite')); g.events.length = 0; }
+    }
+    const at = log.indexOf(true), c = g && g.cargo;
+    check('S-53c burrower: Drift shows the 0.8 s tell, then bites 4 cargo items most valuable first (≈ ▲ ▲ ●), gone, once, never damage',
+      !!g && at >= Math.floor(BURROW_TELL_S * 60) - 2 && at <= Math.ceil(BURROW_TELL_S * 60) + 1 && c.tide === 0 && c.prism === 0 && c.lumen === 0 && c.shard === 5 &&
+      g.burrow.bitten === 4 && g.burrow.bites === 1 && log.filter(Boolean).length === 1 && hurts === 0 && g.burrow.lunges === 0 && g.pickups.length === 0,
+      JSON.stringify({ at, cargo: c, bitten: g && g.burrow.bitten, bites: g && g.burrow.bites, hurts }));
+  }
+  { // S-53c Drift: dodged (moved 2 cells in the tell) = nothing taken; an empty hold = nothing taken, no bite event
+    const g = toTell('drift');
+    if (g) { Object.assign(g.cargo, { shard: 3, prism: 3 }); g.room.x += g.burrow.b.cx > g.room.x ? -2 : 2; for (let i = 0; i < 60; i++) { pin(g); frame(g); } }
+    const e = toTell('drift'); let ev = 0;
+    if (e) for (let i = 0; i < 90; i++) { pin(e); e.enemies.length = 0; e.update(1 / 60, still); if (e.events.includes('burrow-bite')) ev++; e.events.length = 0; }
+    check('S-53c burrower: Drift dodged = no bite; empty hold = it bites nothing (no event)',
+      !!g && !!e && g.cargo.shard === 3 && g.cargo.prism === 3 && g.burrow.dodged === 1 && g.burrow.bitten === 0 && e.burrow.bitten === 0 && e.burrow.bites === 0 && ev === 0 && e.burrow.b && e.burrow.b.state === 'up',
+      JSON.stringify({ g: g && { cargo: g.cargo, dodged: g.burrow.dodged }, e: e && { bitten: e.burrow.bitten, ev } }));
+  }
+  { // S-53c: tunnel ore pays nothing (yield lost, no pickups); a kill then pays only the Glitch loot (its belly cell was floor)
+    for (const mode of ['drift', 'surge']) {
+      const g = toTell(mode, x => { const w = x.world; for (let v = -9; v <= 9; v++) for (let u = -9; u <= 9; u++) if (Math.max(Math.abs(u), Math.abs(v)) >= 3) w.cells[(x.room.y + v) * w.w + x.room.x + u] = T.CRYSTAL; });
+      const b = g && g.burrow.b, lost = g && g.burrow.lost, ate = b && JSON.stringify(b.ate), pick0 = g && g.pickups.length;
+      if (b) { b.state = 'up'; b.t = 2; b.hp = 0; pin(g); frame(g); }
+      const n = {}; if (g) for (const q of g.pickups) n[q.kind] = (n[q.kind] || 0) + 1;
+      check(`S-53c burrower (${mode}): tunnel ore pays nothing (yield lost, no pickups, empty belly); the kill pays only the Glitch loot`,
+        !!b && lost > 0 && ate === '{}' && pick0 === 0 && n.shard === GLITCH_LOOT_SHARDS + b.tier && Object.keys(n).every(k => k === 'shard' || k === 'prism'),
+        JSON.stringify({ lost, ate, pick0, n }));
+    }
   }
   { // loot: a Surge kill and a Drift drive-off pay the same (ate + 2 + tier ◆, ▲ by the same draw)
     const loot = mode => {

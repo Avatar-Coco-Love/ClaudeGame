@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.54 — 2026-11-25
+- **The Burrower bites your hold in Drift.** In the Kiln it now heads for the core in both modes, with the same lilac
+  tell. Move away in time and it surfaces into air; stay put and in Surge it hits your hull, in Drift it takes 4 items
+  from your cargo (the rarest first) with a soft crunch and a lilac flash on the cargo bar. It comes more often (every
+  20–30 s), and ore it tunnels through is lost; beating it still pays.
+
 ## v1.6.53 — 2026-11-25
 - **Design pass: the Burrower gets teeth in both modes (next update).** A play-test measured that it cost a strong miner
   nothing; the retune now planned makes it bite your hold in Drift the way it bites your hull in Surge. No change in

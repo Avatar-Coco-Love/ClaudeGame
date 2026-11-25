@@ -70,7 +70,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -110,6 +110,8 @@ async function browserChecks(browser, url, check, errors) {
   check('Kiln overheat hiss: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-48a)', oh.peakDb <= -24 && oh.above2k < 1 && oh.loudS <= 0.5, JSON.stringify(oh));
   const vt = shots['ventTell()']; // audit 109: plays every 8 s per nearby vent, so held to the Spire tone's ceiling
   check('Kiln vent tell swell: peak ≤ -28 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (audit 109)', vt && vt.peakDb <= -28 && vt.above2k < 1 && vt.loudS <= 0.5, JSON.stringify(vt));
+  const cr = shots['crunch()']; // S-53c: the Burrower bite crunch, a short low noise burst
+  check('Burrower bite crunch: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.3 s (S-53c)', cr && cr.peakDb <= -24 && cr.peakDb > -60 && cr.above2k < 1 && cr.loudS <= 0.3, JSON.stringify(cr));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // S-53b: the Burrower rumble (held while one is within 4 cells), alone on the music bus at the default Music 50: on at
