@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 95** · **Version: v1.4.35** (session 95: Build; rotation: 96 Build, 97 Design, 98 Build, 99 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 96** · **Version: v1.4.36** (session 96: Build; rotation: 97 Design, 98 Build, 99 Audit, 100 Build).
 **Scope (D-119, `01`):** M1–M9 ✅ (v1.0 = M5). The game keeps growing: M10 world + biomes (1.5), M11 economy, M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -20,9 +20,10 @@ _Last updated: 2026-11-25_ · **Session counter: 95** · **Version: v1.4.35** (s
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Undertow (S-47a, D-127, `undertow.js`): ~half the Shoal's chunks flow 30–55 px/s (seeded, unsaved), eased 0.5 s into the realized velocity; pickups ×0.5.
+  Brittle glass (S-47b, D-128, `shatter.js`): a Shoal rock break cracks a seeded neighbour 60 %, no chains; lydian music.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
-- Music (S-44, D-115, `music.js`): synthesized pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
+- Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
   Ending fades out; own PRNG (seed + 'music'); Music slider (`settings.music`, default 50). `tests/music.cjs` (11 checks).
 - Settings (S-3): volume, mute, shake, reduced motion in `lumencore.settings.v1`, apart from the world save (D-016, D-020); short landscape phones: two columns (D-118).
 - Feel (S-4): deposit arpeggio, upgrade ring on the core + pip flash, 35 ms hitstop on yield-cell breaks (D-048 note), beam start sweep (D-021).
@@ -49,11 +50,9 @@ _Last updated: 2026-11-25_ · **Session counter: 95** · **Version: v1.4.35** (s
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-46b2 built (M1–M9 ✅). **M10 specs S-45…S-48 in `07-Build-Specs-8.md`**, S-46b2 / S-47 / S-48 refined in `-9` (D-124) (D-120: new worlds 256, old saves stay 160). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
-## Verified
-- Per-session checks (sessions 10–48): `archive/2026-11-24-09-sessions-49-53.md`; each lives on in the smoke suite.
-
-## Health
+## Verified / Health
+- Per-session checks: `archive/2026-11-24-09-sessions-49-53.md` (each lives on in smoke).
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 96 (Build): S-47b (`07-Build-Specs-9.md` S-47, D-127): Shoal brittle glass (60 % crack to one seeded neighbour, no chains) + lydian Shoal music (clamp → ring 3).
+Session 97 (Design): play-test the Shoal (Undertow + glass) with screenshots; settle Q-027; refine S-48 in `07` (built in 98).

@@ -13,3 +13,4 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-023 | Keys rebinding is hidden on touch (`input.usingTouch`), so an iPad with a hardware keyboard can't rebind. Show it when a key press is seen? | Audit 79. Leaning **later**: no player has asked; revisit with a tablet play-test. |
 | Q-025 | Lazy chunk generation (D-120): when? | Measured eager at 4× CPU: 256 = 65 ms, 320 = 85 ms median; Design 92: 256 = 67 ms median, 75 max (3 seeds). Leaning: only if a later world passes 320 or `new Game` passes 150 ms throttled. |
 | Q-026 | Should the ending (relight every Spire) also ask for the M14 bosses? | D-119. Leaning **no**: the v1.0 arc stays whole; bosses pay their own reward. Decide in M14's design. |
+| Q-027 | `haulrun` (S-47a) tunnels to d 90 and crosses ~10 Shoal cells, so its ×1.00 says little. Add a d 100 leg? | Session 96. Leaning **yes, in the S-48 PR** (the Kiln probe needs a deeper leg anyway). Decide in Design 97. |

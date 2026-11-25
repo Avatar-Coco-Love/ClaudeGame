@@ -13,7 +13,8 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   (Moved from "Later": *Larger world with lazy chunk generation*; eager generation measured enough, Q-025.)
 - ✅ **S-47a** Shoal Undertow: seeded chunk currents (30–55 px/s, half calm) on the realized velocity, pickups at half,
   dashes ≤ 30 / 15, `tools/haulrun.mjs` (median ×1.00 ≤ 1.15) (v1.4.35, D-127).
-- **S-47b** Shoal: brittle glass (a break cracks one neighbour, no chains) + its lydian music (clamp → ring 3).
+- ✅ **S-47b** Shoal brittle glass (a rock break cracks one seeded neighbour for 60 % hp, no chains) + lydian Shoal
+  music (clamp → ring 3; Kiln plays it until S-48) (v1.4.36, D-128).
 - **S-48** Kiln: beam heat that vents (8 s, 17 % steady) + flare vents + its music progression.
 
 ## M11 — Economy

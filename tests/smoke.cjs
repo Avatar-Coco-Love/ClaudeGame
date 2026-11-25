@@ -92,6 +92,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./echo.cjs').nodeChecks(check).catch(e => check('S-42 echo checks ran', false, e.message));
   await require('./echoorder.cjs').nodeChecks(check).catch(e => check('S-43 echo order checks ran', false, e.message));
   await require('./undertow.cjs').nodeChecks(check).catch(e => check('S-47 undertow checks ran', false, e.message));
+  await require('./shatter.cjs').nodeChecks(check).catch(e => check('S-47b shatter checks ran', false, e.message));
   await new Promise(r => server.listen(0, r));
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();

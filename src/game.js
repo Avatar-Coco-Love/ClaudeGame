@@ -14,6 +14,7 @@ import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
+import { shatter } from './shatter.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
@@ -265,7 +266,8 @@ export class Game {
     this.shake = Math.max(this.shake, n);
   }
 
-  onCellBroken(x, y, type) {
+  // `crack`: broken by S-47b brittle glass, so it yields and sounds as normal but cracks nothing (no chains, D-128).
+  onCellBroken(x, y, type, crack = false) {
     this.stats.mined++;
     const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
     this.burst(cx, cy, type === T.ROCK ? 8 : 16, this.world.look(x, y, type).edge, 150);
@@ -284,6 +286,7 @@ export class Game {
       if (this.motionOn() && this.stats.time - this.lastHitstop >= HITSTOP_GAP_S) { this.hitstop = HITSTOP_S; this.lastHitstop = this.stats.time; }
     } else {
       this.audio.break('rock');
+      if (!crack && (type === T.ROCK || type === T.DENSE)) shatter(this, x, y); // S-47b: Shoal glass cracks a neighbour
     }
   }
 

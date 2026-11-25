@@ -48,3 +48,13 @@ Continues `06-Decisions-17.md` (same rules: supersede, never edit; list rejected
 - Measured: haulrun 20 seeds, level 3: median ×1.000, max ×1.012 (level 0: max ×1.16); 17 / 20 pairs (3 hit Spires).
 - Rejected: one PR for all of S-47 (two systems + music + probe); an exponential ease (never "takes 0.5 s"); applying
   the current to the target velocity (the intent would see it, pillar 5); per-chunk streams (more state, same result).
+
+## D-128 — Brittle glass: per-cell seeded pick, cracks via onCellBroken (session 96, build, S-47b)
+- `shatter.js`: `game.onCellBroken` calls `shatter()` for a ROCK / DENSE break unless the break was itself a crack
+  (`crack` flag), so beam, Pulse and Echo breaks all crack the same and nothing chains. The neighbour is picked by
+  `seededStream(seed, 'shatter' + cellIndex)` among standing Shoal ROCK / DENSE 4-neighbours: same seed → same pick
+  whatever the break order. Damage = 0.6 × the neighbour's hp via `world.hit` (unsaved, like all damage). A line
+  (`SHATTER_RGB`) fades over 0.35 s. Music: `MUSIC_RING_MAX` 3, Shoal = lydian, progression I–II–V–II.
+- Rejected: one `'shatter'` stream drawn in break order (picks would depend on what was mined first); cracking from
+  inside `world.hit` (World has no game, and Echo / Wake-lane clears would need their own guards); a chain with decay
+  (the spec says none, and it would make Shoal tunnels runaway).

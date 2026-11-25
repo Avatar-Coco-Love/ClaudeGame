@@ -56,12 +56,12 @@ async function renderMusic([states, secs, { music = 50, volume = 70, seed = 4242
     log: m.log.slice(0, 20), win: win.map(r1) };
 }
 
-const RINGS = ['Hearth', 'Veil', 'Deep'];
+const RINGS = ['Hearth', 'Veil', 'Deep', 'Shoal']; // S-47b: Shoal (ring 3) joins; Kiln clamps to it until S-48
 const st = (ring, mode, wake = false, ending = false) => ({ ring, mode, wake, ending });
 
 async function scenarios(page) {
   const out = {};
-  for (let r = 0; r < 3; r++) for (const mode of ['drift', 'surge']) out[`${RINGS[r]} ${mode}`] = await page.evaluate(renderMusic, [[[0, st(r, mode)]], 30]);
+  for (let r = 0; r < RINGS.length; r++) for (const mode of ['drift', 'surge']) out[`${RINGS[r]} ${mode}`] = await page.evaluate(renderMusic, [[[0, st(r, mode)]], 30]);
   out['Wake (Deep, surge)'] = await page.evaluate(renderMusic, [[[0, st(2, 'surge', true)]], 30]);
   return out;
 }
@@ -104,6 +104,16 @@ async function browserChecks(browser, url, check, errors) {
     return first ? first.t - 5 : null;
   }, { fn: renderMusic.toString(), states: [[0, st(0, 'drift')], [5, st(2, 'drift')]] });
   check('music: a ring change reaches the new ring\'s chord set within 14 s (S-44)', rc !== null && rc <= 14, `after ${rc} s`);
+  // S-47b: the clamp is ring 3: Kiln (ring 4) plays the Shoal's lydian pad, a step below Deep, raised 4th included.
+  const ly = await pg.evaluate(async args => {
+    const r = await (0, eval)('(' + args.fn + ')')([args.states, 40]);
+    const { MUSIC_ROOT_HZ, RING_PITCH_STEP, MUSIC_SCALES } = await import('/src/config.js');
+    const root = MUSIC_ROOT_HZ * Math.pow(2, -RING_PITCH_STEP * 3 / 12), set = new Map();
+    for (let o = 0; o < 3; o++) for (const s of MUSIC_SCALES[3]) set.set(Math.round(root * Math.pow(2, o + s / 12) * 100) / 100, s);
+    const pads = r.log.filter(x => x.kind === 'pad');
+    return { n: pads.length, inSet: pads.every(x => set.has(x.hz)), fourth: pads.some(x => set.get(x.hz) === 6) };
+  }, { fn: renderMusic.toString(), states: [[0, st(4, 'drift')]] });
+  check('music: Kiln clamps to the Shoal lydian pad (ring 3, raised 4th heard) until S-48 (S-47b)', ly.n > 0 && ly.inSet && ly.fourth, JSON.stringify(ly));
   const end = await pg.evaluate(renderMusic, [[[0, st(0, 'surge')], [12, st(0, 'surge', false, true)]], 20]);
   check('music: the Ending card fades to silence within 3.5 s (S-44)', end.lastSound <= 15.5, `last sound at ${end.lastSound} s (ending at 12)`);
   const back = await pg.evaluate(renderMusic, [[[0, st(0, 'drift')], [8, st(0, 'drift', false, true)], [14, st(0, 'drift')]], 24]);

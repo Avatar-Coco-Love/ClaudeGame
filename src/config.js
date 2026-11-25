@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.35';
+export const VERSION = '1.4.36';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -303,8 +303,9 @@ export const QUALITY_GAIN = 0.85;
 export const DEFAULT_MUSIC = 50;
 export const MUSIC_GAIN = 0.5;
 export const MUSIC_ROOT_HZ = 146.83; // D3 in Hearth; drops RING_PITCH_STEP semitones per ring, like the beam hum
-export const MUSIC_SCALES = [[0, 2, 4, 7, 9], [0, 2, 3, 5, 7, 9, 10], [0, 2, 3, 5, 7, 8, 10]]; // Hearth pentatonic / Veil dorian / Deep aeolian
-export const MUSIC_PROGRESSIONS = [[0, 3, 1, 2], [0, 3, 0, 6], [0, 5, 3, 6]]; // chord roots (scale degrees) per ring
+export const MUSIC_SCALES = [[0, 2, 4, 7, 9], [0, 2, 3, 5, 7, 9, 10], [0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 6, 7, 9, 11]]; // Hearth pentatonic / Veil dorian / Deep aeolian / Shoal lydian (S-47b)
+export const MUSIC_PROGRESSIONS = [[0, 3, 1, 2], [0, 3, 0, 6], [0, 5, 3, 6], [0, 1, 4, 1]]; // chord roots (scale degrees) per ring; Shoal leans on lydian's major II
+export const MUSIC_RING_MAX = 3; // S-47b: the music's ring clamp (Kiln plays the Shoal pad until S-48)
 export const MUSIC_CHORD_S = [10, 14], MUSIC_ATTACK_S = 3, MUSIC_RELEASE_S = 4; // a chord every 10-14 s, fades in 3 s, out 4 s
 export const MUSIC_PAD = { gain: 0.05, triMix: 0.5, lowpassHz: 900 };
 export const MUSIC_BELL = { gain: 0.12, gapS: [3, 7], decayS: 0.8, attackS: 0.03, octave: 2 };
@@ -316,3 +317,6 @@ export const MUSIC_XFADE_S = 4, MUSIC_END_FADE_S = 3, MUSIC_LOOKAHEAD_S = 0.1, M
 // pickups drift at UNDERTOW_PICKUP of their chunk's. Dashes on screen ≤ UNDERTOW_DASHES[0] (graphics Low: [1]). Not saved.
 export const UNDERTOW_RING = 3, UNDERTOW_CALM = 0.5, UNDERTOW_SPEED = [30, 25], UNDERTOW_EASE_S = 0.5, UNDERTOW_PICKUP = 0.5;
 export const UNDERTOW_DASHES = [30, 15], UNDERTOW_RGB = '150, 240, 220';
+// S-47b brittle glass (D-128, shatter.js): a Shoal (ring SHATTER_RING) ROCK / DENSE break cracks one seeded ROCK / DENSE
+// 4-neighbour for SHATTER_SHARE of its hp; a crack that breaks it cracks nothing. A faint line flashes SHATTER_FLASH_S. Not saved.
+export const SHATTER_RING = 3, SHATTER_SHARE = 0.6, SHATTER_FLASH_S = 0.35, SHATTER_RGB = '190, 255, 235';
