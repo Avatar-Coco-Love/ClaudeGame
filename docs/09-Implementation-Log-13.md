@@ -23,3 +23,4 @@ Continues `09-Implementation-Log-12.md` (part 12 neared the 8 KB cap at session 
   no save key. `music.cjs`: Shoal in every ring × mode (Drift / Surge gap 0.0 dB) + Kiln clamp check (fails with the
   old clamp 2: proved). Screenshot at d 90 viewed: lines read as faint mint cracks next to the crack overlay.
 - Observed: the first beam pass in the shot hit a Prism cluster, so no crack (correct: ore never shatters).
+- Smoke 455/455 (was 449; +5 shatter, +1 music). Shot: scratch only.
