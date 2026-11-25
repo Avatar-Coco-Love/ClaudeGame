@@ -61,4 +61,4 @@ Continues `09-Implementation-Log-12.md` (part 12 neared the 8 KB cap at session 
   caves (2 of 8 seeds) draw only the faint disc, which reads as "nothing". Guard fails with the dirty repaint cut.
 - Touch: `#toast` has the panel plate (landscape padding-left 4 → 10); 568×320 shot viewed, reads clearly.
 - D-126…D-130 checked against code: match. `09` sessions 89–93 archived word for word.
-- Smoke: see PR (+2: B-087, B-086 guard).
+- Smoke 468/468 (+2: B-087, B-086 guard).
