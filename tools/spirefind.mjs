@@ -4,7 +4,7 @@
 // Usage: node tools/spirefind.mjs [seeds = 40] [first seed = 1]
 import { vaultSites, packBits } from '../src/world.js';
 import { spireCandidates, chooseSpires } from '../src/spire.js';
-import { WORLD_W, WORLD_H } from '../src/config.js';
+import { WORLD_SIZE_OLD as WORLD_W, WORLD_SIZE_OLD as WORLD_H } from '../src/config.js';
 
 const [SEEDS = 40, FIRST = 1] = process.argv.slice(2, 4).map(Number);
 let short = 0, minCand = Infinity, minVault = Infinity, minGap = Infinity, dMin = Infinity, dMax = 0, notFirst = 0;

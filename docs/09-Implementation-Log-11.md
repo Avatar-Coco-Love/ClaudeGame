@@ -74,3 +74,11 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
 - Specs S-45…S-48 (`07-Build-Specs-8.md`). CLAUDE.md: owner gives feedback / Claude decides; unattended runs (one PR,
   check open PRs first, ≤ 10-line reply); no account memory tools. VERSION line updated for M10 → 1.5 … M14 → 1.9.
 
+
+## Session 88 — Build: S-45 world size as saved data (v1.4.28, D-120)
+- `WORLD_W/H` → `WORLD_SIZE_NEW` / `_OLD` (160) + `WORLD_PROFILES` (rings, vaults, Anomaly counts; 256 dev-only, = 160
+  until S-46). World, vaultSites, Spires, Anomalies read the world's size; save format 18 `size`; `saneSave` rejects an
+  unknown size or a bitset ≠ size² bits. Minimap / ending already used `world.w`.
+- `tests/worldsize.cjs` (4 checks): hashes of 3 format-17 saves pinned from v1.4.27; fails when the profile's vault or
+  Anomaly count changes (both tried). Smoke 423/423 (one run: S-15 light holes 2.04× > 2×, timing flake on an
+  unchanged renderer; rerun clean). No visual change, no screenshot.

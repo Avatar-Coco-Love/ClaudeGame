@@ -6,8 +6,8 @@ async function nodeChecks(check) {
   const { World, vaultSites, packBits } = await import('../src/world.js');
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const { spireCandidates, spireFootprint, chooseSpires } = await import('../src/spire.js');
-  const { T, WORLD_W, WORLD_H, SPIRE_D } = await import('../src/config.js');
-  const W = WORLD_W, H = WORLD_H, N = W * H;
+  const { T, WORLD_SIZE_OLD, SPIRE_D } = await import('../src/config.js');
+  const W = WORLD_SIZE_OLD, H = WORLD_SIZE_OLD, N = W * H;
 
   // Placement over 40 seeds: 5 each, d 64–74, ≥ 12 from every vault centre (and no shared cell), ≥ 12 apart, inside the border.
   const bad = [];

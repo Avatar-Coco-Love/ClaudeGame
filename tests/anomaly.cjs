@@ -14,7 +14,7 @@ async function nodeChecks(check) {
   const { makeRelay } = await import('../src/craft.js');
   const { upgradeSave } = await import('../src/save.js');
   const C = await import('../src/config.js');
-  const { CELL, T, ANOMALY_COUNTS, ANOMALY_GAP, ANOMALY_RECHARGE_S, ANOMALY_BEAM_MUL, NEXUS_RADIUS, DEPOSIT_TICK_S } = C;
+  const { CELL, T, WORLD_PROFILES, ANOMALY_GAP, ANOMALY_RECHARGE_S, ANOMALY_BEAM_MUL, NEXUS_RADIUS, DEPOSIT_TICK_S } = C;
   const make = (seed = 4242, mode = 'drift', save) => new Game({ seed, mode, audio: quiet, save });
   const key = s => s.map(q => `${q.x},${q.y},${q.ring}`).join(' ');
   const step = (g, n = 1, dt = 1 / 60) => { for (let i = 0; i < n; i++) g.update(dt, { move: { x: 0, y: 0 }, aim: null, fire: false }); g.events.length = 0; };
@@ -34,7 +34,7 @@ async function nodeChecks(check) {
     for (let k = 1; k <= 20; k++) {
       const seed = k * 104729, w = new World(seed), s = anomalySites(w), vs = vaultSites(seed), sp = chooseSpires(seed);
       const counts = [0, 1, 2].map(r => s.filter(q => q.ring === r).length);
-      if (counts.join() !== ANOMALY_COUNTS.join()) bad.push(`${seed} counts ${counts}`);
+      if (counts.join() !== WORLD_PROFILES[160].anomalies.join()) bad.push(`${seed} counts ${counts}`);
       s.forEach((q, i) => {
         const c = w.cells[q.y * w.w + q.x];
         if (c !== T.ROCK && c !== T.DENSE) bad.push(`${seed}#${i} cell ${c}`);

@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
+import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, upgradeCost, T, VAULT_LOOT, KINDS, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -29,13 +29,15 @@ export function cleanRecords(r) {
 }
 
 export class Game {
-  constructor({ seed, mode, save, audio, settings = null }) {
+  /** `size` (S-45): cells per side of a new world; a save brings its own (`upgradeSave` checked it). */
+  constructor({ seed, mode, save, audio, settings = null, size = WORLD_SIZE_NEW }) {
     this.audio = audio;
     this.mode = mode;
     const skip = save && Array.isArray(save.vaultSkip) ? save.vaultSkip : []; // B-037: a save is never trusted to be well-formed
-    this.world = new World(seed, skip);
+    this.world = new World(seed, skip, save && save.size ? save.size : size);
+    const W = this.world.w;
     // S-19 (D-049): the saved Spires, or chosen now from the seed (+ what an old/malformed save has seen, D-024).
-    this.spires = (save && loadSpires(save.spires)) || chooseSpires(seed, save && save.explored, save && save.broken);
+    this.spires = (save && loadSpires(save.spires, W, W)) || chooseSpires(seed, save && save.explored, save && save.broken, W, W);
     this.anomaly = makeAnomalies(this.world, this.spires); // S-35: sites from the generated terrain, before the stamp (seed-only)
     this.buffs = [];       // S-35: active Anomaly buff ids (saved); they end at the next deposit that banks ≥ 1 item
     stampSpires(this.world, this.spires);
@@ -412,7 +414,7 @@ export class Game {
   // ---------- persistence ----------
   toSave() {
     return {
-      v: SAVE_FORMAT, seed: this.world.seed, mode: this.mode,
+      v: SAVE_FORMAT, seed: this.world.seed, size: this.world.w, mode: this.mode,
       bank: { ...this.bank }, cargo: { ...this.cargo }, upgrades: { ...this.upgrades }, nexus: { ...this.nexusLevels }, research: { ...this.research }, beamMode: this.beamMode, craft: { ...this.craft }, beacons: this.beacons.map(b => b.i), relays: this.relays.map(b => b.i), stats: { ...this.stats },
       player: { x: Math.round(this.player.x), y: Math.round(this.player.y) }, integrity: Math.round(this.player.integrity),
       broken: packBits(this.world.broken), explored: packBits(this.world.explored), vaultSkip: [...this.vaultSkip],

@@ -1,7 +1,7 @@
 // S-19 Spires v1a (D-049, D-068): where the 5 dormant Spires go, their 9×9 shape, and the saved record.
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
-import { WORLD_W, WORLD_H, BORDER, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
+import { WORLD_SIZE_OLD, BORDER, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
   SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, SPIRE_WAKE_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
@@ -23,7 +23,7 @@ export function spireTypeAt(i, j) {
 }
 
 /** Cell indices of a 9×9 footprint centred on (x, y). */
-export function spireFootprint(x, y, w = WORLD_W) {
+export function spireFootprint(x, y, w = WORLD_SIZE_OLD) {
   const out = [];
   for (let j = -SPIRE_HALF; j <= SPIRE_HALF; j++) for (let i = -SPIRE_HALF; i <= SPIRE_HALF; i++) out.push((y + j) * w + (x + i));
   return out;
@@ -32,7 +32,7 @@ export function spireFootprint(x, y, w = WORLD_W) {
 /** Seed-only candidate centres: SPIRE_COUNT sectors × SPIRE_TRIES each, [{ x, y }] per sector, in draw order. Every
  *  candidate costs the same draws, so candidate k is the same whatever was valid before it. Only geometry that depends
  *  on the seed is filtered here (border, depth band, vaults); the Spire-to-Spire gap is checked while choosing. */
-export function spireCandidates(seed, w = WORLD_W, h = WORLD_H) {
+export function spireCandidates(seed, w = WORLD_SIZE_OLD, h = w) {
   const rand = seededStream(seed, 'spire'), a0 = rand() * Math.PI * 2, step = Math.PI * 2 / SPIRE_COUNT;
   const vaults = vaultSites(seed, w, h), cx = w / 2, cy = h / 2, H = SPIRE_HALF;
   const sectors = [];
@@ -58,7 +58,7 @@ function bits(b64, n) {
 /** Choose this world's Spires. With no save (`explored`/`broken` base64 absent) every sector takes its first candidate.
  *  With a save, the first candidate whose footprint has no explored or broken cell; if none, the least-seen one, and the
  *  seen cells go in `keep` (the stamp leaves them as generated). Returns the saved record (the whole M5 shape, D-063). */
-export function chooseSpires(seed, explored, broken, w = WORLD_W, h = WORLD_H) {
+export function chooseSpires(seed, explored, broken, w = WORLD_SIZE_OLD, h = w) {
   const n = w * h, ex = bits(explored, n), br = bits(broken, n), seen = c => (ex && ex[c]) || (br && br[c]);
   const out = [];
   for (const list of spireCandidates(seed, w, h)) {
@@ -78,7 +78,7 @@ export function chooseSpires(seed, explored, broken, w = WORLD_W, h = WORLD_H) {
 }
 
 /** A save's `spires`, if well-formed (B-037); otherwise null and the caller re-chooses from the save's bitsets. */
-export function loadSpires(raw, w = WORLD_W, h = WORLD_H) {
+export function loadSpires(raw, w = WORLD_SIZE_OLD, h = w) {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > SPIRE_COUNT) return null;
   const H = SPIRE_HALF, int = v => Number.isInteger(v);
   const ok = raw.every(s => s && int(s.x) && int(s.y) && s.x - H >= 2 && s.y - H >= 2 && s.x + H <= w - 3 && s.y + H <= h - 3
@@ -176,7 +176,7 @@ export const FACET_RING = [[2, -4], [4, -2], [4, 2], [2, 4], [-2, 4], [-4, 2], [
 export const SPIRE_INTERIOR = 3; // the 7×7 interior: |dx|, |dy| ≤ 3 cells from the centre
 
 /** D-069: broken when the saved `keep` list holds a core or facet cell (the stamp left it as generated). Derived, not saved. */
-function isBroken(s, w = WORLD_W) {
+function isBroken(s, w = WORLD_SIZE_OLD) {
   return (s.keep || []).some(c => { const t = spireTypeAt(c % w - s.x, Math.floor(c / w) - s.y); return t === T.SPIRE || t === T.FACET; });
 }
 
