@@ -15,6 +15,7 @@ import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
 import { makeBurrow, updateBurrower, clearBurrower } from './burrower.js';
+import { makeSwarm, updateSwarm, clearSwarm } from './mote.js';
 import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
@@ -96,9 +97,10 @@ export class Game {
     this.lastHitstop = -Infinity;
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
-    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot'].map(k => [k, seededStream(seed, k)]));
+    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot', 'swarm', 'swarm-loot'].map(k => [k, seededStream(seed, k)]));
     this.undertow = makeUndertow(this.world); // S-47: Shoal currents from the seed (never saved)
     this.burrow = makeBurrow(); // S-53: the Kiln Burrower (never saved)
+    this.swarm = makeSwarm(); // S-54: the Shoal mote swarm (never saved)
     this.heat = 0; this.heatState = makeHeat(); // S-48a: Kiln beam heat (heat.js); never saved
     this.weather = makeWeather(seed); // S-33: schedule from seed + stats.time (weather.js); only `cancel` is saved (B-081)
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
@@ -177,6 +179,7 @@ export class Game {
     this.mode = mode;
     if (mode === 'drift') { this.enemies = []; this.bolts = []; }
     clearBurrower(this); // S-53: it hunts by mode, so a switch sends it away
+    clearSwarm(this); // S-54: likewise
     this.player.integrity = this.stat('hull');
   }
 
@@ -230,6 +233,7 @@ export class Game {
     this.updateBeam(dt, intent);
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
     updateBurrower(this, dt); // S-53: after the beam, so a kill on its last surfaced frame pays
+    updateSwarm(this, dt); // S-54: after the beam, so a mote beamed this frame pays before it touches anything
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
     this.updatePickups(dt);
     this.updateDeposit(dt);
@@ -411,6 +415,7 @@ export class Game {
     this.enemies = this.enemies.filter(e => Math.hypot(e.x - this.nexus.x, e.y - this.nexus.y) > RESPAWN_CLEAR_PX);
     this.bolts = [];
     clearBurrower(this); // S-53
+    clearSwarm(this); // S-54
     this.notify('destabilized');
     if (this.wake) failWake(this); // S-23: a core death fails the Wake
   }

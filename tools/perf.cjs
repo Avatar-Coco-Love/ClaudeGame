@@ -4,7 +4,7 @@
 // Runs: home (idle at the Nexus), base (idle 30 cells out, beam off, no pickups), loot (the S-15 scenario), holes (loot + 20 placed beacons, S-16's cap),
 // surge (base in Surge, god mode, kept at GLITCH_CAP Glitches 250–750 px out: some on screen, some off; audit 39),
 // far (base at d 100 of the 256 world New World now builds, S-46b2), kiln (base at d 110 with a Burrower kept alive and
-// vents on, audit 114).
+// vents on, audit 114), shoal (base at d 92 with a mote swarm kept out, S-54).
 // Headless Chromium paints the canvas in software, so the absolute numbers are far above a real GPU-backed browser's
 // (audit 34: ~121 ms/frame at 4× with no loot). Read the ratios between runs and the per-step split, not the 16.7 ms budget.
 // The step split counts only the JS that records canvas commands; the software raster runs later and lands on whatever
@@ -12,7 +12,7 @@
 // inside each step (a 1-pixel getImageData before and after) for an honest split, at the cost of slower frames; SKIP
 // prices a step by the frame time it frees (that step becomes a no-op).
 // S-41: QUALITY=0|1|2 fixes the graphics level (default 0; Auto is off so the run measures one level).
-// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge|far|kiln] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
+// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [ONLY=home|base|loot|holes|surge|far|kiln|shoal] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
 const path = require('path');
 const { chromium } = require('playwright');
 
@@ -25,7 +25,7 @@ const server = require('../tests/serve.cjs').createServer(ROOT);
 const QUALITY = Math.max(0, Math.min(2, Number(process.env.QUALITY) || 0));
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];
 
-async function run(browser, url, name, { loot, holes, home, surge, far, kiln }) {
+async function run(browser, url, name, { loot, holes, home, surge, far, kiln, shoal }) {
   const pg = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
   const errors = []; pg.on('pageerror', e => errors.push(e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
@@ -35,10 +35,10 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln }) 
   await pg.click('#new-world');
   await pg.evaluate(() => { Math.random = window.__rnd; });
   await pg.waitForTimeout(300);
-  await pg.evaluate(({ loot, holes, home, surge, far, kiln, STEPS, SKIP, FLUSH, QUALITY }) => {
+  await pg.evaluate(({ loot, holes, home, surge, far, kiln, shoal, STEPS, SKIP, FLUSH, QUALITY }) => {
     const { game: g, renderer: R, dev, quality } = window.__lumen;
     quality.mode = 'fixed'; R.setQuality(QUALITY); // S-41: no Auto steps mid-run
-    g.demo = true; dev.god(true); if (!home) dev.teleport(kiln ? 110 : far ? 100 : 30); // S-46b2: far = d 100 (deep Shoal of a 256 world); kiln = d 110
+    g.demo = true; dev.god(true); if (!home) dev.teleport(kiln ? 110 : shoal ? 92 : far ? 100 : 30); // S-46b2: far = d 100 (deep Shoal of a 256 world); kiln = d 110
     if (loot) { g.research.wide = true; g.beamMode = 'wide'; }
     if (surge) g.mode = 'surge';
     // Per-step timing: wrap each renderer draw step (and the whole draw) with performance.now().
@@ -52,6 +52,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln }) 
       while (surge && g.enemies.length < 9) { const a = k++ * 2.4, d = 250 + (k % 5) * 125; // GLITCH_CAP, tier 1, spread on and off screen
         g.enemies.push({ x: g.player.x + Math.cos(a) * d, y: g.player.y + Math.sin(a) * d, r: 11, vx: 0, vy: 0, tier: 1, hp: 3, maxHp: 3, speed: 90, dmg: 0, spin: 0, flash: 0, hitCd: 0.5, wander: a, alert: false }); }
       if (kiln && !g.burrow.b) g.burrow.timer = 0; // audit 114: a Burrower always digging, telling or up nearby
+      if (shoal && !g.swarm.motes.length) g.swarm.timer = 0; // S-54: a mote swarm always out (god mode: they keep coming back)
       if (!loot) return;
       g.cargo.shard = g.cargo.prism = 0; // never cap out, so pickups keep flowing
       while (g.pickups.length < 300) { const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 260; g.spawnPickup(g.player.x + Math.cos(a) * d, g.player.y + Math.sin(a) * d * 0.6, 'shard', true); }
@@ -64,7 +65,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln }) 
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
-  }, { loot, holes, home, surge, far, kiln, STEPS, SKIP, FLUSH, QUALITY });
+  }, { loot, holes, home, surge, far, kiln, shoal, STEPS, SKIP, FLUSH, QUALITY });
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   if (loot) { await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s'); }
@@ -92,13 +93,14 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln }) 
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
   console.log(`S-15 perf: 1280×800 DSF 1, L${QUALITY}, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
-  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true } };
+  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true }, shoal: { loot: false, holes: 0, shoal: true } };
   const out = {};
   for (const [k, v] of Object.entries(runs)) if (!ONLY || ONLY === k) out[k] = await run(browser, url, k, v);
   if (out.base && out.loot) console.log(`loot / base mean frame: ${(out.loot.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.surge) console.log(`surge / base mean frame: ${(out.surge.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.far) console.log(`far / base mean frame: ${(out.far.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.kiln) console.log(`kiln / base mean frame: ${(out.kiln.mean / out.base.mean).toFixed(2)}×`);
+  if (out.base && out.shoal) console.log(`shoal / base mean frame: ${(out.shoal.mean / out.base.mean).toFixed(2)}×`);
   if (out.loot && out.holes) console.log(`holes / loot mean frame: ${(out.holes.mean / out.loot.mean).toFixed(2)}×`);
   await browser.close(); server.close();
 })();

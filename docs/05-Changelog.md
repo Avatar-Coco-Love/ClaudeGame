@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.56 — 2026-11-25
+- **Mote swarms in the Shoal.** Six tiny mint diamonds now come out of the open floor every 40–60 s while you are in the
+  Shoal, riding the currents. In Surge they dart at the core (4 damage a touch); in both modes a mote that touches you
+  snatches one item from your hold (the most valuable). In Drift they also make off with loose ore the Attractor isn't
+  pulling. Beam them: each pays a Shard, a whole swarm pays like a Glitch, and a carried item drops back.
+
 ## v1.6.55 — 2026-11-25
 - **Smoother Kiln.** Flaring vents, Anomaly sites, the Scanner ring and the Burrower's tell look exactly the same but
   cost far less to draw, so the Kiln no longer stutters on slower machines (measured: its frames ~15 % faster, the

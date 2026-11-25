@@ -52,3 +52,12 @@ Continues `09-Implementation-Log-15.md` (part 15 neared the 8 KB cap at session 
 - Workflow review (D-138): too little: perf scenes for new biomes (the vents' glow shipped unmeasured in
   S-48b); a rule broken three times (S-15, B-027, B-091) is now a check (D-149). Too much: full smoke > 10 min still.
 - Smoke 533/533 (+2: drawcost glow clips, burrower tell clip pixels).
+
+## Session 115 — Build: S-54 Mote swarm (v1.6.56, D-150)
+- `mote.js`: one swarm of 6 in the Shoal (256 only), 40–60 s gap, 10–12 cells out on reachable floor; boids-lite pull,
+  full Undertow flow on the velocity, BFS way in; Surge contact 4 + 1 item, Drift 1 item / carries loose pickups the
+  Attractor isn't pulling; beamed 1 ◆ each, Glitch loot per whole swarm. Mint diamonds + trail over the dark, no blur.
+- Gate (`biomefoe.mjs --biome=shoal`, now generic over biomes): as specced FAIL 1.08 / 1.04; shipped PASS 0.907 / 0.896
+  (8), 0.910 / 0.899 (16). Kiln gate unchanged: PASS. Perf `shoal` run: 1.04× base mean (CPU ×4, 8 s).
+- Screenshot of a swarm viewed: six mint diamonds with short trails, readable in the dark Shoal.
+- Smoke 541/541 (+8, `mote.cjs`: spawn, current, contact, carry, loot, mode switch / save, gate, drawn).
