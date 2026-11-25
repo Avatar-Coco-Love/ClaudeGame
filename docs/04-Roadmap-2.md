@@ -4,6 +4,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- Newer audit leftovers continue in `04-Roadmap-4.md` (this part is near the 8 KB cap).
 - **Audit 99 leftovers** (sweeps in-session, no subagent tool; fixed: B-087 heat reset on a destabilize, toast plate,
   B-086 closed with a guard, D-131). Vents have no sound (a tell tone needs `audio.cjs` ceilings). Perf / mobile: not re-measured this audit beyond the d 110 runs.
 - **Audit 94 leftovers** (sweeps in-session; B-084 fixed in #101: glow blit unsmoothed, D-126). Kiln reads dim outside

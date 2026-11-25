@@ -205,7 +205,19 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
   #toast.show { transform: translate(0, 0); }
   .text-large #toast { top: calc(max(12px, env(safe-area-inset-top)) + 126px); } /* audit 84 (B-079): Large Surge panel ends at 130 (123 ≤ 700 px) */
 }
+/* Audit 104 (B-089): with ≈ / ⬟ (S-49) the bank is up to five chips, which ran under the minimap (portrait) or ◎ ⟂ ◇
+   (landscape). Phones lay it out 3 + 2, so the panel is as wide as the three-kind bank B-034 / B-039 pin, one row taller;
+   the landscape toast moves down by that row. tests/touch.cjs checks both with the five kinds shown. */
+@media (max-width: 480px), (pointer: coarse) { .ores .bank { display: grid; grid-template-columns: repeat(3, max-content); row-gap: 2px; } }
+@media (max-width: 380px) { .ores .bank { column-gap: 6px; } .text-large .chip { padding: 1px 5px; } } /* the columns take their widest chip: 6 keeps ≥ 6 px to the minimap at 320; Large's Echo + 3 buff chips touched it (0 px) */
+@media (max-height: 480px) and (min-width: 701px) and (pointer: coarse) { .text-large .bank { font-size: 18px; } } /* audit 104: Large's 21.6 px bank ran under ◎ at 740×360 (any 4-digit bank); not scaled, like the 15 px ≤ 700 */
+@media (max-height: 480px) and (pointer: coarse) {
+  .ores #toast { top: calc(max(12px, env(safe-area-inset-top)) + 136px); } /* the panel ends at 142 (701–932 px) */
+  .text-large.ores #toast { top: calc(max(12px, env(safe-area-inset-top)) + 142px); } /* Large: 148 */
+}
 @media (max-height: 480px) and (max-width: 700px) and (pointer: coarse) {
+  .ores #toast { max-width: calc(50% - 100px); } /* two bank rows push it down beside ⊕ (Core Matrix, 50% − 82 px at Large): keep left of it */
+  .text-large.ores #toast { top: calc(max(12px, env(safe-area-inset-top)) + 134px); }
   .text-large #toast { top: calc(max(12px, env(safe-area-inset-top)) + 114px); padding-top: 2px; padding-bottom: 2px; line-height: 1.2; } /* B-079: 3 lines here; tighter so it ends above ⊕ (568×320) */
 }
 /* S-24 ending card */

@@ -70,3 +70,13 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
   `costHtml` iterate it, so S-50+ add no hand-written key lists. Glyphs upright (their shape is the tell, D-107).
 - Rejected: skipping ore on Anomaly cells (keeps sites but makes ore placement depend on the site list); a separate
   ore pass after site selection (two passes over 65k cells for one rare overlap).
+
+### D-136 — "continue" alone runs 3 orchestrated PRs (session 104, owner rule)
+- Owner: after every final merge with no running tasks, they switch to a new conversation and only say "continue". That
+  bare instruction now means the standard run (`CLAUDE.md`): no PR open against `main` (else stop), then 3 PRs in a row,
+  each to a fresh background subagent with the standing brief in `docs/10-Orchestration.md`; the orchestrator checks each
+  deploy, stops on a failed merge / smoke / deploy, and ends with a per-PR list and "Done — say 'continue' in a new
+  conversation". Fits D-095 (3 PRs per conversation), on the owner's condition that the orchestrating conversation stays
+  under 200k tokens: it never reads subagent transcripts / output files, keeps reports ≤ 8 lines, and on a proxy signal
+  (a summary / compaction, or bloating reports) runs fewer PRs and logs that in `06` rather than pushing on.
+- Rejected: the session writes a prompt for the owner to paste (the owner asked not to; the brief lives in the repo).

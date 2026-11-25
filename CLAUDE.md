@@ -38,6 +38,11 @@ Live site: https://avatar-coco-love.github.io/ClaudeGame/ (deployed by `.github/
   update `docs/02` and stop, even if more were asked for: tell the user to continue in a new conversation.
 - **Many PRs asked for? Orchestrate:** give each PR to a fresh subagent or session (brief: read `CLAUDE.md` + `docs/02`,
   do the next task, ship, reply ≤ 10 lines: PR #, what, smoke count, next step). The cap counts PRs you build yourself.
+- **"continue" (or as bare) is the whole instruction? Standard run (D-136):** no PR open against `main` (else stop, say so);
+  then 3 PRs in a row, each to a fresh background subagent with the brief in `docs/10-Orchestration.md`. Check each deploy
+  yourself; stop on a failed merge, smoke or deploy. End with a per-PR list and "Done — say 'continue' in a new
+  conversation". Never write a handoff prompt for the owner to paste. Stay under 200k tokens: lean habits and the
+  cut-back signal are in `docs/10`.
 - **No account memory tools** (`mcp__memory__*`) in this project: the repo docs are the memory (owner's ask, keeps context small).
 - **Verify cheaply:** iterate with one test file (`node tests/<x>.cjs`); run the full smoke once before the PR (again only
   after a fix), printing only FAIL lines + the count. One screenshot per visual change. Never print whole files or long output.

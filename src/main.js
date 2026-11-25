@@ -172,6 +172,7 @@ function updateHud() {
     if (panelOpen) renderBank(); // B-025: a deposit streams for up to ~5 s while the sheet is open
     $('bank-lumen').parentElement.classList.toggle('hidden', !lumenSeen);
     ['tide', 'calx'].forEach((k, i) => { $('bank-' + k).textContent = g.bank[k]; $('bank-' + k).parentElement.classList.toggle('hidden', !oreSeen[i]); });
+    document.documentElement.classList.toggle('ores', oreSeen[0] || oreSeen[1]); // B-089 (audit 104): phones wrap the bank 3 + 2 (style.css)
     $('cargo-text').textContent = `${total}/${cap}`;
     $('cargo-fill').style.width = `${Math.min(100, total / cap * 100)}%`;
     $('cargo-fill').classList.toggle('full', total >= cap);
