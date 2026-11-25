@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 109** · **Version: v1.6.50** (session 109: Audit; rotation: 110 Build, 111 Build, 112 Design).
+_Last updated: 2026-11-25_ · **Session counter: 110** · **Version: v1.6.51** (session 110: Build; rotation: 111 Build, 112 Design, 113 Build).
 **Scope (D-119, `01`):** M1–M11 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy). The game keeps growing: M12 enemies + tools, M13 events + puzzles, M14 two-form bosses (1.9); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -21,6 +21,7 @@ _Last updated: 2026-11-25_ · **Session counter: 109** · **Version: v1.6.50** (
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): seen sites on the minimap (hollow while recharging), Scanner marks charged ones, end tone, hint line.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
+- Burrower (S-53a, D-145, `burrower.js`): Kiln creature, both modes; tunnels, 0.8 s lilac tell, Surge lunge 22 / Drift eats ore; unsaved.
 - PWA (S-38, D-104): `manifest.webmanifest` + `icons/`, network-first `sw.js?v=VERSION` (cache `lumen-<VERSION>`, warmed
   from the first visit's loaded files), registered by `src/pwa.js` (not on `file:`/`?dev`); offline navigations ignore the query (D-105). Test `pwa.cjs`.
 - Music (S-44, D-115, `music.js`): pad by ring + Drift bell / Surge pulse (equal RMS), Wake = root + pulse ×1.5,
@@ -45,7 +46,7 @@ _Last updated: 2026-11-25_ · **Session counter: 109** · **Version: v1.6.50** (
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 21); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 20 from D-137), `03` questions (Q-xxx), `09` log (tail: `09-…-15`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 21 from D-145), `03` questions (Q-xxx), `09` log (tail: `09-…-15`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-52 built (M11 done). M12: S-53…S-56 (`07-…-12`, D-142). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); no file > 600 lines (`docs.cjs`).
 
@@ -53,4 +54,4 @@ _Last updated: 2026-11-25_ · **Session counter: 109** · **Version: v1.6.50** (
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `chart.cjs`).
 
 ## Next step (one thing)
-Session 110 (Build): S-53 Burrower (`07-Build-Specs-12.md`, D-142); then S-54.
+Session 111 (Build): S-53b Burrower rumble (`audio.cjs` row) + `tools/biomefoe.mjs` Kiln gate, tune (D-145); then S-54.

@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.6.51 — 2026-11-25
+- **New creature: the Burrower (Kiln, new worlds).** Something tunnels through the Kiln's rock, leaving open passages
+  behind it. Watch for a rock cell glowing lilac and cracking: a moment later it bursts out. In Surge it lunges at the
+  core (22 damage) unless you move away in time; in Drift it goes for ore near you and eats it unless you beam it off.
+  Beam it while it is out (about 2 seconds) to win back what it ate plus a Glitch's worth of loot, same in both modes.
+
 ## v1.6.50 — 2026-11-25
 - **Kiln flare vents now sound their warning.** A vent within about five cells of the core gives a soft low rising
   swell as it starts to glow, a second before it flares, so you can hear one coming off-screen or behind you. Once per

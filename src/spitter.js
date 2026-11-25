@@ -60,8 +60,14 @@ export function updateBolts(game, dt) {
 
 function boltPop(game, b, n) { game.burst(b.x, b.y, n, SPITTER_COLORS[1], 120); }
 
-/** What the beam can hit: live Glitches, then bolts. */
-export function beamFoes(game) { return game.bolts.length ? game.enemies.concat(game.bolts) : game.enemies; }
+/** What the beam can hit: live Glitches, then bolts, then a surfaced S-53 Burrower (either mode). */
+export function beamFoes(game) {
+  const b = game.burrow && game.burrow.b, up = b && b.state === 'up' ? b : null;
+  if (!game.bolts.length && !up) return game.enemies;
+  const out = game.enemies.concat(game.bolts);
+  if (up) out.push(up);
+  return out;
+}
 
 // ---------- drawing (render.js calls these; sprites are cached glow canvases, D-051) ----------
 /** A Spitter's body: a violet diamond with an orange core line, no limbs (D-002 / pillars). */

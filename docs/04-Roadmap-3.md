@@ -28,7 +28,8 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   row (no new *kind* of thing needs one; Lumen's surplus waits for M12's beam mode).
 
 ## M12 — Enemies and tools (specced, `07-Build-Specs-12.md`, D-142)
-- **S-53** Burrower (Kiln creature): tunnels through rock, Surge lunges at the core, Drift eats ore; `biomefoe.mjs` gate.
+- ✅ **S-53a** Burrower (Kiln creature): tunnels, tell, Surge lunge / Drift eats ore, equal loot (v1.6.51, D-145).
+- **S-53b** Burrower rumble (music, `audio.cjs` row) + `tools/biomefoe.mjs` Kiln weight gate (0.85–0.95), tune to it.
 - **S-54** Mote swarm (Shoal creature): 6 motes ride the Undertow, Surge darts at the core, Drift steals floor pickups.
 - **S-55** Arc beam mode (Research, 35 ●): the hit arcs to 2 more of the same kind (creatures, or an ore vein).
 - **S-56** Ward node (Crafting, ▲ + ◆): bolts creatures within 4 cells in both modes. M12 done → v1.7.
