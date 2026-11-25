@@ -31,6 +31,18 @@ alternatives). D-137 on.
   splits a spec checks this (`CLAUDE.md`).
 - Rejected: a Retro session type (costs a build slot; already rejected in D-138); dropping record steps (they are the memory).
 
+### D-142 — M12 plan: one creature, two appetites; four specs (session 107, design; Q-029)
+- Play-test: a max (and max + 2) build takes 0 Surge damage in 120 s anywhere (Glitch tier caps at d 84), so M12's foes
+  live in the Shoal / Kiln and are tuned against the top build. Each biome creature exists in both modes: Surge it hunts
+  the core, Drift it hunts ore; beaming it off pays the same loot (also gives Drift a renewable trickle, cf. Q-007).
+  Weight is measured, not argued: `biomefoe.mjs` haul ratio 0.85–0.95 per mode, modes within 0.05.
+- Specs S-53 Burrower (Kiln), S-54 Mote swarm (Shoal), S-55 Arc beam (Research 35 ●), S-56 Ward node (Crafting ▲ + ◆),
+  `07-Build-Specs-12.md`. S-52 unchanged and next. Heat Sink: no tune (in place 16 → ~7 % overheat; in a straight dig
+  the core leaves its 5 cells in ~15 s, +0–4 % cells; free pick-up makes leapfrogging two the intended play).
+- Rejected: a separate Drift hazard per biome (two systems to balance per biome, double the code); a shield pylon / lens
+  (a beam-damage buff the Matrix and Overclock already give); generic Swarm / Burrower in every ring (dilutes the
+  biomes; Q-029 holds the tier question); Glitch tiers past 3 now (Q-029).
+
 ### D-141 — S-51 Heat Sink: own module, save keys `sink` / `sinks`, pick up on the Sink (session 106, build)
 - `src/heatsink.js` holds craft, refusal, pick-up, load, `sinkMul` (heat.js multiplies only the *gain*) and both draws;
   `craft.js` keeps one `tryPlace` path and `PLACE_KINDS` (B / ✦ places the last crafted kind still carried, else the

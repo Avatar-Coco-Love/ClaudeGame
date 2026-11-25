@@ -27,12 +27,13 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - Cut (D-134): the Current Anchor (the Undertow costs a haul ×1.00, so calming it buys nothing) and an M11 Research
   row (no new *kind* of thing needs one; Lumen's surplus waits for M12's beam mode).
 
-## M12 — Enemies and tools
-- **Swarm** (tiny, many, weak; moved from "Later") and **Burrower** (moves through rock, leaves a tunnel; moved from "Later").
-- One native foe per biome (Surge), each with a Drift twin hazard of equal weight (pillar 2).
-- New tools: a beam mode (Research) and placeable neon nodes in Crafting: a turret-like node (Surge use) and a shield
-  pylon (blocks foes and bolts; in Drift, a lens that speeds mining in its radius), costed so neither mode's tool is "the"
-  one. Heat relief stays M11's Heat Sink alone (no double unlock).
+## M12 — Enemies and tools (specced, `07-Build-Specs-12.md`, D-142)
+- **S-53** Burrower (Kiln creature): tunnels through rock, Surge lunges at the core, Drift eats ore; `biomefoe.mjs` gate.
+- **S-54** Mote swarm (Shoal creature): 6 motes ride the Undertow, Surge darts at the core, Drift steals floor pickups.
+- **S-55** Arc beam mode (Research, 35 ●): the hit arcs to 2 more of the same kind (creatures, or an ore vein).
+- **S-56** Ward node (Crafting, ▲ + ◆): bolts creatures within 4 cells in both modes. M12 done → v1.7.
+- One creature, two appetites (D-142) replaces "a Drift twin hazard"; the shield pylon / lens is cut (a beam buff
+  twice). A generic Swarm / Burrower outside the biomes is not planned (Q-029 holds Glitch tiers past 3).
 
 ## M13 — Events and puzzles
 - World events beyond weather, seeded on `stats.time` like D-097: cave-in, Lumen bloom, a rift that opens for ~30 s

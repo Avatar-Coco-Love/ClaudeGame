@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.5.48 — 2026-11-25
+- **Design pass, no gameplay change.** The Kiln was play-tested with Heat Sinks and Overdrive, and the next milestone
+  is planned: creatures native to the Shoal and the Kiln (a Burrower that tunnels through rock, a swarm of motes that
+  rides the currents), an Arc beam mode and a Ward node. In Surge they hunt you; in Drift they go after your ore.
+
 ## v1.5.47 — 2026-11-25
 - **New: Heat Sinks (Craft tab, new worlds).** Craft one for ⬟6 ◆20 (carry 2, place up to 6) and set it down with B / ✦
   on Kiln floor: a lilac pentagon. Within 5 cells your beam heats 60 % slower, so you can mine the Kiln with far fewer
