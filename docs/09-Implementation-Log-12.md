@@ -79,4 +79,5 @@ Continues `09-Implementation-Log-11.md` (part 11 neared the 8 KB cap at session 
 - 256 probes: `surgebot` mine + spire, mid build, Surge, 3 seeds × 6 min: stuck 0, deaths 0, Wake held 3/3. Pixel 5:
   New World → Ring 110, no page error; "Entering the Kiln" toast sits on lit terrain under the core (Debt).
 - `09` sessions 84–88 archived word for word (`archive/2026-11-25-09-sessions-84-88.md`); part 11 removed.
-- Smoke: see PR (+1 drawcost check).
+- **B-085** (flaky, not fixed): run 1 failed `glow.cjs` pool check, outside floor 3.7 (off and on alike, so not the glow;
+  usual 3.2); 285 isolated seeds all 3.2. Debt. Smoke 441/442 then 442/442 (was 441; +1 drawcost).
