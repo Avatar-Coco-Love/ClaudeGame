@@ -24,3 +24,16 @@ Continues `06-Decisions-18.md` (same rules: supersede, never edit; list rejected
   ore that wasn't there). `tests/audit99.cjs` keeps the cache-vs-world comparison (it fails with the dirty repaint removed).
 - The toast gets the panel's backing plate everywhere (it read poorly over lit terrain on phones).
 - Rejected: heat kept through death (no reason to punish a respawn twice); keeping B-086 open without a repro.
+
+### D-132 — Kiln flare vents as built; M10 closed at v1.5 (session 100, S-48b)
+- `src/vent.js`: `ventSites(world, anomalies)` on salt `'vent'` samples whole-map cells, keeps Kiln ones off the border,
+  vault / Spire (seed-only choice) footprints and Anomaly cells, ≥ 6 apart: round(Kiln cells / 250) = 126 at 256 (4 seeds).
+  The phase is the next draw of the same stream. Terrain untouched; none in a 160 world.
+- A flare is live its whole 0.6 s: a core inside at any frame of it is shoved once (`fired` = cycle number), straight
+  out from the vent centre (its facing if dead centre). `updateVents` runs after the beam, so the +0.4 never meets
+  that frame's cooling; reaching 1 calls `overheat()` (split out of `updateHeat`). Shake 4, no sound (debt).
+- Cost: sites bucketed by chunk; only the core's 3×3 chunks are stepped (the game has no view; stricter than view
+  + 3), drawing uses view + 3. First draw (blurred hex per vent) took `bigworld.cjs` d 100 / d 30 to 2.3×; idle hexes
+  now share one unblurred path (1.00×). Drawn on explored cells, rock or open; hidden while `endSeq` runs.
+- Rejected: a flare only on its first frame (a 60 Hz step could make it miss); new empty vent cells (would move a
+  256 save's layout); a vent sound now (needs its own audio ceiling pass).

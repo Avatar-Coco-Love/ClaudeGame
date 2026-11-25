@@ -4,7 +4,7 @@ Owner's ask (session 87): bosses, more enemies, puzzles, a bigger map, biomes, e
 upgrades, sinks and resource types. Claude decides what and how. Order fixed by D-119; one milestone closes its loop
 before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 1.8, M14 → 1.9. Items are candidates until specced.
 
-## M10 — World and biomes (D-120)
+## M10 — World and biomes (D-120) ✅ v1.5
 - ✅ **S-45** World size as saved data (v1.4.28, format 18; old saves stay 160, pinned hash). Spec in `07-Build-Specs-8.md`.
 - ✅ **S-46a** Shoal / Kiln rings, palettes, appended vaults (d 86–118) + Anomalies at 256, dev-only (v1.4.30, D-122).
 - ✅ **S-46b1** Minimap 160-cell window round the core, ending overview frames the explored area (v1.4.31, D-123).
@@ -17,7 +17,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   music (clamp → ring 3; Kiln plays it until S-48) (v1.4.36, D-128).
 - ✅ **S-48a** Kiln beam heat (8 s → 1.2 s overheat, 16 % steady) + phrygian music + `haulrun` d 116 leg (×1.00 ≤ 1.20)
   (v1.4.38, D-130).
-- **S-48b** Kiln flare vents (seed sites, 8 s cycle, shove + heat, no damage) → M10 done, v1.5. Specs: `07-Build-Specs-10.md` (D-129).
+- ✅ **S-48b** Kiln flare vents (126 seed sites at 256, 8 s cycle, shove + 0.4 heat, no damage) (v1.5.40, D-132). **M10 done.**
 
 ## M11 — Economy
 - One resource per biome (Shoal / Kiln ore cells, own glyph shape + colour, pass `colours.cjs`), counted in bank / cargo

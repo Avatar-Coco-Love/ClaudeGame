@@ -28,11 +28,16 @@ export function updateHeat(game, dt) {
   const share = dt > 0 ? Math.min(1, kiln / (game.stat('beam') * dt)) : 0;
   if (share > 0) game.heat = Math.min(1, game.heat + share * dt / KILN_HEAT_S);
   else game.heat = Math.max(0, game.heat - KILN_COOL_MUL * dt / KILN_HEAT_S);
-  if (game.heat >= 1 - 1e-9) {
-    game.heat = 1; h.over = KILN_OVERHEAT_S; h.overheats++;
-    if (game.motionOn()) h.flash = 0.4;
-    game.audio.overheat();
-  }
+  if (game.heat >= 1 - 1e-9) overheat(game);
+}
+
+/** Heat reached 1 (the beam, or a flare vent: vent.js): the realized beam goes off KILN_OVERHEAT_S. */
+export function overheat(game) {
+  const h = game.heatState;
+  if (h.off || h.over > 0) return;
+  game.heat = 1; h.over = KILN_OVERHEAT_S; h.overheats++;
+  if (game.motionOn()) h.flash = 0.4;
+  game.audio.overheat();
 }
 
 /** Past KILN_ARC_FROM a thin warm-white arc round the core (ctx at the core's centre), its length ∝ heat; an overheat flashes a ring. */
