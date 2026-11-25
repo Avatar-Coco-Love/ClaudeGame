@@ -4,12 +4,11 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
-- **B-074 flaky beacon minimap dot** (`craft.cjs`, session 80): one full-smoke failure, then 5 passes; cause not yet found (the pixel is read 2 rAFs after a teleport).
 - **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
   #92 (B-081, D-117). Perf:
   `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,
-  `castBeam` Map/Set); Echo field rebuilds on any break anywhere (≤ 0.3 ms ×4). Touch: 568×320 Matrix shows ~1.5 rows
-  under its header, Settings hides 3 rows below the fold; Keys-view buttons 40 px on a coarse pointer (hidden on touch).
+  `castBeam` Map/Set); Echo field rebuilds on any break anywhere (≤ 0.3 ms ×4). Touch: short landscape sheets done in #93
+  (D-118); Keys-view buttons 40 px on a coarse pointer (hidden on touch).
   Code: numbers to config (`VAULT_HALF`, `BORDER`, craft `SPIRE_HALF` done in #92): quality 1000 / 0.98 / 0.9, Glitch steer 3 / 0.4 / 0.9 / 12 tries, "moving > 20"
   ×3, autosave 10 s, DPR max 2, beam hit pad 4, music ramp/resync constants; `echo.js` repeats the core's steer step
   (`game.js` 173–190: a shared helper); `makeEcho`/`fieldAt` exported but file-local; `spitter.js` `GLITCH_R as

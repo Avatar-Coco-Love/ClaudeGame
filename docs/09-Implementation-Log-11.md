@@ -45,3 +45,16 @@ Continues `09-Implementation-Log-10.md` (part 10 neared the 8 KB cap at session 
 - Config: `BORDER` (2) and `VAULT_HALF` (3) now live in `config.js`; world / spire / anomaly / craft read them
   (craft's `- 4` is `SPIRE_HALF`). Same comparisons, so every seed's world is unchanged (`world.cjs` passes).
 - Smoke: 417/417 (was 416; +1 B-081 check). No visual change, so no screenshot.
+
+## Session 86 — Build: short landscape sheets (v1.4.26, D-118)
+- Measured at 568×320 (Pixel 7 touch): Matrix header + tabs ended at y 131, rows 82 px, 2 whole rows; Settings rows
+  ended at 347/399/451 past the sheet's 304. New `@media (max-height: 480px) and (pointer: coarse)` block in `style.css`
+  (D-118): Matrix 4 rows (5 at 667×375), rows 57 px; Settings 2 columns, all 7 rows. Large + 2750◆ 1470▲ 141●: the
+  bank wraps under the tabs, 3 rows. Screenshots viewed (Core, Research Large, Settings).
+- New `touch.cjs` check at 568×320 + 667×375 (rows, ✕/tabs ≥ 44 px inside the sheet, Settings rows above the fold):
+  FAILS on the old CSS, passes now.
+- Smoke run 1: 417/419 — `02` at 61 lines, and `textsize.cjs` saw a 1 px sideways scroller (the hidden title used
+  `overflow: hidden`; now `clip-path`, no overflow). Both fixed.
+- **B-074** found: runs 2–3 failed the beacon-dot checks (also 1 in 4 on the old CSS). `new-world` is a random seed, and an
+  explored Anomaly site (amber `255,190,120`) or a seen Spire drawn within ~5 map px covers the dot. `craft.cjs` now
+  hides marks within 6 cells (8 runs: 3 hid one, all pass).

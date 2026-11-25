@@ -193,6 +193,39 @@ async function browserChecks(browser, url, check, errors, shots) {
     await ctx.close();
   }
 
+  // ---- Audit 84 leftover (D-118): short landscape sheets. Old CSS at 568×320: the Matrix showed 2 whole rows under its
+  // header + tabs, Settings 4 of 7 rows above the fold. Now ≥ 4 Matrix rows (≥ 3 at Large with a whole world's bank, which
+  // wraps under the tabs) and every Settings row, with ✕ and the tabs still ≥ 44 px and on screen.
+  for (const vp of [{ width: 568, height: 320 }, { width: 667, height: 375 }]) {
+    const ctx = await phone(vp), pg = await ctx.newPage();
+    pg.on('pageerror', e => errors.push('touch sheets: ' + e.message));
+    await pg.goto(url); await pg.waitForTimeout(300);
+    await intoGame(pg);
+    const sheet = () => pg.evaluate(() => {
+      const r = e => e.getBoundingClientRect(), sh = r(document.querySelector('#matrix .sheet')), x = r(document.getElementById('matrix-close'));
+      const tabs = [...document.querySelectorAll('#matrix .tabs button')].map(r);
+      const rows = [...document.querySelectorAll('#upgrade-list .upgrade')].filter(e => r(e).bottom <= sh.bottom).length;
+      const ok = [x, ...tabs].every(b => b.width >= 44 && b.height >= 44 && b.top >= sh.top && b.bottom <= sh.bottom && b.right <= sh.right);
+      return { rows, ok, title: document.getElementById('matrix-title').textContent };
+    });
+    await pg.evaluate(() => window.__lumen.input.pressed.add('matrix')); await pg.waitForTimeout(150);
+    const plain = await sheet();
+    if (shots && vp.width === 568) await pg.screenshot({ path: `${shots}/matrix-568x320.png` });
+    await pg.evaluate(() => { const g = window.__lumen.game; Object.assign(g.bank, { shard: 2750, prism: 1470, lumen: 141 }); g.stats.lumen = 1;
+      document.documentElement.classList.add('text-large'); document.querySelector('[data-tab=core]').click(); });
+    await pg.waitForTimeout(100);
+    const large = await sheet();
+    await pg.evaluate(() => { document.documentElement.classList.remove('text-large'); window.__lumen.input.pressed.add('matrix'); });
+    await pg.waitForTimeout(100);
+    await pg.tap('#menu-btn'); await pg.waitForTimeout(150); await pg.tap('#settings-btn'); await pg.waitForTimeout(150);
+    const set = await pg.evaluate(() => { const sh = document.querySelector('#settings .sheet').getBoundingClientRect();
+      const rows = [...document.querySelectorAll('#settings .sheet > .set-row')].filter(e => e.getBoundingClientRect().height > 0);
+      return { total: rows.length, below: rows.filter(e => e.getBoundingClientRect().bottom > sh.bottom + 0.5).length }; });
+    check(`${vp.width}×${vp.height} touch: Matrix shows ≥ 4 whole rows (≥ 3 Large, full bank), ✕ + tabs ≥ 44 px in the sheet; Settings shows all its rows (D-118)`,
+      plain.rows >= 4 && large.rows >= 3 && plain.ok && large.ok && plain.title.length > 0 && set.total >= 7 && set.below === 0,
+      JSON.stringify({ plain, large, set }));
+    await ctx.close();
+  }
   // ---- B-039 (S-27 rider): 320×568 portrait, Surge, a world's whole supply (2750◆ 1470▲ 141●): the bank panel
   // ends ≥ 6 px left of the minimap. Old CSS (gap 16 px): panel right 219 vs minimap left 212 (7 px under it); 10 px gap 207 (5 px clear); 8 px 203.
   {
