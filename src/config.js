@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.39';
+export const VERSION = '1.5.40';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -324,3 +324,8 @@ export const SHATTER_RING = 3, SHATTER_SHARE = 0.6, SHATTER_FLASH_S = 0.35, SHAT
 // with none that frame it cools at KILN_COOL_MUL / KILN_HEAT_S per s. At 1 the realized beam is off KILN_OVERHEAT_S, then heat = RESTART.
 export const KILN_RING = 4, KILN_HEAT_S = 8, KILN_COOL_MUL = 2, KILN_OVERHEAT_S = 1.2, KILN_HEAT_RESTART = 0.25, KILN_ARC_FROM = 0.3;
 export const HEAT_RGB = '255, 244, 228'; // warm white: the heat arc round the core (an arc, so its shape tells it from Glitch orange)
+// S-48b Kiln flare vents (D-129, vent.js): seed-only sites on Kiln cells, one per VENT_PER_CELLS Kiln cells, ≥ VENT_GAP apart.
+// Each cycles VENT_PERIOD_S from a seeded phase: a VENT_TELL_S tell, then a VENT_FLARE_S flare of VENT_R cells that shoves the
+// core out at HURT_KNOCKBACK and adds VENT_HEAT heat, once per flare. No damage, no cargo loss. Never saved.
+export const VENT_PER_CELLS = 250, VENT_GAP = 6, VENT_TRIES = 60, VENT_PERIOD_S = 8, VENT_TELL_S = 1, VENT_FLARE_S = 0.6, VENT_R = 2.5, VENT_HEAT = 0.4;
+export const VENT_RGB = '255, 232, 205'; // warm white: the vent hexagon and its flare

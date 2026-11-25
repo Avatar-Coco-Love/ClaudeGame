@@ -15,6 +15,7 @@ import { drawUndertow } from './undertow.js';
 import { drawShatter } from './shatter.js';
 import { drawHeat } from './heat.js';
 import { drawAnomalies } from './anomaly.js';
+import { drawVents } from './vent.js';
 import { drawEcho } from './echo.js';
 
 const CHUNK_PX = CHUNK * CELL;
@@ -160,6 +161,7 @@ export class Renderer {
     drawUndertow(this, ctx, left, top, vw, vh); // S-47: dashes moving with the Shoal currents
     drawAurora(this, ctx); // S-33: ore in the core's light shimmers during an aurora
     drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
+    drawVents(this, ctx, left, top, vw, vh); // S-48b: Kiln flare vents
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16

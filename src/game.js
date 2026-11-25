@@ -16,6 +16,7 @@ import { makeWeather, updateWeather, auroraBonus } from './weather.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
 import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
+import { makeVents, updateVents } from './vent.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt } from './craft.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
@@ -42,6 +43,7 @@ export class Game {
     // S-19 (D-049): the saved Spires, or chosen now from the seed (+ what an old/malformed save has seen, D-024).
     this.spires = (save && loadSpires(save.spires, W, W)) || chooseSpires(seed, save && save.explored, save && save.broken, W, W);
     this.anomaly = makeAnomalies(this.world, this.spires); // S-35: sites from the generated terrain, before the stamp (seed-only)
+    this.vents = makeVents(this.world, this.anomaly.sites); // S-48b: Kiln flare vents (seed-only, never saved)
     this.buffs = [];       // S-35: active Anomaly buff ids (saved); they end at the next deposit that banks ≥ 1 item
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
@@ -216,6 +218,7 @@ export class Game {
     if (intent.place) tryPlace(this); // S-16
     if (intent.echoOrder && cycleEchoOrder(this)) this.notify('echo-order'); // S-43
     this.updateBeam(dt, intent);
+    updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
     this.updatePickups(dt);
     this.updateDeposit(dt);
