@@ -5,6 +5,7 @@
 // `attach` puts `game.beacons` itself in `renderer.lightSets`. World drawing of the beacon glyph is here too.
 import { CELL, T, NEXUS_RADIUS, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_GAP, BEACON_LIGHT, BEACON_REVEAL, BEACON_RGB,
   RELAY_COST, RELAY_STOCK, RELAY_MAX, RELAY_MIN_D, RELAY_GAP, RELAY_R, RELAY_LIGHT, RELAY_RGB, PLACE_BURST } from './config.js';
+import { SPIRE_HALF } from './spire.js';
 
 export const BEACON_COLOR = `rgb(${BEACON_RGB})`; // white-cyan, on the map and in the world
 export const RELAY_COLOR = `rgb(${RELAY_RGB})`;   // S-22: cyan-white
@@ -69,7 +70,7 @@ export function placeRefusal(game, kind = placeKind(game)) {
   if (game.relays.some(b => cellsTo(b) < RELAY_GAP)) return 'near';
   if (w.vaults.some(v => Math.hypot(v.x - cx, v.y - cy) < RELAY_GAP)) return 'vault';
   // A Spire's 9×9 footprint: distance from the cell to its nearest footprint cell.
-  if (game.spires.some(q => Math.hypot(Math.max(0, Math.abs(q.x - cx) - 4), Math.max(0, Math.abs(q.y - cy) - 4)) < RELAY_GAP)) return 'spire';
+  if (game.spires.some(q => Math.hypot(Math.max(0, Math.abs(q.x - cx) - SPIRE_HALF), Math.max(0, Math.abs(q.y - cy) - SPIRE_HALF)) < RELAY_GAP)) return 'spire';
   return null;
 }
 

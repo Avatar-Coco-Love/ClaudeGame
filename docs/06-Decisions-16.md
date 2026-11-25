@@ -63,3 +63,10 @@ Continues `06-Decisions-15.md` (same rules: supersede, never edit; list rejected
 - Measured (12 chunks, 4× CPU): 25.3 → 3.1 ms; whole frame 1280×800 headless 11.2 → 7.3 ms (DPR 1), 41 → 30.5 (DPR 2).
 - Rejected: `imageSmoothingEnabled = false` on the scaled blit (5.7 ms, blockier); painting at 1× then rescaling
   (an extra 5.6 ms pass per chunk); capping k at 1.5 (blurry on DPR 2 phones).
+
+## D-117 — A Wake-cancelled weather event is saved (B-081, session 85; supersedes D-097's "nothing new is saved")
+- The save carries `weatherCancel` (the index of the event a Wake / the ending cut short, −1 none; format 17).
+  Load restores it, so that event stays off after a reload; the schedule is still seed + `stats.time`, and an
+  uncancelled event still resumes mid-way.
+- Rejected: skip any event that started before the load (audit 84's note): a reload would end a storm early (a
+  Surge exploit) and drop the D-097 resume; deriving it from Wake state (a Wake isn't saved mid-way).

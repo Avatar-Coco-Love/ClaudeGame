@@ -8,7 +8,7 @@ import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
 import { WORLD_W, WORLD_H } from './config.js';
 
-export const SAVE_FORMAT = 16;
+export const SAVE_FORMAT = 17;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -27,6 +27,7 @@ export const STEPS = [
   s => ({ ...s, cycle: 0, records: {} }), // 13 -> 14: S-29 New Cycle: every world so far is cycle 0
   s => ({ ...s, anomalies: {}, buffs: [] }), // 14 -> 15: S-35 Anomalies: none taken, no buff active
   s => ({ ...s, echoOrder: 'gather' }), // 15 -> 16: S-43 Echo orders; Gather was the only one
+  s => ({ ...s, weatherCancel: -1 }), // 16 -> 17: B-081 a Wake-cancelled weather event stays cancelled; none recorded before
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.

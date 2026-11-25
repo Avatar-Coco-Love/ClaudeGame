@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.4.24';
+export const VERSION = '1.4.25';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -17,6 +17,7 @@ export const CELL = 32;
 export const WORLD_W = 160;
 export const WORLD_H = 160;
 export const CHUNK = 16; // cells per render chunk edge
+export const BORDER = 2; // bedrock cells around the world edge (world.js); footprints keep one cell clear of it (world, spire, anomaly)
 export const NEXUS_RADIUS = 5.5 * CELL; // px; deposit + safe zone
 export const LIGHT_RADIUS = 260; // px around the core
 // S-6 (D-017): any Glitch, alert or wandering, that hasn't closed GLITCH_PROGRESS_PX on its best distance for GLITCH_GIVE_UP_S gives up
@@ -92,6 +93,7 @@ export const LUMEN_SALT = 0x27d4eb2f;
 
 // S-9 vaults (D-023, D-031): sealed 7×7 rooms stamped after generation; the centre cache bursts this loot once.
 export const VAULT_COUNT = 6;
+export const VAULT_HALF = 3; // vault footprints are (2·3 + 1)² = 7×7 cells (world.js templates; anomaly.js clearance)
 export const VAULT_D = [50, 72];     // centre distance from the Nexus, in cells
 export const VAULT_GAP = 20;         // min cells between vault centres
 export const VAULT_TRIES = 200;

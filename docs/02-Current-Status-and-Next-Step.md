@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-24_ · **Session counter: 84** · **Version: v1.4.24** (session 84: Audit; rotation: 85 Build, 86 Build, 87 Design, 88 Build, 89 Audit).
+_Last updated: 2026-11-25_ · **Session counter: 85** · **Version: v1.4.25** (session 85: Build; rotation: 86 Build, 87 Design, 88 Build, 89 Audit, 90 Build).
 **Scope (D-045, D-108, `01`):** v1.0 = M5 ships (Spires, ending, New Cycle); M6–M9 post-1.0 (M9 = Echo ally), all ✅ as of v1.4.23 (M8 last). VERSION minor = milestones shipped (D-046), patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -14,7 +14,7 @@ _Last updated: 2026-11-24_ · **Session counter: 84** · **Version: v1.4.24** (s
   A Glitch that gains no ground on the core for 6 s fades out and frees its slot (D-017); kills drop a Prism half the time (D-018).
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
 - Weather (S-33, D-097, `weather.js`): every 300–420 s of `stats.time` (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
-  Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending. Play-tested D-098 (Q-019: no).
+  Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending (the cut event is saved, D-117). Play-tested D-098 (Q-019: no).
 - Anomalies (S-35/36, D-099, D-101, `anomaly.js`): 16 seed-only sites (3/5/8 by ring) in rock, kind 1/3 each: Overclock
   (beam ×1.5), Lodestone (reach ×2, pull ×1.5), Ballast (cargo ×1.5) via `stat()`; kinds stack; end when a deposit banks
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
@@ -42,7 +42,7 @@ _Last updated: 2026-11-24_ · **Session counter: 84** · **Version: v1.4.24** (s
 - Text (S-40, D-107): every font size × `--ts` (Settings → Large text = 1.2); 12 px floor in play (title footer 11).
   `tests/colours.cjs`: must-tell-apart pairs ΔE ≥ 25 under 3 colour-blind sims, or a shape difference (Shard/Prism).
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064).
-- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 16); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
+- Autosave to localStorage (seed + mined + explored bitsets + economy + floor pickups + beam mode + beacons + relays + spires + anomalies + buffs + echoOrder + ended + cycle + records) every 10 s, on deposit, and on page hide. Saves carry a format number (now 17); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
 - History: `05` changelog, `06` decisions (D-xxx), `03` questions (Q-xxx), `09` log (tail: `09-…-11`), `08` per-system detail.
 - Gameplay randomness is seeded per draw from the world seed (`game.rng.*`, D-025): same seed + input = same run.
 - Dev tools (S-7) `window.__lumen.dev.*` (`?dev` panel); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
@@ -55,5 +55,5 @@ _Last updated: 2026-11-24_ · **Session counter: 84** · **Version: v1.4.24** (s
 - `node tests/smoke.cjs`: all passing (includes `tests/docs.cjs`: doc caps, version = changelog, inbox empty) + `tests/audio.cjs`.
 
 ## Next step (one thing)
-Session 85 (Build): every spec is built; take the top of `04-…-2` "Audit 84 leftovers": the weather event that resumes
-after a reload (skip an event that started before the load; a check that fails on the old code), plus the tuning numbers to config.
+Session 86 (Build): next in `04-…-2` "Audit 84 leftovers": the touch layout at 568×320 (Matrix shows ~1.5 rows under
+its header; Settings hides 3 rows below the fold); measure first, then a `touch.cjs` check that fails on the old CSS.

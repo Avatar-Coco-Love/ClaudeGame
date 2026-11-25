@@ -1,7 +1,7 @@
 // S-19 Spires v1a (D-049, D-068): where the 5 dormant Spires go, their 9×9 shape, and the saved record.
 // Sites are seed-only candidates (like vaultSites, D-023); which candidate a world uses is chosen once and saved, so a
 // later generator change never moves a Spire. An old save takes the first candidate it hasn't looked at (D-024).
-import { WORLD_W, WORLD_H, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
+import { WORLD_W, WORLD_H, BORDER, T, CELL, MATERIAL, SPIRE_COUNT, SPIRE_D, SPIRE_TRIES, SPIRE_VAULT_GAP, SPIRE_GAP,
   SPIRE_BREATH_S, SPIRE_BREATH_ALPHA, SPIRE_MARK_COLOR, SPIRE_PRISMS, SPIRE_FEED_RATE, SPIRE_TAPS, SPIRE_TAP_S, SPIRE_LIGHT, SPIRE_LIT_RGB, SPIRE_WAKE_RGB, RESOURCE } from './config.js';
 import { seededStream, vaultSites, unpackBits } from './world.js';
 import { wakeMask, drawWake } from './wake.js';
@@ -42,7 +42,7 @@ export function spireCandidates(seed, w = WORLD_W, h = WORLD_H) {
       const a = a0 + (k + rand()) * step, d = SPIRE_D[0] + rand() * (SPIRE_D[1] - SPIRE_D[0]);
       const x = Math.floor(cx + Math.cos(a) * d), y = Math.floor(cy + Math.sin(a) * d), dc = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
       if (dc < SPIRE_D[0] || dc > SPIRE_D[1]) continue;
-      if (x - H < 2 || y - H < 2 || x + H > w - 3 || y + H > h - 3) continue; // footprint stays inside the bedrock border
+      if (x - H < BORDER || y - H < BORDER || x + H > w - BORDER - 1 || y + H > h - BORDER - 1) continue; // footprint stays inside the bedrock border
       if (vaults.some(v => Math.hypot(v.x - x, v.y - y) < SPIRE_VAULT_GAP)) continue;
       list.push({ x, y, t });
     }

@@ -39,6 +39,16 @@ async function nodeChecks(check) {
       log.length === 2 && log[0].t === st[1] && log2.length === 2 && log2[1].t === st[0] + 10 && log3.length === 0,
       `skipped → ${JSON.stringify(log)}; cut → ${JSON.stringify(log2)}; ending → ${log3.length}`);
   }
+  // B-081: a Wake-cancelled event stays cancelled after a reload (old code resumed it); the next one still comes.
+  {
+    const st = weatherStarts(4242, 2).map(Math.ceil), wake = { core: { x: 0, y: 0 } }, g = make('surge');
+    run(g, st[0] + 15, (g, t) => { g.wake = (t >= st[0] + 5 && t < st[0] + 10) ? wake : null; });
+    const h = new Game({ seed: 4242, mode: 'surge', audio: quiet, save: JSON.parse(JSON.stringify(g.toSave())) }); updateWeather(h, 1);
+    const off = h.weather.kind === null;
+    h.stats.time = st[1] + 1; updateWeather(h, 1);
+    check('B-081 weather: an event a Wake cancelled stays cancelled after a reload; the next one still starts',
+      off && h.weather.kind === 'storm', `after reload ${off ? 'off' : 'on'}, next → ${h.weather.kind}`);
+  }
   // A reload mid-event resumes it (schedule from the saved play time); a mode switch swaps the face.
   {
     const st = Math.ceil(weatherStarts(4242, 1)[0]), g = make('surge'); g.stats.time = st + 12;

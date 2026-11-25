@@ -1,6 +1,6 @@
 // S-33 Weather (D-087, D-097): a storm in Surge, an aurora in Drift. The schedule is a pure function of the world seed and
 // play time (`stats.time`, saved): event k starts at the sum of k + 1 gaps drawn from rng['weather'] and lasts WEATHER_S.
-// Nothing new is saved: a reload mid-event resumes it. The face follows the mode (storm in Surge, aurora in Drift); a Wake
+// Only `cancel` (the index of the event a Wake ended) is saved (B-081): a reload mid-event resumes it unless it was cancelled. The face follows the mode (storm in Surge, aurora in Drift); a Wake
 // or the ending cancels the event in progress (and one due inside them is skipped). `force` ('on' | 'off') is for tools
 // and tests only. Effects: glitch.js reads `stormOn` (spawn interval, cap); game.js asks `auroraBonus` on an ore break.
 import { WEATHER_EVERY_S, WEATHER_S, WEATHER_EASE_S, WEATHER_TINT, AURORA_BONUS, AURORA_CHANCE, LIGHT_RADIUS, CELL, T, MATERIAL } from './config.js';
