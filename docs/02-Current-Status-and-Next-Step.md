@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 148** · **Version: v1.10.89** (148: Build, S-71a; next 149 Audit).
+_Last updated: 2026-11-26_ · **Session counter: 149** · **Version: v1.10.90** (149: fix B-104 took the Audit slot; next 150).
 **Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, v1.10 = M15 Nexus reaches out: Lens ▲ sink + rings, D-175…D-179). Next (D-181, `04-…-5`): M16 Echo (`07-…-19`), M17 Hunters (`07-…-20`), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -45,8 +45,8 @@ _Last updated: 2026-11-26_ · **Session counter: 148** · **Version: v1.10.89** 
 - Specs (1 PR each, D-063): S-1…S-65, S-69, S-70, S-71a built (M15 done, `07-…-17`). Next: S-71b (M16 gate after Q-040, `07-…-19`), S-72…S-74 (M17), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
-- `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166; Lens gate `eventrun --call` ~95 s). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
-  Swallowed test waits: `node -r ./tools/waitprobe.cjs` (D-172).
+- `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
+  Swallowed test waits: `node -r ./tools/waitprobe.cjs`.
 
 ## Next step (one thing)
-Audit (149) per `CLAUDE.md` (B-103 check queued, `04-…-4`). Then S-71b: settle Q-040 (D-187), wire the gate.
+Audit (150; moved by the B-104 fix) per `CLAUDE.md` (B-103 check queued, `04-…-4`). Then S-71b: settle Q-040 (D-187), wire the gate.
