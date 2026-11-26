@@ -58,3 +58,11 @@ Continues part 17 (sessions 124–125; 119–123 archived in audit 129). Newest 
 - Workflow review: too much: smoke wall time (two full runs = 19 min of a session); too little: no per-file timing,
   so three audits deferred the fix for lack of a measurement. Now printed every run (D-166). Phone sweep: none (124).
 - `09` sessions 119–123 archived word for word (`archive/2026-11-26-09-sessions-119-123.md`). Smoke 610/610 (+1).
+
+## Session 130 — Build: S-60b2, the Crucible gate (v1.8.71, D-167)
+- `surgebot.mjs` route `boss`; `tools/bossrun.mjs` (8 seeds, both modes, the world as played); `tests/boss.cjs` awaits it,
+  `gates.cjs` SMOKE prestarts it (~1 s).
+- Gate line: drift down 8/8, med 0.67 min, 0 deaths, overheats 15; surge down 8/8, med 0.69 min, 0 deaths (boss 0,
+  Burrower 0, Glitch 0), burns 79, embers 0, kills 9. Ratio 1.059: PASS (16 seeds 1.033).
+- Observed: no ember is ever lobbed (the bot stands adjacent, inside BOSS_EMBER_OUT); the burns (~10 / fight, 10 dmg
+  each) never kill a top hull. Surge is no harder for a close fighter: Q-033 for Design 132.

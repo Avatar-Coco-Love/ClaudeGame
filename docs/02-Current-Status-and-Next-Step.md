@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 129** · **Version: v1.8.70** (session 129: Audit; rotation: 130 Build, 131 Build, 132 Design).
-**Scope (D-119, `01`):** M1–M13 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13 events + puzzles). M14 two-form bosses (1.9, D-158) under way: S-60a, S-60b1 ✅; `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-26_ · **Session counter: 130** · **Version: v1.8.71** (session 130: Build; rotation: 131 Build, 132 Design, 133 Build).
+**Scope (D-119, `01`):** M1–M13 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13 events + puzzles). M14 two-form bosses (1.9, D-158) under way: S-60a, S-60b1, S-60b2 ✅; `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -17,7 +17,7 @@ _Last updated: 2026-11-26_ · **Session counter: 129** · **Version: v1.8.70** (
 - Rift (S-57a, D-156, `rift.js`): every 240–360 s (waits out weather), 45 s, a 3 × 3 rock pocket 8–12 cells out in the core's ring turns to ore (×2 yield; Shoal / Kiln 3 + 6 ▲), reverts unmined; unsaved, both modes; shimmer, minimap dot, toast; S-57b (D-157): edge chevron while off screen, open / close chimes. Gate PASS (D-156). `08`.
 - Locks (`lock.js`, `world.hitMul`): Flare (S-58, D-159, Kiln outer vault: shell × 0, × 2 in the last 3 s of 8 s) / Tide (S-59, D-162, Shoal: only against the flow).
 - Crucible (S-60a, D-163, `boss.js`): seed-only Kiln lair stamped by the Game; only the lit plate of 8 cuts, then (i + 5) mod 8; core flares; saved `bosses` [{ ring, down }]. B-095 fixed (D-164).
-  Surge (S-60b1, D-165): awake ≤ 10 cells: any plate, 4 s flare + 10 dmg, embers; death heals the core.
+  Surge (S-60b1, D-165): awake ≤ 10 cells: any plate, 4 s flare + 10 dmg, embers; death heals the core. Gate `bossrun.mjs` PASS (S-60b2, D-167).
 - Weather (S-33, D-097, `weather.js`): every 300–420 s (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
   Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending (the cut event is saved, D-117).
 - Anomalies (S-35/36, D-099, D-101, `anomaly.js`): seed-only sites (3/5/8 by ring; a 256 world 28) in rock, kind 1/3 each: Overclock
@@ -42,12 +42,12 @@ _Last updated: 2026-11-26_ · **Session counter: 129** · **Version: v1.8.70** (
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 23); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 24 from D-164; last D-166), `03` questions (Q-xxx), `09` log (tail: `09-…-18`; 119–123 archived in audit 129), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 24 from D-164; last D-167), `03` questions (Q-xxx), `09` log (tail: `09-…-18`; 119–123 archived in audit 129), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-60b1 built (M13 done, `07-…-14`). M14: S-60b2…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-60b2 built (M13 done, `07-…-14`). M14: S-61a…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~530 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
 
 ## Next step (one thing)
-Session 130 (Build): S-60b2, the `bossrun.mjs` gate (a boss route in `runBot`, lairs on, creatures live; `07-…-15`, D-165). A smoke gate goes in `tests/gates.cjs` `SMOKE`.
+Session 131 (Build): S-61a, Gyre: the Shoal boss lair, body and take-apart (`07-Build-Specs-16.md`, D-158). Q-033 waits for Design 132.

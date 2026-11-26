@@ -189,6 +189,12 @@ async function nodeChecks(check) {
     }
     check('S-60a probe: a mid build (beam 5, range 3) takes the Crucible apart in ≤ 90 s (logged in 09)', res.every(t => t <= 90), `seconds: ${res.join(', ')}`);
   }
+  { // S-60b2 gate (D-165): tools/bossrun.mjs, the world as played, GATE_SEEDS (8) seeds; the boss route plays to down in each mode
+    const out = await require('./gates.cjs').run('bossrun.mjs');
+    const line = out.split('\n').find(l => l.startsWith('gate')) || '';
+    check('S-60b2: the bossrun.mjs gate passes on 8 seeds (Surge / Drift time to down 0.8–1.25, Surge deaths median ≤ 1, every run down)',
+      /PASS/.test(line), out.trim().split('\n').map(l => l.slice(0, 70)).join(' | '));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {

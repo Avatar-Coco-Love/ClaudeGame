@@ -13,7 +13,7 @@ import { CELL, T, UPGRADES, SPIRE_PRISMS, NEXUS_RADIUS, SPITTER_TIER, GLITCH_TIE
 import { spireHere, SPIRE_HALF } from '../src/spire.js';
 import { siteCharged } from '../src/anomaly.js';
 import { beamFoes } from '../src/spitter.js';
-import { clearBosses } from '../src/boss.js';
+import { clearBosses, bossAwake, platesLeft, PLATES } from '../src/boss.js';
 
 /** S-23 guard helpers (one copy for surgebot, wakeprobe and tests/wake.cjs, audit 59): the live Glitch nearest the
  *  Spire core, the spot between the core and a target 3.2 cells out (clamped inside the interior), and the move toward it. */
@@ -25,7 +25,7 @@ export function steer(p, to) { const m = Math.hypot(to.x - p.x, to.y - p.y);
   return m < 3 ? { x: 0, y: 0 } : { x: Math.max(-1, Math.min(1, (to.x - p.x) / m * 2)), y: Math.max(-1, Math.min(1, (to.y - p.y) / m * 2)) }; }
 
 export const LEVELS = { start: {}, mid: { beam: 4, range: 3, thrust: 3, cargo: 4, magnet: 2, hull: 2 }, max: null };
-const WALL = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE, T.FACET]); // the bot never digs these (spec: walls)
+const WALL = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE, T.FACET, T.BOSS_PLATE, T.BOSS_CORE]); // never dug on a path (a boss cell only when aimed at, S-60b2)
 const ORE = new Set([T.CRYSTAL, T.PRISM, T.LUMEN]);
 const ANOMALY_DETOUR_S = 20;
 const dt = 1 / 60, REPLAN_S = 2, STUCK_S = 5, STUCK_PX = 8, FIGHT_PX = 160, RETREAT = 0.35, SPIRE_R = 24;
@@ -166,6 +166,27 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     out.haulMin = out.shardMin + out.prismMin;
     out.carried = g.cargoTotal(); // S-36: still in cargo at the cap (a Ballast run carries more): `gainMin` counts it
     out.gainMin = out.haulMin + out.carried / minutes;
+  } else if (route === 'boss') {
+    // S-60b2 (D-165): take boss 0 apart. Target: the lit plate (asleep) or the standing plate nearest the core (awake), then
+    // the boss core; stand on an open 4-neighbour of it and beam it (a foe in reach first: embers, Glitches, a Burrower).
+    // No retreat: healing is only at the Nexus, ~100 cells off; a death respawns there and the bot paths back.
+    const B = g.bosses.list[0]; let tgt = -1;
+    const pick = () => {
+      if (!platesLeft(g, B)) return B.y * W + B.x;
+      const live = PLATES.map(([i, j]) => (B.y + j) * W + B.x + i).filter(c => w.cells[c] === T.BOSS_PLATE);
+      if (!bossAwake(g, B)) return (B.y + PLATES[B.lit][1]) * W + B.x + PLATES[B.lit][0];
+      if (live.includes(tgt)) return tgt;
+      return live.reduce((a, c) => Math.hypot(cx(c) - g.player.x, cy(c) - g.player.y) < Math.hypot(cx(a) - g.player.x, cy(a) - g.player.y) ? c : a);
+    };
+    while (B && !B.down && t < capT) {
+      tgt = pick();
+      const j = tgt, spot = i => w.cells[i] === T.EMPTY && Math.abs(i % W - j % W) + Math.abs(((i / W) | 0) - ((j / W) | 0)) === 1;
+      setGoal(`boss${j}`, spot);
+      const here = cellOf(g.player.x, g.player.y);
+      if (spot(here)) tick({ x: cx(here), y: cy(here) }, { x: cx(j), y: cy(j) });
+      else if (drive() === 'skip') { skipped++; setGoal('', null); tick(g.player); }
+    }
+    Object.assign(out, { down: !!(B && B.down), toDown: B && B.down ? t / 60 : null, plates: B ? platesLeft(g, B) : 0 });
   } else if (route === 'spire') {
     const H = SPIRE_HALF - 1, inSpire = (s, i) => Math.abs((i % W) - s.x) <= H && Math.abs(((i / W) | 0) - s.y) <= H && w.cells[i] === T.EMPTY;
     const first = search(g, cellOf(g.player.x, g.player.y), i => g.spires.some(s => inSpire(s, i)));

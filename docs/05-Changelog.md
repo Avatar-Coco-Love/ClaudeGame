@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.71 — 2026-11-26
+- No change in play. A balance bot now fights the Crucible to the end in both modes on every test run, so its two
+  forms stay equally quick to take down (about 40 s at the top build).
+
 ## v1.8.70 — 2026-11-26
 - Health check, no change in play. The game's own test run is about 90 s shorter (its balance bots now run side by
   side), and it reports which tests take longest.
