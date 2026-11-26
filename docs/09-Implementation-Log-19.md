@@ -21,4 +21,6 @@ Continues part 18 (sessions 126–131). Newest at the bottom; read the tail only
 - Gate gyre: Drift 8/8 med 0.69 min, Surge 8/8 med 0.66, deaths 0, swarms 16, rims 78, ratio 0.954 PASS (2 s wall).
   Crucible gate unchanged (1.055). Shoal mote gate unchanged (0.907 / 0.890).
 - New checks fail on the old code (stash of `src/`: 3 FAIL + rimGap missing). Screenshot (seed 4242, Surge, 3 cells
-  off): key hidden, mint rim outline over the body, whirlpool dashes; reads clearly. No new bug.
+  off): key hidden, mint rim outline over the body, whirlpool dashes; reads clearly.
+- B-096 (flake, open): smoke run 1 failed `S-46b2 budget` new Game 154 ms under load (alone: 98 ms); run 2 626/626.
+  For audit 134: the throttled timing check shares CPU with the prestarted gates.
