@@ -51,3 +51,12 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
 - **B-098** (fixed, test only): smoke run 1 failed `S-59 tide locks … chevrons` (630/631): the page ignores `?seed`,
   new worlds are random and 16 / 400 seeds have no tide lock. `tidelock.cjs` now rerolls the world (≤ 5, accepts the
   confirm). Reroll path checked (seed changes); 3 + 1 standalone runs PASS.
+
+## Session 136 — Build (Debt): awake Gyre perf run, its glow made cheap (v1.9.77, D-174)
+- `tools/perf.cjs`: new `gyre` run (Surge, god, core held 4 cells north of the Gyre core, swarm clock zeroed: awake,
+  rim tell on, ≤ 2 swarms / 12 motes, ~22 dashes); `ONLY` takes a comma list. Before, CPU × 4: desktop gyre / shoal
+  1.29–1.36×, phone 1.18×. Probe splits (scratch copy): Drift asleep 43.2 ms vs the same spot with the boss down
+  36.6; update 0.5 → 0.8 ms awake; shadowBlur off 39.3; dashes off 43.5 (no gain). So: the 4-cell blur box.
+- Fix: blur clipped to the core ring (0.4 cell + pad), rim tell as `GYRE_RIM_GLOW` strokes, key plate unblurred.
+  After: desktop 1.04 / 1.20× (two runs; headless noise ±3 ms), phone 1.13×. Screenshot of the awake Gyre: the rim
+  still reads as a mint outline. New `gyre.cjs` check fails on the old code (2 blurred strokeRects, no box).

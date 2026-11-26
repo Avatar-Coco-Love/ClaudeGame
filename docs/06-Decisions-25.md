@@ -38,3 +38,14 @@ alternatives). D-171 on.
   (7 / 8 by the boss each). Bosses are late goals; the band holds where the gate is defined (max build). Rejected:
   a softer flare / rim at low Beam (a second tuning per build), gating on mid (the max fight would go soft).
 - M14 closes → v1.9. Nothing new without a design D-xxx (D-119): Design 137 picks the next milestone.
+
+### D-174 — The awake Gyre's glow: blur only the core, rim tell as stacked strokes (session 136, Debt)
+- Debt (audit 134): the awake Gyre had no `perf.cjs` run. New run `gyre` (Surge, god mode, core held 4 cells from the
+  Gyre, rim tell on, 2 tagged swarms kept out; `ONLY` takes a comma list). CPU × 4, 1280 × 800: gyre / shoal mean
+  frame **1.29–1.36×** (+7–11 ms); phone 1.18×. Split: asleep (Drift) already +7 ms, the swarms and the update ~0.3 ms,
+  the dashes ~0; the cost was drawGyre's shadowBlur 12 over a 4-cell + pad clip box, rim tell included.
+- Now: the blur covers only the core ring + hexagon, clipped to 0.4 cell + pad (`r.gyreGlowBox`); the rim tell is three
+  strokes (`GYRE_RIM_GLOW` 10 / 6 / 2 px at × 0.15 / 0.3 / 1, D-160's rule); the key plate is unblurred. Desktop
+  1.04–1.20×, phone 1.13×. Screenshot: the rim still reads as a sparking mint outline. `gyre.cjs` checks no blurred
+  strokeRect and a box < 3 cells (fails on the old code).
+- Rejected: dropping the dashes (measured ~0 ms); fewer swarm motes (the update is ~0.3 ms, and it is the fight's read).
