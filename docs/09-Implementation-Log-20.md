@@ -69,3 +69,5 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   shots in 10 s 12 → 22; a ◆ 6 cells out and a Glitch 160 px out only from Tether 1; saves; tab + phone 320 Large text.
   Fails on old code (no module). Observed: a held Glitch gives up at 6 s (D-017), so the Volley count swaps in a fresh one.
 - Screenshot: Research tab, Focus MAX with 2 pips, Volley "0.6 s → 0.45 s" ●35, Tether row below (scrolls).
+- **B-102 fixed:** `lens.cjs` built its "old save" as `SAVE_FORMAT - 1`, so format 25 skipped the Lens step (smoke
+  669/670). It now finds the step that adds `nexus.lens`. Other `SAVE_FORMAT - 1` users test fields every format has.
