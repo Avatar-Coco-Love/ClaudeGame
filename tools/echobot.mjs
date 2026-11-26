@@ -4,7 +4,8 @@
 // Usage: node tools/echobot.mjs [--seeds=12] [--minutes=10] [--build=mid] [--mode=drift,surge]
 // S-71a (D-186, D-187): `--orders [--seeds=48] [--base=1000]`, the M16 measure: surgebot's `deep` route, mid, 5 min,
 // no Echo vs Mine / Defend / Auto at Echo levels 0 and 2 (all rows); means of gain / min (banked + carried), damage / min.
-// 48 seeds (6 × GATE_SEEDS, ~3 min): on 16 the Auto / Defend damage ratio swung 0.78–1.25 between seed sets (D-187).
+// 48 seeds (6 × GATE_SEEDS, ~4 min): on 16 the Auto / Defend damage ratio swung 0.78–1.25 between seed sets (D-187).
+// S-71b (D-189): the M16 gate in smoke (tests/echoorder.cjs via gates.cjs).
 import { runBot } from './surgebot.mjs';
 import { CELL, ECHO_BLINK_CELLS } from '../src/config.js';
 const GATE_SEEDS = 8; // B-092 / D-155: the seed count gate verdicts are defined on (biomefoe.mjs runs on import)
@@ -63,7 +64,9 @@ export function ordersGate(n = 6 * GATE_SEEDS, mins = 5, base = 1000) {
     const checks = [[`L${l} Auto gain / Mine ${(a.gain / m.gain).toFixed(3)} ≥ 0.9`, a.gain >= 0.9 * m.gain],
       [`L${l} Auto damage / Defend ${(a.dmg / d.dmg).toFixed(3)} ≤ 1.1`, a.dmg <= 1.1 * d.dmg],
       [`L${l} Auto gain Drift / Surge ${(ad.gain / a.gain).toFixed(3)} in 0.8–1.25`, band(ad.gain / a.gain)],
-      [`L${l} added gain Drift / Surge ${(added('drift') / added('surge')).toFixed(3)} in 0.8–1.25`, band(added('drift') / added('surge'))]];
+      // S-71b (D-189, Q-040): the added gain is a difference of noisy means and Surge's Echo spends time saving damage, so
+      // the band is on Auto gain (line above); the added-gain ratio only has a 1.5 ceiling (48 seeds read 1.26–1.33).
+      [`L${l} added gain Drift / Surge ${(added('drift') / added('surge')).toFixed(3)} ≤ 1.5 (D-189)`, added('drift') / added('surge') <= 1.5]];
     if (l === 2) for (const mode of ['surge', 'drift'])
       checks.push([`L2 ${mode} share ${(100 * share(mode)).toFixed(1)} % in 15–35 %`, share(mode) >= 0.15 && share(mode) <= 0.35]);
     for (const [txt, ok] of checks) { lines.push(`${ok ? 'ok  ' : 'FAIL'} ${txt}`); if (!ok) fails.push(txt); }

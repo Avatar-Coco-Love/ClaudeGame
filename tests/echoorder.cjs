@@ -165,6 +165,12 @@ async function nodeChecks(check) {
       keys.length === 10 && keys.every(k => Number.isFinite(r.rows[k].gain) && Number.isFinite(r.rows[k].dmg)) &&
       r.rows['surge auto L0'].sw > 0 && /no verdict/.test(r.lines.at(-1)), r.lines.slice(-3).join(' | '));
   }
+  { // S-71b gate (D-187, D-189): tools/echobot.mjs --orders, 48 seeds × 5 min, every row
+    const out = await require('./gates.cjs').run('echobot.mjs', ['--orders']);
+    const line = out.split('\n').find(l => l.startsWith('gate')) || '';
+    check('S-71b: the echobot.mjs --orders gate passes on 48 seeds (Auto ≥ 0.9 × Mine gain, ≤ 1.1 × Defend damage, Drift / Surge Auto gain 0.8–1.25, added ≤ 1.5, L2 share 15–35 %)',
+      /PASS/.test(line), out.trim().split('\n').filter(l => /FAIL|gate/.test(l)).join(' | '));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
