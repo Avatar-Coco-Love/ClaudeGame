@@ -43,17 +43,18 @@ async function browserChecks(browser, url, c, errors) {
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
 
-  // (1) `new Game` at 256 under a 4× CPU throttle: median of 3 seeds ≤ 150 ms (measured 67 ms, session 92).
+  // (1) `new Game` at 256 under a 4× CPU throttle: median of 5 seeds ≤ 150 ms (measured 67 ms, session 92; 84 alone,
+  // audit 144). B-096 (2nd use of the ID, session 133): 154 ms once under smoke load; 5 seeds outvote a busy moment.
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   const build = await pg.evaluate(async () => {
     const { Game } = await import('/src/game.js'), au = new Proxy({}, { get: () => () => {} }), t = [];
     new Game({ seed: 1, mode: 'drift', audio: au, size: 256 }); // warm (JIT)
-    for (const seed of [77, 4242, 909]) { const s = performance.now(); new Game({ seed, mode: 'drift', audio: au, size: 256 }); t.push(performance.now() - s); }
+    for (const seed of [77, 4242, 909, 31, 5150]) { const s = performance.now(); new Game({ seed, mode: 'drift', audio: au, size: 256 }); t.push(performance.now() - s); }
     return t.sort((a, b) => a - b);
   });
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
-  check('S-46b2 budget: new Game at 256 under a 4× CPU throttle, median of 3 seeds ≤ 150 ms', build[1] <= 150, `${build.map(v => v.toFixed(0)).join(' / ')} ms`);
+  check('S-46b2 budget: new Game at 256 under a 4× CPU throttle, median of 5 seeds ≤ 150 ms', build[2] <= 150, `${build.map(v => v.toFixed(0)).join(' / ')} ms`);
 
   // New World is 256; the dev panel shows Ring 90 / 110 there (5 rings) and hides them in a 160 world.
   // B-090 (audit 109): the draw ratio swings by seed (0.45–1.5×), so New World's random seed is pinned for this page.

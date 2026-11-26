@@ -40,3 +40,15 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   reworking Glitches now (no play-test says they feel dumb; Q-038 asks after S-74); Surge-only hunters.
 - Q-022 closed (D-181); Q-038 / Q-039 opened. Specs `07-Build-Specs-19.md` / `-20.md`, roadmap `04-Roadmap-5.md`.
   No code change; no bugs found.
+
+## Session 144 — Audit: Spire tests pinned (B-101), budget median of 5 (B-096), 09 archive (v1.10.85, D-183)
+- No subagent tool: sweeps in-session, newest code first (`nexusview.js` S-65 rings, Lens cost / cooldown vs D-176…
+  D-179 and `config.js`: match). No game bug found; D-181 / D-182 are specs, no code yet.
+- Debt carried two audits first (D-144): B-096 (`new Game` 154 ms once under load). Profiled in node: world gen is ~all
+  of it (noise ×7 + per-cell loop, ~15 ms unthrottled); hoisting getters gave no change (hash of 80 worlds equal,
+  reverted). Fix in the check: median of 5 seeds, same bar (alone 76 / 77 / 78 / 92 / 110 ms).
+- B-100 repro: `facet.cjs` got its own runner; 6 in parallel × 2 gave 1 FAIL, a different one: **B-101** the relight
+  toast read "A dormant Spire (2/5)", a second Spire near Spire 0 in a random world (D-100 said pin). `facet` /
+  `spirefeed` / `wake` now use `pinnedNewWorld`; the pin's gap check covers 256 too (78.4 cells both sizes). 12 / 12.
+- Docs drift: B-096 was assigned twice (sessions 127, 133; the second is the budget one). `09` sessions 134–138
+  archived word for word. Workflow review in D-183.

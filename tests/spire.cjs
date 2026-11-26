@@ -108,9 +108,10 @@ async function foundChecks(check) {
   check('the core hexagon breathes 0.35–0.6 over 6 s; held at 0.6 under reduced motion (S-27)',
     b[0] === 0.6 && b[2] === 0.35 && b[1] === 0.475 && still.every(v => v === 0.6), JSON.stringify({ b, still }));
   // B-060: the browser checks' pinned seed keeps every other Spire ≥ PIN_GAP cells from Spire 0, so the approach sees one.
-  const ps = new Game({ seed: PIN_SEED, mode: 'drift', audio: au, size: 160 }).spires;
-  const gap = Math.min(...ps.slice(1).map(q => Math.hypot(q.x - ps[0].x, q.y - ps[0].y)));
-  check(`the Spire browser checks' pinned seed has no second Spire within ${PIN_GAP} cells of Spire 0 (B-060)`, gap >= PIN_GAP, `seed ${PIN_SEED}, gap ${gap.toFixed(1)}`);
+  // Audit 144 (B-101): at both sizes, since New World builds 256 (S-46b2) and facet / spirefeed / wake use the pin too.
+  const gaps = [160, 256].map(size => { const ps = new Game({ seed: PIN_SEED, mode: 'drift', audio: au, size }).spires;
+    return Math.min(...ps.slice(1).map(q => Math.hypot(q.x - ps[0].x, q.y - ps[0].y))); });
+  check(`the Spire browser checks' pinned seed has no second Spire within ${PIN_GAP} cells of Spire 0, 160 and 256 (B-060, B-101)`, gaps.every(g => g >= PIN_GAP), `seed ${PIN_SEED}, gaps ${gaps.map(g => g.toFixed(1)).join(' / ')}`);
 }
 
 // Teleport 7 cells out from Spire k's core on the side facing the Nexus (the carved 3×3 room stays clear of the 9×9
@@ -217,4 +218,4 @@ async function browserChecks(browser, url, check, errors, shots) {
   await ph.close();
 }
 
-module.exports = { nodeChecks, foundChecks, browserChecks, nearSpire, PIN_SEED, PIN_GAP };
+module.exports = { nodeChecks, foundChecks, browserChecks, nearSpire, pinnedNewWorld, PIN_SEED, PIN_GAP };
