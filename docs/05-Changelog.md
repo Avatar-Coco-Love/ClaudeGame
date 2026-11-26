@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.83 — 2026-11-26
+- No change in play yet: the next update is planned. Each world will keep a short list of feats (open every vault,
+  chart a third of the map, empty five rifts and more) shown at the Nexus and on the ending card. They pay nothing
+  and count the same in Drift and Surge.
+
 ## v1.10.82 — 2026-11-26
 - **The Nexus reaches out (v1.10).** The Nexus now wears what you've built: a thin cyan ring for Radiance, a mint one for
   the Chart and a violet-white one for the Lens. The Lens ring dims while a call recharges and brightens when you can

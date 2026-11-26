@@ -34,6 +34,8 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
   Drift, same reward, so neither mode is the "real" one.
 - **M15 (D-175): the Nexus reaches out.** A recurring Prism sink in Nexus Development: the Lens calls a rift where you
   stand, for a price, so late Prisms buy play, not nothing.
+- **M16 (D-180): feats.** At most six world goals that pay nothing (one per Nexus hexagon vertex), the same in both
+  modes, so a late world still says what is left to do.
 - **Out of scope:** multiplayer/co-op (a design spike at most, Q-004), telemetry or analytics, a standalone puzzle mode,
   accounts or cloud saves, monetisation, story text or characters.
 - **New milestones:** an item outside M1–M14 needs a design-session D-xxx that names the pillar it serves and what it replaces.
