@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.9.80';
+export const VERSION = '1.9.81';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -312,7 +312,7 @@ export const RIFT_EVERY_S = [240, 120], RIFT_S = 45, RIFT_R = [8, 12], RIFT_TRIE
 export const RIFT_ORE = [[T.LUMEN, T.CRYSTAL], [T.CRYSTAL, T.LUMEN], [T.PRISM, T.LUMEN], [T.TIDE, T.PRISM], [T.CALX, T.PRISM]]; // [major, minor] by ring
 export const RIFT_MAJOR = [6, 6, 6, 3, 3], RIFT_BONUS = 1; // RIFT_MAJOR[ring]: cells of the first ore (≈ / ⬟ are worth 12, so 3 of 9); RIFT_BONUS: extra yield rolls per rift cell (D-156: the gate's tuning)
 // S-63 Lens (D-175): a called rift costs RIFT_CALL_COST ▲ from the bank, RIFT_CALL_CD s of play apart (unsaved), and lasts RIFT_S.
-export const RIFT_CALL_COST = 30, RIFT_CALL_CD = 90;
+export const RIFT_CALL_COST = 30, RIFT_CALL_CD = 150; // S-64 gate (D-178): 90 s gave Kiln call / mine 1.38
 export const RIFT_RGB = '226, 208, 255'; // violet-white: the pocket's shimmer and its minimap dot
 // S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep; + Shoal / Kiln at 256), seed-only
 // (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre

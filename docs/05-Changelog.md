@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.9.81 — 2026-11-26
+- **Lens tuned:** a rift can be called once every 150 s (was 90 s). Tested over many runs in Deep, Shoal and Kiln:
+  calling on every cooldown now earns at most about a quarter more ore than plain mining, and always costs more ▲
+  than it brings back, the same in Drift and Surge. A call stays a choice, not the new way to mine.
+
 ## v1.9.80 — 2026-11-26
 - **Clearer buttons:** the Lens's call-a-rift button is now ❖ (it used to be ✧, the same mark as the Lodestone
   Anomaly's chip). No other change in play; a health check behind the scenes (phone layouts re-checked with every

@@ -18,3 +18,16 @@ alternatives). D-177 on.
 - Workflow: a Debt line carried three audits gets fixed or closed with a reason in that audit, not copied on.
 - Rejected: changing Lodestone's chip instead (older, in saves' toasts and players' memory); ⊛ / ⌖ (thin at 44 px);
   ◈ (reads as Echo's ◇); speeding `quality.cjs` with a fake clock in `Quality` (test-only hook in game code).
+
+### D-178 — S-64 Lens gate PASS at a 150 s call cooldown (session 140, Build)
+- Gate: `tools/eventrun.mjs --call` (in `gates.cjs`, checked by `lens.cjs`): the S-57a bot, max build, Relay pad, no
+  creatures / weather, natural rifts off (`rift.force` 'calls', tools only), Lens built; 16 seeds × 10 min, both modes,
+  Deep / Shoal / Kiln; policy mine vs call-on-cooldown (detour to the pocket). Value ◆ 1 ▲ 3 ● 4 ≈ / ⬟ 12, gross
+  (▲ spent added back: the strict reading). "Net ▲ < 0" read as call − mine ▲ per run, spent included (the sink is
+  real against not calling; a run's own ▲ is always > 0 from ring ore).
+- Try 1, CD 90: Kiln 1.381 / 1.286 FAIL (Deep 1.17 / 1.20, Shoal 1.23 / 1.19). Try 2, CD 120: Kiln 1.304 / 1.237 FAIL.
+  Try 3, CD 150: Deep 1.131 / 1.155, Shoal 1.147 / 1.092, Kiln 1.185 / 1.226; ▲ call − mine −35…−75 / run; Drift /
+  Surge 0.97–1.05: **PASS**. Cost stays ▲ 30 (the pocket rules stay S-57a's, as the spec says).
+- Rejected: cost 40 (it gates the first calls on the bank, not the rate: Kiln's excess is the call rate); net value
+  (spent ▲ taken off: Kiln 1.01, would pass at 90 s but hides that ▲ is cheap to the bot); a separate `lensrun.mjs`
+  (`eventrun` is 100 lines and shares the pad, detour and bot).

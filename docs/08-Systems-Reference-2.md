@@ -16,4 +16,4 @@ when the system changes). Moved in Design 132 for `02` headroom.
 - Lens (S-63, D-176, `rift.js` `callRift` / `callBlock`): Nexus row ▲ 40 (`nexusLevels.lens`, format 24). C / ❖ (D-177) spends
   `RIFT_CALL_COST` ▲ 30 and opens a rift now (own stream `rng['rift-call']`, `open.called`, closes at t0 + 45 s; a natural
   one due meanwhile is skipped). Refused, nothing spent: Nexus ring, open rift, weather / Wake / ending / awake boss,
-  `RIFT_CALL_CD` 90 s (unsaved), < 30 ▲, no site. ❖ dims while refused. `tests/lens.cjs`.
+  `RIFT_CALL_CD` 150 s (unsaved; D-178), < 30 ▲, no site. ❖ dims while refused. `tests/lens.cjs`.

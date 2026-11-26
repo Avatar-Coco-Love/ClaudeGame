@@ -3,7 +3,7 @@
 // schedule stays a pure function of seed and time. While open (RIFT_S), a 3 × 3 rock pocket 8–12 cells from the core, in
 // the core's own ring, is ore (RIFT_ORE by ring); at the close every pocket cell still standing reverts whole to its old
 // type (ore lost). Nothing is saved: the cells regenerate from the seed on a reload, and a reload mid-rift skips that rift.
-// A Wake or the ending closes the open one and skips any due inside them. `force` 'off' is for tools and tests only.
+// A Wake or the ending closes the open one and skips any due inside them. `force` 'off' / 'calls' (no natural rifts, Lens calls still open) is for tools and tests only.
 import { RIFT_CALL_COST, RIFT_CALL_CD, RIFT_EVERY_S, RIFT_S, RIFT_R, RIFT_TRIES, RIFT_ORE, RIFT_MAJOR, RIFT_BONUS, RIFT_RGB, WEATHER_S, NEXUS_RADIUS, CELL, T } from './config.js';
 import { seededStream, insideBorder } from './world.js';
 import { weatherGap } from './weather.js';
@@ -99,7 +99,7 @@ export function updateRift(game) {
   if (r.open && r.open.called) { // S-63: a called rift keeps its own clock; a natural one due meanwhile is skipped
     if (t >= r.open.t0 + RIFT_S || busy) closeRift(game); else if (t >= r.start) r.skip = r.k;
   }
-  const due = t >= r.start && r.skip !== r.k;
+  const due = r.force !== 'calls' && t >= r.start && r.skip !== r.k; // 'calls' (S-64 gate): Lens calls only
   if (r.open && !r.open.called && (r.open.k !== r.k || !due)) closeRift(game);
   if (!r.open && due && r.tried !== r.k) { r.tried = r.k; if (!game.bossAwake) openRift(game); } // S-60b: none opens while a boss is awake
 }
