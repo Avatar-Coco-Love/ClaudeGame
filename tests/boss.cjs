@@ -3,7 +3,7 @@
 // the glow moves (i + 5) mod 8; the core is immune until the 8th plate; the loot bursts once; Drift = Surge; the flare
 // shoves + heats within 3 cells only; a mode switch keeps the fight; an old 256 save gets the lair (refund, core moved),
 // a 160 save none; a reload mid-fight restores the plates, a downed boss stays down. Probe: a mid build (beam 5, range 3)
-// takes it apart in ≤ 90 s. Browser: the core and lit plate are drawn. Usage: node tests/boss.cjs [--browser] (BOSS_SHOT=path.png)
+// takes it apart in ≤ 90 s. Browser: the core and lit plate are drawn; the lit plate's break passes the glow (B-095). Usage: node tests/boss.cjs [--browser] (BOSS_SHOT=path.png)
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -160,6 +160,11 @@ async function browserChecks(browser, url, check, errors, shot) {
   const r = await pg.evaluate(() => ({ drawn: window.__lumen.renderer.bossDrawn }));
   if (shot) await pg.screenshot({ path: shot });
   check('S-60a: a seen Crucible draws its core and lit plate', has && r.drawn === 1, JSON.stringify({ has, ...r }));
+  const pass = await pg.evaluate(() => { // B-095: the renderer once replaced the world's break listeners, so in the page the lit plate's break never passed the glow on
+    const g = window.__lumen.game, B = g.bosses.list[0], [[i, j]] = [[[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]][B.lit]], was = B.lit;
+    g.world.destroy(B.x + i, B.y + j); return { was, now: B.lit };
+  });
+  check('B-095: in the page, breaking the lit plate passes the glow to (i + 5) mod 8', pass.now === (pass.was + 5) % 8, JSON.stringify(pass));
   await pg.close();
 }
 

@@ -17,3 +17,19 @@ Continues part 17 (sessions 119–125). Newest at the bottom; read the tail only
   Shoal pad is 8–16 cells from the lair, and its floor shifts paths and spawns (12 / 16 seeds still PASS). Fix as for
   rifts: `runBot` clears lairs unless `boss: 'on'`; the gates read their old numbers exactly (Shoal 0.017, Kiln 0.039).
 - Smoke 601/601 (+11: `boss.cjs` 10 node + 1 browser).
+
+## Session 127 — Design: Crucible play-test, B-095, boss gate scope (v1.8.68, D-164)
+- Play-test in the page (seed 4242, mid build, the S-60a probe's path as `input.read`): after the first plate broke the
+  glow stayed on the empty cell and nothing took damage for 120 s. **B-095:** `render.js` attach replaced
+  `world.listeners`, dropping `boss.js`'s break listener (node probes have no renderer, so smoke never saw it). Fix: the
+  renderer adds / removes only its own listener. New browser check in `boss.cjs` failed on the old code (was 1, now 1).
+- After the fix: down in 60.5 s (7 → 4 plates by 24 s, core open at 47 s), loot burst + toast + filled minimap octagon.
+  Screenshots viewed: the lit plate shows only as an orange edge in a still frame (close to Kiln rock) → S-60b tints
+  its fill. The flare ring reads; the bot's 3.4-cell ring stays just out of `BOSS_FLARE_R`.
+- Specs vs shipped (D-163): S-60b gate now runs `boss: 'on'` with creatures, spawns and vents live and logs Surge deaths
+  by cause (blind spot from B-094: creature gates run without lairs); Wards ignore the body and embers. S-61a fits D-163
+  as is (a new lair on a format-23 save is refunded by the existing no-record rule). S-62 adds an advisory lairs-on
+  run of both creature gates (16 seeds).
+- B-096 (caught by smoke, 601/602): `lock.cjs`'s browser check crashed on a world with no Flare Lock ("New world"
+  ignores `?seed` and draws a random one; 1 in 25 measured has none). The test now retries a new world (≤ 8) until
+  one has a lock; 5 / 5 standalone runs pass.
