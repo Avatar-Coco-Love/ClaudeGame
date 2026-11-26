@@ -1,8 +1,8 @@
 // S-63 Lens checks (D-175). smoke.cjs calls nodeChecks and browserChecks. Node: the Nexus row (both sizes) and its price;
 // a call charges RIFT_CALL_COST and opens a pocket in the core's ring from its own stream; every refusal charges nothing;
 // the natural schedule's sites are the same with and without calls; a called rift closes at 45 s and a natural one due
-// meanwhile is skipped; Drift = Surge; an old save loads the Lens unbuilt. Browser: ✧ and its key hidden before the Lens,
-// shown after; C and ✧ call (▲ spent, toast), a second press is refused with nothing spent.
+// meanwhile is skipped; Drift = Surge; an old save loads the Lens unbuilt. Browser: ❖ and its key hidden before the Lens,
+// shown after; C and ❖ call (▲ spent, toast), a second press is refused with nothing spent.
 // Usage: node tests/lens.cjs [--browser | --browser-only]
 const quiet = new Proxy({}, { get: () => () => {} });
 
@@ -95,6 +95,14 @@ async function nodeChecks(check) {
     check('S-63 Lens: an old save loads the Lens unbuilt, a built one reloads, a bad value loads 0',
       up.nexus.lens === 0 && g0.nexusLevels.lens === 0 && g1.nexusLevels.lens === 1 && g2.nexusLevels.lens === 0, `${up.nexus.lens} ${g0.nexusLevels.lens} ${g1.nexusLevels.lens} ${g2.nexusLevels.lens}`);
   }
+  { // audit 139 (B-099, D-177): a HUD button's glyph never doubles as an Anomaly chip's (✧ was both the Lens button and Lodestone)
+    const html = require('fs').readFileSync(require('path').join(__dirname, '../index.html'), 'utf8'), btn = {};
+    for (const id of ['scan-btn', 'echo-btn', 'call-btn', 'mode-glyph', 'place-glyph', 'mute-btn', 'menu-btn']) {
+      const m = html.match(new RegExp(`id="${id}"[^>]*>(?:<span[^>]*>)?\\s*(\\S)`, 'u')); btn[id] = m ? m[1] : '?';
+    }
+    const chips = Object.values(C.ANOMALY_KINDS).map(k => k.glyph), clash = Object.entries(btn).filter(([, g]) => g === '?' || chips.includes(g));
+    check('Audit 139: no HUD button glyph (◎ ◇ ❖ ⟂ ✦ ♪ ≡) is also an Anomaly chip glyph (B-099)', !clash.length, JSON.stringify({ btn, chips }));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
@@ -116,7 +124,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.click('#call-btn'); await pg.waitForTimeout(300);
   const refused = await st();
   if (shot) await pg.screenshot({ path: shot });
-  check('S-63 Lens: ✧ and C do nothing before the Lens; after it ✧ shows, C calls a rift (30 ▲, toast), a second press via ✧ is refused (nothing spent)',
+  check('S-63 Lens: ❖ and C do nothing before the Lens; after it ❖ shows, C calls a rift (30 ▲, toast), a second press via ❖ is refused (nothing spent)',
     before.hidden && !before.open && before.prism === 100 && !shown.hidden && called.open && called.prism === 70 && /Rift called/.test(called.toast) &&
     refused.prism === 70 && /already open/.test(refused.toast), JSON.stringify({ before, shown, called, refused }));
   await pg.close();
