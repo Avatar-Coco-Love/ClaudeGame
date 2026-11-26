@@ -13,3 +13,7 @@ Continues part 20 (it neared the 8 KB cap at session 147). Newest at the bottom;
   1 px ring legible, Glitch held off. No bug found.
 - Specs: S-71 rewritten (share = added gain, means, run list); S-72 keeps the Echo's own BFS, S-73 moves it; Tracers in
   `beamFoes` make Auto defend in Drift too; S-74 reports an Auto-Echo row. D-186; Q-039 closed (no).
+- **B-103 fixed:** smoke 669 / 670, `lens.cjs` page check: "No rock here to open a rift in". Its New World used a
+  random seed and moved the core 14 cells east; that spot has no rift site on 5 / 300 seeds (1.7 %). Now
+  `pinnedNewWorld` (D-100). Repro rule (D-183): 6 parallel × 2 runs, 12 / 12 pass. Second random-world test bug after
+  B-101, so a check is queued for audit 149 (`04-…-4` Debt).
