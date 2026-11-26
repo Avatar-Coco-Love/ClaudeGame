@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 144** · **Version: v1.10.85** (144: Audit, D-183; next 145 Build).
+_Last updated: 2026-11-26_ · **Session counter: 145** · **Version: v1.10.86** (145: Build S-69, D-184; next 146 Build).
 **Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, v1.10 = M15 Nexus reaches out: Lens ▲ sink + rings, D-175…D-179). Next (D-181, `04-…-5`): M16 Echo (`07-…-19`), M17 Hunters (`07-…-20`), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -24,7 +24,7 @@ _Last updated: 2026-11-26_ · **Session counter: 144** · **Version: v1.10.85** 
   Surge (S-61b, D-171): any plate; tagged mote swarms / 15 s (≤ 2, `spawnSwarm`), rim 12 dmg / 4 s (≤ 8 px), pull 30; gate `--boss=gyre` PASS.
   Perf (D-174): `perf.cjs` run `gyre`; only the core ring is blurred, rim tell = strokes (1.33× → ~1.1× of shoal).
   Marks (S-62, D-173): Chart L2 shows unseen lairs faint; sting on wake / first Drift plate; ending "Bosses n / 2" (256). Q-034: no.
-- Weather (S-33), Anomalies (S-35…37, saved), Echo (S-42/43, `echo.js`, Gather / Guard): `08-…-2`.
+- Weather (S-33), Anomalies (S-35…37, saved), Echo (S-42/43, `echo.js`; S-69, D-184: Mine / Defend / Auto, new = Auto): `08-…-2`.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
 - Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core; Surge lunge 22 / Drift bites 4 cargo; unsaved. Gate `biomefoe.mjs` PASS (`GATE_SEEDS` 8, D-155).
 - Motes (S-54, D-150, `mote.js`): Shoal swarm of 6, 40–60 s, ride the current; Surge 4 dmg, a touch takes 1 item, Drift carries loose ore; gate PASS.
@@ -40,13 +40,13 @@ _Last updated: 2026-11-26_ · **Session counter: 144** · **Version: v1.10.85** 
 - Darkness/light, minimap (D-123), Nexus pointer, toasts, audio ceilings (`audio.cjs`). `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 24); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 27 from D-181; last D-183), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-20`; 134–138 archived in audit 144), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 27 from D-181; last D-184), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-20`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-65 built (M15 done, `07-…-17`). Next: S-69…S-71 (M16 Echo, `07-Build-Specs-19.md`), S-72…S-74 (M17), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-65, S-69 built (M15 done, `07-…-17`). Next: S-70…S-71 (M16 Echo, `07-Build-Specs-19.md`), S-72…S-74 (M17), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166; Lens gate `eventrun --call` ~95 s). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
   Swallowed test waits: `node -r ./tools/waitprobe.cjs` (D-172).
 
 ## Next step (one thing)
-Build (145): S-69 Echo modes Mine / Defend / Auto per `07-Build-Specs-19.md` (D-181).
+Build (146): S-70 Echo upgrades Focus / Volley / Tether per `07-Build-Specs-19.md` (D-181).

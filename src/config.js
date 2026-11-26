@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.10.85';
+export const VERSION = '1.10.86';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -238,7 +238,7 @@ export const RESEARCH = [
   { id: 'wide', name: 'Wide Beam', desc: 'A 3-cell swath: slower per cell, carves wide halls', cost: 25 },
   { id: 'pulse', name: 'Pulse Beam', desc: 'Hold to charge, release to fire: 1.5× reach, pierces 3 cells', cost: 40 },
   { id: 'arc', name: 'Arc Beam', desc: 'Hits jump to 2 more of the same kind nearby: ore veins, creature packs', cost: 35 }, // S-55 (D-151)
-  { id: 'echo', name: 'Echo', desc: 'A lesser core that follows you and mines exposed ore', cost: 30 }, // S-42 (D-108)
+  { id: 'echo', name: 'Echo', desc: 'A lesser core that follows you: Mine, Defend, or Auto (it picks)', cost: 30 }, // S-42 (D-108), S-69
 ];
 // S-42 Echo (D-108, echo.js): follows down a BFS field from the core's cell, blinks back when stranded, Gathers exposed ore.
 export const ECHO_R = 6;                 // px collision radius
@@ -254,7 +254,9 @@ export const ECHO_DMG = 0.5;             // × the core's Beam Power dps
 export const ECHO_PICK_S = 0.25;         // s between target searches while it has none
 // S-43 orders (D-113): Gather (S-42) or Guard. Guard bolts the Glitch / Spitter bolt nearest the core within ECHO_GUARD_PX,
 // with a clear line from the Echo, every ECHO_GUARD_S; ECHO_GUARD_DMG hp a hit (a tier-1 Glitch, 2.3 hp, in 3; a bolt in 1).
-export const ECHO_ORDERS = ['gather', 'guard'];
+export const ECHO_ORDERS = ['gather', 'guard', 'auto']; // S-69 (D-184): shown as Mine / Defend / Auto; a new Echo starts in Auto
+export const ECHO_AUTO_S = 0.25, ECHO_AUTO_HOLD = 2; // S-69 Auto: threat check every 0.25 s; 2 s with none -> back to Mine
+export const ORE_WORTH = { shard: 1, prism: 3, lumen: 4, tide: 12, calx: 12 }; // S-69: Mine scores worth / (cells + 2); eventrun's VALUE
 export const ECHO_GUARD_S = 0.8, ECHO_GUARD_PX = 140, ECHO_GUARD_DMG = 0.8, ECHO_SHOT_S = 0.12; // shot: drawn this long
 export const RESEARCH_HINT = `Gold Lumen ● hides past ${LUMEN_D} cells, in the Deep`;
 

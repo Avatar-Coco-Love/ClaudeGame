@@ -36,7 +36,7 @@ export function createDev(ui) {
       return { x, y };
     },
     /** S-42: grant the Echo (it appears beside the core next frame). */
-    echo() { g().research.echo = true; ui.persist(); return true; },
+    echo() { g().research.echo = true; g().echoOrder = 'auto'; ui.persist(); return true; }, // S-69: as bought, starts in Auto
     /** S-47: Undertow on / off (tools and by-hand comparison; not saved). */
     undertow(on = g().undertow.off) { g().undertow.off = !on; return on; },
     god(on = !g().god) { g().god = on; return on; },

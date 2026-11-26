@@ -7,7 +7,9 @@ async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { T, CELL, ECHO_GUARD_DMG } = await import('../src/config.js');
   const { makeGlitch } = await import('../src/glitch.js');
+  const { makeSwarm } = await import('../src/mote.js');
   const { orderLabel } = await import('../src/echo.js');
+  const { buyResearch } = await import('../src/research.js');
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const audio = new Proxy({}, { get: () => () => {} });
 
@@ -47,8 +49,13 @@ async function nodeChecks(check) {
     g.update(1 / 60, { ...idle(), echoOrder: true });
     const one = g.echoOrder, ev1 = g.events.includes('echo-order');
     g.update(1 / 60, { ...idle(), echoOrder: true });
-    check('Echo orders: the order action cycles Gather → Guard → Gather once researched, and not before (S-43)',
-      before === 'gather' && !ev0 && one === 'guard' && ev1 && g.echoOrder === 'gather', JSON.stringify({ before, ev0, one, ev1, two: g.echoOrder }));
+    const two = g.echoOrder;
+    g.update(1 / 60, { ...idle(), echoOrder: true });
+    check('Echo orders: the order action cycles Mine → Defend → Auto → Mine once researched, and not before (S-43, S-69)',
+      before === 'gather' && !ev0 && one === 'guard' && ev1 && two === 'auto' && g.echoOrder === 'gather', JSON.stringify({ before, ev0, one, ev1, two, three: g.echoOrder }));
+    const nb = new Game({ seed: 4242, mode: 'surge', audio }); nb.bank.lumen = 99;
+    const ok = buyResearch(nb, 'echo');
+    check('Echo orders: a newly researched Echo starts in Auto (S-69)', ok && nb.echoOrder === 'auto' && orderLabel(nb) === 'Auto · Mine', `${ok} ${nb.echoOrder} ${orderLabel(nb)}`);
   }
 
   // Guard kills a held tier-1 Glitch in 3 hits; Gather leaves it whole.
@@ -75,8 +82,63 @@ async function nodeChecks(check) {
   // Drift: the chip says idle; Surge: plain Guard; Gather either way.
   {
     const d = lab('guard', 'drift').g, s = lab('guard').g, ga = lab('gather', 'drift').g;
-    check('Echo orders: the chip reads "Guard (idle)" in Drift, "Guard" in Surge, "Gather" (S-43)',
-      orderLabel(d) === 'Guard (idle)' && orderLabel(s) === 'Guard' && orderLabel(ga) === 'Gather', [orderLabel(d), orderLabel(s), orderLabel(ga)].join(' / '));
+    check('Echo orders: the chip reads "Defend" in Drift and Surge, "Mine" (S-43, S-69: no more "idle")',
+      orderLabel(d) === 'Defend' && orderLabel(s) === 'Defend' && orderLabel(ga) === 'Mine', [orderLabel(d), orderLabel(s), orderLabel(ga)].join(' / '));
+  }
+
+  // S-69 Auto: a seen Glitch at 100 px -> Auto · Defend within 0.25 s; back to Mine 2 s after it dies.
+  {
+    const { g } = lab('auto');
+    const lbl0 = orderLabel(g), e = makeGlitch(g.player.x + 100, g.player.y, 1, 0); e.aggro = true; g.enemies.push(e);
+    let tD = null, t = 0;
+    for (; t < 0.5 && tD === null; t += 1 / 60) { Object.assign(e, { x: g.player.x + 100, y: g.player.y, vx: 0, vy: 0 }); g.update(1 / 60, idle()); if (g.echo.auto === 'defend') tD = t; }
+    const lblD = orderLabel(g);
+    g.enemies.length = 0;
+    let tM = null;
+    for (t = 0; t < 3 && tM === null; t += 1 / 60) { g.update(1 / 60, idle()); if (g.echo.auto === 'mine') tM = t; }
+    check('Echo Auto: a Glitch at 100 px turns it to Auto · Defend within 0.25 s; back to Auto · Mine ~2 s after it is gone (S-69)',
+      lbl0 === 'Auto · Mine' && tD !== null && tD <= 0.25 + 1e-6 && lblD === 'Auto · Defend' && tM !== null && tM >= 1.7 && tM <= 2.3 && orderLabel(g) === 'Auto · Mine',
+      JSON.stringify({ lbl0, tD, lblD, tM }));
+  }
+  // Hysteresis: a Glitch swinging across the range edge (110…170 px, period 2 s) for 10 s gives ≤ 2 switches.
+  {
+    const { g } = lab('auto');
+    const e = makeGlitch(g.player.x + 140, g.player.y, 1, 0); e.aggro = true; e.hp = 1e9; g.enemies.push(e);
+    g.echo.switches = 0;
+    for (let t = 0; t < 10; t += 1 / 60) { Object.assign(e, { x: g.player.x + 140 + 30 * Math.sin(Math.PI * t), y: g.player.y, vx: 0, vy: 0, hp: 1e9, stall: 0 }); g.update(1 / 60, idle()); }
+    check('Echo Auto: a foe swinging across the range edge for 10 s gives ≤ 2 switches: one, into Defend (hysteresis, S-69)', g.echo.switches === 1, `switches ${g.echo.switches}`);
+  }
+  // Defend shoots a closing bolt (100 px) before a nearer Glitch (60 px).
+  {
+    const { g } = lab('guard');
+    const e = makeGlitch(g.player.x + 60, g.player.y, 1, 0); e.aggro = true; g.enemies.push(e);
+    const b = { bolt: true, x: g.player.x + 100, y: g.player.y + 30, vx: -20, vy: -6, r: 5, hp: 0.5, flash: 0, life: 10 }; g.bolts.push(b);
+    const hp0 = e.hp;
+    for (let i = 0; i < 40 && !g.echo.shots; i++) { Object.assign(e, { x: g.player.x + 60, y: g.player.y, vx: 0, vy: 0 }); g.update(1 / 60, idle()); }
+    check('Echo Defend: a closing bolt is shot before a nearer Glitch (S-69)', g.echo.shots === 1 && b.hp <= 0 && e.hp === hp0, JSON.stringify({ shots: g.echo.shots, bolt: b.hp, glitch: e.hp }));
+  }
+  // Mine: a ▲ 3 cells away beats a ◆ 1 cell away (worth / (cells + 2)).
+  {
+    const { g, w, ox, oy } = lab('gather');
+    const ex = Math.floor(g.echo.x / CELL), ey = Math.floor(g.echo.y / CELL);
+    g.echo.x = (ex + 0.5) * CELL; g.echo.y = (ey + 0.5) * CELL;
+    const dy = ey - oy >= 3 ? -1 : 1, sh = [ex + 1, ey], pr = [ex, ey + 3 * dy]; // ◆ 1 cell east, ▲ 3 cells along the hall's height
+    w.cells[w.idx(...sh)] = T.CRYSTAL; w.cells[w.idx(...pr)] = T.PRISM;
+    for (const [x, y] of [sh, pr]) w.explored[w.idx(x, y)] = 1;
+    g.echo.target = null; g.echo.pickT = 0;
+    for (let i = 0; i < 3 && !g.echo.target; i++) { g.echo.x = (ex + 0.5) * CELL; g.echo.y = (ey + 0.5) * CELL; g.update(1 / 60, idle()); }
+    const tg = g.echo.target;
+    check('Echo Mine: picks a ▲ 3 cells away over a ◆ 1 cell away (ORE_WORTH / (cells + 2), S-69)', !!tg && tg.x === pr[0] && tg.y === pr[1],
+      JSON.stringify({ tg, echo: [ex, ey], sh, pr }));
+  }
+  // Drift: Defend hits a Mote.
+  {
+    const { g } = lab('guard', 'drift');
+    if (!g.swarm) g.swarm = makeSwarm();
+    const m = { mote: true, boss: false, grp: 0, x: g.player.x + 70, y: g.player.y, vx: 0, vy: 0, r: 4, hp: 5, maxHp: 5, trail: [] };
+    g.swarm.motes.push(m);
+    for (let i = 0; i < 30 && !g.echo.shots; i++) { Object.assign(m, { x: g.player.x + 70, y: g.player.y }); g.update(1 / 60, idle()); }
+    check('Echo Defend: shoots a Mote in Drift (S-69)', g.echo.shots === 1 && m.hp < 5, JSON.stringify({ shots: g.echo.shots, hp: m.hp }));
   }
 
   // Save: the order round-trips; an old save (the format before this one, no field) loads as Gather; a bad value loads Gather.
@@ -89,6 +151,8 @@ async function nodeChecks(check) {
     const up = upgradeSave(JSON.parse(JSON.stringify(old)));
     const fromOld = up && new Game({ seed: 4242, mode: 'surge', audio, save: up }).echoOrder;
     const bad = new Game({ seed: 4242, mode: 'surge', audio, save: { ...s, echoOrder: 'attack' } }).echoOrder;
+    const auto = new Game({ seed: 4242, mode: 'surge', audio, save: { ...s, echoOrder: 'auto' } }).echoOrder;
+    check('Echo orders: an Auto order round-trips through a save (S-69)', auto === 'auto', auto);
     check('Echo orders: saved as echoOrder; the previous format loads as Gather; a bad value loads Gather (S-43, D-005, B-037)',
       s.echoOrder === 'guard' && back === 'guard' && !!up && up.v === SAVE_FORMAT && fromOld === 'gather' && bad === 'gather',
       JSON.stringify({ saved: s.echoOrder, back, upV: up && up.v, fromOld, bad }));
@@ -113,16 +177,25 @@ async function browserChecks(browser, url, check, errors, shot) {
   const key = await ui();
   await pg.click('#echo-btn'); await pg.waitForTimeout(200);
   const btn = await ui();
-  check('Echo orders: chip and ◇ hidden (R does nothing) until researched; then R → Guard, ◇ → Gather, with chip and toast (S-43)',
-    before.chip === null && !before.btn && unowned.order === 'gather' && key.order === 'guard' && key.chip === 'Guard (idle)' && key.btn && /Echo: Guard/.test(key.toast)
-      && btn.order === 'gather' && btn.chip === 'Gather', JSON.stringify({ before, unowned, key, btn }));
+  check('Echo orders: chip and ◇ hidden (R does nothing) until researched; it starts in Auto; R → Mine, ◇ → Defend, with chip and toast (S-43, S-69)',
+    before.chip === null && !before.btn && unowned.order === 'gather' && key.order === 'gather' && key.chip === 'Mine' && key.btn && /Echo: Mine/.test(key.toast)
+      && btn.order === 'guard' && btn.chip === 'Defend', JSON.stringify({ before, unowned, key, btn }));
+  // S-69: Surge, Auto, a Glitch held 90 px off -> the chip reads Auto · Defend and the ring shows (the screenshot).
+  await pg.evaluate(async () => {
+    const { makeGlitch } = await import('./src/glitch.js'), g = window.__lumen.game;
+    g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.echoOrder = 'auto';
+    const w = g.world, C = 32, px = Math.floor(g.player.x / C), py = Math.floor(g.player.y / C); // an open hall, so the Echo sees it
+    for (let y = py - 2; y <= py + 2; y++) for (let x = px - 2; x <= px + 5; x++) if (w.cells[w.idx(x, y)]) w.destroy(x, y);
+    const e = makeGlitch(g.player.x + 90, g.player.y, 1, 0); e.aggro = true; e.hp = 1e9; g.enemies.push(e);
+    window.__s69 = setInterval(() => Object.assign(e, { x: g.player.x + 90, y: g.player.y, vx: 0, vy: 0, hp: 1e9, stall: 0 }), 10);
+  });
+  await pg.waitForTimeout(600);
+  const au = { ...(await ui()), dbg: await pg.evaluate(() => { const g = window.__lumen.game; return { auto: g.echo && g.echo.auto, nexus: g.inNexus(), paused: g.echo && g.echo.paused, n: g.enemies.length, p: [g.player.x | 0, g.player.y | 0], e: g.echo && [g.echo.x | 0, g.echo.y | 0] }; }) };
+  check('Echo Auto in the page: a held Glitch in Surge turns the chip to "Auto · Defend" (S-69)', au.order === 'auto' && au.chip === 'Auto · Defend', JSON.stringify(au));
   if (shot) await pg.screenshot({ path: shot });
+  await pg.evaluate(() => clearInterval(window.__s69));
   await pg.close();
 }
 
 module.exports = { nodeChecks, browserChecks };
-if (require.main === module) {
-  let fail = 0;
-  nodeChecks((name, ok, detail) => { if (!ok) fail++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`); })
-    .then(() => process.exit(fail ? 1 : 0));
-}
+if (require.main === module) require('./serve.cjs').runStandalone({ nodeChecks, browserChecks, shot: process.env.ECHO_ORDER_SHOT });

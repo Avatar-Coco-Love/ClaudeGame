@@ -52,3 +52,12 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   `spirefeed` / `wake` now use `pinnedNewWorld`; the pin's gap check covers 256 too (78.4 cells both sizes). 12 / 12.
 - Docs drift: B-096 was assigned twice (sessions 127, 133; the second is the budget one). `09` sessions 134–138
   archived word for word. Workflow review in D-183.
+
+## Session 145 — Build: S-69 Echo Mine / Defend / Auto (v1.10.86, D-184)
+- `echo.js`: `autoPick` every 0.25 s (threat → Defend; 2 s calm → Mine), `echoDoing`, labels Mine / Defend /
+  Auto · x; Defend ranks closing bolts, then distance / speed; Mine scores `ORE_WORTH` / (cells + 2). Ring tell.
+- `echoorder.cjs` +8 checks (Auto in 0.25 s and back ~2 s, edge swing 10 s = 1 switch, bolt before a nearer Glitch,
+  ▲ 3 cells over ◆ 1, Drift Mote, new Echo = Auto, save `auto`, page chip). Proved on old code: hold 0.25 s gives 9
+  switches and fails; nearest-first picks the ◆ / the Glitch. Own runner now (`runStandalone`).
+- Screenshot: chip "Auto · Defend", a thin ring round the Echo, Glitch held 90 px off. Observed: a Glitch held 10 s
+  gives up (D-017 `stall`) and Auto goes back to Mine; the test resets `stall`.

@@ -9,7 +9,7 @@
 // Usage: node tools/eventrun.mjs [--call] [--ring=deep,kiln] [--seeds=16] [--minutes=10] [--mode=drift,surge] [--v]
 import { runBot } from './surgebot.mjs';
 import { callBlock, callRift } from '../src/rift.js';
-import { CELL, T, RIFT_CALL_COST, KILN_RING, TIDE_RING, ORE_KIND } from '../src/config.js';
+import { CELL, T, RIFT_CALL_COST, KILN_RING, TIDE_RING, ORE_KIND, ORE_WORTH } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
@@ -17,7 +17,7 @@ const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)
 // GATE_SEEDS (8, D-155): 8 seeds put Deep Surge at 1.034 one run, 16 / 24 converge (≈ 1.09). Fewer = no verdict.
 const GATE_SEEDS = 16;
 const RINGS = { deep: { ring: 2, ore: new Set(['shard', 'prism', 'lumen']) }, shoal: { ring: TIDE_RING, ore: new Set(['shard', 'prism', 'tide']) }, kiln: { ring: KILN_RING, ore: new Set(['shard', 'prism', 'calx']) } };
-const CALL = process.argv.includes('--call'), VALUE = { shard: 1, prism: 3, lumen: 4, tide: 12, calx: 12 }; // S-64's weights (D-156's)
+const CALL = process.argv.includes('--call'), VALUE = ORE_WORTH; // S-64's weights (D-156's), one table since S-69
 const WEIGHT = { shard: 1, prism: 4, lumen: 4, tide: 12, calx: 12 };
 const DETOUR = 12; // cells
 const worth = o => Object.entries(o).reduce((a, [k, n]) => a + (WEIGHT[k] || 0) * n, 0);

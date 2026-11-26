@@ -28,6 +28,7 @@ export function buyResearch(game, id) {
   if (!canResearch(game, id)) return false;
   game.bank.lumen -= researchNode(id).cost;
   game.research[id] = true;
+  if (id === 'echo') game.echoOrder = 'auto'; // S-69: a new Echo starts in Auto
   game.stats.upgrades++;
   game.audio.upgrade();
   if (game.motionOn()) game.coreRing = 1;

@@ -85,7 +85,7 @@ export class Game {
     };
     this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null, facetLatch: null, midEnemy: false }; // S-14: Pulse state
     this.echo = null; // S-42: the live Echo (echo.js) once research.echo; never saved
-    this.echoOrder = 'gather'; // S-43: 'gather' | 'guard' (saved)
+    this.echoOrder = 'gather'; // S-43: 'gather' | 'guard' | 'auto' (S-69: Mine / Defend / Auto; saved; buying the Echo sets 'auto')
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];

@@ -49,3 +49,12 @@ alternatives). D-181 on.
   longer ride audits, D-177 holds). B-IDs: grep the highest before assigning (B-096 was used twice).
 - Rejected: a retry on a failed budget (hides a real slowdown); raising the bar (weakens it); a smaller world-gen
   rewrite (hoisting getters measured no change, reverted).
+
+### D-184 — Echo Auto: a threat check with a 2 s hold; worth-first ore (session 145, S-69)
+- Ids stay `gather` / `guard` (no save change) and `auto` joins; labels Mine / Defend / Auto · Mine|Defend. Buying the
+  Echo (and `dev.echo`) sets Auto; the game default stays `gather`, so old saves keep their order.
+- Auto checks every 0.25 s: a bolt closing ≤ 1.5 × 140 px of the core (no sight needed) or a seen foe ≤ 140 px →
+  Defend; 2 s with none → Mine. Defend ranks closing bolts first, then distance / speed. Mine: `ORE_WORTH` / (cells + 2);
+  `ORE_WORTH` is now eventrun's `VALUE` (one table). Tell: a 1 px ring while defending, no blur (D-160).
+- Rejected: a toast on each Auto switch (noise; the chip and ring show it); defending only while a shot is ready (it
+  would mine between shots and flicker); sight for bolts (a bolt behind a corner still arrives).

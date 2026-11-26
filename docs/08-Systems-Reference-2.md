@@ -11,7 +11,8 @@ when the system changes). Moved in Design 132 for `02` headroom.
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): minimap sites, Scanner marks, end tone, hint line.
 - Echo (S-42, D-112, `echo.js`, 30 ●): follows by BFS, blinks back when stranded, Gathers ore at 0.5× beam dps. Bot `tools/echobot.mjs`.
-  Orders (S-43, D-113): R / ◇ cycles Gather ↔ Guard (0.8 hp / 0.8 s at the foe nearest the core ≤ 140 px); chip in the
+  Orders (S-43, D-113; S-69, D-184): R / ◇ cycles Mine → Defend → Auto (ids gather / guard / auto; 0.8 hp / 0.8 s,
+  closing bolt first, then soonest to the core ≤ 140 px); Auto: threat → Defend, 2 s calm → Mine; chip in the
   `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
 - Lens (S-63, D-176, `rift.js` `callRift` / `callBlock`): Nexus row ▲ 40 (`nexusLevels.lens`, format 24). C / ❖ (D-177) spends
   `RIFT_CALL_COST` ▲ 30 and opens a rift now (own stream `rng['rift-call']`, `open.called`, closes at t0 + 45 s; a natural
