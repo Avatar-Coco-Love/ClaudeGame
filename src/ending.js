@@ -114,5 +114,6 @@ export const fmtTime = t => `${Math.floor(t / 60)}m ${String(Math.floor(t % 60))
 export function endingSummary(game) {
   const by = m => game.spires.filter(s => s.lit && s.mode === m).length, t = game.endedAt ?? game.stats.time;
   return { time: fmtTime(t), cycle: game.cycle, best: game.records.best, mined: game.stats.mined,
-    drift: by('drift'), surge: by('surge'), restored: by('broken'), glitches: game.stats.glitches, n: game.spires.length };
+    drift: by('drift'), surge: by('surge'), restored: by('broken'), glitches: game.stats.glitches, n: game.spires.length,
+    bosses: game.bosses && game.bosses.list.length ? game.bosses.list.filter(B => B.down).length : null, bossN: game.bosses ? game.bosses.list.length : 0 }; // S-62: 256 worlds only (D-158: not required)
 }

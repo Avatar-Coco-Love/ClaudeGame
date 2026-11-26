@@ -13,7 +13,7 @@
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
   WARD_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
-  BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, GYRE_SWARM_S, BOSS_WAKES, BOSS_RGB } from './config.js';
+  BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, GYRE_SWARM_S, BOSS_WAKES, BOSS_RGB, BOSS_CHART_ALPHA } from './config.js';
 import { stepGyre, surgeGyre, gyreKeyBroke, drawGyre } from './gyre.js';
 import { World, seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
@@ -145,6 +145,7 @@ function onBroken(game, x, y) {
   if (!B || B.down || w.get(x, y) !== T.EMPTY) return;
   if (x === B.x && y === B.y) { down(game, B); return; }
   const k = plateIndex(B, x, y);
+  if (k >= 0 && !bossAwake(game, B) && platesLeft(game, B) === 7) game.audio.bossSting(); // S-62: the first plate (asleep)
   if (k < 0 || k !== B.lit) return; // S-60b: an awake boss's other plates break without moving the glow
   if (B.ring === GYRE_RING) { gyreKeyBroke(game, B, k); return; } // S-61a: the key passes on clockwise
   for (let n = nextPlate(k), s = 0; s < 8; n = nextPlate(n), s++) {
@@ -172,6 +173,9 @@ export function updateBosses(game, dt = 0) {
   if (!bs || !bs.list.length || game.endSeq) return;
   for (const B of bs.list) {
     if (B.down) continue;
+    const woke = bossAwake(game, B); // S-62: a low sting each time a boss wakes (unsaved, so a load beside one stings too)
+    if (woke && !B.woke) game.audio.bossSting();
+    B.woke = woke;
     if (B.ring === GYRE_RING) { stepGyre(game, B, dt); surgeGyre(game, B, dt); continue; } // S-61a: no flare; the key steps (S-61b: Surge form)
     const awake = bossAwake(game, B), ph = bossPhase(game, B), key = (awake ? 's' : 'd') + ph.n;
     const dx = p.x - (B.x + 0.5) * CELL, dy = p.y - (B.y + 0.5) * CELL, d = Math.hypot(dx, dy);
@@ -241,16 +245,22 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
   }
 }
 
-/** Minimap: a hollow octagon in the boss's colour at a seen lair, filled once the boss is down. */
+/** Minimap: a hollow octagon in the boss's colour at a seen lair, filled once the boss is down. S-62: the Chart's level 2
+ *  also draws each unseen lair, faint (`g.chartLairs` counts them for tests). */
 export function drawBossMarks(m, g, sc) {
   const bs = g.bosses, w = g.world;
+  g.chartLairs = 0;
   if (!bs || !bs.list.length) return;
+  const charted = (g.nexusLevels.chart || 0) >= 2 && !g.endSeq;
   m.save(); m.lineWidth = 1.25;
   for (const B of bs.list) {
-    if (!w.explored[B.y * w.w + B.x]) continue;
+    const seen = w.explored[B.y * w.w + B.x];
+    if (!seen && !charted) continue;
     m.strokeStyle = m.fillStyle = `rgb(${BOSS_RGB[B.ring]})`;
+    m.globalAlpha = seen ? 1 : BOSS_CHART_ALPHA;
+    if (!seen) g.chartLairs++;
     m.beginPath(); octagon(m, (B.x + 0.5) * CELL * sc, (B.y + 0.5) * CELL * sc, 4);
-    if (B.down) m.fill(); else m.stroke();
+    if (B.down && seen) m.fill(); else m.stroke();
   }
   m.restore();
 }

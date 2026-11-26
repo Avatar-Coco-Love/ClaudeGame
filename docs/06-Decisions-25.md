@@ -29,3 +29,12 @@ alternatives). D-171 on.
   the check uses. Rejected: banning `.catch` on waits (most are fine: a slow frame just measures a little later);
   a smoke-wide probe (doubles every wait's cost to log; an audit tool is enough).
 
+### D-173 — S-62 built: boss marks, sting, ending line; M14 done (v1.9); Q-034 closed: no
+- Chart L2 draws each unseen lair as a faint octagon (`BOSS_CHART_ALPHA` 0.35, in `drawBossMarks`); a seen lair keeps
+  its full mark (down = filled, as S-60a). Sting (`audio.bossSting`, two low sines 98 / 73 Hz, peak -31 dBFS): each
+  wake in Surge, and the first plate in Drift (asleep, 7 left). Ending card "Bosses n / 2" only with lairs (256).
+- Lairs vs creature gates (16 seeds, `--boss=on`): Kiln 0.878 / 0.897, Shoal 0.913 / 0.881, both PASS: no Debt.
+- Q-034 → **no**: mid build (`bossrun --build=mid`): Crucible ratio 1.40, Gyre 1.29, all down, Surge deaths med 1
+  (7 / 8 by the boss each). Bosses are late goals; the band holds where the gate is defined (max build). Rejected:
+  a softer flare / rim at low Beam (a second tuning per build), gating on mid (the max fight would go soft).
+- M14 closes → v1.9. Nothing new without a design D-xxx (D-119): Design 137 picks the next milestone.

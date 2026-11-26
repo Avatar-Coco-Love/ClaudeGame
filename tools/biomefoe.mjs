@@ -7,7 +7,8 @@
 // them, they hop to open cells 2–4 cells round it, ≥ WARD_GAP apart, like a player re-placing them). Ward gate: ≤ 1.00 each.
 // B-092 (D-155): the gates are defined on GATE_SEEDS (8) seeds; 4 seeds swing ±0.06 (Kiln 0.800 / 0.916, Shoal FAIL too), so a
 // run with fewer seeds prints its ratios but no verdict. 8 / 12 / 16 seeds all PASS and converge (Kiln 16: 0.883 / 0.885).
-// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--wards=0] [--v]
+// Usage: node tools/biomefoe.mjs [--biome=kiln|shoal] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--wards=0] [--boss=off|on] [--v]
+// S-62 (D-164): --boss=on keeps the lairs in the world (advice: do they skew the creature gate? logged in 09)
 import { runBot } from './surgebot.mjs';
 import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, WARD_GAP } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
@@ -22,7 +23,7 @@ const BIOMES = { // S-54: shoal = the mote swarm
     stats: g => { const s = g.swarm; return { spawned: s.spawned, touches: s.touches, hits: s.hits, kills: s.kills, taken: s.taken, carried: s.carried, cleared: s.cleared }; } },
 };
 const biome = BIOMES[arg('biome', 'kiln')], seeds = Number(arg('seeds', GATE_SEEDS)), minutes = Number(arg('minutes', 10));
-const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v'), WARDS = Number(arg('wards', 0));
+const modes = arg('mode', 'drift,surge').split(','), V = process.argv.includes('--v'), WARDS = Number(arg('wards', 0)), BOSS = arg('boss', 'off');
 /** S-56: keep WARDS Wards within 3 cells of the core: re-placed round it when it has moved on. */
 function keepWards(g) {
   const w = g.world, p = g.player, cx = Math.floor(p.x / CELL), cy = Math.floor(p.y / CELL);
@@ -61,7 +62,7 @@ function run(seed, mode, creature) {
   };
   const ore = i => game.world.rings[i] === biome.ring && biome.ore.has(ORE_KIND[game.world.cells[i]]);
   let wt = 0; const onTick = WARDS ? (g, dt) => { if ((wt -= dt) <= 0) { wt = 5; keepWards(g); } } : null;
-  const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', setup, ore, onTick });
+  const r = runBot({ seed, route: 'mine', build: 'max', mode, minutes, weather: 'off', anomaly: 'off', boss: BOSS, setup, ore, onTick });
   const banked = {}; for (const k in game.bank) banked[k] = game.bank[k] - (game.bank0[k] || 0);
   return { ...r, haul: worth(banked) + worth(game.cargo), relay: game.relays.length, foe: biome.stats(game), shots: game.wardShots || 0 };
 }

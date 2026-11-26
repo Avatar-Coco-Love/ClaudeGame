@@ -83,7 +83,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()', 'riftOpen()', 'riftClose()', 'bossThump()', 'ember()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()', 'riftOpen()', 'riftClose()', 'bossThump()', 'ember()', 'bossSting()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -131,6 +131,8 @@ async function browserChecks(browser, url, check, errors) {
   const bt = shots['bossThump()'], em = shots['ember()']; // S-60b: an awake boss's flare thump (every 4 s close in) and ember lob (every 2 s)
   check('Boss flare thump + ember lob: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.3 s (S-60b)',
     bt && em && [bt, em].every(v => v.peakDb <= -24 && v.peakDb > -60 && v.above2k < 1 && v.loudS <= 0.3), JSON.stringify({ bt, em }));
+  const bs = shots['bossSting()']; // S-62: once per wake / first plate, a low two-note sine sting
+  check('Boss sting: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.9 s (S-62)', bs && bs.peakDb <= -24 && bs.peakDb > -60 && bs.above2k < 1 && bs.loudS <= 0.9, JSON.stringify(bs));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // S-53b: the Burrower rumble (held while one is within 4 cells), alone on the music bus at the default Music 50: on at
