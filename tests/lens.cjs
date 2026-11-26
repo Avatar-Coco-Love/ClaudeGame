@@ -65,7 +65,7 @@ async function nodeChecks(check) {
     const log = [];
     for (let t = st[0] - 9; t <= st[0] + RIFT_S + 5; t++) { g.stats.time = t; updateRift(g); if (g.rift.open !== (log.length ? log[log.length - 1].o : o)) log.push({ t, o: g.rift.open }); }
     g.stats.time = st[0] - 10 + RIFT_CALL_CD; const again = callRift(g);
-    check('S-63 Lens: a called rift closes at 45 s; a natural rift due while it is open is skipped; the next call waits 90 s',
+    check('S-63 Lens: a called rift closes at 45 s; a natural rift due while it is open is skipped; the next call waits RIFT_CALL_CD',
       !why && o && log.length === 1 && log[0].t === st[0] - 10 + RIFT_S && log[0].o === null && again === '', `${why} ${JSON.stringify(log.map(l => [l.t, !!l.o]))} again '${again}'`);
   }
   { // the natural schedule and its sites are identical with and without calls between natural rifts (own stream)
@@ -102,6 +102,18 @@ async function nodeChecks(check) {
     }
     const chips = Object.values(C.ANOMALY_KINDS).map(k => k.glyph), clash = Object.entries(btn).filter(([, g]) => g === '?' || chips.includes(g));
     check('Audit 139: no HUD button glyph (◎ ◇ ❖ ⟂ ✦ ♪ ≡) is also an Anomaly chip glyph (B-099)', !clash.length, JSON.stringify({ btn, chips }));
+  }
+  { // S-64: the gate tool's force 'calls' opens no natural rift, yet a Lens call still opens and keeps its 45 s clock
+    const st = riftStarts(4242, 1).map(Math.ceil), g = ready(make()); g.rift.force = 'calls';
+    let natural = 0; for (let t = 1; t <= st[0] + 5; t++) { g.stats.time = t; updateRift(g); if (g.rift.open) natural++; }
+    const why = callRift(g); g.stats.time += RIFT_S - 1; updateRift(g); const mid = !!g.rift.open; g.stats.time += 2; updateRift(g);
+    check("S-64 Lens gate: force 'calls' opens no natural rift; a call still opens and closes at 45 s",
+      natural === 0 && why === '' && mid && !g.rift.open, `natural ${natural}, call '${why}', open at 44 s ${mid}, after ${!!g.rift.open}`);
+  }
+  { // S-64 gate (D-178): tools/eventrun.mjs --call, Deep / Shoal / Kiln, 16 seeds × 10 min, mine vs call-on-cooldown
+    const out = await require('./gates.cjs').run('eventrun.mjs', ['--call']);
+    check('S-64 Lens gate passes (call / mine value ≤ 1.25, ▲ call − mine < 0, Drift / Surge 0.8–1.25; Deep + Shoal + Kiln, 16 seeds)',
+      /: PASS/.test(out.trim().split('\n').pop()), out.trim().split('\n').filter(l => /call\/mine|drift\/surge/.test(l)).map(l => l.split(' ▲ spent')[0]).join('; '));
   }
 }
 
