@@ -59,7 +59,7 @@ function search(g, start, goal, h = () => 0, maxCost = Infinity) {
 
 // S-53b: `setup(g)` runs once before the clock (biomefoe: start in a biome, place a Relay); `ore(i)` replaces the mine
 // route's ore test (cell index -> bool). A surfaced Burrower counts as a foe in both modes (a player beams it).
-export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', rift = 'off', boss = 'off', echo = false, onTick = null, setup = null, ore = null }) {
+export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', minutes = 20, bank = 20, hold = 40, weather = null, anomaly = 'on', rift = 'off', boss = 'off', lair = 4, echo = false, onTick = null, setup = null, ore = null }) {
   const g = new Game({ seed, mode, audio }), w = g.world, W = w.w;
   for (const s of g.anomaly.sites) if (anomaly !== 'on' && s.kind !== anomaly) s.void = true; // S-36: off / one kind only
   if (weather === 'on' || weather === 'off') g.weather.force = weather; // S-33: storm / aurora all run, or never (default: the schedule)
@@ -167,10 +167,10 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     out.carried = g.cargoTotal(); // S-36: still in cargo at the cap (a Ballast run carries more): `gainMin` counts it
     out.gainMin = out.haulMin + out.carried / minutes;
   } else if (route === 'boss') {
-    // S-60b2 (D-165): take boss 0 apart. Target: the lit plate (asleep) or the standing plate nearest the core (awake), then
+    // S-60b2 (D-165): take the boss apart. Target: the lit plate (asleep) or the standing plate nearest the core (awake), then
     // the boss core; stand on an open 4-neighbour of it and beam it (a foe in reach first: embers, Glitches, a Burrower).
     // No retreat: healing is only at the Nexus, ~100 cells off; a death respawns there and the bot paths back.
-    const B = g.bosses.list[0]; let tgt = -1;
+    const B = g.bosses.list.find(b => b.ring === lair); let tgt = -1; // S-61b: `lair` = the boss's ring (4 Crucible, 3 Gyre)
     const pick = () => {
       if (!platesLeft(g, B)) return B.y * W + B.x;
       const live = PLATES.map(([i, j]) => (B.y + j) * W + B.x + i).filter(c => w.cells[c] === T.BOSS_PLATE);

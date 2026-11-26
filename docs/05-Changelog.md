@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.74 — 2026-11-26
+- **The Gyre wakes in Surge.** Come within 10 cells and every plate can be cut, in any order. It fights back: every
+  15 s a mote swarm leaves the lair's edge (two at most), its whirlpool drags you inward, and hugging the body lashes
+  you (12 damage and a shove out into the current) at most once every 4 s. Watch the body's mint outline: when it
+  sparks, the rim is ready to strike. Drift keeps the calm stepping-key puzzle.
+
 ## v1.8.73 — 2026-11-26
 - Design pass on the bosses (no gameplay change). The Crucible's embers stay a threat for a core that stands off; up
   close its flare is the danger. The Gyre's coming Surge form is planned the same way: mote swarms at range, a rim

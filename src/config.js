@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.8.73';
+export const VERSION = '1.8.74';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -402,8 +402,11 @@ export const BOSS_WAKE_R = 10, BOSS_SURGE_FLARE_S = 4, BOSS_FLARE_DMG = 10, BOSS
 // S-61a Gyre (D-168, gyre.js): the Shoal boss (ring 3; same lair rules and stamp). Within GYRE_R cells of its core the Undertow
 // is replaced by a clockwise tangential current of GYRE_SPEED px/s. One plate is the mint key (GYRE_RGB); only it cuts. The
 // key steps one standing plate clockwise every GYRE_STEP_S (plates keep their damage). No flare. BOSS_WAKES: the rings whose
-// boss has a Surge form so far (the Gyre's comes in S-61b; until then Surge uses the take-apart rule).
-export const GYRE_RING = 3, GYRE_R = 6, GYRE_SPEED = 45, GYRE_STEP_S = 1.2, GYRE_RGB = '120, 255, 200', BOSS_WAKES = [4];
+// boss has a Surge form. S-61b (D-170): awake, every GYRE_SWARM_S it releases a mote swarm at the lair edge (≤ GYRE_SWARMS
+// alive); a core within GYRE_RIM_PX of a standing body cell takes BOSS_TOUCH_DMG + knockback, once per GYRE_TOUCH_CD_S (the rim
+// sparks for the last GYRE_RIM_TELL_S); the whirlpool also pulls inward at GYRE_PULL px/s.
+export const GYRE_RING = 3, GYRE_R = 6, GYRE_SPEED = 45, GYRE_STEP_S = 1.2, GYRE_RGB = '120, 255, 200', BOSS_WAKES = [3, 4];
+export const GYRE_SWARM_S = 15, GYRE_SWARMS = 2, GYRE_RIM_PX = 8, BOSS_TOUCH_DMG = 12, GYRE_TOUCH_CD_S = 4, GYRE_RIM_TELL_S = 0.5, GYRE_PULL = 30;
 export const BOSS_RGB = { 3: GYRE_RGB, 4: BOSS_KEY_RGB };
 // S-53 Burrower (D-142, D-145, burrower.js): the Kiln creature, 256 worlds only, one at a time while the core is in the Kiln.
 // First BURROW_FIRST_S in the Kiln, then BURROW_EVERY_S [min, + span] after the last one ended. Starts in rock 10–14 cells

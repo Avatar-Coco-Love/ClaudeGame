@@ -14,3 +14,11 @@ Continues part 18 (sessions 126–131). Newest at the bottom; read the tail only
 - Q-033 closed (D-169): no ember change. S-61b refined (D-170): the rim (8 px, 12 dmg, once / 4 s) replaces plain
   contact, which a held core never meets (6 px gap); gate `--boss=gyre`, no Heat Sink. S-62 gains the mid-build line;
   new Q-034. `02` trimmed (Weather / Anomalies / Echo detail → new `08-Systems-Reference-2.md`). No new bug.
+
+## Session 133 — Build: S-61b Gyre awake in Surge (v1.8.74, D-171)
+- `gyre.js` `surgeGyre` + `rimGap`, swarms via `mote.js` `spawnSwarm(.., true)` (groups: own centre / leash / loot);
+  `BOSS_WAKES` [3, 4]; inward pull in `gyreCurrent`; rim tell outline. Bot route `lair` option; `bossrun --boss=gyre`.
+- Gate gyre: Drift 8/8 med 0.69 min, Surge 8/8 med 0.66, deaths 0, swarms 16, rims 78, ratio 0.954 PASS (2 s wall).
+  Crucible gate unchanged (1.055). Shoal mote gate unchanged (0.907 / 0.890).
+- New checks fail on the old code (stash of `src/`: 3 FAIL + rimGap missing). Screenshot (seed 4242, Surge, 3 cells
+  off): key hidden, mint rim outline over the body, whirlpool dashes; reads clearly. No new bug.
