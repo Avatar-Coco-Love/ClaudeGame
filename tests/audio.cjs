@@ -83,7 +83,7 @@ async function renderSfx([script, secs]) {
 }
 const ONE_SHOTS = ["break('rock')", "break('lumen')", "pickup('prism')", 'deposit(0)', 'depositDone(3)', 'beamStart()', 'upgrade()',
   'cache()', 'scan()', 'scanCache()', 'beacon()', 'modeSwitch()', 'pulse(1)', 'pulseFizzle()', 'hurt()', 'enemyDie()', 'spit()', 'full()', 'spire()',
-  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()', 'riftOpen()', 'riftClose()'];
+  'facet(true)', 'facet(false)', 'spireRelit()', 'anomaly()', 'anomalyEnd()', 'echoBlink()', 'overheat()', 'ventTell()', 'crunch()', 'riftOpen()', 'riftClose()', 'bossThump()', 'ember()'];
 
 async function measure(page, secs = 4, vol = 0.7) { return page.evaluate(renderBeam, [secs, vol]); }
 
@@ -128,6 +128,9 @@ async function browserChecks(browser, url, check, errors) {
   const ro = shots['riftOpen()'], rc = shots['riftClose()']; // S-57b: once per rift (every 4–6 min), soft sines like the Anomaly set
   check('Rift open + close chimes: peak ≤ -24 dBFS, close ≥ 3 dB softer, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-57b)',
     ro && rc && [ro, rc].every(v => v.peakDb <= -24 && v.peakDb > -60 && v.above2k < 1 && v.loudS <= 0.5) && rc.peakDb <= ro.peakDb - 3, JSON.stringify({ ro, rc }));
+  const bt = shots['bossThump()'], em = shots['ember()']; // S-60b: an awake boss's flare thump (every 4 s close in) and ember lob (every 2 s)
+  check('Boss flare thump + ember lob: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.3 s (S-60b)',
+    bt && em && [bt, em].every(v => v.peakDb <= -24 && v.peakDb > -60 && v.above2k < 1 && v.loudS <= 0.3), JSON.stringify({ bt, em }));
   check('Anomaly take + end tones: peak ≤ -24 dBFS, < 1 % energy > 2 kHz, loud ≤ 0.5 s (S-37)',
     an.every(v => v.peakDb <= -24 && v.above2k < 1 && v.loudS <= 0.5), JSON.stringify(an));
   // S-53b: the Burrower rumble (held while one is within 4 cells), alone on the music bus at the default Music 50: on at

@@ -33,3 +33,15 @@ Continues part 17 (sessions 119–125). Newest at the bottom; read the tail only
 - B-096 (caught by smoke, 601/602): `lock.cjs`'s browser check crashed on a world with no Flare Lock ("New world"
   ignores `?seed` and draws a random one; 1 in 25 measured has none). The test now retries a new world (≤ 8) until
   one has a lock; 5 / 5 standalone runs pass.
+
+## Session 128 — Build: S-60b1 Crucible awake in Surge (v1.8.69, D-165)
+- `boss.js`: `bossAwake` (Surge, live, core ≤ `BOSS_WAKE_R` 10 cells), any plate cuts, 4 s flare + 10 dmg, embers
+  (`game.bolts`, `ember: true`), `healBosses` on death; `vent.js` `ventPhase` takes a period; Wards skip embers;
+  weather / rifts check `game.bossAwake`; `audio.js` `bossThump` / `ember`; ember sprite redder and larger.
+- Split (D-165): the `bossrun.mjs` gate is S-60b2. Probe (4 seeds, mid build, no creatures): Surge 57.1–57.3 s,
+  Drift 59.8–61.0 s (ratio ≈ 0.95), 0 deaths, 28 embers a fight, all popped or blocked.
+- `boss.cjs` +6 checks (16 node + 2 browser), `audio.cjs` +1; the 6 new boss checks failed on the old code (stash run). Thump peak
+  -27.7 dBFS, ember -34.2, 0 % > 2 kHz.
+- Screenshot viewed (seed 4242, Surge, 3.5 cells out): all 7 standing plates glow, the core octagon reads; awake vs
+  Drift is clear (one lit plate vs all), but the awake glow is pink-dominant: S-60b2 may push it toward ember.
+- Smoke 609/609 (+7).

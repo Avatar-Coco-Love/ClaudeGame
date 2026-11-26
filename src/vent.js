@@ -42,8 +42,8 @@ export function makeVents(world, anomalies) {
 }
 
 /** Where a vent is in its cycle at time `t`: { n (cycle number), u (seconds into it), tell 0..1, flare 0..1 (1 = just fired) }. */
-export function ventPhase(s, t) {
-  const v = t + s.phase, n = Math.floor(v / VENT_PERIOD_S), u = v - n * VENT_PERIOD_S, f0 = VENT_PERIOD_S - VENT_FLARE_S;
+export function ventPhase(s, t, P = VENT_PERIOD_S) { // S-60b: an awake boss cycles faster (P)
+  const v = t + s.phase, n = Math.floor(v / P), u = v - n * P, f0 = P - VENT_FLARE_S;
   return { n, u, tell: u >= f0 - VENT_TELL_S && u < f0 ? (u - f0 + VENT_TELL_S) / VENT_TELL_S : 0, flare: u >= f0 ? 1 - (u - f0) / VENT_FLARE_S : 0 };
 }
 

@@ -63,7 +63,7 @@ export function wardTarget(game, s) {
   const w = game.world, R = WARD_R * CELL;
   let best = null, bd = Infinity;
   for (const f of beamFoes(game)) {
-    if (f.fade !== undefined || f.hp <= 0) continue; // gave up (S-6) or already dead this frame
+    if (f.fade !== undefined || f.hp <= 0 || f.ember) continue; // S-60b: a boss's embers are not creatures // gave up (S-6) or already dead this frame
     const d = Math.hypot(f.x - s.x, f.y - s.y);
     if (d > R || d >= bd) continue;
     if (d > 0.01 && w.raycast(s.x, s.y, (f.x - s.x) / d, (f.y - s.y) / d, Math.max(0, d - (f.r || 0)))) continue;

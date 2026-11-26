@@ -33,6 +33,7 @@ two forms' time to defeat within 0.8–1.25 of each other. A 160 world has no Sh
   apart in ≤ 90 s (log in `09`). Screenshot viewed.
 
 ## S-60b — Crucible awake (Surge form) + `tools/bossrun.mjs` gate (M14)
+**Split (D-165):** S-60b1 (the Surge form, smoke, audio rows, fill tint) ✅ v1.8.69; S-60b2 = the gate below.
 **Save:** none new.
 - **Surge:** the Crucible wakes when the core is within `BOSS_WAKE_R` 10 cells: every plate takes beam damage, in any
   order. It hits back: the core's flare every `BOSS_SURGE_FLARE_S` 4 s deals `BOSS_FLARE_DMG` 10 within 3 cells (on

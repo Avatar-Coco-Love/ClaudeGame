@@ -133,6 +133,8 @@ export class Audio {
   pulseFizzle() { this.tone(360, 0.05, { type: 'sine', vol: 0.025 }); }
   // B-018: these two were square waves, the only buzzy (odd-harmonic-rich) sounds in the kit. Triangle keeps the pitch drop.
   hurt() { this.tone(160, 0.25, { type: 'triangle', vol: 0.16, slide: -90 }); }
+  bossThump() { this.tone(70, 0.3, { type: 'sine', vol: 0.12, slide: -30, throttle: 0.5, key: 'bthump' }); } // S-60b: an awake boss's flare lands, a low thump
+  ember() { this.tone(440, 0.12, { type: 'triangle', vol: 0.06, slide: -180, throttle: 0.3, key: 'ember' }); } // S-60b: a boss lobs an ember (a Spitter shot, falling)
   spit() { this.tone(520, 0.12, { type: 'triangle', vol: 0.07, slide: 260, throttle: 0.3, key: 'spit' }); } // S-32: a Spitter fires
   /** S-53c: a Burrower bites the hold: a short low noise burst (lowpassed noise, seeded so it renders the same each time). */
   crunch() {

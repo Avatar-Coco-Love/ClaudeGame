@@ -27,6 +27,7 @@ export function updateWeather(game, dt) {
   while (t >= w.start + WEATHER_S) { w.start += gap(w.rng); w.k++; }
   let on = w.force === 'on' || (w.force !== 'off' && t >= w.start && w.cancel !== w.k);
   if (on && (game.wake || game.endSeq)) { on = false; if (w.force !== 'on') w.cancel = w.k; }
+  if (on && !w.kind && game.bossAwake && w.force !== 'on') { on = false; w.cancel = w.k; } // S-60b: never starts while a boss is awake
   const kind = on ? (game.mode === 'surge' ? 'storm' : 'aurora') : null;
   if (kind !== w.kind) {
     if (kind) game.notify('weather-start'); else { w.was = w.kind; if (!game.wake && !game.endSeq) game.notify('weather-end'); } // a Wake's own toast says enough

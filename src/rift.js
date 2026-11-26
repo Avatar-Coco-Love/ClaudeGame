@@ -97,7 +97,7 @@ export function updateRift(game) {
   if (busy && t >= r.start) r.skip = r.k; // cancelled, as weather is; one due inside them never opens
   const due = t >= r.start && r.skip !== r.k;
   if (r.open && (r.open.k !== r.k || !due)) closeRift(game);
-  if (!r.open && due && r.tried !== r.k) { r.tried = r.k; openRift(game); }
+  if (!r.open && due && r.tried !== r.k) { r.tried = r.k; if (!game.bossAwake) openRift(game); } // S-60b: none opens while a boss is awake
 }
 
 /** Extra yield rolls for an ore cell broken at (x, y): RIFT_BONUS inside the open pocket, else 0 (D-156). */
