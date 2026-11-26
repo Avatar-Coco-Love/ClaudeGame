@@ -1,4 +1,4 @@
-# 04 — Roadmap, part 3: M10–M16 (the game grows, D-119)
+# 04 — Roadmap, part 3: M10–M15 (the game grows, D-119)
 
 Owner's ask (session 87): bosses, more enemies, puzzles, a bigger map, biomes, events, ways to mine / defend / attack,
 upgrades, sinks and resource types. Claude decides what and how. Order fixed by D-119; one milestone closes its loop
@@ -60,8 +60,4 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-65** The Nexus draws a ring per structure built; the Lens ring dims on cooldown (v1.10.82, D-179). **M15 done.**
 - Cut (D-175): Gate fast travel, ▲ → biome ore converter, an Anomaly on demand. Open: feats per world (Q-035).
 
-## M16 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.11
-- **S-66** Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 25), Nexus tab list, ending row.
-- **S-67** `tools/featrun.mjs`: tune `FEAT_CHART` / `FEAT_RIFTS`; gate Drift / Surge 0.8–1.25.
-- **S-68** The Nexus lights one hexagon vertex per feat done.
-- Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.
+## M16 onward → `04-Roadmap-5.md` (D-181: M16 Echo minds, M17 Hunters, M18 Feats)

@@ -1,0 +1,40 @@
+# 06 — Decisions log, part 27
+
+Continues `06-Decisions-26.md` (part 26 neared the 8 KB cap at D-180; same rules: supersede, never edit; list rejected
+alternatives). D-181 on.
+
+### D-181 — Owner ask first: M16 Echo minds, M17 Hunters, Feats move to M18 (session 143, inbox; supersedes D-180's slot)
+- **Inbox** (`archive/2026-11-26-owner-feedback-echo-enemies.md`): Echo upgrades, Mine / Defend modes and an Auto that
+  does both and "acts smart"; more enemy kinds, some with real pathfinding and better AI.
+- **Order:** owner requests go first (D-119: the owner gives feedback, Claude decides; feedback is the strongest signal
+  we get). **M16 = Echo minds** (S-69…S-71, `07-Build-Specs-19.md`) → v1.11; **M17 = Hunters** (S-72…S-74,
+  `07-Build-Specs-20.md`) → v1.12; **M18 = Feats** (D-180's S-66…S-68 unchanged, `07-…-18`) → v1.13. Feats' save step
+  takes the next free format number when built (S-70 takes 25; tests never pin it). Echo first: smallest, reuses
+  `echo.js`, and S-72's Tracers give Defend a target in Drift.
+- **Echo (M16):** orders become **Mine / Defend / Auto** (ids `gather` / `guard` kept, `auto` added: no save change; a
+  new Echo starts in Auto). Auto is a rule with hysteresis, not a learner: Defend while a threat is near (bolts first),
+  Mine otherwise, the chip says which. Mine picks ore by worth over distance (eventrun's `VALUE` weights). Upgrades:
+  3 Research rows bought with ● once the Echo is researched (Focus / Volley / Tether, 2 levels each, ● 165 in all;
+  format 25). Q-022 settled: **yes** to a third order (Auto), the second Echo stays out (Q-039).
+- **Both modes:** Defend already hits Burrowers and Motes in Drift; "Guard (idle)" goes; every upgrade helps both.
+- **Layers:** Echo upgrades live in Research only and change Echo-only numbers (its share of Beam Power, its fire rate,
+  its reach); no Core Matrix stat is touched, so nothing unlocks twice. Bounded ● sink (late Lumen ~530 vs 140 spent,
+  Design 137), not a second M15: Q-036's "leave" stands for open-ended sinks.
+- Rejected: Feats first (the owner's ask would wait 3 PRs for an unasked feature); interleaving the two milestones
+  (two half-done systems on `main`); an Attack order or a squad (D-108); a learning / weighted-utility Auto with
+  sliders (opaque, untestable); Echo upgrades on the Core Matrix (core-only layer) or on the Nexus (▲ sink); more than
+  2 levels a row (the gate can't tell them apart); an Echo that roams off its leash to mine (loses the core).
+
+### D-182 — Hunters: a shared flow field, a Tracer and a Pincer pair, both modes (session 143, inbox)
+- **Pathfinding budget:** one BFS flow field from the core's cell (`src/flow.js`, 32-cell bound, ≤ 4225 cells, every
+  0.5 s or on a break inside it), shared by the Echo (its 24-cell field moves onto it) and every hunter: hunters add
+  no BFS. The Pincer's flank runs one bounded A* (≤ 800 nodes) per 0.5 s. `perf.cjs` run `hunt` ≤ 1.1× `deep`.
+- **Tracer** (S-72): comes through tunnels down the field instead of beelining, leaves a short trail of the cells it
+  took (the "smart" tell). **Pincer** (S-73): two that split: one down the field, one by A* to where the core is
+  heading, from a different tunnel. Both modes, two faces like the Burrower / Motes (D-152): Surge contact damage,
+  Drift a touch takes 1 cargo item and it runs; the beam and Echo Defend kill both. Gate S-74 (D-158 band).
+- **Existing foes:** Glitches keep the beeline + give-up (D-017); it is the tunnel's safety and the contrast that
+  makes hunters read as smart (Q-038 asks again after S-74's play-test). No other foe changes.
+- Rejected: A* per enemy per frame (perf, 8+ foes); flow fields for Glitches now (no play-test says they feel dumb;
+  the owner wasn't sure); Surge-only hunters (pillar 2); a hunter that bores rock (the Burrower's role); a boss-like
+  hunter (M14 has two); creature shapes with limbs (pillar 1: chevrons and dots only).

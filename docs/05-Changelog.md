@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.84 — 2026-11-26
+- No change in play yet: your feedback shaped the next updates. The Echo gets Mine, Defend and a smart Auto mode
+  plus its own upgrades, then new hunters arrive that follow you through the tunnels you dig, in Drift and Surge alike.
+  World feats come after that.
+
 ## v1.10.83 — 2026-11-26
 - No change in play yet: the next update is planned. Each world will keep a short list of feats (open every vault,
   chart a third of the map, empty five rifts and more) shown at the Nexus and on the ending card. They pay nothing
