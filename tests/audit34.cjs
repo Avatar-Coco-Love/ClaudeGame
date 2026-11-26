@@ -1,13 +1,14 @@
 // Audit 34 checks (B-027): repeated glowing shapes are sprites, not one shadowBlur draw each. smoke.cjs calls this.
 // A shadowBlur fill cost ~3.4 ms on headless Chromium's canvas: 30 floor pickups took a 1280×800 frame from 22 to 120 ms,
 // a 44-glyph Scanner ping to 148 ms (`09`, session 34). The check counts draws made while a shadow is set, so it is exact.
+const { newWorld } = require('./pinworld.cjs');
 async function browserChecks(browser, url, check, errors) {
   const pg = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   pg.on('pageerror', e => errors.push('audit34: ' + e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
 
   const r = await pg.evaluate(async () => {
     const { game: g, renderer: R } = window.__lumen, P = CanvasRenderingContext2D.prototype;

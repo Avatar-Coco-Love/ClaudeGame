@@ -4,6 +4,7 @@
 // shoves + heats within 3 cells only; a mode switch keeps the fight; an old 256 save gets the lair (refund, core moved),
 // a 160 save none; a reload mid-fight restores the plates, a downed boss stays down. Probe: a mid build (beam 5, range 3)
 // takes it apart in ≤ 90 s. Browser: the core and lit plate are drawn; the lit plate's break passes the glow (B-095). Usage: node tests/boss.cjs [--browser] (BOSS_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -203,7 +204,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url + (url.includes('?') ? '&' : '?') + 'seed=4242'); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const { CELL } = await import('../src/config.js');
   const has = await pg.evaluate(C => {
     const L = window.__lumen, g = L.game, B = g.bosses && g.bosses.list[0];

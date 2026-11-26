@@ -3,6 +3,7 @@
 // `prev` (cracked too) and keeps mined cells open; Drift = Surge and a mode switch keeps it open; a reload mid-rift skips it
 // and nothing is saved; a Wake cancels it; the tools/eventrun.mjs gate passes on its 16 seeds.
 // Browser: an open pocket is drawn and its toast shows. Usage: node tests/rift.cjs [--browser | --browser-only] (RIFT_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -123,7 +124,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   await pg.evaluate(() => { const g = window.__lumen.game, ctx = window.__lumen.renderer.ctx, sr = ctx.strokeRect.bind(ctx);
     g.stats.time = g.rift.start + 0.1; window.__riftRects = 0;
     ctx.strokeRect = (...a) => { if (ctx.strokeStyle === '#e2d0ff') window.__riftRects++; return sr(...a); }; });

@@ -4,6 +4,7 @@
 // ease takes 0.5 s; Drift and Surge push the same; pickups drift at half; nothing is saved; tools/haulrun.mjs median
 // round trip ≤ 1.15× with it off. Browser: dashes on screen ≤ 30 at High, ≤ 15 at Low, inside a flowing chunk.
 // Usage: node tests/undertow.cjs   (UNDERTOW_SHOT=path.png to keep the screenshot)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -104,7 +105,7 @@ async function browserChecks(browser, url, check, errors, shot) {
     await pg.goto(url); await pg.waitForTimeout(200);
     await pg.evaluate(gr => { try { localStorage.removeItem('lumencore.save.v1'); localStorage.setItem('lumencore.settings.v1', JSON.stringify({ graphics: gr })); } catch {} }, graphics);
     await pg.reload(); await pg.waitForTimeout(200);
-    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    await newWorld(pg); await pg.waitForTimeout(200);
     await pg.evaluate(() => {
       const L = window.__lumen, g = L.game, w = g.world, f = g.undertow.flow;
       let i = -1; for (let k = 0; k < f.length / 2 && i < 0; k++) if (f[2 * k] || f[2 * k + 1]) i = k;

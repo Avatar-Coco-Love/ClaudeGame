@@ -1,6 +1,7 @@
 // S-44 (D-114) ambient music checks: render src/music.js offline (OfflineAudioContext, headless Chromium) at the default
 // Volume and Music settings and measure it (D-037: measured, not heard). smoke.cjs calls browserChecks.
 // Alone: `node tests/music.cjs` serves the repo and prints the measurements for every scenario.
+const { newWorld } = require('./pinworld.cjs');
 
 // Runs in the page. `states` is a list of [fromSecond, state] (state null = title screen); the music is stepped at 60 Hz
 // with the audio clock faked to the step time (as audio.cjs renderSfx does), then rendered and measured.
@@ -129,7 +130,7 @@ async function browserChecks(browser, url, check, errors) {
   await pg.evaluate(() => { localStorage.clear(); localStorage.setItem('lumencore.settings.v1', JSON.stringify({ volume: 70, muted: false })); });
   await pg.reload(); await pg.waitForTimeout(300);
   const title = await pg.evaluate(() => ({ s: window.__lumen.settings.music, ui: document.getElementById('set-music').value, playing: window.__lumen.music.playing }));
-  await pg.click('#new-world'); await pg.waitForTimeout(600);
+  await newWorld(pg); await pg.waitForTimeout(600);
   const inWorld = await pg.evaluate(() => ({ playing: window.__lumen.music.playing, notes: window.__lumen.music.notes.length }));
   await pg.$eval('#set-music', el => { el.value = 0; el.dispatchEvent(new Event('input', { bubbles: true })); });
   await pg.waitForTimeout(100);

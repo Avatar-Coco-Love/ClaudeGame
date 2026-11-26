@@ -3,6 +3,7 @@
 // already refuses and changes nothing; it can go back on the same cell or 30 cells on; a reload keeps the moved Relay;
 // cargo banking at that ring the frame it is picked up doesn't crash or lose cargo; outside every ring B still places.
 // Browser (320×568 touch): the hint "✦: pick up this Relay" in an empty-cargo ring, a ✦ tap picks it up with its toast.
+const { newWorld } = require('./pinworld.cjs');
 const audio = new Proxy({}, { get: () => () => {} });
 const idle = (place = false) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, place });
 
@@ -47,7 +48,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   const page = await ctx.newPage();
   page.on('pageerror', e => errors.push('reclaim: ' + e.message));
   await page.goto(url); await page.waitForTimeout(200);
-  await page.tap('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page, true); await page.waitForTimeout(300);
   await page.evaluate(async () => {
     const g = window.__lumen.game, cr = await import('/src/craft.js'), p = g.player; g.stats.mined = 20; g.stats.upgrades = 1;
     const x = Math.floor(g.nexus.x / 32) + 30, y = Math.floor(g.nexus.y / 32);

@@ -4,6 +4,7 @@
 // kill pays no kill loot (D-154); B / ✦ on a Ward picks it up (full refund, refused while 2 are carried); save round-trip;
 // format 21 → 22; junk loads as none. Browser: the Craft row, craft, place with B, a shot draws; screenshot.
 // Usage: node tests/ward.cjs [--browser]   (WARD_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -127,7 +128,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   await pg.evaluate(() => { const g = window.__lumen.game; Object.assign(g.bank, { prism: 20, shard: 100 }); g.player.x = g.nexus.x; g.player.y = g.nexus.y; });
   await pg.waitForTimeout(100);
   const row = await pg.evaluate(() => {

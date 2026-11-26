@@ -1,5 +1,6 @@
 // S-14 Pulse beam checks (D-042): charge -> piercing burst, recovery, Glitch stop, unlock + cycle, save, mouse + touch.
 // smoke.cjs calls both functions.
+const { newWorld } = require('./pinworld.cjs');
 const fire = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: { x: 1, y: 0 }, fire: true, ...extra });
 const idle = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, ...extra });
 
@@ -141,7 +142,7 @@ async function nodeChecks(check) {
 async function setup(pg, tap) {
   await pg.evaluate(() => { try { localStorage.clear(); } catch {} });
   await pg.reload(); await pg.waitForTimeout(250);
-  await (tap ? pg.tap('#new-world') : pg.click('#new-world')); await pg.waitForTimeout(200);
+  await newWorld(pg, tap); await pg.waitForTimeout(200);
   await pg.evaluate(() => {
     const g = window.__lumen.game, w = g.world, gx = w.cx + 2, gy = w.cy + 6, C = 32;
     for (let y = gy - 2; y <= gy + 2; y++) for (let x = gx - 4; x <= gx + 8; x++) w.cells[w.idx(x, y)] = y === gy && x >= gx + 2 ? 1 : 0;

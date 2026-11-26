@@ -3,6 +3,7 @@
 // the upgrade ring at the Nexus (not the core) and reduced motion skips it. Browser: the new draw strokes 3 hexagons with
 // no shadowBlur, and the 0-structure Nexus draws exactly as many strokes as before.
 // Usage: node tests/nexusview.cjs [--browser | --browser-only]   (NEXUS_SHOT=path.png for a screenshot)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -42,7 +43,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const r = await pg.evaluate(() => {
     const { game: g, renderer: R } = window.__lumen, P = CanvasRenderingContext2D.prototype, ctx = R.ctx;
     g.demo = true;

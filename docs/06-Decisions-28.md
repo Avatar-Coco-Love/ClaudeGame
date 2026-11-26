@@ -18,3 +18,16 @@ alternatives). D-187 on.
   choosing the answer). The tool's own run is checked (`echoorder.cjs`, 1 seed: rows, switches, no verdict).
 - Rejected: shipping the 16-seed PASS from hold 3 s (seeds 1001–1016; the 48-seed run fails it); widening the band
   to 1.35 in a Build session; a Surge-only Echo buff (pillar: Drift and Surge are equals).
+
+### D-188 — Every test's New World is pinned by one helper, and a check enforces it (audit 150)
+- Random New World seeds broke tests twice (B-101 Spire tests, B-103 `lens.cjs`): a rule broken twice gets a check.
+  `tests/pinworld.cjs` `newWorld(page, tap, r = 0.42)` fixes Math.random for the click only (D-100's way); 42 test files
+  moved to it, `spire.cjs` `pinnedNewWorld` wraps it. Its `run()` (in smoke) fails on any raw `#new-world` click in
+  `tests/` / `tools/` with no `Math.random = ` pin on that line or the 3 above and no `any-seed:` note. Old code: 55 hits.
+- One seed for all: 0.42 is the Spire tests' world (`foundChecks` prove its gaps). A test that needs another world
+  passes its own `r`. Seed coverage lives in the bots and gates (many seeds), not in page tests.
+- Rejected: flagging only tests that act on terrain near the core (a heuristic on test code misses new ones); pinning
+  Math.random for the whole page (visual randomness and game draws would all freeze); a `?seed=` URL flag (game code for tests).
+- Workflow review (D-138): too much: audit Debt lines restating "perf / phone not re-measured" every audit (closed:
+  re-measured when a change touches draw cost, `perf.cjs`); too little: shared test helpers (5 of 47 files had the pin).
+  B-100 closed: unseen since B-101's pin (audits 144, 150).

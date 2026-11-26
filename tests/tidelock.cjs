@@ -4,6 +4,7 @@
 // or the Echo's), other cells and plain vaults × 1; Drift = Surge; an opened lock is a plain vault; nothing saved, an old
 // save loads the same flow; probe: time to open with a top build holding station downstream ≤ 2× a plain vault's.
 // Browser: mint chevrons on the upstream shell. Usage: node tests/tidelock.cjs [--browser] (TIDE_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -94,12 +95,12 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url + (url.includes('?') ? '&' : '?') + 'seed=4242'); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   // B-098: the page ignores ?seed (new worlds are random) and ~4 % of 256 worlds have no tide lock, so reroll up to 5 times
   pg.on('dialog', d => d.accept()); // a page-hide autosave may be back: accept "Start a new world?"
   for (let k = 0; k < 5 && !(await pg.evaluate(() => { const ls = window.__lumen.game.locks; return !!(ls && ls.tides && ls.tides.length); })); k++) {
     await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
-    await pg.reload(); await pg.waitForTimeout(200); await pg.click('#new-world'); await pg.waitForTimeout(200);
+    await pg.reload(); await pg.waitForTimeout(200); await newWorld(pg); await pg.waitForTimeout(200);
   }
   const { CELL } = await import('../src/config.js');
   const has = await pg.evaluate(C => {

@@ -142,11 +142,7 @@ async function nearSpire(page, k) {
 // apart where sectors meet), so the approach saw both: "(2/5)" or a mark at the "unseen" one. Pin the seed (B-012's way);
 // `foundChecks` proves this seed keeps every other Spire far enough away.
 const PIN_R = 0.42, PIN_SEED = (PIN_R * 2 ** 31) | 0, PIN_GAP = 24; // cells: 7 (approach) + 7.2 (CORE_REVEAL) + 4 (footprint) + margin
-async function pinnedNewWorld(page, tap = false) {
-  await page.evaluate(r => { window.__rnd = Math.random; Math.random = () => r; }, PIN_R);
-  await (tap ? page.tap('#new-world') : page.click('#new-world'));
-  await page.evaluate(() => { Math.random = window.__rnd; });
-}
+const pinnedNewWorld = (page, tap = false) => require('./pinworld.cjs').newWorld(page, tap, PIN_R); // audit 150: one helper
 
 // B-060: emulate a slow device: every frame busy-waits `ms`, so the loop's dt clamp (0.05 s) makes game time run slower
 // than the wall clock, as on a loaded CI runner. A wall-clock wait for a game-time toast fails here every time.

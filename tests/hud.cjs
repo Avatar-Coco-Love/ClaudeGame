@@ -1,6 +1,7 @@
 // HUD layout checks (audit 49). smoke.cjs calls browserChecks.
 // T1: the Nexus pointer sat on the 40 px inset edge whatever was there, so for 20–39% of headings (by viewport) it drew
 //     under the minimap, the buttons or the bank panel, and hid the cargo-full "NEXUS" label. It now slides inward along its ray.
+const { newWorld } = require('./pinworld.cjs');
 const { devices } = require('playwright');
 
 const SIZES = [['568x320', 568, 320, true], ['320x568', 320, 568, true], ['412x839', 412, 839, true], ['863x360', 863, 360, true], ['1280x800', 1280, 800, false]];
@@ -12,7 +13,7 @@ async function browserChecks(browser, url, check, errors) {
     const page = await ctx.newPage();
     page.on('pageerror', e => errors.push(`hud ${name}: ${e.message}`));
     await page.goto(url); await page.waitForTimeout(200);
-    await page.click('#new-world'); await page.waitForTimeout(300);
+    await newWorld(page); await page.waitForTimeout(300);
     const r = await page.evaluate(async () => {
       // Every optional HUD box shown, as late in a run; the Matrix button only shows at the Nexus, where there's no pointer.
       const g = window.__lumen.game; Object.assign(g.research, { scanner: true, wide: true, echo: true }); g.craft.beacon = 3; g.bank.lumen = 9;
@@ -51,7 +52,7 @@ async function toastChecks(browser, url, check, errors) {
   const page = await ctx.newPage();
   page.on('pageerror', e => errors.push(`toast: ${e.message}`));
   await page.goto(url); await page.waitForTimeout(200);
-  await page.click('#new-world'); await page.waitForTimeout(1200); // past the start toasts
+  await newWorld(page); await page.waitForTimeout(1200); // past the start toasts
   await page.evaluate(() => {
     const el = document.getElementById('toast'), t0 = performance.now(), log = window.__toastLog = [];
     const note = () => log.push({ text: el.classList.contains('show') ? el.textContent : '', t: performance.now() - t0,

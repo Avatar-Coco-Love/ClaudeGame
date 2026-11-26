@@ -5,6 +5,7 @@
 // format 20 → 21 (chart 0); a saved level loads clamped (0 in a 160 world). Browser: the Nexus tab shows the row in a 256
 // world, none in a 160 one; the charted minimap draws; screenshot (CHART_SHOT=path.png).
 // Usage: node tests/chart.cjs [--browser]
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 /** A stub 2D context that records path segments and counts draw calls. */
@@ -140,7 +141,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const row = await pg.evaluate(() => {
     const g = window.__lumen.game;
     Object.assign(g.bank, { tide: 30, prism: 12 });

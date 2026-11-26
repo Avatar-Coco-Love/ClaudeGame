@@ -5,6 +5,7 @@
 // Probe: a mid build riding the whirlpool takes it apart in ≤ 90 s. Browser: a seen Gyre draws (core, key, whirlpool dashes).
 // S-61b (D-170): the Surge form (any order, pull, rim + its delay, swarm cap + Drift clear) and the bossrun --boss=gyre gate.
 // Usage: node tests/gyre.cjs [--browser] (GYRE_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -166,7 +167,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url + (url.includes('?') ? '&' : '?') + 'seed=4242'); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const { CELL } = await import('../src/config.js');
   const has = await pg.evaluate(C => {
     const g = window.__lumen.game, B = g.bosses && g.bosses.list.find(b => b.name === 'Gyre');

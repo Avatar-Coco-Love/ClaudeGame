@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.91 — 2026-11-26
+- No change in play: the game's own tests now always start the same test world, so a rare unlucky map can no longer
+  make a check fail for no reason (audit 150).
+
 ## v1.10.90 — 2026-11-26
 - **Fixed (B-104):** on some phones, faint straight lines flickered along the right and bottom edges of a square
   around a Relay or Beacon light while you moved. The soft floor glow under a light pool now draws cleanly at every edge.

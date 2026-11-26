@@ -3,6 +3,7 @@
 // B-044 (C2): a Glitch crossing the centre ray reset the Focus facet latch, so the same facet flipped twice with the aim unchanged.
 // B-045 (C3): a malformed save with lit: true and a bad mask loaded mask null, so the relit Spire's facets drew unlit.
 // B-046 (T2): a tap's answer toast (`now`, e.g. a placement refusal) waited up to 3.8 s behind a milestone toast (`keep`).
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 const DT = 1 / 60;
 
@@ -61,7 +62,7 @@ async function browserChecks(browser, url, check, errors) {
   await page.goto(url); await page.waitForTimeout(200);
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
   await page.reload(); await page.waitForTimeout(200);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; g.notify('spire-primed'); });
   await page.waitForTimeout(300);
   const text = () => page.evaluate(() => { const t = document.getElementById('toast'); return t.classList.contains('show') ? t.textContent : ''; });

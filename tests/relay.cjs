@@ -1,4 +1,5 @@
 // S-22 Relays v1 (Crafting, D-056) checks. smoke.cjs calls both functions.
+const { newWorld } = require('./pinworld.cjs');
 const calls = [];
 const audio = new Proxy({}, { get: (_, k) => (...a) => { calls.push(k); } });
 const idle = (place = false) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, place });
@@ -108,7 +109,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload, sh
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.bank.prism = 20; g.bank.shard = 50; });
   await pg.keyboard.press('e'); await pg.waitForTimeout(100);
   await pg.click('#matrix .tabs button[data-tab="craft"]');
@@ -163,7 +164,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload, sh
   await ph.goto(url); await ph.waitForTimeout(200);
   await ph.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await ph.reload(); await ph.waitForTimeout(200);
-  await ph.tap('#new-world'); await ph.waitForTimeout(200);
+  await newWorld(ph, true); await ph.waitForTimeout(200);
   await ph.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.bank.prism = 50; g.bank.shard = 100; });
   await ph.waitForTimeout(100);
   await ph.tap('#matrix-btn'); await ph.waitForTimeout(100);

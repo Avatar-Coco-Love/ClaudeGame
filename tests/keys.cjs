@@ -1,6 +1,7 @@
 // S-39 keys checks (D-106). smoke.cjs calls nodeChecks + browserChecks. Keys are read by physical position
 // (`e.code`), rebound in Settings (tap a row, press a key; a clash swaps; Esc cancels; Reset), saved in settings.keys.
 // Usage: node tests/keys.cjs   (SHOTS=1 writes keys-view.png)
+const { newWorld } = require('./pinworld.cjs');
 const path = require('path');
 const fs = require('fs');
 const ROOT = path.resolve(__dirname, '..');
@@ -38,7 +39,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   await page.reload(); await page.waitForTimeout(300);
 
   // Move by position: an AZERTY Z sends key 'z' with code KeyW and must move up; key 'w' on code KeyZ must not.
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   const hold = (key, code) => page.evaluate(async ([key, code]) => {
     const g = window.__lumen.game; g.demo = true; g.player.x = g.nexus.x; g.player.y = g.nexus.y; g.player.vx = g.player.vy = 0;
     const y0 = g.player.y;
@@ -80,7 +81,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   // Survives a reload; the game hears G, not F; the badge and title line name the bound key.
   await page.evaluate(() => { window.__lumen.game.demo = true; localStorage.removeItem('lumencore.save.v1'); }); // New World asks before replacing a save
   await page.reload(); await page.waitForTimeout(300);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   const pre = await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; g.research.scanner = true; g.scan.cooldown = 0; g.hitstop = 0;
     return { k: window.__lumen.settings.keys.scan, stored: JSON.parse(localStorage.getItem('lumencore.settings.v1')).keys.scan }; });
   await page.keyboard.press('f'); await page.waitForTimeout(150);

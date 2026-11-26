@@ -1,13 +1,14 @@
 // Audit 84 checks (browser). smoke.cjs calls browserChecks.
 // Chunk pre-scale: terrain chunks are painted at zoom·dpr and blitted 1:1 (a scaled blit cost ~25 ms a frame at 4× CPU).
 // B-080: a buff taken on a deposit's last frame lost its chip (the fading chips' flash overwrote it and nothing redrew it).
+const { newWorld } = require('./pinworld.cjs');
 async function browserChecks(browser, url, check, errors) {
   const pg = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   pg.on('pageerror', e => errors.push('audit84: ' + e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const ch = await pg.evaluate(() => {
     const { renderer: R, game: g } = window.__lumen; g.demo = true;
     const k = R.zoom * R.dpr, sizes = [...R.chunks.values()].map(c => c.canvas.width);

@@ -4,6 +4,7 @@
 // fixed hp; mine one of each -> bank +1 at a deposit; a saved floor pickup of each round-trips; format 18 -> 19 loads
 // both at 0; the Scanner marks them. Browser: the chips stay hidden until held; both glyphs drawn (ORE_SHOT=path.png).
 // Usage: node tests/ore.cjs [--browser]
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 // FNV-1a of world.cells with every Tide / Calx cell set to 255, and of the Anomaly + vent site lists, from the pre-S-49 code.
 const PINS = { 4242: [521686979, 4024875518], 7: [3395619034, 3487137189], 99: [2299736302, 340502908], 31337: [3672187676, 703367365] };
@@ -79,7 +80,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const hidden = () => pg.evaluate(() => ['tide', 'calx'].map(k => document.getElementById('bank-' + k).parentElement.classList.contains('hidden')).join());
   const before = await hidden();
   const { CELL, T } = await import('../src/config.js');

@@ -4,6 +4,7 @@
 // Drift carries a loose pickup outside the Attractor's reach and drops it when beamed; the loot (1 ◆ a mote + the Glitch loot
 // once a swarm) is the same in both modes; the beam reaches motes; a mode switch clears them; nothing saved; the
 // `biomefoe.mjs` Shoal gate passes on 8 seeds. Browser: motes are drawn. Usage: node tests/mote.cjs [--browser] (MOTE_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -135,7 +136,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const ok = await pg.evaluate(() => {
     const L = window.__lumen, g = L.game, w = g.world, C = 32;
     let at = -1;

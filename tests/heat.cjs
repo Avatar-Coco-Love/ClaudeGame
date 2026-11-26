@@ -3,6 +3,7 @@
 // but no cell takes damage; heat restarts at 0.25; 60 s of steady fire is overheated 17 % ± 2; Wide and Overclock heat no
 // faster; Drift = Surge; the Echo / other world.hit callers add none; nothing saved; the Kiln leg haul ≤ 1.20×.
 // B-087: a destabilize resets heat. Browser: the arc is drawn round the core in the Kiln. Usage: node tests/heat.cjs [--browser]   (HEAT_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -111,7 +112,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const r = await pg.evaluate(() => {
     const L = window.__lumen, g = L.game, w = g.world;
     L.dev.teleport(112, 0.6);

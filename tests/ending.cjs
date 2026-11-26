@@ -5,6 +5,7 @@
 // all" -> the overview sequence (zoomed out, lines), a key/tap skips it, the card fits and matches the stats, Continue
 // resumes, a reload keeps the lifted dark with no sequence and the card is reachable from the Matrix; reduced motion: a
 // short fade, no pull-out. Screenshots (env SPIRE_SHOT): ending-seq-*.png, ending-card-*.png.
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 const DT = 1 / 60, idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 
@@ -58,7 +59,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     await page.goto(url); await page.waitForTimeout(200);
     await page.evaluate(() => { try { localStorage.clear(); } catch {} });
     await page.reload(); await page.waitForTimeout(200);
-    if (touch) await page.tap('#new-world'); else await page.click('#new-world');
+    await newWorld(page, touch);
     await page.waitForTimeout(300);
     await page.evaluate(() => { const g = window.__lumen.game; g.stats.mined = 50; g.stats.glitches = 3; window.__lumen.dev.relightAll(); });
     await page.waitForTimeout(3000);
@@ -105,7 +106,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     await pg.goto(url + '?dev'); await pg.waitForTimeout(200);
     await pg.evaluate(() => { try { localStorage.clear(); } catch {} });
     await pg.reload(); await pg.waitForTimeout(200);
-    await pg.click('#new-world'); await pg.waitForTimeout(300);
+    await newWorld(pg); await pg.waitForTimeout(300);
     await pg.click('#mute-btn'); const m0 = await pg.evaluate(() => window.__lumen.settings.muted);
     await pg.evaluate(() => { window.__lumen.dev.relightAll(); document.getElementById('mute-btn').focus(); });
     await pg.waitForTimeout(300);
@@ -124,7 +125,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   await page.goto(url); await page.waitForTimeout(200);
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
   await page.reload(); await page.waitForTimeout(200);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   await page.evaluate(() => { window.__lumen.settings.reducedMotion = true; window.__lumen.dev.relightAll(); });
   await page.waitForTimeout(300);
   const rm = await page.evaluate(async () => ({ seq: !!window.__lumen.game.endSeq, ov: (await import('/src/ending.js')).endingView(window.__lumen.renderer) }));
