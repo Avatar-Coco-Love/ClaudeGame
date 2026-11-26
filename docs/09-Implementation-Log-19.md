@@ -47,4 +47,7 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
   Gyre 9.29 / 11.94, ratio 1.285, deaths med 1 (boss 7, glitch 1), swarms 33, rims 143. All 32 runs down. Q-034: no.
 - New checks fail on the old code (stash `src/`: 3 FAIL). Screenshots: the faint Crucible octagon reads at the
   minimap's edge without competing with seen marks; the ending card at 568 × 320 fits with the Bosses row. Sting
-  -31.4 dBFS, 0 % > 2 kHz. No new bug.
+  -31.4 dBFS, 0 % > 2 kHz.
+- **B-098** (fixed, test only): smoke run 1 failed `S-59 tide locks … chevrons` (630/631): the page ignores `?seed`,
+  new worlds are random and 16 / 400 seeds have no tide lock. `tidelock.cjs` now rerolls the world (≤ 5, accepts the
+  confirm). Reroll path checked (seed changes); 3 + 1 standalone runs PASS.
