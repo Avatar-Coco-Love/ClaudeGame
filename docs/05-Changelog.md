@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.72 — 2026-11-26
+- New in the Shoal (large worlds): the Gyre, a second boss. Its lair sits in a whirlpool that carries you round it
+  clockwise; one plate glows mint and only it can be cut, and the glow steps round the body every second or so. Ride
+  the current with the beam on the glowing plate; each plate keeps the damage it took. Down, it pays like the Crucible
+  (with Tide ≈) and the whirlpool stills. Same fight in Drift and Surge for now.
+
 ## v1.8.71 — 2026-11-26
 - No change in play. A balance bot now fights the Crucible to the end in both modes on every test run, so its two
   forms stay equally quick to take down (about 40 s at the top build).

@@ -8,10 +8,12 @@
 // first stamped into an older save refunds what was placed in it and moves a core standing in it to the Nexus.
 // S-60b Surge form (D-165): in Surge, with the core within BOSS_WAKE_R cells, the boss is awake: any plate cuts, the flare
 // cycles BOSS_SURGE_FLARE_S and hurts, embers (Spitter bolts, `ember`) fly at a core in sight. A death heals its core only.
+// S-61a: the Shoal's Gyre shares all of this but the take-apart order, the flare and the look (gyre.js; list: Crucible first).
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
   WARD_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
-  BOLT_LIFE_S } from './config.js';
+  BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, BOSS_WAKES, BOSS_RGB } from './config.js';
+import { stepGyre, gyreKeyBroke, drawGyre } from './gyre.js';
 import { World, seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 import { ventPhase } from './vent.js';
@@ -48,11 +50,11 @@ export function lairSite(world, ring, anomalies = [], vents = []) {
 /** Builds `game.bosses` (before a save is applied) and hooks the world's hit multiplier for boss cells. */
 export function makeBosses(game) {
   const list = [];
-  for (const ring of Object.keys(LAIR_D).map(Number)) {
+  for (const ring of Object.keys(LAIR_D).map(Number).sort((a, b) => b - a)) { // the Crucible (S-60) stays boss 0
     const s = lairSite(game.world, ring, game.anomaly.sites, game.vents.sites);
-    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1, ember: BOSS_EMBER_S, awake: false });
+    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1, ember: BOSS_EMBER_S, awake: false, step: GYRE_STEP_S });
   }
-  game.bosses = { list, flares: 0, refunds: 0, burns: 0, embers: 0 };
+  game.bosses = { list, flares: 0, refunds: 0, burns: 0, embers: 0, steps: 0 };
   if (!list.length) return;
   const w = game.world, prev = w.hitMul;
   w.hitMul = (x, y, type, dir) => type === T.BOSS_PLATE || type === T.BOSS_CORE ? bossMul(game, x, y, type) : prev ? prev(x, y, type, dir) : 1;
@@ -66,7 +68,7 @@ export const platesLeft = (game, B) => PLATES.filter(([i, j]) => game.world.get(
 
 /** S-60b: awake = Surge, live, and the core within BOSS_WAKE_R cells of the boss core (follows a mode switch at once). */
 export function bossAwake(game, B) {
-  if (game.mode !== 'surge' || B.down || game.endSeq) return false;
+  if (game.mode !== 'surge' || B.down || game.endSeq || !BOSS_WAKES.includes(B.ring)) return false; // S-61a: no Gyre form yet
   const p = game.player;
   return Math.hypot(p.x - (B.x + 0.5) * CELL, p.y - (B.y + 0.5) * CELL) <= BOSS_WAKE_R * CELL;
 }
@@ -102,7 +104,7 @@ export function stampBosses(game, raw, fromSave) {
       if (!B.down && ring <= 1) w.broken[c] = 0;
       w.markDirty(B.x + i, B.y + j);
     }
-    B.lit = Math.floor(game.rng.crucible() * 8);
+    B.lit = Math.floor(game.rng[B.ring === GYRE_RING ? 'gyre' : 'crucible']() * 8); B.step = GYRE_STEP_S;
     const p = game.player;
     if (fromSave && !rec) {
       refund(game, B);
@@ -143,6 +145,7 @@ function onBroken(game, x, y) {
   if (x === B.x && y === B.y) { down(game, B); return; }
   const k = plateIndex(B, x, y);
   if (k < 0 || k !== B.lit) return; // S-60b: an awake boss's other plates break without moving the glow
+  if (B.ring === GYRE_RING) { gyreKeyBroke(game, B, k); return; } // S-61a: the key passes on clockwise
   for (let n = nextPlate(k), s = 0; s < 8; n = nextPlate(n), s++) {
     const [i, j] = PLATES[n];
     if (w.get(B.x + i, B.y + j) === T.BOSS_PLATE) { B.lit = n; return; }
@@ -153,7 +156,7 @@ function down(game, B) {
   B.down = true;
   const cx = (B.x + 0.5) * CELL, cy = (B.y + 0.5) * CELL;
   for (const [k, n] of Object.entries(BOSS_LOOT)) for (let i = 0; i < n; i++) game.spawnPickup(cx, cy, k === 'biome' ? BOSS_ORE[B.ring] : k, true);
-  game.burst(cx, cy, 60, `rgb(${BOSS_KEY_RGB})`, 300);
+  game.burst(cx, cy, 60, `rgb(${BOSS_RGB[B.ring]})`, 300);
   game.audio.cache();
   game.addShake(6);
   game.bossDown = B.name;
@@ -168,6 +171,7 @@ export function updateBosses(game, dt = 0) {
   if (!bs || !bs.list.length || game.endSeq) return;
   for (const B of bs.list) {
     if (B.down) continue;
+    if (B.ring === GYRE_RING) { stepGyre(game, B, dt); continue; } // S-61a: no flare; the key steps
     const awake = bossAwake(game, B), ph = bossPhase(game, B), key = (awake ? 's' : 'd') + ph.n;
     const dx = p.x - (B.x + 0.5) * CELL, dy = p.y - (B.y + 0.5) * CELL, d = Math.hypot(dx, dy);
     if (awake !== B.awake) { B.awake = awake; B.ember = BOSS_EMBER_S; }
@@ -207,8 +211,9 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
   const still = g.settings && g.settings.reducedMotion;
   r.bossDrawn = 0;
   for (const B of bs.list) {
-    const x0 = (B.x - LAIR_HALF) * CELL, y0 = (B.y - LAIR_HALF) * CELL, S = (2 * LAIR_HALF + 1) * CELL;
+    const x0 = (B.x - LAIR_HALF - 2) * CELL, y0 = (B.y - LAIR_HALF - 2) * CELL, S = (2 * LAIR_HALF + 5) * CELL; // + the whirlpool
     if (B.down || x0 > left + vw || y0 > top + vh || x0 + S < left || y0 + S < top || !w.explored[B.y * w.w + B.x]) continue;
+    if (B.ring === GYRE_RING) { drawGyre(r, ctx, B, still); r.bossDrawn++; continue; }
     const cx = (B.x + 0.5) * CELL, cy = (B.y + 0.5) * CELL, ph = bossPhase(g, B), m = BOSS_FLARE_R * CELL + r.glowPad(12);
     const pulse = still ? 1 : 0.7 + 0.3 * Math.sin(r.time * 1.6);
     ctx.save();
@@ -235,13 +240,14 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
   }
 }
 
-/** Minimap: a hollow ember octagon at a seen lair, filled once the boss is down. */
+/** Minimap: a hollow octagon in the boss's colour at a seen lair, filled once the boss is down. */
 export function drawBossMarks(m, g, sc) {
   const bs = g.bosses, w = g.world;
   if (!bs || !bs.list.length) return;
-  m.save(); m.lineWidth = 1.25; m.strokeStyle = m.fillStyle = `rgb(${BOSS_KEY_RGB})`;
+  m.save(); m.lineWidth = 1.25;
   for (const B of bs.list) {
     if (!w.explored[B.y * w.w + B.x]) continue;
+    m.strokeStyle = m.fillStyle = `rgb(${BOSS_RGB[B.ring]})`;
     m.beginPath(); octagon(m, (B.x + 0.5) * CELL * sc, (B.y + 0.5) * CELL * sc, 4);
     if (B.down) m.fill(); else m.stroke();
   }

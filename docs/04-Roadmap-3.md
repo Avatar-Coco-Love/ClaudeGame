@@ -49,7 +49,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-60a** Crucible (Kiln): lair, core + 8 plates, take-apart (the lit plate jumps across), loot, save (format 23; v1.8.67, D-163).
 - ✅ **S-60b1** Crucible awake in Surge: any plate, 4 s burning flare, embers, death heals the core (v1.8.69, D-165).
 - ✅ **S-60b2** `tools/bossrun.mjs` gate PASS: Surge / Drift 1.059, Surge deaths median 0 (v1.8.71, D-167).
-- **S-61a** Gyre (Shoal): lair, whirlpool, take-apart (ride round with the stepping key plate).
+- ✅ **S-61a** Gyre (Shoal, `gyre.js`): lair, whirlpool, stepping key plate; probe 56 s mid build (v1.8.72, D-168).
 - **S-61b** Gyre awake in Surge (inward pull, touch damage, mote swarms) + gate.
 - **S-62** Lairs on the Chart L2, boss sting, ending line "Bosses n / 2". M14 done → v1.9.
 - The ending does not ask for the bosses (Q-026 → D-158). Cut: one boss per ring, a roaming boss, unlock rewards.

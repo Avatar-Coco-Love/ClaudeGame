@@ -49,3 +49,13 @@ alternatives). D-164 on.
 - 8 seeds: Drift 0.67 / Surge 0.69 min median, ratio 1.059, 0 deaths (16 seeds 1.033): PASS, no tuning. Smoke gate.
 - Rejected: retreat to heal (a 200-cell round trip would gate the walk, not the boss); a gate-only start next to the
   body (the spec's 12 cells crosses the wake radius, so the switch to awake is measured).
+
+### D-168 — Build 131: the Gyre (S-61a, D-158)
+- `gyre.js` holds what differs from the Crucible (whirlpool, key step, look); `boss.js` keeps lair, stamp, loot, save.
+  The boss list runs Kiln first, so the Crucible stays boss 0 for tools and tests. Key start: its own rng stream `gyre`.
+- Whirlpool = `flowAt` within GYRE_R (so pickups and Motes ride it too); the core eases into it like a chunk border.
+  `undertow.off` (tools flag) turns it off too. The chunk's dashes skip it; the Gyre draws four rings of arc dashes.
+- The key steps to the next *standing* plate clockwise; when it breaks it passes on at once with a full 1.2 s step.
+- Interim Surge: `BOSS_WAKES` [4] (only the Crucible wakes); S-61b adds 3. Colours per boss: `BOSS_RGB`.
+- Rejected: the key drawn with 'lighter' (mint over the rose plate read white); a separate save entry (`bosses` holds
+  { ring, down } per lair already; an older 23 save without the Gyre gets it stamped by S-60a's rule).
