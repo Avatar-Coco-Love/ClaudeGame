@@ -58,3 +58,11 @@ alternatives). D-181 on.
   `ORE_WORTH` is now eventrun's `VALUE` (one table). Tell: a 1 px ring while defending, no blur (D-160).
 - Rejected: a toast on each Auto switch (noise; the chip and ring show it); defending only while a shot is ready (it
   would mine between shots and flicker); sight for bolts (a bolt behind a corner still arrives).
+
+### D-185 — Echo upgrades live in `echolevels.js`; `echoStat` is the only reader (session 146, S-70)
+- `ECHO_LEVELS` (config) holds Focus `dmg`, Volley `guardS`, Tether `reach` + `guardPx` per level; `ECHO_DMG`,
+  `ECHO_REACH`, `ECHO_GUARD_S`, `ECHO_GUARD_PX` are gone, so nothing can read a level-0 number by mistake.
+- Rows sit under the Echo row in Research (only once it is owned) and reuse the Core Matrix row builder (pips, MAX).
+  `game.echoLevels` is saved (format 25); load clamps 0…2, anything else 0 (B-037). New Cycle starts at 0 like Research.
+- Rejected: a fourth Research-style one-time unlock per level (no pips, 6 rows); levels on the Core Matrix (D-181 cut);
+  keeping the old constants as level-0 aliases (two sources of one number).

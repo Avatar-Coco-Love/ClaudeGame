@@ -93,6 +93,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
   await require('./echo.cjs').nodeChecks(check).catch(e => check('S-42 echo checks ran', false, e.message));
   await require('./echoorder.cjs').nodeChecks(check).catch(e => check('S-43 echo order checks ran', false, e.message));
+  await require('./echolevels.cjs').nodeChecks(check).catch(e => check('S-70 echo level checks ran', false, e.message));
   await require('./undertow.cjs').nodeChecks(check).catch(e => check('S-47 undertow checks ran', false, e.message));
   await require('./shatter.cjs').nodeChecks(check).catch(e => check('S-47b shatter checks ran', false, e.message));
   await require('./heat.cjs').nodeChecks(check).catch(e => check('S-48a heat checks ran', false, e.message));
@@ -397,6 +398,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('textsize', () => require('./textsize.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-40 text size browser checks ran', false, e.message)));
     await T('echo', () => require('./echo.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_SHOT).catch(e => check('S-42 echo browser checks ran', false, e.message)));
     await T('echoorder', () => require('./echoorder.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_ORDER_SHOT).catch(e => check('S-43 echo order browser checks ran', false, e.message)));
+    await T('echolevels', () => require('./echolevels.cjs').browserChecks(browser, url, check, errors, process.env.ECHO_LEVELS_SHOT).catch(e => check('S-70 echo level browser checks ran', false, e.message)));
     await T('undertow', () => require('./undertow.cjs').browserChecks(browser, url, check, errors, process.env.UNDERTOW_SHOT).catch(e => check('S-47 undertow browser checks ran', false, e.message)));
     await T('heat', () => require('./heat.cjs').browserChecks(browser, url, check, errors, process.env.HEAT_SHOT).catch(e => check('S-48a heat browser checks ran', false, e.message)));
     await T('vent', () => require('./vent.cjs').browserChecks(browser, url, check, errors, process.env.VENT_SHOT).catch(e => check('S-48b vent browser checks ran', false, e.message)));

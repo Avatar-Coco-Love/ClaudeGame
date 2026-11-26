@@ -5,6 +5,7 @@ import { callBlock, callCooldown } from './rift.js';
 import { orderLabel } from './echo.js';
 import { burrowerRumble } from './burrower.js';
 import { canResearch, buyResearch } from './research.js';
+import { ECHO_ROWS, echoRowDef, echoLevelCost, canBuyEchoLevel, buyEchoLevel } from './echolevels.js';
 import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, placeRefusal, relayAt, PLACE_GLYPH } from './craft.js';
 import { sinksOn, canCraftSink, craftSink, sinkAt } from './heatsink.js';
@@ -364,7 +365,11 @@ function renderPanel() {
     if (sinksOn(g)) list.appendChild(craftRow('sink', 'Kiln floor only: within 5 cells your beam heats 60 % slower.', HEATSINK_STOCK, HEATSINK_COST, canCraftSink, craftSink)); // S-51
     list.appendChild(craftRow('ward', `Guards: bolts the nearest creature within ${WARD_R} cells it can see.`, WARD_STOCK, WARD_COST, canCraftWard, craftWard)); // S-56
   } else if (panelTab === 'research') {
-    for (const r of RESEARCH) list.appendChild(researchRow(r));
+    for (const r of RESEARCH) {
+      list.appendChild(researchRow(r));
+      if (r.id === 'echo' && g.research.echo) for (const k of ECHO_ROWS) // S-70: Focus / Volley / Tether under the Echo row
+        list.appendChild(upgradeRow(echoRowDef(k), g.echoLevels[k], { lumen: echoLevelCost(g, k) }, canBuyEchoLevel(g, k), () => buyEchoLevel(g, k)));
+    }
     if (RESEARCH.every(r => g.research[r.id] || !canResearch(g, r.id)) && !RESEARCH.every(r => g.research[r.id])) {
       const tip = document.createElement('div');
       tip.className = 'research-hint'; tip.textContent = RESEARCH_HINT;

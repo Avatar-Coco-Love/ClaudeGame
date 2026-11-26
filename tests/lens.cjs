@@ -9,7 +9,7 @@ const quiet = new Proxy({}, { get: () => () => {} });
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { riftStarts, updateRift, callRift } = await import('../src/rift.js');
-  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { upgradeSave, STEPS } = await import('../src/save.js');
   const C = await import('../src/config.js');
   const { NEXUS_UPGRADES, RIFT_CALL_COST, RIFT_CALL_CD, RIFT_S, RIFT_ORE, RIFT_MAJOR, CELL, T } = C;
   const make = (mode = 'drift', seed = 4242, size) => { const g = new Game({ seed, mode, audio: quiet, size }); updateRift(g); return g; };
@@ -87,8 +87,10 @@ async function nodeChecks(check) {
     const p = mode => { const g = ready(make(mode)); g.stats.time = 30; callRift(g); const o = g.rift.open; return o && JSON.stringify(o.cells.map(c => [c.x, c.y, c.type])); };
     check('S-63 Lens: Drift and Surge open the same called pocket', !!p('drift') && p('drift') === p('surge'));
   }
-  { // saves: format 23 upgrades with the Lens unbuilt; a built one reloads; junk loads 0; no rift state saved
-    const s = make().toSave(); delete s.nexus.lens; s.v = SAVE_FORMAT - 1;
+  { // saves: the format before the Lens upgrades with it unbuilt; a built one reloads; junk loads 0; no rift state saved
+    // (S-70: found by the step that adds `nexus.lens`, not SAVE_FORMAT - 1, so later formats don't break it)
+    const lensStep = STEPS.findIndex(f => { try { return 'lens' in (f({ nexus: {} }).nexus || {}); } catch { return false; } });
+    const s = make().toSave(); delete s.nexus.lens; s.v = lensStep + 1;
     const up = upgradeSave(JSON.parse(JSON.stringify(s))), g0 = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: up });
     const b = ready(make()).toSave(), g1 = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: JSON.parse(JSON.stringify(b)) });
     b.nexus.lens = 'x'; const g2 = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: JSON.parse(JSON.stringify(b)) });

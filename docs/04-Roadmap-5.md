@@ -5,7 +5,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 
 ## M16 — Echo minds (D-181, `07-Build-Specs-19.md`) → v1.11
 - ✅ **S-69** (session 145, v1.10.86, D-184) Echo orders Mine / Defend / Auto (Auto: threat → Defend, 2 s hold → Mine); worth-first ore, soonest-threat first.
-- **S-70** Echo upgrades in Research (● 165): Focus (mine dps), Volley (fire rate), Tether (reach); format 25.
+- ✅ **S-70** (session 146, v1.10.87, D-185) Echo upgrades in Research (● 165): Focus (mine dps), Volley (fire rate), Tether (reach); format 25.
 - **S-71** `echobot --orders` gate: Auto ≥ 0.9 × Mine's haul, ≤ 1.1 × Defend's damage; Echo share ≤ 35 %. **M16 done.**
 - Cut (D-181): an Attack order, a second Echo (Q-039), levels past 2, a learning Auto, an Echo off its leash.
 

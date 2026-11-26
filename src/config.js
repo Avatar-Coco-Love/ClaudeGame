@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.10.86';
+export const VERSION = '1.10.87';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -249,15 +249,22 @@ export const ECHO_SPEED_MUL = 1.15;      // × the core's Thrusters speed
 export const ECHO_BLINK_CELLS = 10;      // path distance past which it blinks
 export const ECHO_STUCK_S = 1.5, ECHO_STUCK_PX = 4; // < 4 px progress toward the core in 1.5 s -> blink
 export const ECHO_FADE_S = 0.25;         // each way
-export const ECHO_REACH = 5;             // cells from the core an ore cell may be to Gather it
-export const ECHO_DMG = 0.5;             // × the core's Beam Power dps
+// S-70 (D-185): Echo upgrades, Research tab, paid in Lumen; level 0…2 per row. `echoStat(game, key)` (echolevels.js) is
+// the only reader: Focus = Mine dps × the core's Beam Power; Volley = s between Defend shots; Tether = Mine reach (cells
+// from the core) + Defend range (px from the core).
+export const ECHO_LEVELS = {
+  focus: { name: 'Echo Focus', desc: 'Its mining beam: × your Beam Power', stats: { dmg: [0.5, 0.7, 0.9] } },
+  volley: { name: 'Echo Volley', desc: 'Defend: seconds between its shots', stats: { guardS: [0.8, 0.6, 0.45] } },
+  tether: { name: 'Echo Tether', desc: 'How far from you it mines (cells) and defends (px)', stats: { reach: [5, 6, 7], guardPx: [140, 170, 200] } },
+};
+export const ECHO_LEVEL_COST = [20, 35]; // ● for level 1, level 2 (● 165 for all three rows)
 export const ECHO_PICK_S = 0.25;         // s between target searches while it has none
-// S-43 orders (D-113): Gather (S-42) or Guard. Guard bolts the Glitch / Spitter bolt nearest the core within ECHO_GUARD_PX,
-// with a clear line from the Echo, every ECHO_GUARD_S; ECHO_GUARD_DMG hp a hit (a tier-1 Glitch, 2.3 hp, in 3; a bolt in 1).
+// S-43 orders (D-113): Gather (S-42) or Guard. Guard bolts the Glitch / Spitter bolt nearest the core within guardPx (S-70 Tether),
+// with a clear line from the Echo, every guardS (S-70 Volley); ECHO_GUARD_DMG hp a hit (a tier-1 Glitch, 2.3 hp, in 3; a bolt in 1).
 export const ECHO_ORDERS = ['gather', 'guard', 'auto']; // S-69 (D-184): shown as Mine / Defend / Auto; a new Echo starts in Auto
 export const ECHO_AUTO_S = 0.25, ECHO_AUTO_HOLD = 2; // S-69 Auto: threat check every 0.25 s; 2 s with none -> back to Mine
 export const ORE_WORTH = { shard: 1, prism: 3, lumen: 4, tide: 12, calx: 12 }; // S-69: Mine scores worth / (cells + 2); eventrun's VALUE
-export const ECHO_GUARD_S = 0.8, ECHO_GUARD_PX = 140, ECHO_GUARD_DMG = 0.8, ECHO_SHOT_S = 0.12; // shot: drawn this long
+export const ECHO_GUARD_DMG = 0.8, ECHO_SHOT_S = 0.12; // shot: drawn this long
 export const RESEARCH_HINT = `Gold Lumen ● hides past ${LUMEN_D} cells, in the Deep`;
 
 // Beam modes (S-13, D-036), in Q / ⟂ cycle order. Rays are parallel, `offsets` px sideways; range and damage are multipliers
