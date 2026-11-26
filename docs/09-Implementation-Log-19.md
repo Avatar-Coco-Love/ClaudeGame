@@ -71,3 +71,6 @@ Continues part 18 (sessions 129–133 archived word for word in audit 139: `arch
   v1.7.59–65 archived. Debt lines of audits 109–134 moved to the done archive; the slow-file items closed (D-177).
 - Workflow review: too much copying of the same Debt lines audit to audit (the slow files rode four audits); too
   little: phone sweeps (two audits skipped). Change (D-177): a line carried three audits is fixed or closed.
+- Smoke: run 1 641/643 (S-38 / S-29 read VERSION while I bumped it mid-run: mine, not a bug); run 2 640/643:
+  **B-100** (flake, open): `facet.cjs` 320 × 568 primed Spire: mask set, hint empty, so the 2 later checks fail too;
+  3 standalone runs PASS; worlds are random (B-098), so seed or load. Run 3 643/643.
