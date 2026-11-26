@@ -12,7 +12,7 @@ async function nodeChecks(check) {
   const { chooseSpires, stampSpires, SPIRE_HALF } = await import('../src/spire.js');
   const { anomalySites } = await import('../src/anomaly.js');
   const { ventSites } = await import('../src/vent.js');
-  const { lairSite, PLATES, nextPlate, platesLeft } = await import('../src/boss.js');
+  const { lairSite, PLATES, nextPlate, platesLeft, clearBosses } = await import('../src/boss.js');
   const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
   const C = await import('../src/config.js');
   const { CELL, T, KILN_RING, VAULT_HALF, LAIR_HALF, LAIR_CLEAR, VENT_PERIOD_S, VENT_FLARE_S, VENT_HEAT, HURT_KNOCKBACK, MATERIAL, BOSS_LOOT, BEACON_COST } = C;
@@ -35,6 +35,10 @@ async function nodeChecks(check) {
       for (let c = 0; c < w.cells.length; c++) if (w.cells[c] !== plain.cells[c] && !(Math.abs(c % 256 - B.x) <= H && Math.abs(Math.floor(c / 256) - B.y) <= H)) diff++;
       if (diff) bad.push(`${seed}: ${diff} cells changed outside the lair`);
       if (JSON.stringify(lairSite(plain, KILN_RING, an, vs)) !== JSON.stringify({ x: B.x, y: B.y, ring: B.ring, t: B.t })) bad.push(`${seed}: not seed-only`);
+    }
+    { // B-094: bots run without lairs unless asked (surgebot boss: 'off'), so older gates keep their numbers
+      const g = make('drift', 4242), plain = new World(4242, [], 256); stampSpires(plain, g.spires); clearBosses(g);
+      if (g.bosses.list.length || g.world.cells.some((c, i) => c !== plain.cells[i])) bad.push('clearBosses left the lair');
     }
     const small = make('drift', 4242, null), g160 = new Game({ seed: 4242, mode: 'drift', audio: quiet, size: 160 });
     check('S-60a lair: a seed-only 9 × 9 site in the Kiln on 30 / 30 seeds, clear of vaults (2) / vents + Anomalies (3) / Spires (6); nothing else moves; none in a 160 world',

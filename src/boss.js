@@ -9,7 +9,7 @@
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
   WARD_COST } from './config.js';
-import { seededStream, vaultSites, insideBorder } from './world.js';
+import { World, seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 import { ventPhase } from './vent.js';
 import { collides } from './body.js';
@@ -92,6 +92,17 @@ export function stampBosses(game, raw, fromSave) {
     }
   }
   if (game.bosses.list.length && collides(w, game.player.x, game.player.y, PLAYER_R)) toNexus(game);
+}
+
+/** Tools only (surgebot `boss: 'off'`, like rifts and weather): the lairs go back to generated terrain and the bosses are
+ *  gone, so a bot gate measured before S-60a keeps its numbers. */
+export function clearBosses(game) {
+  const w = game.world, gen = new World(w.seed, game.vaultSkip, w.w), H = LAIR_HALF;
+  for (const B of game.bosses.list) for (let j = -H; j <= H; j++) for (let i = -H; i <= H; i++) {
+    const c = (B.y + j) * w.w + B.x + i;
+    w.cells[c] = gen.cells[c]; w.damage[c] = 0; w.broken[c] = 0; w.markDirty(B.x + i, B.y + j);
+  }
+  game.bosses.list.length = 0;
 }
 
 function toNexus(game) { const p = game.player; p.x = game.nexus.x; p.y = game.nexus.y + SPAWN_OFFSET; p.vx = p.vy = 0; }

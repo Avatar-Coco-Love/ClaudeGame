@@ -76,5 +76,6 @@ alternatives). D-158 on.
   refunded at craft cost, a core inside goes to the Nexus. The upgrade step only adds `bosses: []` (it has no World).
 - Boss hits go through `world.hitMul` (wrapping the locks'); an unlit plate sparks grey (`quenched`). Probe: mid build
   (beam 5, range 3) bot 60–61 s on 4 seeds (≤ 90 PASS).
+- Bots run without lairs unless asked (`surgebot` `boss: 'off'` → `clearBosses`), as rifts (D-156): B-094.
 - Rejected: stamping in `World` (moves the terrain hash `vent.cjs` / `ore.cjs` pin); refunding in the save step (needs
   the anomaly + vent sites, i.e. a World); a lit-plate edge in its own colour only (it pulses + glows, enough vs Kiln rock).

@@ -13,3 +13,7 @@ Continues part 17 (sessions 119–125). Newest at the bottom; read the tail only
   well; a lit plate's orange edge is close to Kiln rock's, but its pulse and glow set it apart.
 - `tests/boss.cjs` (10 node + 1 browser checks); the old-save check failed first (the Beacon cell was solid in the save's
   map, so it never loaded): the test now breaks that cell in the old map, as a real save would.
+- B-094 (caught by smoke): the 8-seed Shoal gate (`mote.cjs`) went 0.922 / 0.855, gap 0.067 FAIL: on 3 seeds the bot's
+  Shoal pad is 8–16 cells from the lair, and its floor shifts paths and spawns (12 / 16 seeds still PASS). Fix as for
+  rifts: `runBot` clears lairs unless `boss: 'on'`; the gates read their old numbers exactly (Shoal 0.017, Kiln 0.039).
+- Smoke 601/601 (+11: `boss.cjs` 10 node + 1 browser).
