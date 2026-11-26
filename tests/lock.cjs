@@ -98,9 +98,12 @@ async function browserChecks(browser, url, check, errors, shot) {
   const pg = await browser.newPage({ viewport: { width: 1000, height: 700 } });
   pg.on('pageerror', e => errors.push('lock: ' + e.message));
   await pg.goto(url + (url.includes('?') ? '&' : '?') + 'seed=4242'); await pg.waitForTimeout(200);
-  await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
-  await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  for (let k = 0; k < 8; k++) { // B-096: "New world" draws a random seed and ~1 in 25 has no Flare Lock: retry until one does
+    await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
+    await pg.reload(); await pg.waitForTimeout(200);
+    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    if (await pg.evaluate(() => !!(window.__lumen.game.locks && window.__lumen.game.locks.sites[0]))) break;
+  }
   const { CELL, VENT_PERIOD_S } = await import('../src/config.js');
   const has = await pg.evaluate(([C, P]) => {
     const L = window.__lumen, g = L.game, w = g.world, K = g.locks && g.locks.sites[0];

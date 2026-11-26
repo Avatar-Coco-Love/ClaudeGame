@@ -39,10 +39,16 @@ two forms' time to defeat within 0.8–1.25 of each other. A 160 world has no Sh
   top of the shove), and every `BOSS_EMBER_S` 2 s it lobs an ember (the Spitter bolt: 8 dmg, rock stops it, the beam
   pops it) at the core when in line of sight within 10 cells. No Glitch spawns from it; weather / rifts never start
   while it is awake. A death in Surge: plates stay broken, the core heals to full (no grind, no free kill).
-- **Drift** is unchanged (S-60a's rule). Mode switch: the awake state follows the mode at once.
+- **Drift** is unchanged (S-60a's rule). Mode switch: the awake state follows the mode at once. Wards ignore the body
+  and its embers (they bolt creatures only). The lit plate's fill also tints ember at 35 % (D-164: its edge alone reads
+  close to Kiln rock in a still frame).
 - **Gate (`tools/bossrun.mjs`, `GATE_SEEDS` 8, D-155):** a bot with the top base build, a Heat Sink and 2 Wards
   starts 12 cells out and plays to "down" in each mode. Time ratio Surge / Drift **0.8–1.25**, Surge deaths median
   ≤ 1. If it misses: tune ember cadence first, then flare damage. Fewer seeds = no verdict. Gate line in `09`.
+  **The world as played (D-164):** `runBot` with `boss: 'on'` and nothing else stripped: Burrowers, Glitch spawns,
+  vents and heat stay live (only weather / rifts per the rule above), so the creature + lair pair is measured once
+  (the creature gates run without lairs, B-094). Log Surge deaths by cause (boss / Burrower / Glitch). If Burrowers
+  cause most deaths, retune the boss (not the Burrower: its own gate holds) or keep Burrowers out of `BOSS_WAKE_R`.
 - Smoke: plates any order only in Surge; flare damage only in Surge and only ≤ 3 cells; ember hits and is blocked by
   rock; death heals the core and keeps broken plates; gate PASS. `audio.cjs` rows for the flare thump and ember.
 

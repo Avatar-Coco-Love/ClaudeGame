@@ -83,7 +83,10 @@ export class Renderer {
     this.miniData = this.miniCtx.createImageData(w.w, w.h);
     for (let i = 0; i < w.w * w.h; i++) if (w.explored[i]) this.setMini(i);
     this.miniCtx.putImageData(this.miniData, 0, 0);
-    w.listeners = [(x, y) => { const i = w.idx(x, y); if (w.explored[i]) this.setMini(i); this.miniDirty = true; }];
+    // B-095: add to the world's listeners, never replace them (the Crucible's break listener lives there too, boss.js)
+    if (this.onBreak) w.listeners = w.listeners.filter(f => f !== this.onBreak);
+    this.onBreak = (x, y) => { const i = w.idx(x, y); if (w.explored[i]) this.setMini(i); this.miniDirty = true; };
+    w.listeners.push(this.onBreak);
     const p = game.player;
     this.cam.x = p.x; this.cam.y = p.y;
   }

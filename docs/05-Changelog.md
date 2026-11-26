@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.68 — 2026-11-26
+- **The Crucible can be finished.** In the live game the glow stopped after the first plate broke, so no plate took
+  damage and the boss could not be downed. Now the glow jumps across the body after every break, as intended.
+
 ## v1.8.67 — 2026-11-26
 - **The Crucible (first boss, Kiln).** Deep in the Kiln a 9 × 9 lair holds an ember core ringed by eight rose plates.
   Only the plate that glows takes your beam; break it and the glow jumps across the body, so you keep circling it while

@@ -33,5 +33,7 @@ Continues `07-Build-Specs-15.md` (plan D-158, rules there: one body, two forms, 
   filled octagon on the minimap. A low two-note sting when a boss wakes (Surge) or its first plate breaks (Drift),
   `audio.cjs` row. The ending's stats list "Bosses n / 2" on a 256 world (no line on 160; D-158: the ending does not
   require them).
+- **Lairs vs creature gates (D-164):** run `biomefoe.mjs` and the Shoal gate once with `boss: 'on'` on 16 seeds; log
+  both lines in `09` (advisory, not a smoke gate). A gap past the band becomes Debt in `04`.
 - **Close-out:** `VERSION` minor → 1.9, `04-Roadmap-3` M14 ✅, `02` scope line; next milestone needs a design D-xxx.
 - Smoke: Chart shows lairs only at L2; ending line only on 256; sting under ceiling. Screenshot viewed.
