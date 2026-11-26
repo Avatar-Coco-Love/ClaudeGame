@@ -4,7 +4,7 @@
 // the core's own ring, is ore (RIFT_ORE by ring); at the close every pocket cell still standing reverts whole to its old
 // type (ore lost). Nothing is saved: the cells regenerate from the seed on a reload, and a reload mid-rift skips that rift.
 // A Wake or the ending closes the open one and skips any due inside them. `force` 'off' is for tools and tests only.
-import { RIFT_EVERY_S, RIFT_S, RIFT_R, RIFT_TRIES, RIFT_ORE, RIFT_MAJOR, RIFT_BONUS, RIFT_RGB, WEATHER_S, NEXUS_RADIUS, CELL, T } from './config.js';
+import { RIFT_CALL_COST, RIFT_CALL_CD, RIFT_EVERY_S, RIFT_S, RIFT_R, RIFT_TRIES, RIFT_ORE, RIFT_MAJOR, RIFT_BONUS, RIFT_RGB, WEATHER_S, NEXUS_RADIUS, CELL, T } from './config.js';
 import { seededStream, insideBorder } from './world.js';
 import { weatherGap } from './weather.js';
 
@@ -24,7 +24,7 @@ function schedule(seed) {
 
 export function makeRift(seed) {
   const next = schedule(seed);
-  return { next, site: seededStream(seed, 'rift-site'), k: 0, start: next(), open: null, tried: -1, skip: -1, fresh: true, opened: 0, mined: 0, force: null };
+  return { next, site: seededStream(seed, 'rift-site'), callSite: seededStream(seed, 'rift-call'), lastCall: -Infinity, k: 0, start: next(), open: null, tried: -1, skip: -1, fresh: true, opened: 0, mined: 0, force: null };
 }
 
 /** Start times of the first `n` rifts for a seed (tests and tools; the same draws updateRift makes). */
@@ -46,11 +46,11 @@ export function pocketClear(game, x, y) {
   return !game.anomaly.sites.some(near) && !(game.vents ? game.vents.sites : []).some(near);
 }
 
-/** A pocket centre for the core's position, or null (up to RIFT_TRIES draws from rng['rift-site']). */
-export function riftSite(game) {
+/** A pocket centre for the core's position, or null (up to RIFT_TRIES draws from `rnd`: rng['rift-site'], or rng['rift-call'] for a call). */
+export function riftSite(game, rnd = game.rift.site) {
   const w = game.world, p = game.player, px = p.x / CELL, py = p.y / CELL, ring = w.ring(Math.floor(px), Math.floor(py));
   for (let t = 0; t < RIFT_TRIES; t++) {
-    const a = game.rift.site() * Math.PI * 2, d = RIFT_R[0] + game.rift.site() * (RIFT_R[1] - RIFT_R[0]);
+    const a = rnd() * Math.PI * 2, d = RIFT_R[0] + rnd() * (RIFT_R[1] - RIFT_R[0]);
     const x = Math.floor(px + Math.cos(a) * d), y = Math.floor(py + Math.sin(a) * d), dc = Math.hypot(x + 0.5 - px, y + 0.5 - py);
     if (dc < RIFT_R[0] || dc > RIFT_R[1] || w.ring(x, y) !== ring || !pocketClear(game, x, y)) continue;
     return { x, y, ring };
@@ -58,19 +58,20 @@ export function riftSite(game) {
   return null;
 }
 
-/** Open rift k now, if a site exists (else it is skipped quietly). The 3 minor-ore cells are drawn from the site stream. */
-export function openRift(game) {
-  const r = game.rift, s = riftSite(game);
+/** Open rift k now, if a site exists (else it is skipped quietly). The 3 minor-ore cells are drawn from the site stream.
+ *  `called` (S-63): a Lens call, drawn from its own stream so the natural sites stay as they were. */
+export function openRift(game, called = false) {
+  const r = game.rift, rnd = called ? r.callSite : r.site, s = riftSite(game, rnd);
   if (!s) return false;
   const [major, minor] = RIFT_ORE[s.ring], order = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-  for (let i = 8; i > 0; i--) { const j = Math.floor(r.site() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  for (let i = 8; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
   const cells = [];
   order.forEach((n, rank) => {
     const x = s.x + (n % 3) - 1, y = s.y + Math.floor(n / 3) - 1, type = rank < RIFT_MAJOR[s.ring] ? major : minor;
     cells.push({ x, y, prev: game.world.get(x, y), type });
     game.world.retype(x, y, type);
   });
-  r.open = { k: r.k, x: s.x, y: s.y, ring: s.ring, cells, t0: game.stats.time };
+  r.open = { k: r.k, x: s.x, y: s.y, ring: s.ring, cells, t0: game.stats.time, called };
   r.opened++;
   game.audio.riftOpen(); // S-57b
   game.notify('rift-open');
@@ -95,10 +96,39 @@ export function updateRift(game) {
   if (r.fresh) { r.fresh = false; if (t >= r.start) r.skip = r.k; } // a reload mid-rift skips it (nothing saved)
   const busy = game.wake || game.endSeq;
   if (busy && t >= r.start) r.skip = r.k; // cancelled, as weather is; one due inside them never opens
+  if (r.open && r.open.called) { // S-63: a called rift keeps its own clock; a natural one due meanwhile is skipped
+    if (t >= r.open.t0 + RIFT_S || busy) closeRift(game); else if (t >= r.start) r.skip = r.k;
+  }
   const due = t >= r.start && r.skip !== r.k;
-  if (r.open && (r.open.k !== r.k || !due)) closeRift(game);
+  if (r.open && !r.open.called && (r.open.k !== r.k || !due)) closeRift(game);
   if (!r.open && due && r.tried !== r.k) { r.tried = r.k; if (!game.bossAwake) openRift(game); } // S-60b: none opens while a boss is awake
 }
+
+/** Why a Lens call would be refused now ('' = it may go ahead). The natural rift's own rules (weather, Wake, ending, an
+ *  awake boss), plus one rift at a time, RIFT_CALL_CD, the bank, and never from inside the Nexus ring. */
+export function callBlock(game) {
+  const r = game.rift, t = game.stats.time;
+  if (!game.nexusLevels.lens) return 'lens';
+  if (game.inNexus()) return 'nexus';
+  if (r.open) return 'open';
+  if (game.weather.kind || game.wake || game.endSeq || game.bossAwake) return 'busy';
+  if (t - r.lastCall < RIFT_CALL_CD) return 'cooldown';
+  if (game.bank.prism < RIFT_CALL_COST) return 'prisms';
+  return '';
+}
+
+/** S-63 Lens: call a rift where the core stands. Returns '' when it opened (▲ spent), else why not (nothing spent). */
+export function callRift(game) {
+  const why = callBlock(game);
+  if (why) return why;
+  if (!openRift(game, true)) return 'site';
+  game.bank.prism -= RIFT_CALL_COST;
+  game.rift.lastCall = game.stats.time;
+  return '';
+}
+
+/** Seconds until the Lens can call again (0 = ready, cooldown only). */
+export const callCooldown = game => Math.max(0, Math.ceil(game.rift.lastCall + RIFT_CALL_CD - game.stats.time));
 
 /** Extra yield rolls for an ore cell broken at (x, y): RIFT_BONUS inside the open pocket, else 0 (D-156). */
 export function riftBonus(game, x, y) {

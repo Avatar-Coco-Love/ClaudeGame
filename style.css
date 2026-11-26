@@ -61,7 +61,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pair:not(:has(> :not(.hidden))) { display: none; } /* no stray column gap while both are hidden */
 #echo-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid #d8fbff; background: rgba(20, 40, 52, .85); color: #d8fbff;
   font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(216,251,255,.25); } /* S-43 Echo order */
-@media (pointer: coarse) { #echo-btn { min-width: 44px; width: 44px; padding: 0; } } /* phones: glyph-only, the chip names the order */
+#call-btn { min-width: 78px; height: 44px; border-radius: 10px; border: 1px solid rgb(226,208,255); background: rgba(36, 26, 56, .85); color: rgb(226,208,255);
+  font-size: calc(20px * var(--ts)); box-shadow: 0 0 14px rgba(226,208,255,.25); transition: opacity .2s; } /* S-63 Lens: call a rift */
+#call-btn.cooling { opacity: .35; box-shadow: none; }
+@media (pointer: coarse) { #echo-btn, #call-btn { min-width: 44px; width: 44px; padding: 0; } } /* phones: glyph-only, the chip names the order */
 #beacon-count { font-size: calc(14px * var(--ts)); font-weight: 700; margin-left: 5px; font-variant-numeric: tabular-nums; }
 .research-hint { padding: 12px 0 4px; border-top: 1px solid rgba(90,120,255,.15); font-size: calc(13px * var(--ts)); color: var(--gold); text-align: center; }
 .touch kbd { display: none; }
@@ -189,6 +192,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
   .top-right { flex-direction: row; align-items: flex-start; gap: 8px; }
   .pair { display: contents; } /* landscape: ◎ and ◇ join the row */
   #scan-btn { order: 1; } #mode-btn { order: 2; } #echo-btn { order: 3; } .top-right .buttons { order: 4; } #minimap { order: 5; width: 112px; height: 112px; }
+  #call-btn { position: absolute; top: 52px; right: 206px; } /* S-63: under the row, left of ✦ */
   #beacon-btn { position: absolute; top: 52px; right: 120px; } /* S-16: under the row, beside the minimap: the row stays as wide as before */
   .chip:not(.echo) .chip-name { display: none; } /* audit 84 (B-078): named chips at 701–932 px pushed the bank panel under ◎ ⟂ */
 }
@@ -199,6 +203,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
   #mode-btn .mode-name { display: none; }
   #minimap { width: 100px; height: 100px; }
   #beacon-btn { right: 108px; }
+  #call-btn { right: 246px; } /* S-63: left of ◇ */
   #echo-btn { position: absolute; top: 52px; right: 194px; } /* S-43: no room in the row at 568 px: under it, left of ✦ */
   .top-left { min-width: 0; } .bank { font-size: 15px; gap: 10px; } /* S-40: not scaled by Large (already ≥ 15 px) */
 }

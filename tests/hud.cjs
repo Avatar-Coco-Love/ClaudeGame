@@ -17,7 +17,7 @@ async function browserChecks(browser, url, check, errors) {
       // Every optional HUD box shown, as late in a run; the Matrix button only shows at the Nexus, where there's no pointer.
       const g = window.__lumen.game; Object.assign(g.research, { scanner: true, wide: true, echo: true }); g.craft.beacon = 3; g.bank.lumen = 9;
       document.getElementById('matrix-btn').classList.add('hidden'); g.player.x += 3000;
-      for (const id of ['scan-btn', 'mode-btn', 'echo-btn', 'beacon-btn', 'integrity-row']) document.getElementById(id).classList.remove('hidden');
+      for (const id of ['scan-btn', 'mode-btn', 'echo-btn', 'call-btn', 'beacon-btn', 'integrity-row']) document.getElementById(id).classList.remove('hidden');
       document.querySelector('#hud .lumen').classList.remove('hidden');
       await new Promise(f => requestAnimationFrame(() => requestAnimationFrame(f)));
       const boxes = [...document.querySelectorAll('#hud > *:not(#toast):not(.top-right), #hud .top-right > *:not(.pair), #hud .top-right .pair > *')] // S-43: ◎ and ◇ live in .pair

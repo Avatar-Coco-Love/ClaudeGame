@@ -70,3 +70,12 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
   was cut (D-175). Pocket ▲ ≤ ~18, so a ▲ 30 call nets −12.
 - Specs in `07-Build-Specs-17.md`; Q-035 (feats), Q-036 (Lumen surplus) opened. No code change; no bugs found.
 
+## Session 138 — Build: S-63 Lens + rift call (v1.9.79, D-176)
+- `rift.js`: `callRift` / `callBlock` / `callCooldown`; `openRift(game, called)` draws from `rng['rift-call']`;
+  `updateRift` closes a called rift at t0 + 45 and skips a natural one due meanwhile. Row `lens` (▲ 40), key C, ✧ button, format 24.
+- New `tests/lens.cjs` (8 checks): 55 calls over 12 seeds × 5 rings charge 30 ▲ with ring ore; 10 refusals spend
+  nothing; 4 natural rifts identical with 4 calls between them (fails with calls on `rng['rift-site']`: proved).
+- Layout probe (Pixel 7 touch, Surge, every button): 360 × 640, 640 × 360, 568 × 320, 740 × 360, 844 × 390, 1280 × 800
+  no overlap; first try put ✧ first in the landscape row, over the bank panel at 568 / 740 (moved under the row).
+  `touch.cjs` / `hud.cjs` now include ✧. Screenshots 360 × 640 and 640 × 360 viewed: ✧ violet, reads apart from ◇.
+- HUD key now includes the call state, else ✧ stayed hidden after the Lens (first browser run failed). No bugs logged.

@@ -13,7 +13,7 @@ import { updateGlitches } from './glitch.js';
 import { updateWake, failWake } from './wake.js';
 import { checkEnding, recordCycle } from './ending.js';
 import { makeWeather, updateWeather, auroraBonus } from './weather.js';
-import { makeRift, updateRift, riftBonus } from './rift.js';
+import { makeRift, updateRift, riftBonus, callRift } from './rift.js';
 import { makeUndertow, updateUndertow, pickupDrift } from './undertow.js';
 import { makeBurrow, updateBurrower, clearBurrower } from './burrower.js';
 import { makeSwarm, updateSwarm, clearSwarm } from './mote.js';
@@ -239,6 +239,7 @@ export class Game {
     if (intent.beamMode && cycleBeamMode(this)) this.notify('beam-mode');
     if (intent.place) tryPlace(this); // S-16
     if (intent.echoOrder && cycleEchoOrder(this)) this.notify('echo-order'); // S-43
+    if (intent.call && this.nexusLevels.lens) { this.callResult = callRift(this); if (this.callResult) this.notify('rift-call'); } // S-63: a refusal says why
     this.updateBeam(dt, intent);
     updateWards(this, dt); // S-56: after the beam, before the creatures' passes, so a Ward kill pays this frame
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
@@ -492,6 +493,7 @@ export class Game {
     for (const u of UPGRADES) { const v = s.upgrades && s.upgrades[u.id]; if (Number.isInteger(v) && v >= 0) this.upgrades[u.id] = Math.min(v, this.topLevel(u)); } // S-50: clamped to the top level (B-037)
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     { const c = Math.floor(Number(this.nexusLevels.chart)); this.nexusLevels.chart = chartOn(this) && c > 0 ? Math.min(2, c) : 0; } // S-52: 0–2, 0 without a Kiln
+    this.nexusLevels.lens = this.nexusLevels.lens === 1 ? 1 : 0; // S-63 (B-037)
     Object.assign(this.stats, s.stats || {});
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
     this.records = cleanRecords(s.records); // B-057: a save is never trusted
