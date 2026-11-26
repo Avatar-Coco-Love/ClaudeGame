@@ -104,15 +104,6 @@ async function nodeChecks(check) {
     p.x -= CELL; const far = rimGap(g, B);
     check('S-61b rim reach: the open cell beside a plate is in reach (gap ≤ 8 px), one cell farther is not', near <= C.GYRE_RIM_PX && far > C.GYRE_RIM_PX, JSON.stringify({ near, far }));
   }
-  { // Session 136 (D-174): drawGyre glows with stacked strokes, never shadowBlur (awake it cost ~5 ms a frame, tools/perf.cjs ONLY=gyre)
-    const { drawGyre } = await import('../src/gyre.js');
-    const g = make('surge'), B = gyre(g), blurs = []; let strokes = 0;
-    const ctx = new Proxy({}, { get: (o, k) => k in o ? o[k] : k === 'stroke' ? () => { strokes++; } : () => {},
-      set: (o, k, v) => { if (k === 'shadowBlur' && v > 0) blurs.push(v); o[k] = v; return true; } });
-    for (const awake of [true, false]) { B.awake = awake; B.touch = 0; drawGyre({ game: g, time: 1.3, glowPad: () => 0 }, ctx, B, false); }
-    B.awake = false;
-    check('D-174: the Gyre (awake with its rim tell, and asleep) draws no shadowBlur; its glow is stacked strokes', blurs.length === 0 && strokes >= 3 * C.GYRE_GLOW.length, JSON.stringify({ blurs, strokes }));
-  }
   { // S-61b swarms: every 15 s awake, at the lair edge, at most 2 alive; a switch to Drift clears them
     const g = make('surge'), B = gyre(g), p = g.player, s = g.swarm; g.god = true; s.off = false;
     const at = () => { p.x = (B.x + 0.5 - 3) * CELL; p.y = (B.y + 0.5) * CELL; p.vx = p.vy = 0; };

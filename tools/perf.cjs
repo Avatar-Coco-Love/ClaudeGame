@@ -14,9 +14,7 @@
 // S-41: QUALITY=0|1|2 fixes the graphics level (default 0; Auto is off so the run measures one level).
 // Audit 124: scan (base with the Scanner ring kept sweeping: a fresh ring every 0.7 s, the time it is on screen);
 // VP=phone runs at 390×844 DSF 3 (the renderer caps dpr at 2 on L0) instead of 1280×800 DSF 1.
-// Session 136: gyre (Surge, god mode, the core held 3 cells west of seed 77's seen Gyre: awake, so the whirlpool arcs, the
-// rim tell and both tagged swarms, GYRE_SWARMS, are always out).
-// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [VP=phone] [ONLY=home|base|loot|holes|surge|far|kiln|shoal|scan|gyre] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
+// Usage: [QUALITY=0] [SECONDS=20] [RATE=4] [VP=phone] [ONLY=home|base|loot|holes|surge|far|kiln|shoal|scan] [SKIP=drawLight,drawPickups] [FLUSH=1] node tools/perf.cjs
 const path = require('path');
 const { chromium } = require('playwright');
 
@@ -30,7 +28,7 @@ const VP = process.env.VP === 'phone' ? { viewport: { width: 390, height: 844 },
 const QUALITY = Math.max(0, Math.min(2, Number(process.env.QUALITY) || 0));
 const STEPS = ['drawGrid', 'drawNexus', 'drawCrack', 'drawPickups', 'drawEnemies', 'drawBeam', 'drawPlayer', 'drawParticles', 'drawLight', 'drawScan'];
 
-async function run(browser, url, name, { loot, holes, home, surge, far, kiln, shoal, scan, gyre }) {
+async function run(browser, url, name, { loot, holes, home, surge, far, kiln, shoal, scan }) {
   const pg = await browser.newPage(VP);
   const errors = []; pg.on('pageerror', e => errors.push(e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
@@ -40,16 +38,12 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
   await pg.click('#new-world');
   await pg.evaluate(() => { Math.random = window.__rnd; });
   await pg.waitForTimeout(300);
-  await pg.evaluate(({ loot, holes, home, surge, far, kiln, shoal, scan, gyre, STEPS, SKIP, FLUSH, QUALITY }) => {
+  await pg.evaluate(({ loot, holes, home, surge, far, kiln, shoal, scan, STEPS, SKIP, FLUSH, QUALITY }) => {
     const { game: g, renderer: R, dev, quality } = window.__lumen;
     quality.mode = 'fixed'; R.setQuality(QUALITY); // S-41: no Auto steps mid-run
     g.demo = true; dev.god(true); if (!home) dev.teleport(kiln ? 110 : shoal ? 92 : far ? 100 : 30); // S-46b2: far = d 100 (deep Shoal of a 256 world); kiln = d 110
     if (loot) { g.research.wide = true; g.beamMode = 'wide'; }
     if (surge) g.mode = 'surge';
-    const GB = gyre && g.bosses && g.bosses.list.find(b => b.name === 'Gyre'), C = 32;
-    if (gyre && !GB) throw new Error('perf gyre: seed 77 has no Gyre');
-    const pin = () => { g.player.x = (GB.x - 3) * C; g.player.y = (GB.y + 0.5) * C; g.player.vx = g.player.vy = 0; };
-    if (GB) { pin(); g.world.reveal(g.player.x, g.player.y, 10 * C); g.setMode('surge'); }
     // Per-step timing: wrap each renderer draw step (and the whole draw) with performance.now().
     const t = window.__perf = { frames: [], draw: [], steps: Object.fromEntries(STEPS.map(k => [k, 0])) };
     for (const k of STEPS) if (!SKIP.includes(k)) { const f = R[k]; R[k] = function (...a) { if (FLUSH) R.ctx.getImageData(0, 0, 1, 1); const s = performance.now(); const r = f.apply(this, a); if (FLUSH) R.ctx.getImageData(0, 0, 1, 1); t.steps[k] += performance.now() - s; return r; }; }
@@ -63,7 +57,6 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
       if (kiln && !g.burrow.b) g.burrow.timer = 0; // audit 114: a Burrower always digging, telling or up nearby
       if (scan && (!g.scan.ring || g.scan.age > 0.7)) g.scan = { cooldown: 99, age: 0, x: g.player.x, y: g.player.y, ring: true, marks: [], end: 999 }; // audit 124
       if (shoal && !g.swarm.motes.length) g.swarm.timer = 0; // S-54: a mote swarm always out (god mode: they keep coming back)
-      if (GB) { pin(); GB.swarmT = Math.min(GB.swarmT, 0.01); } // held in the whirlpool; a swarm leaves whenever < 2 are out
       if (!loot) return;
       g.cargo.shard = g.cargo.prism = 0; // never cap out, so pickups keep flowing
       while (g.pickups.length < 300) { const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 260; g.spawnPickup(g.player.x + Math.cos(a) * d, g.player.y + Math.sin(a) * d * 0.6, 'shard', true); }
@@ -76,7 +69,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
     let last = performance.now();
     const tick = now => { t.frames.push(now - last); last = now; fill(); requestAnimationFrame(tick); };
     fill(); requestAnimationFrame(tick);
-  }, { loot, holes, home, surge, far, kiln, shoal, scan, gyre, STEPS, SKIP, FLUSH, QUALITY });
+  }, { loot, holes, home, surge, far, kiln, shoal, scan, STEPS, SKIP, FLUSH, QUALITY });
   const cdp = await pg.context().newCDPSession(pg);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   if (loot) { await pg.mouse.move(640, 790); await pg.mouse.down(); await pg.keyboard.down('s'); }
@@ -88,13 +81,13 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
     const t = window.__perf, g = window.__lumen.game, f = t.frames.slice(1).sort((a, b) => a - b), n = f.length;
     const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
     return { n, mean: mean(f), p95: f[Math.floor(n * 0.95)], max: f[n - 1], draw: mean(t.draw), drawN: t.draw.length,
-      steps: t.steps, mined: g.stats.mined, gyre: (() => { const B = g.bosses && g.bosses.list.find(b => b.name === 'Gyre'); return B ? { awake: B.awake, swarms: new Set(g.swarm.motes.filter(m => m.boss).map(m => m.grp)).size, motes: g.swarm.motes.length, dashes: window.__lumen.renderer.gyreDashes, rim: window.__lumen.renderer.gyreRim } : null; })(), pickups: g.pickups.length, lights: window.__lumen.renderer.extraLights.length };
+      steps: t.steps, mined: g.stats.mined, pickups: g.pickups.length, lights: window.__lumen.renderer.extraLights.length };
   });
   await pg.close();
   const total = r.draw * r.drawN, split = Object.entries(r.steps).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1])
     .map(([k, v]) => `${k.replace('draw', '')} ${(100 * v / total).toFixed(0)}%`).join(', ');
   console.log(`${name.padEnd(6)} frames ${r.n}  mean ${r.mean.toFixed(1)} ms  p95 ${r.p95.toFixed(1)}  max ${r.max.toFixed(1)}  ` +
-    `draw ${r.draw.toFixed(1)} ms  | mined ${r.mined}, ${r.pickups} pickups, ${r.lights} extra lights${name === 'gyre' ? ', gyre ' + JSON.stringify(r.gyre) : ''}${errors.length ? '  ERRORS ' + errors.join('; ') : ''}`);
+    `draw ${r.draw.toFixed(1)} ms  | mined ${r.mined}, ${r.pickups} pickups, ${r.lights} extra lights${errors.length ? '  ERRORS ' + errors.join('; ') : ''}`);
   console.log(`       draw split: ${split}`);
   return r;
 }
@@ -104,7 +97,7 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
   const url = `http://localhost:${server.address().port}/`;
   const browser = await chromium.launch();
   console.log(`S-15 perf: ${VP.viewport.width}×${VP.viewport.height} DSF ${VP.deviceScaleFactor}, L${QUALITY}, CPU ×${RATE}, seed 77, ${SECONDS} s per run${SKIP.length ? ', skipping ' + SKIP : ''}. Budget p95 ≤ 16.7 ms (see header: software canvas).`);
-  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true }, shoal: { loot: false, holes: 0, shoal: true } , scan: { loot: false, holes: 0, scan: true }, gyre: { loot: false, holes: 0, gyre: true } };
+  const runs = { home: { loot: false, holes: 0, home: true }, base: { loot: false, holes: 0 }, loot: { loot: true, holes: 0 }, holes: { loot: true, holes: 20 }, surge: { loot: false, holes: 0, surge: true }, far: { loot: false, holes: 0, far: true }, kiln: { loot: false, holes: 0, kiln: true }, shoal: { loot: false, holes: 0, shoal: true } , scan: { loot: false, holes: 0, scan: true } };
   const out = {};
   for (const [k, v] of Object.entries(runs)) if (!ONLY || ONLY === k) out[k] = await run(browser, url, k, v);
   if (out.base && out.loot) console.log(`loot / base mean frame: ${(out.loot.mean / out.base.mean).toFixed(2)}×`);
@@ -113,7 +106,6 @@ async function run(browser, url, name, { loot, holes, home, surge, far, kiln, sh
   if (out.base && out.far) console.log(`far / base mean frame: ${(out.far.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.kiln) console.log(`kiln / base mean frame: ${(out.kiln.mean / out.base.mean).toFixed(2)}×`);
   if (out.base && out.shoal) console.log(`shoal / base mean frame: ${(out.shoal.mean / out.base.mean).toFixed(2)}×`);
-  if (out.base && out.gyre) console.log(`gyre / base mean frame: ${(out.gyre.mean / out.base.mean).toFixed(2)}×`);
   if (out.loot && out.holes) console.log(`holes / loot mean frame: ${(out.holes.mean / out.loot.mean).toFixed(2)}×`);
   await browser.close(); server.close();
 })();

@@ -51,12 +51,3 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
 - **B-098** (fixed, test only): smoke run 1 failed `S-59 tide locks … chevrons` (630/631): the page ignores `?seed`,
   new worlds are random and 16 / 400 seeds have no tide lock. `tidelock.cjs` now rerolls the world (≤ 5, accepts the
   confirm). Reroll path checked (seed changes); 3 + 1 standalone runs PASS.
-
-## Session 136 — Build: awake-Gyre perf run, glow as strokes (v1.9.77, D-174)
-- Took the top Debt line of `04-Roadmap-4` (no spec left). `tools/perf.cjs` `ONLY=gyre`: base 31.7 / gyre 42.1 ms
-  mean (×1.33; shoal ×1.05, surge ×1.10). Skipping `drawGyre` alone: 36.8, so the boss draw was ~5 ms of it.
-- `drawGyre` glow → `GYRE_GLOW` stacked strokes (D-174): 38.0 ms mean, p95 66.7 → 50.1. The rest over shoal is the
-  two swarms + Surge Glitches (Enemies 3 % of draw), fine.
-- New node check (mock ctx: no shadowBlur, ≥ 9 strokes) fails on the old code (blurs [12, 12]). Screenshot awake:
-  ring, hexagon and the rim tell read as before, soft mint edge, no halo box.
-- Not done: phone (`VP=phone`) gyre run; the Crucible's `drawBosses` still blurs (logged Debt).
