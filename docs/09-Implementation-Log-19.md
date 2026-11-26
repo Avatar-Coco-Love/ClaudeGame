@@ -60,3 +60,13 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
 - Fix: blur clipped to the core ring (0.4 cell + pad), rim tell as `GYRE_RIM_GLOW` strokes, key plate unblurred.
   After: desktop 1.04 / 1.20× (two runs; headless noise ±3 ms), phone 1.13×. Screenshot of the awake Gyre: the rim
   still reads as a mint outline. New `gyre.cjs` check fails on the old code (2 blurred strokeRects, no box).
+
+## Session 137 — Design: M15 picked, S-63…S-65 specced (v1.9.78, D-175)
+- Economy probe (node, 4 seeds, expected yield): 256 ore ◆ 5.5–6.3k, ▲ 4.4–5.0k, ● 500–560, ≈ 280–410, ⬟ 270–280;
+  all sinks ◆ 4.4k, ▲ 379, ● 140, ≈ 108, ⬟ 108 (+ crafting caps). ▲ 8–13× past its sinks, ● ~3.8×; biome ore is not.
+- Play-test (Playwright, `?dev` maxAll, 900 ▲): Nexus tab = two MAX rows at 1280 × 800, 360 × 640, 640 × 360 (rows
+  82 / 97 / 57 px; room for one more row on the phone sheet). Kiln screenshot: ▲ cells everywhere.
+- Sites (4 seeds): Spires 64–73 cells out, lairs 90–115; at max Thrusters 398 px/s a lair is ~9 s straight, so a Gate
+  was cut (D-175). Pocket ▲ ≤ ~18, so a ▲ 30 call nets −12.
+- Specs in `07-Build-Specs-17.md`; Q-035 (feats), Q-036 (Lumen surplus) opened. No code change; no bugs found.
+

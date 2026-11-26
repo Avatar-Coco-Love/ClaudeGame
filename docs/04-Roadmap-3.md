@@ -1,4 +1,4 @@
-# 04 — Roadmap, part 3: M10–M14 (the game grows, D-119)
+# 04 — Roadmap, part 3: M10–M15 (the game grows, D-119)
 
 Owner's ask (session 87): bosses, more enemies, puzzles, a bigger map, biomes, events, ways to mine / defend / attack,
 upgrades, sinks and resource types. Claude decides what and how. Order fixed by D-119; one milestone closes its loop
@@ -53,3 +53,9 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - ✅ **S-61b** Gyre awake in Surge: swarms, rim, pull; gate `--boss=gyre` PASS 0.954, deaths 0 (v1.8.74, D-171).
 - ✅ **S-62** Lairs on the Chart L2, boss sting, ending "Bosses n / 2", mid build: Q-034 no (v1.9.76, D-173). **M14 done.**
 - The ending does not ask for the bosses (Q-026 → D-158). Cut: one boss per ring, a roaming boss, unlock rewards.
+
+## M15 — The Nexus reaches out (D-175, `07-Build-Specs-17.md`) → v1.10
+- **S-63** Lens (Nexus Development, ▲ 40) + Call: ▲ 30 opens a rift where you stand (90 s cooldown; format 24).
+- **S-64** Lens gate: call ≤ 1.25× plain mining, net ▲ < 0, Drift = Surge (`eventrun --call`).
+- **S-65** The Nexus draws a ring per structure built; the Lens ring dims on cooldown. **M15 done** after it.
+- Cut (D-175): Gate fast travel, ▲ → biome ore converter, an Anomaly on demand. Open: feats per world (Q-035).

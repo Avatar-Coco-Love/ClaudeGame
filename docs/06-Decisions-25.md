@@ -49,3 +49,17 @@ alternatives). D-171 on.
   1.04–1.20×, phone 1.13×. Screenshot: the rim still reads as a sparking mint outline. `gyre.cjs` checks no blurred
   strokeRect and a box < 3 cells (fails on the old code).
 - Rejected: dropping the dashes (measured ~0 ms); fewer swarm motes (the update is ~0.3 ms, and it is the fight's read).
+
+### D-175 — M15 "The Nexus reaches out": a recurring Prism sink; Lens calls a rift (session 137, Design; D-119's rule)
+- **Measured** (`09` session 137): a 256 world's expected ore (4 seeds) is ◆ 5.5–6.3k, ▲ 4.4–5.0k, ● 500–560,
+  ≈ 280–410, ⬟ 270–280. Everything buyable: ◆ 4.4k, ▲ 379, ● 140, ≈ 108, ⬟ 108 (+ crafting caps ~250 ▲, 36 ⬟). Every
+  sink is one-time; ▲ runs 8–13× past its sinks. Play-test (maxed, 900 ▲): the Nexus tab is two MAX rows, and the Kiln
+  screen is thick with ▲ nobody needs. Pillar 4's loop stops at "bank" late on; this is Q-032's "out of goals" in numbers.
+- **M15 (pillar 4, Nexus Development, D-009's ▲ layer):** S-63 Lens (▲ 40) + Call (▲ 30 a rift, 90 s cooldown, the
+  ring's rift ore, net ≈ −12 ▲), S-64 gate (calls ≤ 1.25× plain mining, Drift = Surge), S-65 the Nexus draws its
+  structures. Specs: `07-Build-Specs-17.md`. VERSION: M15 → 1.10 (D-119's rule). Replaces nothing; one face (D-152).
+- Rejected: a **Gate** to lit Spires / lairs (lairs sit 90–115 cells out: ~9 s straight at max Thrusters, so it saves
+  ~20–30 s a trip, and Relays already shorten hauls); a **▲ → ≈ / ⬟ converter** (a menu, no play, skips the Kiln:
+  a called rift still needs you in the ring); **cutting ▲ density** (the outer rings' look and Spire feeding lean on
+  it; late surplus is a sink gap, not a supply bug); **an Anomaly on demand** (a second source for the Temporary
+  layer); **feats / goals per world** (open as Q-035: a goals list risks a long shallow list).
