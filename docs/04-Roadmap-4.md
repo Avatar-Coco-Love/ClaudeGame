@@ -4,9 +4,11 @@ Continues the Debt list of `04-Roadmap-2.md` (near the 8 KB cap at audit 104). A
 `archive/2026-11-24-04-debt-done.md` word for word.
 
 ## Debt
+- **Audit 134 leftovers** (sweeps in-session; fixed: B-097 `touch.cjs` toast wait, 108 → 70 s, D-172; `09` sessions
+  124–128 archived). Still open: `quality` 48 s, `ending` 27 s, `spire` / `facet` ~20 s; the awake Gyre (arc rings,
+  rim tell, 2 swarms) has no `perf.cjs` run; no phone sweep since audit 124 (two audits now: do it first next time).
 - **Audit 129 leftovers** (sweeps in-session; fixed: the bot gates run beside the smoke, per-file TIME lines, D-166;
-  `09` sessions 119–123 archived). Still open: `touch.cjs` 106 s (audit 74: ~25 s of `waitForTimeout`; wait on
-  conditions), `quality` 46 s, `ending` 26 s, `spire` / `facet` ~20 s each; no phone sweep or perf run this audit (124).
+  `09` sessions 119–123 archived). Still open: `touch.cjs` 106 s (done in audit 134, B-097), `quality` 46 s, `ending` 26 s, `spire` / `facet` ~20 s each; no phone sweep or perf run this audit (124).
 - **Audit 124 leftovers** (sweeps in-session; fixed: Scanner ring glow as strokes, ×1.73 → ×1.12 on a phone, D-160;
   phone sweep at 320 / 360 / 412 portrait and 568 / 640 / 844 landscape with 5 banks, Echo, 3 buffs: no overlap, nothing
   off screen, buttons ≥ 44 px; `09` sessions 114–118 archived). Still open (third audit): the full smoke's browser phase

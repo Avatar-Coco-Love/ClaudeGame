@@ -17,3 +17,15 @@ alternatives). D-171 on.
   rims 78: PASS first try, nothing tuned. Smoke runs both gates.
 - Rejected: a separate mote list for boss swarms (doubles beam / Ward / draw wiring); a swarm the moment one dies
   (no breather; the spec's 15 s is the rhythm); counting the Shoal's own swarm in the cap of 2 (it is not the boss's).
+
+### D-172 — Audit 134: a wait that guards a measurement is part of the check
+- B-097: `touch.cjs` waited for the camera to sit < 2 px from the core, but the camera rests 36 px ahead of it (render.js
+  look-ahead), so the wait never passed and its `.catch(() => {})` hid a 5 s timeout at all 8 sizes (59 s a smoke).
+  Now it waits on the look-ahead spot and the check fails if the camera never settled (`settled` in the detail).
+- `tools/waitprobe.cjs` (preload, `node -r`) logs every timed-out `waitForFunction` with its caller; run in audits.
+  This audit: the other 12 swallowed waits (spire, spirefeed, facet, quality, echo, wake, ward) never time out.
+- Workflow review: too much: two ~9 min smokes a session; too little: nothing showed a wait that silently times out,
+  so audits 74 and 129 blamed `waitForTimeout` instead. Rule: a swallowed wait before a measurement returns a flag
+  the check uses. Rejected: banning `.catch` on waits (most are fine: a slow frame just measures a little later);
+  a smoke-wide probe (doubles every wait's cost to log; an audit tool is enough).
+

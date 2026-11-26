@@ -253,8 +253,11 @@ async function browserChecks(browser, url, check, errors, shots) {
     await pg.goto(url); await pg.waitForTimeout(300);
     await intoGame(pg);
     // Surge: the integrity row makes the bank panel its tallest. Wait for the camera to settle on the core first.
+    // Audit 134: the camera rests 36 px ahead of the core (render.js look-ahead), so wait on that spot; a wait on
+    // the core itself (< 2 px) could never pass and burned its 5 s timeout at every size (59 of this file's 108 s).
     await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; g.buffs = ['overclock', 'lodestone', 'ballast']; g.research.echo = true; });
-    await pg.waitForFunction(() => { const L = window.__lumen, p = L.game.player; return Math.hypot(L.renderer.cam.x - p.x, L.renderer.cam.y - p.y) < 2; }, null, { timeout: 5000 }).catch(() => {});
+    const settled = await pg.waitForFunction(() => { const L = window.__lumen, p = L.game.player, c = L.renderer.cam;
+      return Math.hypot(c.x - p.x - Math.cos(p.angle) * 36, c.y - p.y - Math.sin(p.angle) * 36) < 2; }, null, { timeout: 5000 }).then(() => true, () => false);
     await pg.evaluate(() => { document.getElementById('integrity-row').classList.remove('hidden'); window.__lumen.game.notify('destabilized'); }); // the row main.js shows in Surge
     await pg.waitForTimeout(450);
     const measure = () => pg.evaluate(() => {
@@ -281,7 +284,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     await pg.waitForTimeout(100);
     const large = await measure();
     check(`${vp.width}×${vp.height}: a long toast covers no HUD control, panel, hint or the core; the panel clears the buttons, also Large (B-047, B-078, B-079)`,
-      /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length && !large.hits.length, JSON.stringify({ death: death.hits, mode: mode.hits, large: large.hits, t: large.t }));
+      settled && /destabilized/.test(death.text) && death.buttons >= 8 && !death.hits.length && !mode.hits.length && !large.hits.length, JSON.stringify({ settled, death: death.hits, mode: mode.hits, large: large.hits, t: large.t }));
     await ctx.close();
   }
   // ---- B-089 (audit 104): with ≈ / ⬟ held (S-49) the five-chip bank ran under the minimap (portrait, 12–315 vs 212 at
