@@ -21,6 +21,7 @@ import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
 import { makeLocks, updateLocks } from './lock.js';
+import { makeBosses, stampBosses, updateBosses } from './boss.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
 import { loadWards, updateWards } from './ward.js';
@@ -52,6 +53,7 @@ export class Game {
     this.anomaly = makeAnomalies(this.world, this.spires); // S-35: sites from the generated terrain, before the stamp (seed-only)
     this.vents = makeVents(this.world, this.anomaly.sites); // S-48b: Kiln flare vents (seed-only, never saved)
     makeLocks(this); // S-58: Kiln outer vaults are Flare Locks (seed-only, never saved; hooks world.hitMul)
+    makeBosses(this); // S-60a: seed-only boss lairs (drawn last); stamped below, after a save's broken cells
     this.buffs = [];       // S-35: active Anomaly buff ids (saved); they end at the next deposit that banks ≥ 1 item
     stampSpires(this.world, this.spires);
     this.spireLights = this.spires.filter(s => s.lit).map(spireLight); // S-28: the Renderer's lightSets[2]
@@ -102,7 +104,7 @@ export class Game {
     this.lastHitstop = -Infinity;
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
-    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot', 'swarm', 'swarm-loot'].map(k => [k, seededStream(seed, k)]));
+    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot', 'swarm', 'swarm-loot', 'crucible'].map(k => [k, seededStream(seed, k)]));
     this.undertow = makeUndertow(this.world); // S-47: Shoal currents from the seed (never saved)
     this.burrow = makeBurrow(); // S-53: the Kiln Burrower (never saved)
     this.swarm = makeSwarm(); // S-54: the Shoal mote swarm (never saved)
@@ -111,6 +113,7 @@ export class Game {
     this.rift = makeRift(seed); // S-57a: schedule from seed + stats.time (rift.js); never saved, a reload mid-rift skips it
     this.vaultSkip = skip; // S-9: fixed for this world's life (D-023)
     if (save) { this.load(save); markSpiresSeen(this); const h = spireHere(this); this.wakeBlock = h && !h.lit && h.mask !== null ? h : null; } // S-23: a reload mid-Wake is a failed one (B-049: only a primed Spire) // S-27: a footprint explored before v0.2.52 is seen, silently
+    stampBosses(this, save && save.bosses, !!save); // S-60a: every plate restored; a lair new to an old save refunds what is in it
     this.player.integrity = this.stat('hull');
     if (save && save.integrity != null) this.player.integrity = Math.min(save.integrity, this.stat('hull'));
     this.world.reveal(this.player.x, this.player.y, CORE_REVEAL);
@@ -240,6 +243,7 @@ export class Game {
     updateWards(this, dt); // S-56: after the beam, before the creatures' passes, so a Ward kill pays this frame
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
     updateLocks(this); // S-58: the same, for a Flare Lock's window flare
+    updateBosses(this); // S-60a: the boss core's flare
     updateBurrower(this, dt); // S-53: after the beam, so a kill on its last surfaced frame pays
     updateSwarm(this, dt); // S-54: after the beam, so a mote beamed this frame pays before it touches anything
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
@@ -471,6 +475,7 @@ export class Game {
       ended: this.ended, endedAt: this.endedAt, // S-24
       cycle: this.cycle, records: this.records, // S-29
       anomalies: { ...this.anomaly.taken }, buffs: [...this.buffs], // S-35
+      bosses: this.bosses.list.map(b => ({ ring: b.ring, down: b.down })), // S-60a: only the down flags (fight state is never saved)
       echoOrder: this.echoOrder, // S-43
       weatherCancel: this.weather.cancel, // B-081: the event a Wake / the ending cancelled stays cancelled after a reload
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022

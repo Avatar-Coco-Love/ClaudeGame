@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.8.66';
+export const VERSION = '1.8.67';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -80,7 +80,7 @@ export const DEPOSIT_TICK_S = 0.035; // one cargo item banked per tick inside th
 export const HURT_INVULN_S = 0.5, HURT_KNOCKBACK = 320; // after a hit: grace seconds, push speed (px/s)
 export const RESPAWN_INVULN_S = 2, RESPAWN_CLEAR_PX = 900; // after a death: grace seconds; Glitches within this of the Nexus vanish
 
-export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8, SPIRE_SHELL: 9, SPIRE: 10, FACET: 11, TIDE: 12, CALX: 13 };
+export const T = { EMPTY: 0, ROCK: 1, DENSE: 2, CRYSTAL: 3, PRISM: 4, BEDROCK: 5, VAULT: 6, CACHE: 7, LUMEN: 8, SPIRE_SHELL: 9, SPIRE: 10, FACET: 11, TIDE: 12, CALX: 13, BOSS_CORE: 14, BOSS_PLATE: 15 };
 
 export const MATERIAL = {
   [T.ROCK]:    { hp: 0.55, yield: null }, // ROCK/DENSE colours come from their depth ring (RINGS, world.look)
@@ -96,6 +96,8 @@ export const MATERIAL = {
   [T.FACET]:   { hp: Infinity, fill: '#18123a', edge: '#a89cf0', yield: null }, // S-19 facet in the shell: unmineable (S-28 toggles it)
   [T.TIDE]:    { hp: 3.0,  fill: '#10302a', edge: '#d8fff0', yield: { kind: 'tide', min: 1, max: 1 } }, // S-49, Shoal only; hp not ring-scaled
   [T.CALX]:    { hp: 4.2,  fill: '#24163a', edge: '#c8a0ff', yield: { kind: 'calx', min: 1, max: 1 } }, // S-49, Kiln only (Kiln rock for heat)
+  [T.BOSS_CORE]: { hp: 40, fill: '#3a1a08', edge: '#ffa040', yield: null }, // S-60a boss core (BOSS_CORE_HP): × 0 while a plate stands (boss.js)
+  [T.BOSS_PLATE]: { hp: 16, fill: '#3a1024', edge: '#ff8aa8', yield: null }, // S-60a boss plate (BOSS_PLATE_HP): no ring multiplier, no yield
 };
 
 // S-10 Lumen (D-033): re-types ROCK/DENSE at d >= LUMEN_D cells where its own noise (seed ^ LUMEN_SALT, at x/5, y/5) > LUMEN_CUT.
@@ -385,6 +387,14 @@ export const LOCK_SOFT_S = 3, LOCK_SOFT_MUL = 2, LOCK_RGB = '255, 150, 60', LOCK
 // S-59 Tide Lock (D-162, lock.js): an outer vault centred in the Shoal. Its chunk always flows (a calm draw becomes LOCK_TIDE_MIN
 // px/s along a seeded heading); its shell takes beam damage only when the hit points against that flow (dot < LOCK_TIDE_DOT).
 export const LOCK_TIDE_MIN = 40, LOCK_TIDE_DOT = -0.5;
+// S-60a Crucible (D-158, boss.js): a seed-only LAIR_HALF·2+1 lair per outer ring (salt 'lair-<ring>', up to LAIR_TRIES draws at
+// centre distance LAIR_D[ring]), all in the ring, clear of vaults (LAIR_CLEAR.vault cells), vents / Anomalies (.site) and Spires
+// (.spire). Floor, a BOSS_CORE centre ringed by 8 BOSS_PLATEs (hp in MATERIAL). Take-apart: only the lit plate takes damage;
+// the glow then moves to (i + 5) mod 8; the core cuts once all 8 are gone and bursts BOSS_LOOT (biome: the ring's ore). The core
+// flares like a vent (VENT_PERIOD_S, VENT_TELL_S tell) within BOSS_FLARE_R cells: shove + VENT_HEAT, no damage. Saved: down flags.
+export const LAIR_HALF = 4, LAIR_TRIES = 60, LAIR_D = { 4: [108, 118] }, LAIR_CLEAR = { vault: 2, site: 3, spire: 6 };
+export const BOSS_CORE_HP = 40, BOSS_PLATE_HP = 16, BOSS_FLARE_R = 3, BOSS_LOOT = { shard: 80, prism: 20, biome: 24 };
+export const BOSS_KEY_RGB = '255, 120, 40', BOSS_NAMES = { 4: 'Crucible' }, BOSS_ORE = { 3: 'tide', 4: 'calx' };
 // S-53 Burrower (D-142, D-145, burrower.js): the Kiln creature, 256 worlds only, one at a time while the core is in the Kiln.
 // First BURROW_FIRST_S in the Kiln, then BURROW_EVERY_S [min, + span] after the last one ended. Starts in rock 10–14 cells
 // out, moves one cell per BURROW_STEP_S through ROCK / DENSE / ore (or open floor), clearing each cell it leaves (no

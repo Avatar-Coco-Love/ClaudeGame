@@ -216,6 +216,7 @@ function updateHud() {
     if (ev === 'deposited') { toast('Deposited'); persist(); if (panelOpen) renderPanel(); } // B-025: buy buttons follow the new bank
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`, 2600, KEEP);
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
+    if (ev === 'boss') { toast(`The ${g.bossDown} is down`, 3200, KEEP); persist(); } // S-60a
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'spire-primed') { if (!g.wake) toast('Spire primed', 3200, KEEP); persist(); } // S-20; B-052: a Wake's own toast says it
     if (ev === 'ending') { persist(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } // S-24; B-056

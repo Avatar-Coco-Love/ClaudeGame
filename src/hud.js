@@ -5,6 +5,7 @@ import { markAlpha } from './research.js';
 import { BEACON_COLOR, RELAY_COLOR } from './craft.js';
 import { drawSpireMarks } from './spire.js';
 import { drawAnomalyMarks } from './anomaly.js';
+import { drawBossMarks } from './boss.js';
 import { drawSinkMarks } from './heatsink.js';
 import { drawWardMarks } from './ward.js';
 import { drawChartMarks } from './chart.js';
@@ -15,6 +16,7 @@ const MINI_COLORS = {
   [T.CRYSTAL]: [46, 242, 255], [T.PRISM]: [255, 79, 216], [T.BEDROCK]: [16, 18, 30],
   [T.VAULT]: [235, 252, 255], [T.CACHE]: [255, 255, 255], // S-9: vault shells read white on the minimap
   [T.LUMEN]: [255, 201, 79], [T.TIDE]: [216, 255, 240], [T.CALX]: [200, 160, 255], // S-49
+  [T.BOSS_CORE]: [255, 160, 64], [T.BOSS_PLATE]: [255, 138, 168], // S-60a
   [T.SPIRE_SHELL]: [150, 140, 220], [T.SPIRE]: [120, 104, 200], [T.FACET]: [150, 140, 220], // S-19: dim violet; S-27's mark is spire.js drawSpireMarks
 };
 // S-8: the minimap tints ROCK/DENSE by ring, a dimmed mix of the ring's fill and edge so rings read at a glance.
@@ -69,6 +71,7 @@ export function drawMinimap(r) {
   drawWardMarks(m, g, sc); // S-56: placed Wards, a lime ring, always shown
   drawAnomalyMarks(m, g, sc); // S-37: seen sites, filled when charged, hollow while recharging
   drawRiftMark(m, g, sc); // S-57a: an open rift's pocket
+  drawBossMarks(m, g, sc); // S-60a: a seen lair, hollow; filled once down
   drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();

@@ -92,6 +92,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./vent.cjs').nodeChecks(check).catch(e => check('S-48b vent checks ran', false, e.message));
   await require('./lock.cjs').nodeChecks(check).catch(e => check('S-58 lock checks ran', false, e.message));
   await require('./tidelock.cjs').nodeChecks(check).catch(e => check('S-59 tide lock checks ran', false, e.message));
+  await require('./boss.cjs').nodeChecks(check).catch(e => check('S-60a boss checks ran', false, e.message));
   await require('./ore.cjs').nodeChecks(check).catch(e => check('S-49 ore checks ran', false, e.message));
   await require('./overdrive.cjs').nodeChecks(check).catch(e => check('S-50 overdrive checks ran', false, e.message));
   await require('./heatsink.cjs').nodeChecks(check).catch(e => check('S-51 heat sink checks ran', false, e.message));
@@ -397,6 +398,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message));
     await require('./lock.cjs').browserChecks(browser, url, check, errors, process.env.LOCK_SHOT).catch(e => check('S-58 lock browser checks ran', false, e.message));
     await require('./tidelock.cjs').browserChecks(browser, url, check, errors, process.env.TIDE_SHOT).catch(e => check('S-59 tide lock browser checks ran', false, e.message));
+    await require('./boss.cjs').browserChecks(browser, url, check, errors, process.env.BOSS_SHOT).catch(e => check('S-60a boss browser checks ran', false, e.message));
     await require('./audit99.cjs').browserChecks(browser, url, check, errors).catch(e => check('audit 99 browser checks ran', false, e.message));
     await audioChecks.browserChecks(browser, url, check, errors);
     await require('./music.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-44 music browser checks ran', false, e.message));

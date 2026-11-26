@@ -10,7 +10,7 @@ import { makeGlitch, glitchTier, glitchPop } from './glitch.js';
 
 const GAPS = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // N E S W; spawns take turns in this order
 /** Cells a lane can't clear (D-071): bedrock, vaults, any Spire cell. */
-const STOPS = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE_SHELL, T.SPIRE, T.FACET]);
+const STOPS = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE_SHELL, T.SPIRE, T.FACET, T.BOSS_CORE, T.BOSS_PLATE]);
 export const WAKE_RING_CELLS = 2.2; // the charge ring's radius round the core (cosmetic; tests/wake.cjs samples it)
 // Cyclic with spire.js and glitch.js: use their imports only inside functions, never at module top level.
 

@@ -82,7 +82,10 @@ export function lockMul(game, x, y, type, dir) {
 }
 
 /** True when a beam on (x, y) is wasted on a quenched shell (the beam's spark turns dull grey). */
-export const quenched = (game, x, y) => !!game.world.hitMul && game.world.get(x, y) === T.VAULT && lockMul(game, x, y, T.VAULT) === 0;
+export const quenched = (game, x, y) => {
+  const w = game.world, t = w.get(x, y); // S-60a: an unlit boss plate (or a core still ringed) sparks grey too
+  return !!w.hitMul && (t === T.VAULT || t === T.BOSS_PLATE || t === T.BOSS_CORE) && w.hitMul(x, y, t) === 0;
+};
 
 /** Once a frame, with the vents: a lock's window opening flares at a core within VENT_R cells of its footprint. */
 export function updateLocks(game) {

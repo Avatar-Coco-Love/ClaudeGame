@@ -65,3 +65,16 @@ alternatives). D-158 on.
 - Probe (top build holding station 6 cells downstream): 3.60 s vs a plain vault's 3.60 s (1.00×; ≤ 2× PASS).
 - Rejected: × 1.5 against the flow (no need: the rule is the cost, not time); per-ray aim for Wide (offsets of a few
   degrees never cross the 120° cone's edge in practice); chevrons on every shell cell (hides which side is upstream).
+
+### D-163 — S-60a Crucible as specced; the lair is stamped by the Game, not the World (session 126, build; D-158)
+- `boss.js`: `lairSite` (salt `'lair-4'`, ≤ 60 draws, d 108–118) runs after the vents in `new Game`; clearances are empty
+  cells between footprints (Chebyshev): vault 2, vent / Anomaly 3, seed-only Spire choice 6. 30 / 30 seeds, last draw 11.
+- The stamp happens after a save is applied (so a plate broken in the saved map comes back) and leaves `World` alone, so
+  every terrain hash, site list and old-save upgrade stays as it was. Plates are numbered clockwise from north; the first
+  lit plate is `rng['crucible']`; a lit break passes to the next standing plate in the (i + 5) sequence.
+- Save 23 `bosses: [{ ring, down }]`. A lair with no record in a save is new to it: placed things in its footprint are
+  refunded at craft cost, a core inside goes to the Nexus. The upgrade step only adds `bosses: []` (it has no World).
+- Boss hits go through `world.hitMul` (wrapping the locks'); an unlit plate sparks grey (`quenched`). Probe: mid build
+  (beam 5, range 3) bot 60–61 s on 4 seeds (≤ 90 PASS).
+- Rejected: stamping in `World` (moves the terrain hash `vent.cjs` / `ore.cjs` pin); refunding in the save step (needs
+  the anomaly + vent sites, i.e. a World); a lit-plate edge in its own colour only (it pulses + glows, enough vs Kiln rock).

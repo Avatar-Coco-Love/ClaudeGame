@@ -46,7 +46,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
   wandering lode (two unequal faces; Q-029), new Spire puzzles (M14's bosses bring the take-apart puzzle).
 
 ## M14 — Bosses (two forms, specced, `07-Build-Specs-15/16`, D-158)
-- **S-60a** Crucible (Kiln): lair, core + 8 plates, take-apart (the lit plate jumps across), loot, save (format 23).
+- ✅ **S-60a** Crucible (Kiln): lair, core + 8 plates, take-apart (the lit plate jumps across), loot, save (format 23; v1.8.67, D-163).
 - **S-60b** Crucible awake in Surge (flare damage, embers) + `tools/bossrun.mjs` gate (Surge / Drift 0.8–1.25).
 - **S-61a** Gyre (Shoal): lair, whirlpool, take-apart (ride round with the stepping key plate).
 - **S-61b** Gyre awake in Surge (inward pull, touch damage, mote swarms) + gate.
