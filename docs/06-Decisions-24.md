@@ -30,3 +30,12 @@ alternatives). D-164 on.
 - Probe (mid build, beam 5 / range 3, no creatures, embers popped): Surge 57.1–57.3 s vs Drift 59.8–61.0 s, 0 deaths.
 - Rejected: shipping the gate in the same PR (a new bot route + 8-seed tuning loop is its own slice); embers that
   pass through boss cells (a special case in `updateBolts`); cancelling a running rift (punishes the player for it).
+
+### D-166 — Audit 129: the bot gates run beside the smoke; every smoke file is timed
+- `tests/gates.cjs` `run(tool, args)` starts a `tools/*.mjs` gate once (async child process) and memoizes it;
+  `smoke.cjs` prestarts every gate in `SMOKE` first, so they run on spare cores during the node and browser phases.
+  A check keeps the list in step with the tests' calls and bans `execFileSync` of a tool. Same seeds, same verdicts.
+- `smoke.cjs` times each browser file (`T()`), the node phase and the inline block, and prints the 12 slowest
+  as TIME lines plus the total: the next speed fix starts from a number (620 → 529 s here).
+- Rejected: running browser files in parallel (wall-clock waits and the frame-time checks would see contention);
+  fewer gate seeds (D-155: 8 / 16 are the verdict floors); a separate gate job outside the smoke (main could merge red).

@@ -111,7 +111,7 @@ async function nodeChecks(check) {
       !!o && opened === 'riftOpen' && both === 'riftOpen,riftClose' && marked === 9, `calls ${both}, marked ${marked}`);
   }
   { // the gate (D-156): tools/eventrun.mjs, Deep + Kiln, at its default 16 seeds × 10 min
-    const out = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, '../tools/eventrun.mjs')], { encoding: 'utf8' });
+    const out = await require('./gates.cjs').run('eventrun.mjs');
     const line = out.trim().split('\n').pop();
     check('S-57a rift: the eventrun.mjs gate passes (haul on / off 1.04–1.12 each mode, modes within 0.05; Deep + Kiln, 16 seeds)',
       /: PASS/.test(line), out.trim().split('\n').filter(l => / on\/off /.test(l)).map(l => l.split(' (')[0]).join('; '));
