@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.9.76 — 2026-11-26
+- **Bosses complete (v1.9).** The Chart's second level now marks each boss lair you haven't found as a faint octagon
+  on the minimap. A low two-note sting sounds when a boss wakes in Surge or when its first plate breaks in Drift.
+  On a large world the ending card adds "Bosses n / 2" (beating them is still optional).
+
 ## v1.8.75 — 2026-11-26
 - Health check (no gameplay change). The phone layout tests now wait for the camera the right way and run 40 s
   faster; the dev log was tidied and a probe for stalled test waits was added.

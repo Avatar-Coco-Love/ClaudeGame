@@ -38,3 +38,13 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
 - `09` sessions 124–128 archived word for word (`archive/2026-11-26-09-sessions-124-128.md`, part 17 removed).
   Smoke 626/626.
 
+## Session 135 — Build: S-62 boss marks, sting, ending line; M14 done (v1.9.76, D-173)
+- `drawBossMarks`: Chart L2 adds unseen lairs at alpha 0.35 (`g.chartLairs`); `audio.bossSting` on wake (`B.woke`,
+  unsaved) and the first Drift plate; `endingSummary` `bosses` / `bossN` (null without lairs). New `bossmarks.cjs`.
+- Tools: `biomefoe.mjs --boss=on`, `bossrun.mjs --build=mid` (advice only; smoke gates unchanged).
+- Lairs on, 16 seeds: Kiln 0.878 / 0.897 PASS (gap 0.019); Shoal 0.913 / 0.881 PASS (gap 0.032). No Debt.
+- Mid build: Crucible Drift sum 9.00 min / Surge 12.59, ratio 1.399, deaths med 1 (boss 7, glitch 1), burns 137;
+  Gyre 9.29 / 11.94, ratio 1.285, deaths med 1 (boss 7, glitch 1), swarms 33, rims 143. All 32 runs down. Q-034: no.
+- New checks fail on the old code (stash `src/`: 3 FAIL). Screenshots: the faint Crucible octagon reads at the
+  minimap's edge without competing with seen marks; the ending card at 568 × 320 fits with the Bosses row. Sting
+  -31.4 dBFS, 0 % > 2 kHz. No new bug.

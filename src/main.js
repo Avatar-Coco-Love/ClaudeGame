@@ -402,7 +402,7 @@ function openEnding() {
   const e = endingSummary(game), row = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
   $('ending-stats').innerHTML = row('Time to light them all', e.time) + row('Cells mined', e.mined) +
     row('Spires relit in Drift', e.drift) + row('Spires relit in Surge', e.surge) + (e.restored ? row('Spires restored', e.restored) : '') +
-    row('Glitches cleared', e.glitches) + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
+    row('Glitches cleared', e.glitches) + (e.bosses !== null ? row('Bosses', `${e.bosses} / ${e.bossN}`) : '') + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
   closePanel(); endingOpen = true; $('hint').classList.add('hidden'); $('ending').classList.remove('hidden'); $('ending-continue').focus(); // B-054: no hint under the card (B-008)
 }
 function closeEnding() { endingOpen = false; $('ending').classList.add('hidden'); input.pressed.clear(); }

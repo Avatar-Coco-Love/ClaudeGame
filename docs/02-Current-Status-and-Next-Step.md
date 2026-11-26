@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 134** · **Version: v1.8.75** (session 134: Audit; rotation: 135 Build, 136 Build, 137 Design).
-**Scope (D-119, `01`):** M1–M13 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13 events + puzzles). M14 two-form bosses (1.9, D-158) under way: S-60a, S-60b1, S-60b2, S-61a, S-61b ✅; S-62 left (D-170); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-26_ · **Session counter: 135** · **Version: v1.9.76** (session 135: Build; rotation: 136 Build, 137 Design, 139 Audit).
+**Scope (D-119, `01`):** M1–M14 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, D-173). No next milestone yet: it needs a design D-xxx (D-119). Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -20,6 +20,7 @@ _Last updated: 2026-11-26_ · **Session counter: 134** · **Version: v1.8.75** (
   Surge (S-60b1, D-165): awake ≤ 10 cells: any plate, 4 s flare + 10 dmg, embers; death heals the core. Gate `bossrun.mjs` PASS (S-60b2, D-167). Q-033 closed (D-169): embers stay a range threat, the flare is the close one.
 - Gyre (S-61a, D-168, `gyre.js`): Shoal lair, whirlpool 45 px/s ≤ 6 cells (`flowAt`); mint key steps clockwise / 1.2 s.
   Surge (S-61b, D-171): any plate; tagged mote swarms / 15 s (≤ 2, `spawnSwarm`), rim 12 dmg / 4 s (≤ 8 px), pull 30; gate `--boss=gyre` PASS.
+  Marks (S-62, D-173): Chart L2 shows unseen lairs faint; sting on wake / first Drift plate; ending "Bosses n / 2" (256). Q-034: no.
 - Weather (S-33, `weather.js`), Anomalies (S-35…37, `anomaly.js`, saved), Echo (S-42/43, `echo.js`, Gather / Guard): `08-…-2`.
 - Shoal / Kiln (S-47a/b, S-48a/b): Undertow, brittle glass, Kiln heat, flare vents (tell tone: audit 109, D-144). Detail: `08`.
 - Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core; Surge lunge 22 / Drift bites 4 cargo; unsaved. Gate `biomefoe.mjs` PASS (`GATE_SEEDS` 8, D-155).
@@ -36,13 +37,14 @@ _Last updated: 2026-11-26_ · **Session counter: 134** · **Version: v1.8.75** (
 - Darkness/light, minimap (D-123), Nexus pointer, toasts, audio ceilings (`audio.cjs`). `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 23); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 25 from D-171; last D-172), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-19`; 124–128 archived in audit 134), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 25 from D-171; last D-173), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-19`; 124–128 archived in audit 134), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-61a built (M13 done, `07-…-14`). M14: S-61a…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-62 built (M14 done, `07-…-15/16`, D-158). No spec left: the next milestone is Design 137's. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
   Swallowed test waits: `node -r ./tools/waitprobe.cjs` (D-172).
 
 ## Next step (one thing)
-Session 135 (Build): S-62 (`07-…-16`, D-170), the last M14 slice; then 136 Build, 137 Design.
+Session 136 (Build): no spec left (M14 ✅), so take the top Debt item in `04-Roadmap-4` (a `perf.cjs` run of the awake
+Gyre, fix what it shows); then 137 Design picks the next milestone (D-xxx + specs).

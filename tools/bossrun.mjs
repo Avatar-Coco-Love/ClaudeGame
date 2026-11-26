@@ -6,7 +6,8 @@
 // boss (flare, or a bolt with no Spitter near = an ember), Burrower, Glitch (contact or a Spitter's bolt), other.
 // S-61b (D-170): --boss=gyre runs the Shoal's Gyre instead: 2 Wards at ± 4, no Heat Sink (no heat in the Shoal); its rim and
 // a hit from one of its swarm motes count as boss. The same band, seeds and start.
-// Usage: node tools/bossrun.mjs [--boss=crucible|gyre] [--seeds=8] [--minutes=15] [--mode=drift,surge] [--v]
+// S-62 (Q-034): --build=mid runs a mid base build instead (advice, logged in 09; the gate is defined on max).
+// Usage: node tools/bossrun.mjs [--boss=crucible|gyre] [--build=max|mid] [--seeds=8] [--minutes=15] [--mode=drift,surge] [--v]
 import { runBot } from './surgebot.mjs';
 const GATE_SEEDS = 8; // B-092 / D-155: the seed count every gate verdict is defined on (biomefoe.mjs runs on import)
 import { CELL } from '../src/config.js';
@@ -14,7 +15,7 @@ import { tryPlace } from '../src/craft.js';
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
 const seeds = Number(arg('seeds', GATE_SEEDS)), minutes = Number(arg('minutes', 15)), modes = arg('mode', 'drift,surge').split(',');
-const V = process.argv.includes('--v'), START = 12, BOSS = arg('boss', 'crucible'), RING = BOSS === 'gyre' ? 3 : 4;
+const V = process.argv.includes('--v'), START = 12, BOSS = arg('boss', 'crucible'), RING = BOSS === 'gyre' ? 3 : 4, BUILD = arg('build', 'max');
 
 /** Places one of `kind` on cell (x, y) by standing the core there (the player's own B / ✦). */
 function place(g, kind, x, y) {
@@ -46,7 +47,7 @@ export function bossRun(seed, mode, ring = RING) {
     const hurt = g.hurtPlayer.bind(g);
     g.hurtPlayer = (n, dx, dy) => { if (!g.god && g.player.integrity - n <= 0) why[cause(g)]++; hurt(n, dx, dy); };
   };
-  const r = runBot({ seed, route: 'boss', build: 'max', mode, minutes, boss: 'on', lair: ring, rift: 'on', anomaly: 'off', setup });
+  const r = runBot({ seed, route: 'boss', build: BUILD, mode, minutes, boss: 'on', lair: ring, rift: 'on', anomaly: 'off', setup });
   return { ...r, why, placed: game.placed, embers: game.bosses.embers, burns: game.bosses.burns, overheats: game.heatState.overheats, swarms: game.swarm.bossSwarms, rims: game.bosses.rims };
 }
 
