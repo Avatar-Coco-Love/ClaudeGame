@@ -1,4 +1,5 @@
 // S-13 beam-mode checks (Focus + Wide, D-036), split out of smoke.cjs. smoke.cjs calls both functions.
+const { newWorld } = require('./pinworld.cjs');
 const audio = new Proxy({}, { get: () => () => {} });
 const fire = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: { x: 1, y: 0 }, fire: true, ...extra });
 const idle = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, ...extra });
@@ -74,7 +75,7 @@ async function browserChecks(browser, url, check, errors) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; });
   await pg.keyboard.press('q'); await pg.waitForTimeout(100);
   const pre = await pg.evaluate(() => ({ mode: window.__lumen.game.beamMode, btn: !document.getElementById('mode-btn').classList.contains('hidden') }));

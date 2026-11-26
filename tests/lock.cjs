@@ -3,6 +3,7 @@
 // and other cells × 1; the window's flare shoves + heats a core ≤ 2.5 cells from the footprint, once per cycle, nothing
 // farther; Drift = Surge; an opened lock (cache gone, also from an old save) is a plain vault; nothing saved; probe: time to
 // open with a top build ≤ 2× a plain vault's. Browser: the tell is drawn. Usage: node tests/lock.cjs [--browser] (LOCK_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -101,7 +102,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   for (let k = 0; k < 8; k++) { // B-096: "New world" draws a random seed and ~1 in 25 has no Flare Lock: retry until one does
     await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
     await pg.reload(); await pg.waitForTimeout(200);
-    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    await newWorld(pg); await pg.waitForTimeout(200);
     if (await pg.evaluate(() => !!(window.__lumen.game.locks && window.__lumen.game.locks.sites[0]))) break;
   }
   const { CELL, VENT_PERIOD_S } = await import('../src/config.js');

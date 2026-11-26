@@ -3,6 +3,7 @@
 // cycle 0 with no records; the Nexus hue follows NEXUS_HUES[cycle % 5]. Browser (1280×800): card -> New Cycle -> confirm:
 // a new seed, cycle 1, empty bank + Matrix, no Spire lit, records kept, the Nexus drawn in cycle 1's hue; dismissing the
 // confirm keeps the world; a reload shows "Cycle 1 · best …" on the title. Screenshots (env SPIRE_SHOT): cycle-title, cycle-nexus.
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -48,7 +49,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   await page.goto(url); await page.waitForTimeout(200);
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
   await page.reload(); await page.waitForTimeout(200);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   await page.evaluate(() => { const g = window.__lumen.game; g.bank.shard = 500; g.upgrades.beam = 3; window.__lumen.dev.relightAll(); });
   await page.waitForTimeout(200); await page.keyboard.press(' '); await page.waitForTimeout(300);
   const seed0 = await page.evaluate(() => window.__lumen.game.world.seed);

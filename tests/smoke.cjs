@@ -1,5 +1,6 @@
 // Health check: serves the repo, drives the game in headless Chromium, exits non-zero on any failure.
 // Usage: node tests/smoke.cjs   (uses the pre-installed Playwright; no npm install needed)
+const { newWorld } = require('./pinworld.cjs');
 const path = require('path');
 const { chromium, devices } = require('playwright');
 
@@ -56,6 +57,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./quality.cjs').nodeChecks(check);
   for (const r of require('./tuning.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./comments.cjs').run()) check(r.name, r.ok, r.detail);
+  for (const r of require('./pinworld.cjs').run()) check(r.name, r.ok, r.detail);
   for (const r of require('./colours.cjs').run()) check(r.name, r.ok, r.detail);
   await require('./world.cjs').nodeChecks(check);
   await require('./worldsize.cjs').nodeChecks(check);
@@ -277,7 +279,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     // A save this build can't read (newer format) must not be wiped without asking (D-005, B-004).
     await plantSaveAndReload(pg, () => ({ v: 99, seed: 5, mode: 'drift', bank: { shard: 1, prism: 1 } }));
     let asked = false; pg.once('dialog', d => { asked = true; d.dismiss(); });
-    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    await newWorld(pg); await pg.waitForTimeout(200);
     const kept = await pg.evaluate(() => JSON.parse(localStorage.getItem('lumencore.save.v1'))?.v);
     check('New World asks before replacing an unreadable save', asked && kept === 99, `asked ${asked}, v ${kept}`);
 
@@ -291,7 +293,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     dp.on('pageerror', e => errors.push('dev: ' + e.message));
     await dp.goto(url + '?dev'); await dp.waitForTimeout(200);
     await dp.evaluate(() => { try { localStorage.clear(); } catch {} });
-    await dp.click('#new-world'); await dp.waitForTimeout(200);
+    await newWorld(dp); await dp.waitForTimeout(200);
     const tp = await dp.evaluate(async () => {
       const L = window.__lumen, g = L.game, { x, y } = L.dev.teleport(60), w = g.world;
       let open = true; for (let yy = y - 1; yy <= y + 1; yy++) for (let xx = x - 1; xx <= x + 1; xx++) if (w.solid(xx, yy)) open = false;
@@ -338,7 +340,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await ph.reload(); await ph.waitForTimeout(300);
     await ph.reload(); await ph.waitForTimeout(300); // a fresh visitor leaving + returning must not get a phantom save
     check('title demo world is never saved', !(await ph.isVisible('#continue')));
-    await ph.tap('#new-world'); await ph.waitForTimeout(300);
+    await newWorld(ph, true); await ph.waitForTimeout(300);
     // Before any touch: a phone must already get touch hints and no keyboard badge (B-002, S-2).
     const pre = await ph.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; return document.getElementById('hint').textContent; });
     await ph.waitForTimeout(150);
@@ -435,7 +437,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await sp.$eval('#set-volume', el => { el.value = 0; el.dispatchEvent(new Event('input', { bubbles: true })); });
     await sp.keyboard.press('Escape'); await sp.waitForTimeout(100);
     const closed = !(await sp.isVisible('#settings'));
-    await sp.click('#new-world'); await sp.waitForTimeout(200);
+    await newWorld(sp); await sp.waitForTimeout(200);
     // Kill a Glitch and take a hit with shake off, stepped in-page; both used to set game.shake to 4 / 8.
     const sk = await sp.evaluate(() => {
       const g = window.__lumen.game, p = g.player, C = 32;
@@ -470,7 +472,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     ovTitle.push(...await overflow());
     check('Settings fits at 320×568, controls ≥ 40 px (S-3)', st.top >= 0 && st.bottom <= 568 && !st.scroll && st.short.length === 0, JSON.stringify(st));
     await np.click('#settings-close'); await np.waitForTimeout(100);
-    await np.click('#new-world'); await np.waitForTimeout(200);
+    await newWorld(np); await np.waitForTimeout(200);
     await np.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.demo = true; });
     await np.keyboard.press('e'); await np.waitForTimeout(100);
     await np.click('#matrix .tabs button[data-tab="nexus"]');

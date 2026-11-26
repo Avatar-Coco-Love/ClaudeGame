@@ -2,6 +2,7 @@
 // focus → wide → pulse → arc, the ray at × 0.8 and each jump at × ARC_MUL × the ray's dps, jumps only to the same kind
 // within 2 cells (a creature never to a bolt; ore only to its own type, never rock), an aim bot clears 3–9 cell crystal
 // clusters 1.3–1.5× faster than Focus and rock at 0.8×, Drift = Surge. Browser: buy, Q to Arc, the ↯ glyph, a screenshot (ARC_SHOT).
+const { newWorld } = require('./pinworld.cjs');
 const audio = new Proxy({}, { get: () => () => {} });
 const fire = () => ({ move: { x: 0, y: 0 }, aim: { x: 1, y: 0 }, fire: true });
 const idle = (extra = {}) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, ...extra });
@@ -94,7 +95,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.bank.lumen = 35; g.demo = true; });
   await pg.keyboard.press('e'); await pg.waitForTimeout(100);
   await pg.click('#matrix .tabs button[data-tab="research"]');

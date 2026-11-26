@@ -1,6 +1,7 @@
 // S-43 Echo orders checks (D-113): cycle by key intent and by the ◇ button, Guard kills a held Glitch while Gather ignores
 // it, Guard pops a Spitter bolt, rock blocks a Guard shot, Drift labels it idle, save format 16 + the 15 -> 16 upgrade.
 // smoke.cjs calls nodeChecks + browserChecks.
+const { newWorld } = require('./pinworld.cjs');
 const idle = () => ({ move: { x: 0, y: 0 }, aim: null, fire: false });
 
 async function nodeChecks(check) {
@@ -172,7 +173,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const ui = () => pg.evaluate(() => ({ order: window.__lumen.game.echoOrder, chip: document.getElementById('echo-chip').classList.contains('hidden') ? null : document.getElementById('echo-name').textContent.trim(),
     btn: !document.getElementById('echo-btn').classList.contains('hidden'), toast: document.getElementById('toast').textContent }));
   const before = await ui();

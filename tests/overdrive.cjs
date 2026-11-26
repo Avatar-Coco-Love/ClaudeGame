@@ -4,6 +4,7 @@
 // a saved level past the top is clamped on load. Browser: the sheet shows the hollow pips + all three prices once a row is
 // maxed in a 256 world, and none of it in a 160 one (OVERDRIVE_SHOT=path.png saves the sheet).
 // Usage: node tests/overdrive.cjs [--browser]
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -60,7 +61,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const sheet = () => pg.evaluate(() => {
     const L = window.__lumen, g = L.game;
     document.getElementById('matrix-close').click(); document.getElementById('matrix-btn').click();

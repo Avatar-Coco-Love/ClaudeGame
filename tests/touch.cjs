@@ -1,5 +1,6 @@
 // S-17 touch pass checks (Pixel 7 emulation): landscape title, ◎/⟂ row out of the aim thumb, 44 px targets, hint wrap at 320 px,
 // the ⟂ label, the second-finger stick handoff, and (audit 39) sheet tap targets at three phone sizes. smoke.cjs calls browserChecks.
+const { newWorld } = require('./pinworld.cjs');
 const { devices } = require('playwright');
 
 const rect = (page, sel) => page.evaluate(s => { const r = document.querySelector(s).getBoundingClientRect();
@@ -9,7 +10,7 @@ const rect = (page, sel) => page.evaluate(s => { const r = document.querySelecto
 async function intoGame(page) {
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
   await page.reload(); await page.waitForTimeout(300);
-  await page.tap('#new-world'); await page.waitForTimeout(200);
+  await newWorld(page, true); await page.waitForTimeout(200);
   await page.evaluate(() => { const g = window.__lumen.game; g.research.scanner = true; g.research.wide = true; g.demo = true;
     g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; });
   await page.waitForTimeout(200);
@@ -116,7 +117,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     await pg.evaluate(() => { try { localStorage.clear(); } catch {} });
     await pg.reload(); await pg.waitForTimeout(300);
     if (shots) await pg.screenshot({ path: `${shots}/title-320x568.png` });
-    await pg.tap('#new-world'); await pg.waitForTimeout(300);
+    await newWorld(pg, true); await pg.waitForTimeout(300);
     await pg.evaluate(() => { const g = window.__lumen.game; g.research.scanner = true; g.research.wide = true; });
     await pg.waitForTimeout(200);
     if (shots) await pg.screenshot({ path: `${shots}/hud-320x568.png` });

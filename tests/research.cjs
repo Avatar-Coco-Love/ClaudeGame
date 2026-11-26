@@ -1,4 +1,5 @@
 // S-11 Research v1 (Scanner) checks, split out of smoke.cjs to keep it under ~600 lines. smoke.cjs calls both functions.
+const { newWorld } = require('./pinworld.cjs');
 const audio = new Proxy({}, { get: () => () => {} });
 const idle = (scan = false) => ({ move: { x: 0, y: 0 }, aim: null, fire: false, scan });
 
@@ -82,7 +83,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; });
   await pg.keyboard.press('f'); await pg.waitForTimeout(100);
   const pre = await pg.evaluate(() => ({ marks: window.__lumen.game.scan.marks.length, btn: !document.getElementById('scan-btn').classList.contains('hidden') }));

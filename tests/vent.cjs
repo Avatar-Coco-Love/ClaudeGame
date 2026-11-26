@@ -3,6 +3,7 @@
 // world; the terrain is unchanged; a flare shoves equally in Drift and Surge, never changes integrity or cargo, adds
 // +0.4 heat (and can overheat), once per flare; a core outside 2.5 cells is untouched; only sites round the core are
 // stepped; nothing saved. Browser: a tell and a flare are drawn. Usage: node tests/vent.cjs [--browser]   (VENT_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -99,7 +100,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const { CELL } = await import('../src/config.js');
   await pg.evaluate(C => {
     const L = window.__lumen, g = L.game, w = g.world, s = g.vents.sites[0];

@@ -1,5 +1,6 @@
 // Audit 39 checks: leaving the page never fires a Pulse charge (B-032, D-042); no "cargo full" toast inside the Nexus (B-033).
 // smoke.cjs calls both functions.
+const { newWorld } = require('./pinworld.cjs');
 
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
@@ -22,7 +23,7 @@ async function browserChecks(browser, url, check, errors) {
   await page.goto(url); await page.waitForTimeout(300);
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
   await page.reload(); await page.waitForTimeout(300);
-  await page.click('#new-world'); await page.waitForTimeout(300);
+  await newWorld(page); await page.waitForTimeout(300);
   await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; g.research.pulse = true; g.beamMode = 'pulse'; });
   await page.mouse.move(900, 300);
   // Hold Space ~0.5 s (charge ≈ 0.4), then the page loses focus (blur) or is hidden: the charge drops, no burst, no recovery.

@@ -3,6 +3,7 @@
 // full alpha); the sting plays once per wake (Surge) and once on the first plate (Drift), never on later plates; the ending
 // summary counts bosses down on a 256 world only. Browser: Chart L2 minimap screenshot (BOSSMARK_SHOT=path.png).
 // Usage: node tests/bossmarks.cjs [--browser]
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 function stubCtx() {
@@ -60,7 +61,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url + (url.includes('?') ? '&' : '?') + 'seed=4242'); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const { CELL } = await import('../src/config.js');
   await pg.evaluate(C => { // stand 30 cells from the Crucible (Nexus side) so its lair falls in the minimap window, unseen
     const g = window.__lumen.game, B = g.bosses.list.find(b => b.ring === 4), w = g.world, d = Math.hypot(w.cx - B.x, w.cy - B.y);

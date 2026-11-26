@@ -1,6 +1,7 @@
 // S-40 readable text: every text the play HUD shows is >= 12 px at Normal and Large (the title footer alone keeps 11 px);
 // Large (Settings, x1.2 via --ts on :root) is saved, survives a reload, and still fits at 320x568 and 568x320 (no HUD box
 // overlaps another, the ◎ ⟂ ♪ ≡ targets stay >= 44 px, no HUD text overflows its box). smoke.cjs calls browserChecks.
+const { newWorld } = require('./pinworld.cjs');
 const { devices } = require('playwright');
 
 const SETTINGS = 'lumencore.settings.v1';
@@ -11,7 +12,7 @@ const SETTINGS = 'lumencore.settings.v1';
 async function busyHud(pg, large, bank = { shard: 8888, prism: 8888, lumen: 8888 }) {
   await pg.evaluate(([k, l]) => { localStorage.clear(); localStorage.setItem(k, JSON.stringify({ largeText: l })); }, [SETTINGS, large]);
   await pg.reload(); await pg.waitForTimeout(300);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(b => { const { game: g, dev } = window.__lumen; dev.setMode('surge'); g.demo = true; g.enemies = []; g.spawnTimer = 1e9;
     g.research.scanner = true; g.research.wide = true; g.craft.beacon = 3; g.buffs = ['overclock', 'lodestone', 'ballast'];
     Object.assign(g.bank, b); g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; }, bank);

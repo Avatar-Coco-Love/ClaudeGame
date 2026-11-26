@@ -2,13 +2,14 @@
 // little there (tools/perf.cjs prices the real loop under a 4× CPU throttle). These checks are either exact (draw calls
 // counted) or relative: one scene's draw time against another's in the same page, medians of interleaved samples, with
 // a ~2× margin. Each frame is flushed (a 1-pixel getImageData) so the software raster is inside the timing.
+const { newWorld } = require('./pinworld.cjs');
 async function browserChecks(browser, url, check, errors) {
   const pg = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   pg.on('pageerror', e => errors.push('drawcost: ' + e.message));
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
 
   const r = await pg.evaluate(() => {
     const { game: g, renderer: R, input, dev } = window.__lumen, P = CanvasRenderingContext2D.prototype;

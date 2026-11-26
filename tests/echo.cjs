@@ -1,5 +1,6 @@
 // S-42 Echo checks (D-108): Research row, follow through an L-bend, blink when walled off, Gather ore not rock, pauses,
 // cargo-full stop, save, determinism. smoke.cjs calls nodeChecks + browserChecks.
+const { newWorld } = require('./pinworld.cjs');
 const idle = () => ({ move: { x: 0, y: 0 }, aim: null, fire: false });
 
 async function nodeChecks(check) {
@@ -140,7 +141,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   await pg.evaluate(() => { const g = window.__lumen.game; g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; g.bank.lumen = 30; });
   await pg.keyboard.press('e'); await pg.waitForTimeout(100);
   await pg.click('#matrix .tabs button[data-tab="research"]');

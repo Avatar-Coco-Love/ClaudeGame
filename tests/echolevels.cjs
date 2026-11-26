@@ -2,6 +2,7 @@
 // Costs and levels; echoStat per level; Focus moves the Echo's dps, Volley its shots in 10 s, Tether the cells it may
 // pick and its Defend range; no Core Matrix stat moves; old / malformed saves; Research tab rows (+ phone Large text).
 // smoke.cjs calls nodeChecks + browserChecks.
+const { newWorld } = require('./pinworld.cjs');
 const idle = () => ({ move: { x: 0, y: 0 }, aim: null, fire: false });
 
 async function nodeChecks(check) {
@@ -106,7 +107,7 @@ async function nodeChecks(check) {
 async function browserChecks(browser, url, check, errors, shot) {
   const open = async (pg, lv) => {
     await pg.goto(url); await pg.waitForTimeout(200);
-    await pg.click('#new-world'); await pg.waitForTimeout(200);
+    await newWorld(pg); await pg.waitForTimeout(200);
     await pg.evaluate(lv => { const g = window.__lumen.game; window.__lumen.dev.echo(); Object.assign(g.echoLevels, lv); g.bank.lumen = 40;
       g.player.x = g.nexus.x; g.player.y = g.nexus.y + 40; }, lv);
     await pg.keyboard.press('e'); await pg.waitForTimeout(100);

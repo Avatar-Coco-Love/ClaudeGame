@@ -5,6 +5,7 @@
 // damage; kill (Surge) and drive-off (Drift) pay the same; the beam reaches it only surfaced; a mode
 // switch clears it; nothing saved. Browser: the tell is drawn over the dark. Usage: node tests/burrower.cjs [--browser]
 // (BURROW_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -144,7 +145,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const ok = await pg.evaluate(() => {
     const L = window.__lumen, g = L.game, w = g.world, C = 32;
     let at = -1;

@@ -1,4 +1,5 @@
 // Audit 29 "Fix first" checks (B-022…B-026), split out of smoke.cjs to keep it under ~600 lines. smoke.cjs calls both.
+const { newWorld } = require('./pinworld.cjs');
 const audio = new Proxy({}, { get: () => () => {} });
 const idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 
@@ -53,7 +54,7 @@ async function browserChecks(browser, url, check, errors) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
 
   // B-024: F pressed during a hitstop is kept until the sim runs, not consumed and lost.
   const hs = await pg.evaluate(async () => {

@@ -1,6 +1,7 @@
 // S-25 beacon floor glow checks (D-061), run by smoke.cjs. A big open floor is carved 18 cells east of the Nexus with one
 // wall cell left standing 3 cells from the beacon; the core is parked 11 cells west of the beacon so only the beacon lights
 // the samples. Luma is the mean of a 5×5 screen patch at a cell centre (grid lines run on even cell edges, never there).
+const { newWorld } = require('./pinworld.cjs');
 async function measure(pg) {
   return pg.evaluate(() => {
     const { game: g, renderer: R, input } = window.__lumen, w = g.world, C = 32;
@@ -40,7 +41,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(200);
+  await newWorld(pg); await pg.waitForTimeout(200);
   const m = await measure(pg);
   if (shots) await pg.screenshot({ path: `${shots}/beacon-glow.png` });
   check('a beacon pool lifts its open floor: 3 cells in ≥ 2× the floor 3 cells outside the pool (S-25, D-061)',

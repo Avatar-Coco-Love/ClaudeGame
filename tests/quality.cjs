@@ -2,6 +2,7 @@
 // L2, and High / Low never step. Browser: a slow frame stream steps Auto to L1 (DPR 2 → 1) then L2; High holds L0;
 // the Graphics button cycles and is saved; the same seed + input gives the same game state at L0 and L2.
 // smoke.cjs calls nodeChecks and browserChecks; `node tests/quality.cjs` runs both alone.
+const { newWorld } = require('./pinworld.cjs');
 const path = require('path');
 
 async function nodeChecks(check) {
@@ -57,7 +58,7 @@ async function browserChecks(browser, url, check, errors) {
   const sT = await st();
   check('S-41 slow frames on the title (paused) never step', sT.lv === 0, JSON.stringify(sT));
   await page.evaluate(() => { window.__slow = 0; });
-  await page.click('#new-world'); await page.waitForTimeout(200);
+  await newWorld(page); await page.waitForTimeout(200);
   await page.evaluate(() => { const g = window.__lumen.game; g.demo = true; window.__slow = 50; });
   await page.waitForFunction(() => window.__lumen.quality.level >= 1, null, { timeout: 15000 }).catch(() => {});
   const s1 = await st();

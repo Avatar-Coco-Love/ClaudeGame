@@ -4,6 +4,7 @@
 // (full refund, refused while 2 are carried); save round-trip; format 19 → 20; a 160 world has none.
 // Browser: the Craft tab row in a 256 world; craft, then B in the Kiln places one, the floor ring draws; screenshot.
 // Usage: node tests/heatsink.cjs [--browser]   (HEATSINK_SHOT=path.png)
+const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
@@ -123,7 +124,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await newWorld(pg); await pg.waitForTimeout(300);
   const a = await pg.evaluate(() => {
     const g = window.__lumen.game;
     Object.assign(g.bank, { calx: 20, shard: 100 });

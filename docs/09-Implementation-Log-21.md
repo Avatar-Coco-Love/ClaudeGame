@@ -40,3 +40,12 @@ Continues part 20 (it neared the 8 KB cap at session 147). Newest at the bottom;
 - Check (`glow.cjs`): big box, then a pan that clips the pool at the view's top-left; every layer texel past lw × lh must
   be clear and a margin must exist. Old code: FAIL, 2349 stale texels (lw 51, layer 300 × 150). Screenshot viewed: pool
   glow round and soft, no edge lines.
+
+## Session 150 — Audit: every test's New World pinned + a check (v1.10.91, D-188), 09 archive
+- No subagent tool: sweeps in-session, newest code first. `light.js` B-104 fix: the whole-layer clear is bounded by the
+  quarter-res layer (grows only), fine. D-184…D-187 vs `config.js` (`ECHO_ORDERS`, `ECHO_AUTO_HOLD` 2): match.
+- **Queued check (B-101, B-103):** `tests/pinworld.cjs` — `newWorld(page, tap, r)` pins Math.random for the click;
+  `run()` in smoke flags raw `#new-world` clicks with no nearby pin / `any-seed:` note. Old tree: 55 hits (FAIL);
+  42 files converted mechanically, `spire.cjs` `pinnedNewWorld` now wraps it (same 0.42 seed).
+- B-100 closed (unseen since the Spire pin, two audits). `09` sessions 139–143 archived word for word
+  (`archive/2026-11-26-09-sessions-139-143.md`), part 19 removed. Workflow review in D-188. No game bug found.
