@@ -42,3 +42,19 @@ alternatives). D-177 on.
 - Perf: +3 strokes at most (smoke counts them, none blurred); `perf.cjs` home builds no structure, so it is unchanged.
 - Rejected: fixed slots per structure (gaps in a 160 world read as missing), rings inside the 62 px one (crowded by
   the cycle hue), level ticks per Radiance level (the Nexus panel shows levels already), a blurred glow (D-160).
+
+### D-180 — M16 "Feats": six world goals that pay nothing; Q-032 no, Q-035 yes, Q-036 leave (session 142, Design)
+- **Play-test** (`?dev` maxAll, 256): Kiln, Lens call → "Rift called — 30 ▲", pocket opens beside the core; the bank
+  still holds 270 ▲ after a call; ▲ cells everywhere. M15 gives late ▲ a use; what's missing is a reason to go anywhere
+  (Q-032's "out of goals"). Counts (seed): 10 vaults, 28 Anomaly sites, 5 Spires, 2 lairs; explored 3 % at start.
+- **M16 (pillar 4: a goal layer that closes the late loop; replaces Q-032's second boss form):** at most 6 feats, one
+  per Nexus hexagon vertex: Quiet lairs, Open vaults, Three lights, Charted, Overdriven, Rift runner (4 in a 160
+  world). Derived from saved state plus two counters (`stats.kinds`, `stats.rifts`, format 25). Shown in the Nexus
+  tab, on the ending card and as lit vertices on the Nexus. Same in both modes; no reward (Q-001, D-002). Specs
+  S-66…S-68 in `07-Build-Specs-18.md`; VERSION M16 → 1.11.
+- **Q-032 → no:** a boss once per world stands; feats answer the late gap without a harder fight only Surge reads as
+  harder. **Q-035 → yes, capped at 6** (the hexagon is the cap's reason, not taste). **Q-036 → leave:** Lumen's
+  surplus is late only and Research is one-time kinds (a Lumen sink would be a second M15).
+- Rejected: per-mode feats (pillar 2); feats that pay (an unlock twice, or Surge-first rewards); a Feats tab (a 5th tab
+  for a list of 6; the Nexus tab is where the vertices are); "every Spire" (the ending already asks it); "both modes
+  used" (pushes a Drift player into Surge); a Lumen Research sink; a 6th ring / bigger world (Q-025 perf, save size).

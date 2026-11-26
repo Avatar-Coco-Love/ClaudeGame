@@ -1,7 +1,7 @@
 # 03 — Open Questions
 
 Undecided only. Once a question is settled, remove it here and record the answer as a D-xxx entry in `06-Decisions.md` (cite the Q number).
-New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169.
+New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169, Q-032 / Q-035 / Q-036 by D-180.
 
 | ID | Question | Notes |
 |----|----------|-------|
@@ -15,6 +15,4 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-028 | Should Glitch kills in the Shoal / Kiln drop Tide / Calx (a renewable biome income for Surge, as ◆▲ are now)? | Design 102 (D-134). Leaning **no**: biome ore stays finite in both modes; revisit with Q-007 if a late 256 world runs dry. |
 | Q-029 | Surge at the base max build takes 0 damage anywhere (Glitch tier stops at 3, d 84). Should Glitch tiers go past 3 in the Shoal / Kiln? | Design 107 probe (auto-aim bot, 120 s, 4 seeds). Leaning **no**: M12 biome creatures (D-142) carry the outer threat; revisit after `biomefoe.mjs` at S-54 if Hearth–Deep Surge still feels empty late. |
 | Q-031 | Should a rift (S-57) also show on the Scanner ring or the Chart before it opens (a warning a few seconds ahead)? | Design 117. Leaning **no**: the toast + chevron at open is enough for a 45 s window; revisit if S-57a's bot rarely reaches one in time. |
-| Q-032 | Should a downed boss come back (a harder second form) in the same world? | Design 122 (D-158). Leaning **no**: one fight per world, New Cycle brings a new one; revisit if late 256 play runs out of goals. Design 137: the late gap is a ▲ sink gap, M15 answers it (D-175). |
-| Q-035 | Should a world keep a short list of feats (goals that pay nothing: both bosses, every Spire, map 50 %, one stat in Overdrive) shown on the ending card? | Design 137 (D-175). Leaning **later**: re-read after M15; a list risks pillar 4's "long shallow list". |
-| Q-036 | Lumen runs ~3.8× past its sinks in a 256 world (~530 vs 140). A new Research kind, or leave it? | Design 137. Leaning **leave**: Lumen pays the Echo and the beams early on, when it is scarce; the surplus is late only. |
+| Q-037 | Should a feat's rule show before it is near (e.g. Rift runner 0 / 5 from the start), or only once begun? | Design 142 (D-180). Leaning **show all**: a goal you can't see is not a goal; revisit if the S-66 screenshot reads as a chore list. |
