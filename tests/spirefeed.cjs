@@ -1,5 +1,5 @@
 // S-20 Spire feed checks (D-055, D-069, D-070). smoke.cjs calls both functions.
-const { nearSpire } = require('./spire.cjs');
+const { nearSpire, pinnedNewWorld } = require('./spire.cjs');
 const idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 
 async function nodeChecks(check) {
@@ -100,7 +100,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     const page = await browser.newPage({ viewport: { width: vw, height: vh }, deviceScaleFactor: 1, ...(touch ? { isMobile: true, hasTouch: true } : {}) });
     page.on('pageerror', e => errors.push(`spirefeed ${vw}: ` + e.message));
     await page.goto(url + '?dev'); await page.waitForTimeout(200);
-    if (touch) await page.tap('#new-world'); else await page.click('#new-world');
+    await pinnedNewWorld(page, touch); // audit 144 (B-101): every Spire approach pins its seed (D-100)
     await page.waitForTimeout(300);
     await page.evaluate(m => window.__lumen.game.setMode(m), mode);
     await nearSpire(page, 0);

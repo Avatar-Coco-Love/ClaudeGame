@@ -1,6 +1,6 @@
 // S-28 facet puzzle + relit checks (D-055, D-078, D-080, D-081). smoke.cjs calls nodeChecks and browserChecks;
 // tools/facetprobe.mjs reuses `aims` and `solveInGame` to solve every generated pattern in-game over many seeds.
-const { nearSpire } = require('./spire.cjs');
+const { nearSpire, pinnedNewWorld } = require('./spire.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 const DT = 1 / 60;
 
@@ -172,7 +172,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     const page = await ctx.newPage();
     page.on('pageerror', e => errors.push(`facet ${vw}: ` + e.message));
     await page.goto(url + '?dev'); await page.waitForTimeout(200);
-    if (touch) await page.tap('#new-world'); else await page.click('#new-world');
+    await pinnedNewWorld(page, touch); // audit 144 (B-101): every Spire approach pins its seed (D-100)
     await page.waitForTimeout(300);
     await page.evaluate(m => window.__lumen.game.setMode(m), mode);
     await nearSpire(page, 0);
@@ -240,3 +240,5 @@ async function browserChecks(browser, url, check, errors, shots) {
 }
 
 module.exports = { nodeChecks, browserChecks, aims, solveInGame, tapSet };
+
+if (require.main === module) require('./serve.cjs').runStandalone({ nodeChecks, browserChecks }); // audit 144: `node tests/facet.cjs` runs alone

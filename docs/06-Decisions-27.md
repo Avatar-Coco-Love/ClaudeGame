@@ -38,3 +38,14 @@ alternatives). D-181 on.
 - Rejected: A* per enemy per frame (perf, 8+ foes); flow fields for Glitches now (no play-test says they feel dumb;
   the owner wasn't sure); Surge-only hunters (pillar 2); a hunter that bores rock (the Burrower's role); a boss-like
   hunter (M14 has two); creature shapes with limbs (pillar 1: chevrons and dots only).
+
+### D-183 — Audit 144: Spire browser tests pin their seed; flakes get a stress repro (session 144, Audit)
+- **B-101 fixed:** `facet.cjs` / `spirefeed.cjs` / `wake.cjs` built random New Worlds, then teleported to Spire 0
+  (D-100 said pin). 1 of 12 parallel runs showed "A dormant Spire (2/5)" instead of "Spire relit (1/5)". All three now
+  use `pinnedNewWorld` (`spire.cjs`); its gap check covers 160 and 256 (New World builds 256). 12 / 12 after.
+- **B-096 (2nd use of that ID) fixed:** `bigworld.cjs` `new Game` budget is the median of 5 seeds, same 150 ms bar.
+- **Workflow (D-138):** too little: a flake was logged "open" without a try at reproducing it. Rule: before a flake is
+  logged open, run its file 6 at a time, twice (its own runner); log the result. Too much: nothing new (Debt lines no
+  longer ride audits, D-177 holds). B-IDs: grep the highest before assigning (B-096 was used twice).
+- Rejected: a retry on a failed budget (hides a real slowdown); raising the bar (weakens it); a smaller world-gen
+  rewrite (hoisting getters measured no change, reverted).

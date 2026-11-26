@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.85 — 2026-11-26
+- No change in play: a health check. The game's own tests got steadier (two that failed now and then under load), so
+  new features reach you with fewer false alarms.
+
 ## v1.10.84 — 2026-11-26
 - No change in play yet: your feedback shaped the next updates. The Echo gets Mine, Defend and a smart Auto mode
   plus its own upgrades, then new hunters arrive that follow you through the tunnels you dig, in Drift and Surge alike.

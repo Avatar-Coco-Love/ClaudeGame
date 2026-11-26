@@ -3,6 +3,7 @@
 // retries; a core death fails it; Drift never starts one; lanes clear only rock/ore, stop at what they can't clear and drop
 // ore loot; Glitches spawn only at usable lane ends (a Spire with a bedrock-blocked lane still runs); a reload mid-Wake
 // doesn't restart it until the core steps out. Browser: the Wake toast, hint and charge ring on screen (env SPIRE_SHOT).
+const { pinnedNewWorld } = require('./spire.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 const DT = 1 / 60, idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
 
@@ -124,7 +125,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     const page = await ctx.newPage();
     page.on('pageerror', e => errors.push(`wake ${vw}: ` + e.message));
     await page.goto(url + '?dev'); await page.waitForTimeout(200);
-    if (touch) await page.tap('#new-world'); else await page.click('#new-world');
+    await pinnedNewWorld(page, touch); // audit 144 (B-101): every Spire approach pins its seed (D-100)
     await page.waitForTimeout(300);
     await page.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.god = true; g.stats.mined = 20;
       const s = g.spires[0]; s.fed = 80; g.player.x = (s.x + 0.5) * 32; g.player.y = (s.y + 3.5) * 32; g.player.vx = g.player.vy = 0; });
