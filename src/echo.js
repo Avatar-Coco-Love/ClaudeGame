@@ -4,10 +4,11 @@
 // S-43: `game.echoOrder` (saved) picks what it does at rest: Gather ore or Guard the core (bolts at Glitches / Spitter bolts).
 // S-69 (D-184): ids gather / guard / auto read Mine / Defend / Auto; Auto Defends on a threat, back to Mine after ECHO_AUTO_HOLD.
 import { CELL, ORE_KIND, PLAYER_ACCEL, ECHO_R, ECHO_FIELD, ECHO_FIELD_S, ECHO_HOLD, ECHO_SPEED_MUL, ECHO_BLINK_CELLS,
-  ECHO_STUCK_S, ECHO_STUCK_PX, ECHO_FADE_S, ECHO_REACH, ECHO_DMG, ECHO_PICK_S,
-  ECHO_ORDERS, ECHO_GUARD_S, ECHO_GUARD_PX, ECHO_GUARD_DMG, ECHO_SHOT_S, ECHO_AUTO_S, ECHO_AUTO_HOLD, ORE_WORTH } from './config.js';
+  ECHO_STUCK_S, ECHO_STUCK_PX, ECHO_FADE_S, ECHO_PICK_S,
+  ECHO_ORDERS, ECHO_GUARD_DMG, ECHO_SHOT_S, ECHO_AUTO_S, ECHO_AUTO_HOLD, ORE_WORTH } from './config.js';
 import { collides, moveBody } from './body.js';
 import { beamFoes } from './spitter.js';
+import { echoStat } from './echolevels.js';
 
 /** S-43: a saved order that isn't one loads as Gather / Mine (B-037). */
 export const validOrder = o => (ECHO_ORDERS.includes(o) ? o : 'gather');
@@ -180,15 +181,16 @@ const seen = (w, e, f) => {
 /** A bolt moving toward the core. */
 const closing = (f, p) => f.bolt && (f.vx || 0) * (p.x - f.x) + (f.vy || 0) * (p.y - f.y) > 0;
 
-/** S-69 Auto, every ECHO_AUTO_S: a threat (a closing bolt ≤ 1.5 × ECHO_GUARD_PX of the core, or a foe ≤ ECHO_GUARD_PX
+/** S-69 Auto, every ECHO_AUTO_S: a threat (a closing bolt ≤ 1.5 × guardPx of the core, or a foe ≤ guardPx
  *  the Echo can see) -> Defend; ECHO_AUTO_HOLD s with none -> Mine (hysteresis: no flicker at the range edge). */
 export function autoPick(game, e) {
   const p = game.player, w = game.world;
   let threat = false;
+  const range = echoStat(game, 'guardPx');
   for (const f of beamFoes(game)) {
     if (f.fade !== undefined || f.hp <= 0) continue;
     const dc = Math.hypot(f.x - p.x, f.y - p.y);
-    if (f.bolt ? closing(f, p) && dc <= 1.5 * ECHO_GUARD_PX : dc <= ECHO_GUARD_PX && seen(w, e, f)) { threat = true; break; }
+    if (f.bolt ? closing(f, p) && dc <= 1.5 * range : dc <= range && seen(w, e, f)) { threat = true; break; }
   }
   const was = e.auto;
   if (threat) { e.auto = 'defend'; e.calmT = 0; }
@@ -196,7 +198,7 @@ export function autoPick(game, e) {
   if (e.auto !== was) { e.switches++; e.target = null; e.beam = null; }
 }
 
-/** S-43 Guard: every ECHO_GUARD_S, a bolt at a foe within ECHO_GUARD_PX of the core that the Echo can see. S-69: a closing
+/** S-43 Guard: every guardS, a bolt at a foe within guardPx (S-70: echoStat) of the core that the Echo can see. S-69: a closing
  *  bolt first, then the least time to reach the core (distance / speed). It only takes hp: glitch.js / spitter.js kill or
  *  pop it on their next pass (loot as from the beam). */
 function guard(game, e) {
@@ -204,10 +206,11 @@ function guard(game, e) {
   if (e.guardT > 0) return;
   const p = game.player, w = game.world;
   let best = null;
+  const range = echoStat(game, 'guardPx');
   for (const f of beamFoes(game)) {
     if (f.fade !== undefined || f.hp <= 0) continue; // gave up (S-6) or already dead this frame
     const dc = Math.hypot(f.x - p.x, f.y - p.y);
-    if (dc > ECHO_GUARD_PX) continue;
+    if (dc > range) continue;
     const sp = typeof f.speed === 'number' ? Math.max(f.speed, Math.hypot(f.vx || 0, f.vy || 0)) : Math.hypot(f.vx || 0, f.vy || 0);
     const rank = (closing(f, p) ? 0 : 1e6) + dc / Math.max(sp, 1); // closing bolts first, then time to reach
     if ((best && rank >= best.rank) || !seen(w, e, f)) continue; // rock between
@@ -215,7 +218,7 @@ function guard(game, e) {
   }
   if (!best) return;
   const f = best.f;
-  e.guardT = ECHO_GUARD_S; e.shots++;
+  e.guardT = echoStat(game, 'guardS'); e.shots++;
   f.hp -= ECHO_GUARD_DMG; f.flash = 0.08;
   e.shot = { x: f.x, y: f.y, t: ECHO_SHOT_S };
 }
@@ -232,7 +235,7 @@ function coreFree(game) {
 function gatherable(game, e, x, y) {
   const w = game.world, p = game.player, i = w.idx(x, y);
   if (!ORE.has(w.cells[i]) || !w.explored[i]) return false;
-  if (Math.hypot((x + 0.5) * CELL - p.x, (y + 0.5) * CELL - p.y) > ECHO_REACH * CELL) return false;
+  if (Math.hypot((x + 0.5) * CELL - p.x, (y + 0.5) * CELL - p.y) > echoStat(game, 'reach') * CELL) return false;
   if (!N4.some(([dx, dy]) => !w.solid(x + dx, y + dy))) return false;
   const cx = (x + 0.5) * CELL - e.x, cy = (y + 0.5) * CELL - e.y, cd = Math.hypot(cx, cy) || 1;
   const h = w.raycast(e.x, e.y, cx / cd, cy / cd, cd + CELL);
@@ -247,7 +250,8 @@ function gather(game, e, dt) {
     e.pickT = ECHO_PICK_S;
     const gx = Math.floor(p.x / CELL), gy = Math.floor(p.y / CELL);
     let best = null;
-    for (let y = gy - ECHO_REACH; y <= gy + ECHO_REACH; y++) for (let x = gx - ECHO_REACH; x <= gx + ECHO_REACH; x++) {
+    const R = echoStat(game, 'reach');
+    for (let y = gy - R; y <= gy + R; y++) for (let x = gx - R; x <= gx + R; x++) {
       if (!w.inBounds(x, y) || !ORE.has(w.cells[w.idx(x, y)])) continue;
       const d = Math.hypot((x + 0.5) * CELL - e.x, (y + 0.5) * CELL - e.y) / CELL; // S-69: worth / (cells away + 2)
       const score = (ORE_WORTH[ORE_KIND[w.cells[w.idx(x, y)]]] || 1) / (d + 2);
@@ -259,7 +263,7 @@ function gather(game, e, dt) {
   const { x, y } = e.target, cx = (x + 0.5) * CELL - e.x, cy = (y + 0.5) * CELL - e.y, cd = Math.hypot(cx, cy) || 1;
   const h = w.raycast(e.x, e.y, cx / cd, cy / cd, cd + CELL);
   e.beam = { ex: e.x + cx / cd * h.dist, ey: e.y + cy / cd * h.dist };
-  const res = w.hit(x, y, game.stat('beam') * ECHO_DMG * dt, [cx / cd, cy / cd]); // S-59: its own aim on a Tide Lock
+  const res = w.hit(x, y, game.stat('beam') * echoStat(game, 'dmg') * dt, [cx / cd, cy / cd]); // S-59: its own aim on a Tide Lock
   if (res && res.broken) { e.target = null; game.onCellBroken(x, y, res.type); }
 }
 

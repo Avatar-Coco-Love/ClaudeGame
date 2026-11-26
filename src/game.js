@@ -7,6 +7,7 @@ import { World, packBits, unpackBits, seededStream } from './world.js';
 import { SAVE_FORMAT } from './save.js';
 import { tryScan, updateScan, emptyScan } from './research.js';
 import { updateEcho, cycleEchoOrder, validOrder } from './echo.js';
+import { validEchoLevels } from './echolevels.js';
 import { castBeam, cycleBeamMode, validMode, updatePulse } from './beam.js';
 import { collides, moveBody } from './body.js';
 import { updateGlitches } from './glitch.js';
@@ -86,6 +87,7 @@ export class Game {
     this.beam = { on: false, ex: 0, ey: 0, target: null, enemy: null, rays: [], charge: 0, recover: 0, flash: 0, flashMax: 1, flashLine: null, facetLatch: null, midEnemy: false }; // S-14: Pulse state
     this.echo = null; // S-42: the live Echo (echo.js) once research.echo; never saved
     this.echoOrder = 'gather'; // S-43: 'gather' | 'guard' | 'auto' (S-69: Mine / Defend / Auto; saved; buying the Echo sets 'auto')
+    this.echoLevels = validEchoLevels(); // S-70: Focus / Volley / Tether 0…2 (echolevels.js; saved)
     this.beamMode = 'focus'; // S-13: intent; castBeam realizes it as beam.rays
     this.pickups = [];
     this.enemies = [];
@@ -481,7 +483,7 @@ export class Game {
       cycle: this.cycle, records: this.records, // S-29
       anomalies: { ...this.anomaly.taken }, buffs: [...this.buffs], // S-35
       bosses: this.bosses.list.map(b => ({ ring: b.ring, down: b.down })), // S-60a: only the down flags (fight state is never saved)
-      echoOrder: this.echoOrder, // S-43
+      echoOrder: this.echoOrder, echoLevels: { ...this.echoLevels }, // S-43, S-70
       weatherCancel: this.weather.cancel, // B-081: the event a Wake / the ending cancelled stays cancelled after a reload
       pickups: this.pickups.map(q => [KINDS.indexOf(q.kind), Math.round(q.x), Math.round(q.y), q.kept ? 1 : 0]), // B-011, B-022
     };
@@ -513,6 +515,7 @@ export class Game {
     loadWards(this, s.wards);
     loadAnomalies(this, s.anomalies, s.buffs); // S-35
     this.echoOrder = validOrder(s.echoOrder); // S-43: anything else loads as Gather (B-037)
+    this.echoLevels = validEchoLevels(s.echoLevels); // S-70: clamped 0…2, malformed -> 0 (B-037)
     this.weather.cancel = Number.isInteger(s.weatherCancel) && s.weatherCancel >= 0 ? s.weatherCancel : -1; // B-081
     this.beamMode = validMode(this, s.beamMode); // S-13: a mode that isn't unlocked loads as Focus
     if (s.player && !collides(w, s.player.x, s.player.y, PLAYER_R)) { this.player.x = s.player.x; this.player.y = s.player.y; }

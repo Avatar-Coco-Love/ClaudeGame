@@ -61,3 +61,11 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   switches and fails; nearest-first picks the ◆ / the Glitch. Own runner now (`runStandalone`).
 - Screenshot: chip "Auto · Defend", a thin ring round the Echo, Glitch held 90 px off. Observed: a Glitch held 10 s
   gives up (D-017 `stall`) and Auto goes back to Mine; the test resets `stall`.
+
+## Session 146 — Build: S-70 Echo upgrades Focus / Volley / Tether (v1.10.87, D-185)
+- New `echolevels.js` (`echoStat`, buy, `validEchoLevels`, row defs); `echo.js` reads its four numbers through it.
+  Save format 25 (step 24 → 25: all 0). Research tab: three rows under the Echo once owned.
+- `echolevels.cjs` (12 checks): costs 20 / 35, 165 total, 3rd buy refused, no Matrix stat moves; dps 0.5 → 0.9 ×;
+  shots in 10 s 12 → 22; a ◆ 6 cells out and a Glitch 160 px out only from Tether 1; saves; tab + phone 320 Large text.
+  Fails on old code (no module). Observed: a held Glitch gives up at 6 s (D-017), so the Volley count swaps in a fresh one.
+- Screenshot: Research tab, Focus MAX with 2 pips, Volley "0.6 s → 0.45 s" ●35, Tether row below (scrolls).

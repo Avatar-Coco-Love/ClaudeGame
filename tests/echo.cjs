@@ -4,7 +4,8 @@ const idle = () => ({ move: { x: 0, y: 0 }, aim: null, fire: false });
 
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
-  const { T, CELL, ECHO_DMG } = await import('../src/config.js');
+  const { T, CELL } = await import('../src/config.js');
+  const { echoStat } = await import('../src/echolevels.js');
   const { buyResearch } = await import('../src/research.js');
   const blinks = [];
   const audio = new Proxy({}, { get: (_, k) => (...a) => { if (k === 'echoBlink') blinks.push(k); } });
@@ -128,7 +129,7 @@ async function nodeChecks(check) {
     for (let i = 0; i < 60 && !w.damage[i0]; i++) g.update(1 / 60, idle());
     const d0 = w.damage[i0];
     for (let i = 0; i < 15; i++) g.update(1 / 60, idle());
-    const rate = (w.damage[i0] - d0) * 4, want = g.stat('beam') * ECHO_DMG;
+    const rate = (w.damage[i0] - d0) * 4, want = g.stat('beam') * echoStat(g, 'dmg');
     check('Echo Gather: mines at 0.5 × the core\'s Beam dps (Matrix level counts) (S-42)', Math.abs(rate - want) < 0.02 * want, JSON.stringify({ rate, want }));
   }
 }

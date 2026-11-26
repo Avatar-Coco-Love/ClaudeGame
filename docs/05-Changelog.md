@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.87 — 2026-11-26
+- Echo upgrades in the Research tab, paid in Lumen ●: **Focus** (it mines faster), **Volley** (it shoots faster) and
+  **Tether** (it mines and defends farther from you). Two levels each, ● 20 then ● 35; each helps in Drift and Surge.
+
 ## v1.10.86 — 2026-11-26
 - The Echo has three orders now: **Mine**, **Defend** and **Auto**. A new Echo starts in Auto: it mines, turns to
   defend when something comes for you (a ring round it shows it), and goes back to mining 2 s after it is safe.
