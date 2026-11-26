@@ -8,7 +8,7 @@ import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
 import { WORLD_SIZE_OLD, WORLD_PROFILES, KINDS } from './config.js';
 
-export const SAVE_FORMAT = 22;
+export const SAVE_FORMAT = 23;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -33,6 +33,7 @@ export const STEPS = [
   s => ({ ...s, craft: { ...s.craft, sink: 0 }, sinks: [] }), // 19 -> 20: S-51 Heat Sinks: none crafted, none placed
   s => ({ ...s, nexus: { ...s.nexus, chart: 0 } }), // 20 -> 21: S-52 Nexus Chart: not bought
   s => ({ ...s, craft: { ...s.craft, ward: 0 }, wards: [] }), // 21 -> 22: S-56 Wards: none crafted, none placed
+  s => ({ ...s, bosses: [] }), // 22 -> 23: S-60a boss lairs: none recorded, so each is stamped fresh (refunds what was placed in it)
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.

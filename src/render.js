@@ -20,6 +20,7 @@ import { drawHeat } from './heat.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawVents } from './vent.js';
 import { drawLocks, drawTides } from './lock.js';
+import { drawBosses } from './boss.js';
 import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
 import { drawMotes } from './mote.js';
@@ -172,6 +173,7 @@ export class Renderer {
     drawVents(this, ctx, left, top, vw, vh); // S-48b: Kiln flare vents
     drawLocks(this, ctx, left, top, vw, vh); // S-58: a Flare Lock's warm shell edge
     drawTides(this, ctx, left, top, vw, vh); // S-59: a Tide Lock's mint chevrons
+    drawBosses(this, ctx, left, top, vw, vh); // S-60a: the boss core, its lit plate and flare
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16

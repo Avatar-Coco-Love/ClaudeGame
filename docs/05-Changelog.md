@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.67 — 2026-11-26
+- **The Crucible (first boss, Kiln).** Deep in the Kiln a 9 × 9 lair holds an ember core ringed by eight rose plates.
+  Only the plate that glows takes your beam; break it and the glow jumps across the body, so you keep circling it while
+  the core flares heat at anyone too close. Strip all eight, break the core, and it bursts 80 ◆, 20 ▲ and 24 ⬟. A seen
+  lair is an octagon on the minimap, filled once it is down. Both modes take it apart the same way for now.
+
 ## v1.8.66 — 2026-11-26
 - **Tide Locks — events and puzzles complete (v1.8).** A vault in the Shoal's outer reaches always sits in a current, and
   its shell only gives to a beam aimed against the flow: cut it from downstream while the Undertow pushes you away. Faint

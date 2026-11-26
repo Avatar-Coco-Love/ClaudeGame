@@ -77,3 +77,5 @@ Continues part 16 (sessions 114–118 archived word for word in audit 124: `arch
 - `tests/tidelock.cjs` (4 node + 1 browser checks), failing on the old code (no `tideSites`). M13 ✅ → v1.8.
 - B-093 (caught by smoke): `undertow.cjs` failed on 2 lock chunks whose centre sits outside the Shoal; the check now
   names Tide Lock chunks as allowed (D-162), the band and bearing checks still apply to them. Smoke 590/590 (+5).
+
+Continued in `09-Implementation-Log-18.md` (126 on).
