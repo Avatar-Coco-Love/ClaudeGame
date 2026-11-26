@@ -220,7 +220,7 @@ function gather(game, e, dt) {
   const { x, y } = e.target, cx = (x + 0.5) * CELL - e.x, cy = (y + 0.5) * CELL - e.y, cd = Math.hypot(cx, cy) || 1;
   const h = w.raycast(e.x, e.y, cx / cd, cy / cd, cd + CELL);
   e.beam = { ex: e.x + cx / cd * h.dist, ey: e.y + cy / cd * h.dist };
-  const res = w.hit(x, y, game.stat('beam') * ECHO_DMG * dt);
+  const res = w.hit(x, y, game.stat('beam') * ECHO_DMG * dt, [cx / cd, cy / cd]); // S-59: its own aim on a Tide Lock
   if (res && res.broken) { e.target = null; game.onCellBroken(x, y, res.type); }
 }
 

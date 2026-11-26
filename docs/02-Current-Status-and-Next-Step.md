@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-25_ · **Session counter: 124** · **Version: v1.7.65** (session 124: Audit; rotation: 125 Build, 126 Build, 127 Design).
-**Scope (D-119, `01`):** M1–M12 ✅ (v1.0 = M5, v1.5 = M10 world + biomes, v1.6 = M11 economy, v1.7 = M12 creatures + tools). Next: M13 events + puzzles, M14 two-form bosses (1.9, specced: D-158); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-26_ · **Session counter: 125** · **Version: v1.8.66** (session 125: Build; rotation: 126 Build, 127 Design, 128 Build).
+**Scope (D-119, `01`):** M1–M13 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13 events + puzzles). Next: M14 two-form bosses (1.9, specced: D-158); `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -16,6 +16,7 @@ _Last updated: 2026-11-25_ · **Session counter: 124** · **Version: v1.7.65** (
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
 - Rift (S-57a, D-156, `rift.js`): every 240–360 s (waits out weather), 45 s, a 3 × 3 rock pocket 8–12 cells out in the core's ring turns to ore (×2 yield; Shoal / Kiln 3 + 6 ▲), reverts unmined; unsaved, both modes; shimmer, minimap dot, toast; S-57b (D-157): edge chevron while off screen, open / close chimes. Gate PASS (D-156). `08`.
 - Flare Lock (S-58, D-159, `lock.js`): a Kiln outer vault; `world.hitMul`: shell × 0, × 2 in the last 3 s of an 8 s cycle (tell, flare). `09`.
+- Tide Lock (S-59, D-162, `lock.js`): a Shoal outer vault in a current that never calms; shell hit only against the flow.
 - Weather (S-33, D-097, `weather.js`): every 300–420 s (seeded, unsaved), 40 s: Surge storm (spawns ×0.75, cap +2, violet dark),
   Drift aurora (Shard / Prism breaks in the core's light +1 at 40 %, teal dark, shimmer). Never in a Wake / the ending (the cut event is saved, D-117).
 - Anomalies (S-35/36, D-099, D-101, `anomaly.js`): seed-only sites (3/5/8 by ring; a 256 world 28) in rock, kind 1/3 each: Overclock
@@ -41,12 +42,12 @@ _Last updated: 2026-11-25_ · **Session counter: 124** · **Version: v1.7.65** (
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 22); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 23 from D-158; last D-161), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 114–118 archived in audit 124), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 23 from D-158; last D-162), `03` questions (Q-xxx), `09` log (tail: `09-…-17`; 114–118 archived in audit 124), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-58 built (M12 done, `07-…-12/13`). M13 left: S-59 (`07-…-14`, D-152). M14: S-60a…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-59 built (M13 done, `07-…-14`). M14: S-60a…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `rift.cjs`, `lock.cjs`). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
 
 ## Next step (one thing)
-Session 125 (Build): S-59 Tide Lock (`07-Build-Specs-14`, D-152). Then 126 Build: S-60a (M14, `07-…-15`).
+Session 126 (Build): S-60a (M14 first boss slice, `07-Build-Specs-15`, D-158). Then 127 Design.

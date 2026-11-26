@@ -68,3 +68,12 @@ Continues part 16 (sessions 114–118 archived word for word in audit 124: `arch
   Too much: a subagent PR's own context; too little: nothing new (sweeps in-session stay the norm with no subagent tool).
 - `09` sessions 114–118 archived word for word (`archive/2026-11-25-09-sessions-114-118.md`, part 16 removed).
 - Smoke 585/585 (+1, `audit34.cjs` ring check), 567 s.
+
+## Session 125 — Build: S-59 Tide Lock, M13 done (v1.8.66, D-162)
+- `lock.js` `tideSites` / `tideFlow` / `drawTides`; `undertow.js` makes a lock chunk flow; `world.hit` takes an optional
+  dir (Echo). 8 seeds: 24 Tide Locks, 16 of them on a calm draw (now 40 px/s); flows elsewhere unchanged.
+- Probe: lock 3.60 s = plain 3.60 s from downstream (1.00×). Screenshot viewed (seed 4242 new world): five mint `>`
+  chevrons on the shell's upstream column read at a glance, pointing with the flow.
+- `tests/tidelock.cjs` (4 node + 1 browser checks), failing on the old code (no `tideSites`). M13 ✅ → v1.8.
+- B-093 (caught by smoke): `undertow.cjs` failed on 2 lock chunks whose centre sits outside the Shoal; the check now
+  names Tide Lock chunks as allowed (D-162), the band and bearing checks still apply to them. Smoke 590/590 (+5).

@@ -195,11 +195,11 @@ export class World {
   }
 
   /** Apply beam damage. Returns {broken:true, type} when the cell is destroyed. */
-  hit(x, y, amount) {
+  hit(x, y, amount, dir) { // dir: the hit's unit [dx, dy] when it is not the core's own (S-59: the Echo)
     const type = this.get(x, y);
     if (type === T.EMPTY || UNBREAKABLE.has(type)) return null;
     const i = this.idx(x, y);
-    if (this.hitMul) amount *= this.hitMul(x, y, type); // S-58: a Flare Lock's shell (lock.js); null in plain worlds
+    if (this.hitMul) amount *= this.hitMul(x, y, type, dir); // S-58 / S-59: a Flare / Tide Lock's shell (lock.js); null in plain worlds
     this.damage[i] += amount;
     const hp = this.hpAt(x, y, type);
     if (this.damage[i] >= hp) {

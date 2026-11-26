@@ -19,7 +19,7 @@ import { drawShatter } from './shatter.js';
 import { drawHeat } from './heat.js';
 import { drawAnomalies } from './anomaly.js';
 import { drawVents } from './vent.js';
-import { drawLocks } from './lock.js';
+import { drawLocks, drawTides } from './lock.js';
 import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
 import { drawMotes } from './mote.js';
@@ -171,6 +171,7 @@ export class Renderer {
     drawAnomalies(this, ctx, left, top, vw, vh); // S-35: hexagrams, faint in rock, full once open
     drawVents(this, ctx, left, top, vw, vh); // S-48b: Kiln flare vents
     drawLocks(this, ctx, left, top, vw, vh); // S-58: a Flare Lock's warm shell edge
+    drawTides(this, ctx, left, top, vw, vh); // S-59: a Tide Lock's mint chevrons
     drawSpireBreath(this, ctx, left, top, vw, vh); // S-27: the core hexagon breathes (was painted into the chunk)
     this.drawNexus(ctx, left, top, vw, vh);
     drawBeacons(this, ctx, left, top, vw, vh); // S-16

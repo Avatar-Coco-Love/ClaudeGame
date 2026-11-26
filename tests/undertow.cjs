@@ -30,18 +30,18 @@ async function nodeChecks(check) {
     const same = a.undertow.flow.every((v, i) => v === b.undertow.flow[i]), differs = a.undertow.flow.some((v, i) => v !== c.undertow.flow[i]);
     let shoal = 0, flow = 0, bad = 0;
     for (let s = 1; s <= 8; s++) {
-      const g = make('drift', s * 7919), f = g.undertow.flow, w = g.world;
+      const g = make('drift', s * 7919), f = g.undertow.flow, w = g.world, locks = new Set(g.locks.tides.map(L => L.chunk)); // S-59 (D-162): a Tide Lock's chunk flows too
       for (let i = 0; i < f.length / 2; i++) {
         const { x, y } = centre(g, i), sp = Math.hypot(f[2 * i], f[2 * i + 1]), inShoal = w.ring(x, y) === 3;
         if (inShoal) shoal++;
         if (!sp) continue;
         flow++;
         const dir = Math.atan2(f[2 * i + 1], f[2 * i]) / (Math.PI / 4);
-        if (!inShoal || sp < UNDERTOW_SPEED[0] - 1e-3 || sp > UNDERTOW_SPEED[0] + UNDERTOW_SPEED[1] + 1e-3 || Math.abs(dir - Math.round(dir)) > 1e-4) bad++;
+        if ((!inShoal && !locks.has(i)) || sp < UNDERTOW_SPEED[0] - 1e-3 || sp > UNDERTOW_SPEED[0] + UNDERTOW_SPEED[1] + 1e-3 || Math.abs(dir - Math.round(dir)) > 1e-4) bad++;
       }
     }
     const share = flow / shoal, old = flowing(make('drift', 4242, 160)).length;
-    check('S-47 undertow: same seed → same currents (another seed differs); only Shoal chunks flow, 30–55 px/s on 8 bearings, ~half calm; none at 160',
+    check('S-47 undertow: same seed → same currents (another seed differs); only Shoal chunks (and Tide Lock chunks, D-162) flow, 30–55 px/s on 8 bearings, ~half calm; none at 160',
       same && differs && bad === 0 && share > 0.35 && share < 0.65 && old === 0, `flowing ${flow}/${shoal} Shoal chunks over 8 seeds (${share.toFixed(2)}), bad ${bad}, 160-world flowing ${old}`);
   }
   // In a current: realized ≠ intended while the intent and target stay zero; a calm chunk adds nothing.

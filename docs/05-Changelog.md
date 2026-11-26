@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.66 — 2026-11-26
+- **Tide Locks — events and puzzles complete (v1.8).** A vault in the Shoal's outer reaches always sits in a current, and
+  its shell only gives to a beam aimed against the flow: cut it from downstream while the Undertow pushes you away. Faint
+  mint chevrons on its upstream side show which way the water runs.
+
 ## v1.7.65 — 2026-11-25
 - **Smoother Scanner ping on phones.** The ping's sweeping ring keeps its amber glow but no longer slows the frame rate
   while it crosses the screen.
