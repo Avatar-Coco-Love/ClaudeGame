@@ -19,6 +19,17 @@ alternatives). D-187 on.
 - Rejected: shipping the 16-seed PASS from hold 3 s (seeds 1001–1016; the 48-seed run fails it); widening the band
   to 1.35 in a Build session; a Surge-only Echo buff (pillar: Drift and Surge are equals).
 
+### D-189 — Q-040 settled: the Drift / Surge band is on Auto's gain; the Echo's added gain has a 1.5 ceiling (session 151)
+- Probe of the lean (a Defend Echo mines while its shot reloads, idle once ready; 48 seeds): Defend gain +0.3–0.7 /min,
+  added gain Drift / Surge L0 1.33 (worse), L2 1.23; Auto / Defend damage 0.94. Shots are 0.45–0.8 s apart and
+  re-targeting eats most of that: it barely mines, so it was **reverted**.
+- **Gate:** Auto gain Drift / Surge in 0.8–1.25 (0.89 / 0.92) stays the equal-modes line (D-158). The added-gain ratio is a
+  difference of noisy means (1.12–1.44 on 16-seed sets) and Surge's Echo spends ~14 % of its time on safety (damage
+  19.3 → 11.3 / 7.5 /min), which Drift has no need of: that safety is counted. It keeps a ceiling ≤ 1.5 so a real drift
+  still fails. In smoke via `echoorder.cjs` (`gates.cjs` SMOKE `echobot.mjs --orders`). M16 done (v1.11).
+- Rejected: mine between shots (above); a Drift-only Echo nerf (punishes the calm mode for Surge's choice); dropping the
+  added-gain line (nothing would catch a large drift); more seeds to squeeze under 1.25 (48 already 4 min).
+
 ### D-188 — Every test's New World is pinned by one helper, and a check enforces it (audit 150)
 - Random New World seeds broke tests twice (B-101 Spire tests, B-103 `lens.cjs`): a rule broken twice gets a check.
   `tests/pinworld.cjs` `newWorld(page, tap, r = 0.42)` fixes Math.random for the click only (D-100's way); 42 test files

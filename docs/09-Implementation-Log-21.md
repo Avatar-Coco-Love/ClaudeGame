@@ -49,3 +49,10 @@ Continues part 20 (it neared the 8 KB cap at session 147). Newest at the bottom;
   42 files converted mechanically, `spire.cjs` `pinnedNewWorld` now wraps it (same 0.42 seed).
 - B-100 closed (unseen since the Spire pin, two audits). `09` sessions 139–143 archived word for word
   (`archive/2026-11-26-09-sessions-139-143.md`), part 19 removed. Workflow review in D-188. No game bug found.
+
+## Session 151 — Build: S-71b, Q-040 settled, the Echo gate in smoke (v1.11.92, D-189; M16 done)
+- Probe of Q-040's lean (Defend mines while its shot reloads, idle once ready; 48 seeds, hold 2 s): Defend gain
+  36.4 / 36.8 → 37.1 / 37.1, damage 13.3 / 8.9; added gain Drift / Surge L0 1.329, L2 1.229. Not ≤ 1.25: reverted.
+- D-189: band on Auto gain Drift / Surge (0.890 / 0.915); added-gain ratio keeps a 1.5 ceiling. Gate on the shipped
+  code, 48 seeds × 5 min: PASS (Auto 0.98 × Mine, 0.83 / 0.67 × Defend damage, share 21 / 29 %), ~4.3 min.
+- `echoorder.cjs` awaits `gates.cjs` run('echobot.mjs', ['--orders']) (in SMOKE, prestarted beside the smoke). No bug.

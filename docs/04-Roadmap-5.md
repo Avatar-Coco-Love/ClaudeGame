@@ -7,7 +7,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-69** (session 145, v1.10.86, D-184) Echo orders Mine / Defend / Auto (Auto: threat → Defend, 2 s hold → Mine); worth-first ore, soonest-threat first.
 - ✅ **S-70** (session 146, v1.10.87, D-185) Echo upgrades in Research (● 165): Focus (mine dps), Volley (fire rate), Tether (reach); format 25.
 - ✅ **S-71a** (session 148, v1.10.89, D-187) `echobot --orders` measure, 48 seeds: all lines pass but added gain Drift / Surge 1.26 / 1.27.
-- **S-71b** settle Q-040, then wire the gate into smoke (`gates.cjs`): Auto ≥ 0.9 × Mine, ≤ 1.1 × Defend's damage; share 15–35 %. **M16 done.**
+- ✅ **S-71b** (session 151, v1.11.92, D-189) Q-040 settled, gate in smoke (`echoorder.cjs`): PASS on 48 seeds. **M16 done.**
 - Cut (D-181): an Attack order, a second Echo (Q-039 no, D-186), levels past 2, a learning Auto, an Echo off its leash.
 
 ## M17 — Hunters (D-182, `07-Build-Specs-20.md`) → v1.12

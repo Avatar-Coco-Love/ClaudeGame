@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.92 — 2026-11-26
+- **M16 Echo minds is complete.** No change in play: the Echo's Auto order is now held to its promise by the game's own
+  checks on every update — it gathers nearly as much as Mine and keeps you as safe as Defend, in Drift and Surge alike.
+
 ## v1.10.91 — 2026-11-26
 - No change in play: the game's own tests now always start the same test world, so a rare unlucky map can no longer
   make a check fail for no reason (audit 150).
