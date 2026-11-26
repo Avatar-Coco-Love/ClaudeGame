@@ -39,3 +39,13 @@ alternatives). D-164 on.
   as TIME lines plus the total: the next speed fix starts from a number (620 → 529 s here).
 - Rejected: running browser files in parallel (wall-clock waits and the frame-time checks would see contention);
   fewer gate seeds (D-155: 8 / 16 are the verdict floors); a separate gate job outside the smoke (main could merge red).
+
+### D-167 — Build 130: the boss gate route (S-60b2, D-165)
+- `runBot` route `boss`: target the lit plate (asleep) or the nearest standing plate (awake), then the core; stand on an
+  open 4-neighbour and beam it, foes first. No retreat (the only heal is the Nexus, ~100 cells off); a death respawns
+  there and the bot paths back. Boss cells joined the bot's walls: a path never digs through the body.
+- `tools/bossrun.mjs`: base max, Heat Sink at core + (2, 0) (within 5 cells of every standing spot), Wards at ± 4,
+  start 12 cells toward the Nexus; lairs, rifts and creatures on, anomalies off. Deaths by cause from the hit's caller.
+- 8 seeds: Drift 0.67 / Surge 0.69 min median, ratio 1.059, 0 deaths (16 seeds 1.033): PASS, no tuning. Smoke gate.
+- Rejected: retreat to heal (a 200-cell round trip would gate the walk, not the boss); a gate-only start next to the
+  body (the spec's 12 cells crosses the wake radius, so the switch to awake is measured).
