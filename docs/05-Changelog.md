@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.75 — 2026-11-26
+- Health check (no gameplay change). The phone layout tests now wait for the camera the right way and run 40 s
+  faster; the dev log was tidied and a probe for stalled test waits was added.
+
 ## v1.8.74 — 2026-11-26
 - **The Gyre wakes in Surge.** Come within 10 cells and every plate can be cut, in any order. It fights back: every
   15 s a mote swarm leaves the lair's edge (two at most), its whirlpool drags you inward, and hugging the body lashes
