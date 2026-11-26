@@ -59,3 +59,22 @@ alternatives). D-164 on.
 - Interim Surge: `BOSS_WAKES` [4] (only the Crucible wakes); S-61b adds 3. Colours per boss: `BOSS_RGB`.
 - Rejected: the key drawn with 'lighter' (mint over the rose plate read white); a separate save entry (`bosses` holds
   { ring, down } per lair already; an older 23 save without the Gyre gets it stamped by S-60a's rule).
+
+### D-169 — Design 132: Crucible embers stay a range threat (Q-033)
+- Play-test (`bossrun.mjs`, 8 seeds, the world as played): max build Surge 77 flare burns, 0 deaths, 0 embers, ratio
+  1.055. Same route at mid build: Surge 7 of 8 deaths by the flare, 137 burns, ratio 1.40; start build: 0 / 8 down.
+  A core set 5 cells out (scripted, Playwright) drew an ember. So the close fighter is already hit (by the flare);
+  the embers cover the ground the flare can't. Two zones, one choice: hug the body (burns) or stand off (embers you pop).
+- No change. Rejected: embers at any range (doubles the close tax the mid build already fails on); a shorter
+  BOSS_EMBER_OUT (same); dropping embers (a stand-off fight would be free).
+- The mid-build line is advice, not a gate (D-167 gates the top build): Q-034, measured for both bosses in S-62.
+
+### D-170 — Design 132: S-61b refined (the Gyre's close threat is the rim)
+- Lesson of D-169: each form needs a close and a far threat. The Gyre's far threat: mote swarms (every 15 s, ≤ 2
+  alive). Close: the rim. A core within `GYRE_RIM_PX` 8 of a standing body cell (any open spot next to the body) takes
+  `BOSS_TOUCH_DMG` 12 and a knockback out into the whirlpool, at most once per `GYRE_TOUCH_CD_S` 4 s (the Crucible's
+  flare rate: ~3 dps, measured safe for a top hull). The inward pull (30 px/s) drags an idle core onto the rim.
+- Gate: `bossrun.mjs --boss=gyre` (route `boss` takes the lair ring), 2 Wards at ± 4, no Heat Sink (no heat in the
+  Shoal); a swarm mote's hit counts as `boss`. Tune order if it misses: swarm gap, then the touch delay, then the pull.
+- Rejected: plain body contact (a held core sits 6 px off the plate and is never touched: the Q-033 trap again); a
+  Crucible-style pulse (two bosses, one fight); touch at the Glitch re-hit 0.9 s (~13 dps, past the flare 4×).

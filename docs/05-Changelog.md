@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.73 — 2026-11-26
+- Design pass on the bosses (no gameplay change). The Crucible's embers stay a threat for a core that stands off; up
+  close its flare is the danger. The Gyre's coming Surge form is planned the same way: mote swarms at range, a rim
+  that lashes a core hugging the body, and a pull that drags you in if you stop steering.
+
 ## v1.8.72 — 2026-11-26
 - New in the Shoal (large worlds): the Gyre, a second boss. Its lair sits in a whirlpool that carries you round it
   clockwise; one plate glows mint and only it can be cut, and the glow steps round the body every second or so. Ride

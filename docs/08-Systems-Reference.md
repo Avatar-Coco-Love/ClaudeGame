@@ -1,6 +1,6 @@
 # 08 — Systems Reference
 
-Per-system detail of what is built, moved word for word from `02` in audit 69 (size cap). `02` keeps one line per system;
+Per-system detail of what is built, moved word for word from `02` in audit 69 (size cap); continued in `08-Systems-Reference-2.md`. `02` keeps one line per system;
 update the line here when a system changes. Decisions live in `06`, specs in `07`.
 
 ## Systems

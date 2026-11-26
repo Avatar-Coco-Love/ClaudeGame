@@ -1,7 +1,7 @@
 # 03 — Open Questions
 
 Undecided only. Once a question is settled, remove it here and record the answer as a D-xxx entry in `06-Decisions.md` (cite the Q number).
-New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158.
+New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169.
 
 | ID | Question | Notes |
 |----|----------|-------|
@@ -15,5 +15,5 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-028 | Should Glitch kills in the Shoal / Kiln drop Tide / Calx (a renewable biome income for Surge, as ◆▲ are now)? | Design 102 (D-134). Leaning **no**: biome ore stays finite in both modes; revisit with Q-007 if a late 256 world runs dry. |
 | Q-029 | Surge at the base max build takes 0 damage anywhere (Glitch tier stops at 3, d 84). Should Glitch tiers go past 3 in the Shoal / Kiln? | Design 107 probe (auto-aim bot, 120 s, 4 seeds). Leaning **no**: M12 biome creatures (D-142) carry the outer threat; revisit after `biomefoe.mjs` at S-54 if Hearth–Deep Surge still feels empty late. |
 | Q-031 | Should a rift (S-57) also show on the Scanner ring or the Chart before it opens (a warning a few seconds ahead)? | Design 117. Leaning **no**: the toast + chevron at open is enough for a 45 s window; revisit if S-57a's bot rarely reaches one in time. |
-| Q-033 | The Crucible embers never fire in the gate (the bot hugs the body, inside the 2.2-cell launch ring): should an ember threaten a core that stays close, or is the flare enough there? | Build 130 (`bossrun.mjs`, D-167). Gate PASS without them; Design 132 to decide with a play-test. |
+| Q-034 | A mid build loses the Surge Crucible fight more (7 flare deaths / 8 seeds, time ratio 1.40; top build 1.06). Should the boss band also hold below the top build? | Design 132 (D-169). Leaning **no** (bosses are late goals; Drift and Surge are equal where the gate is defined); S-62 logs a mid line for both bosses, decide then. |
 | Q-032 | Should a downed boss come back (a harder second form) in the same world? | Design 122 (D-158). Leaning **no**: one fight per world, New Cycle brings a new one; revisit if late 256 play runs out of goals. |

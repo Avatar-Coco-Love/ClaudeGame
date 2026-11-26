@@ -18,14 +18,19 @@ Continues `07-Build-Specs-15.md` (plan D-158, rules there: one body, two forms, 
 - Smoke: site rules; the key steps and keeps damage; only the key cuts; whirlpool only ≤ 6 cells and gone when down;
   Drift = Surge (interim). Probe: mid build takes it apart in ≤ 90 s (log in `09`). Screenshot viewed.
 
-## S-61b — Gyre awake (Surge form) (M14)
+## S-61b — Gyre awake (Surge form) (M14; refined Design 132, D-170)
 **Save:** none new.
-- **Surge:** awake within `BOSS_WAKE_R`: every plate cuts in any order and the key mark is hidden. It hits back: the
-  whirlpool pulls inward too (radial `GYRE_PULL` 30 px/s on top of the 45 tangential), body contact deals
-  `BOSS_TOUCH_DMG` 12 (knockback, as a Glitch hit), and every `GYRE_SWARM_S` 15 s it releases a mote swarm (S-54
-  rules, at most 2 swarms alive). Death: as the Crucible (plates stay broken, the core heals).
-- **Gate:** `bossrun.mjs --boss gyre`, same band and seed count. If it misses: tune the swarm gap first, then the pull.
-- Smoke: any order only in Surge; pull and touch damage only in Surge; swarm cap; gate PASS.
+- **Surge:** `BOSS_WAKES` [3, 4]; awake within `BOSS_WAKE_R`: every plate cuts in any order and the key mark is hidden.
+  Far threat: every `GYRE_SWARM_S` 15 s it releases a mote swarm (S-54 rules, spawned on open floor at the lair edge,
+  at most 2 swarms alive, tagged `swarm`). Close threat, the rim: a core within `GYRE_RIM_PX` 8 of a standing body cell
+  takes `BOSS_TOUCH_DMG` 12 + knockback out into the current, at most once per `GYRE_TOUCH_CD_S` 4 s; the rim sparks
+  mint for the 0.5 s before it can hit again (the tell). The whirlpool also pulls inward (radial `GYRE_PULL` 30 px/s on
+  top of the 45 tangential), so an idle core drifts onto the rim. Death: as the Crucible (plates stay broken, the core heals).
+- **Gate:** route `boss` takes the lair ring; `bossrun.mjs --boss=gyre` (default `crucible`): 2 Wards at ± 4, no Heat
+  Sink; same band, seeds, start; a swarm mote's hit counts as `boss`. Smoke runs both. If it misses: tune the swarm gap
+  first, then the touch delay, then the pull. Log embers-style counts (swarms, rim hits) in the gate line.
+- Smoke: any order only in Surge; pull and rim only in Surge (Drift: no damage, no pull); rim delay; swarm cap; mode
+  switch to Drift clears swarms; gate PASS (both bosses).
 
 ## S-62 — Boss marks and the M14 close-out (→ v1.9)
 **Save:** none new.
@@ -35,5 +40,6 @@ Continues `07-Build-Specs-15.md` (plan D-158, rules there: one body, two forms, 
   require them).
 - **Lairs vs creature gates (D-164):** run `biomefoe.mjs` and the Shoal gate once with `boss: 'on'` on 16 seeds; log
   both lines in `09` (advisory, not a smoke gate). A gap past the band becomes Debt in `04`.
+- **Mid build (Q-034, D-169):** `bossrun.mjs --build=mid` for both bosses, logged in `09` (advice, no gate); settle Q-034.
 - **Close-out:** `VERSION` minor → 1.9, `04-Roadmap-3` M14 ✅, `02` scope line; next milestone needs a design D-xxx.
 - Smoke: Chart shows lairs only at L2; ending line only on 256; sting under ceiling. Screenshot viewed.
