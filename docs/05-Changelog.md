@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.9.79 — 2026-11-26
+- **New: the Lens.** A Nexus row for 40 ▲. Once built, press C (or tap ✧) anywhere outside the Nexus to spend 30 ▲
+  and open a rift nearby right now: the same 45-second ore pocket as a natural rift, from your ring. One call every
+  90 s; it won't open during weather, a Wake, an awake boss or while a rift is open, and a refused call costs nothing.
+
 ## v1.9.78 — 2026-11-26
 - No change in play yet: the next update is planned. Late on, Prisms pile up with nothing to buy, so the Nexus will
   grow a Lens that calls a rift where you stand, for a Prism price, in both modes.

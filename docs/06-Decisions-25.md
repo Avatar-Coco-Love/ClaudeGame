@@ -63,3 +63,13 @@ alternatives). D-171 on.
   a called rift still needs you in the ring); **cutting ▲ density** (the outer rings' look and Spire feeding lean on
   it; late surplus is a sink gap, not a supply bug); **an Anomaly on demand** (a second source for the Temporary
   layer); **feats / goals per world** (open as Q-035: a goals list risks a long shallow list).
+
+### D-176 — S-63 Lens: call state is unsaved; ✧ sits beside ◇ / under the phone row (session 138, Build)
+- The call cooldown (`rift.lastCall`) and a called rift are not saved, as every rift (S-57a): a reload resets the 90 s
+  wait but also drops the open pocket, so it buys nothing. The natural rift skips its slot while a called one is open
+  (no stacking); calls draw sites from `rng['rift-call']` so natural sites never shift (checked).
+- HUD: ✧ joins the ◎ ◇ pair (portrait / desktop); on landscape phones it sits under the row left of ✦ (≥ 701 px) or
+  of ◇ (568–700 px). Probe 320 × 568 … 1280 × 800: no overlap, 44 px. Dim (`.cooling`) whenever a call would be refused.
+- Rejected: saving `lastCall` (a save key for a 90 s timer, while the pocket itself is unsaved); ✧ in the landscape row
+  (pushes ◎ into the bank panel at 568 / 740 px, measured); a refusal toast for "no Lens" (the key does nothing until
+  built, as F before the Scanner).

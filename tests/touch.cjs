@@ -68,17 +68,17 @@ async function browserChecks(browser, url, check, errors, shots) {
     await pg.goto(url); await pg.waitForTimeout(300);
     await intoGame(pg);
     await pg.evaluate(() => { const { game: g, dev } = window.__lumen; dev.setMode('surge'); g.demo = true; g.enemies = [];
-      Object.assign(g.bank, { shard: 8888, prism: 8888, lumen: 8888 }); g.craft.beacon = 3; g.research.echo = true; });
+      Object.assign(g.bank, { shard: 8888, prism: 8888, lumen: 8888 }); g.craft.beacon = 3; g.research.echo = true; g.nexusLevels.lens = 1; });
     await pg.waitForTimeout(250);
     if (shots && vp.width === 568) await pg.screenshot({ path: `${shots}/hud-568x320.png` });
-    const sels = ['.top-left', '#minimap', '#scan-btn', '#mode-btn', '#echo-btn', '#beacon-btn', '#mute-btn', '#menu-btn'], r = {}; // S-43: ◇ too
+    const sels = ['.top-left', '#minimap', '#scan-btn', '#mode-btn', '#echo-btn', '#call-btn', '#beacon-btn', '#mute-btn', '#menu-btn'], r = {}; // S-43: ◇ too
     for (const s of sels) r[s] = await rect(pg, s);
     const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b, overlaps = [];
     for (let i = 0; i < sels.length; i++) for (let j = i + 1; j < sels.length; j++) if (hit(r[sels[i]], r[sels[j]])) overlaps.push(sels[i] + '×' + sels[j]);
     const small = sels.slice(2).filter(s => r[s].w < 44 || r[s].h < 44), shown = sels.every(s => r[s].w > 0), gap = r['#scan-btn'].l - r['.top-left'].r;
-    check(`${vp.width}×${vp.height} landscape, Surge, 4-digit bank, ◎ ⟂ ◇ ✦: no HUD overlap, ◎ ≥ 8 px past the bank, buttons ≥ 44 px (B-034)`,
+    check(`${vp.width}×${vp.height} landscape, Surge, 4-digit bank, ◎ ⟂ ◇ ✧ ✦: no HUD overlap, ◎ ≥ 8 px past the bank, buttons ≥ 44 px (B-034)`,
       shown && !overlaps.length && !small.length && gap >= 8 && Object.values(r).every(x => x.l >= 0 && x.r <= vp.width),
-      JSON.stringify({ overlaps, small, gap, panel: r['.top-left'], scan: r['#scan-btn'], mode: r['#mode-btn'], echo: r['#echo-btn'], beacon: r['#beacon-btn'], mini: r['#minimap'] }));
+      JSON.stringify({ overlaps, small, gap, panel: r['.top-left'], scan: r['#scan-btn'], mode: r['#mode-btn'], echo: r['#echo-btn'], call: r['#call-btn'], beacon: r['#beacon-btn'], mini: r['#minimap'] }));
     await ctx.close();
   }
 
@@ -255,7 +255,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     // Surge: the integrity row makes the bank panel its tallest. Wait for the camera to settle on the core first.
     // Audit 134: the camera rests 36 px ahead of the core (render.js look-ahead), so wait on that spot; a wait on
     // the core itself (< 2 px) could never pass and burned its 5 s timeout at every size (59 of this file's 108 s).
-    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; g.buffs = ['overclock', 'lodestone', 'ballast']; g.research.echo = true; });
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.stats.mined = 50; g.buffs = ['overclock', 'lodestone', 'ballast']; g.research.echo = true; g.nexusLevels.lens = 1; });
     const settled = await pg.waitForFunction(() => { const L = window.__lumen, p = L.game.player, c = L.renderer.cam;
       return Math.hypot(c.x - p.x - Math.cos(p.angle) * 36, c.y - p.y - Math.sin(p.angle) * 36) < 2; }, null, { timeout: 5000 }).then(() => true, () => false);
     await pg.evaluate(() => { document.getElementById('integrity-row').classList.remove('hidden'); window.__lumen.game.notify('destabilized'); }); // the row main.js shows in Surge
@@ -264,7 +264,7 @@ async function browserChecks(browser, url, check, errors, shots) {
       const box = el => { const r = el.getBoundingClientRect(); return { id: el.id || el.className, l: r.left, t: r.top, r: r.right, b: r.bottom }; };
       const vis = el => !el.classList.contains('hidden') && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().width > 0;
       const t = box(document.getElementById('toast')), L = window.__lumen;
-      const hud = ['.top-left', '#minimap', '#mute-btn', '#menu-btn', '#scan-btn', '#mode-btn', '#echo-btn', '#beacon-btn', '#matrix-btn', '#hint']
+      const hud = ['.top-left', '#minimap', '#mute-btn', '#menu-btn', '#scan-btn', '#mode-btn', '#echo-btn', '#call-btn', '#beacon-btn', '#matrix-btn', '#hint']
         .map(s => document.querySelector(s)).filter(vis).map(box);
       // The core sits up to 36 world px (render.js look-ahead) from the screen centre, any direction, + its own 16 px.
       const o = L.renderer.worldToScreen(L.renderer.cam.x, L.renderer.cam.y), k = L.renderer.worldToScreen(L.renderer.cam.x + 52, 0).x - o.x;
@@ -296,7 +296,7 @@ async function browserChecks(browser, url, check, errors, shots) {
     pg.on('pageerror', e => errors.push(`touch ores ${vp.width}: ` + e.message));
     await pg.goto(url); await pg.waitForTimeout(300);
     await intoGame(pg);
-    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.research.echo = true;
+    await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.enemies = []; g.spawnTimer = 1e9; g.craft.beacon = 1; g.research.echo = true; g.nexusLevels.lens = 1;
       g.buffs = ['overclock', 'lodestone', 'ballast']; Object.assign(g.bank, { shard: 2750, prism: 1470, lumen: 141, tide: 359, calx: 477 }); g.stats.lumen = g.stats.tide = g.stats.calx = 1;
       document.getElementById('integrity-row').classList.remove('hidden'); g.notify('destabilized'); });
     for (const large of [false, true]) {
@@ -304,7 +304,7 @@ async function browserChecks(browser, url, check, errors, shots) {
       await pg.waitForTimeout(450);
       const r = await pg.evaluate(() => {
         const out = {};
-        for (const s of ['.top-left', '#toast', '#minimap', '#scan-btn', '#mode-btn', '#echo-btn', '#beacon-btn', '#mute-btn', '#menu-btn', '#matrix-btn', '#hint']) {
+        for (const s of ['.top-left', '#toast', '#minimap', '#scan-btn', '#mode-btn', '#echo-btn', '#call-btn', '#beacon-btn', '#mute-btn', '#menu-btn', '#matrix-btn', '#hint']) {
           const q = document.querySelector(s).getBoundingClientRect(); if (q.width > 0) out[s] = { l: q.left, t: q.top, r: q.right, b: q.bottom };
         }
         out.rows = new Set([...document.querySelectorAll('.bank > span:not(.hidden)')].map(e => Math.round(e.getBoundingClientRect().top))).size;

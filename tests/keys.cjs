@@ -71,7 +71,7 @@ async function browserChecks(browser, url, check, errors, shots) {
   check('S-39 Settings: binding a key another action holds swaps the two', sw.matrix === 'KeyG' && sw.scan === 'KeyE', JSON.stringify(sw));
   await page.click('#keys-reset'); await page.waitForTimeout(50);
   const reset = await page.evaluate(() => JSON.stringify(window.__lumen.settings.keys));
-  check('S-39 Reset keys restores every default', reset === JSON.stringify({ up: 'KeyW', left: 'KeyA', down: 'KeyS', right: 'KeyD', mine: 'Space', matrix: 'KeyE', scan: 'KeyF', beamMode: 'KeyQ', place: 'KeyB', mute: 'KeyM', echoOrder: 'KeyR' }), reset); // S-43 added R
+  check('S-39 Reset keys restores every default', reset === JSON.stringify({ up: 'KeyW', left: 'KeyA', down: 'KeyS', right: 'KeyD', mine: 'Space', matrix: 'KeyE', scan: 'KeyF', beamMode: 'KeyQ', place: 'KeyB', mute: 'KeyM', echoOrder: 'KeyR', call: 'KeyC' }), reset); // S-43 added R, S-63 C
   await page.click('[data-bind="scan"]'); await page.keyboard.press('g'); await page.waitForTimeout(50);
   if (shots) await page.screenshot({ path: path.join(ROOT, 'keys-view.png') });
   await page.keyboard.press('Escape'); await page.waitForTimeout(100); // not capturing now: closes Settings

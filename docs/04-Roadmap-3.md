@@ -55,7 +55,7 @@ before the next starts. VERSION: M10 → 1.5, M11 → 1.6, M12 → 1.7, M13 → 
 - The ending does not ask for the bosses (Q-026 → D-158). Cut: one boss per ring, a roaming boss, unlock rewards.
 
 ## M15 — The Nexus reaches out (D-175, `07-Build-Specs-17.md`) → v1.10
-- **S-63** Lens (Nexus Development, ▲ 40) + Call: ▲ 30 opens a rift where you stand (90 s cooldown; format 24).
+- ✅ **S-63** Lens (Nexus Development, ▲ 40) + Call: ▲ 30 opens a rift where you stand (90 s cooldown; format 24; v1.9.79, D-176).
 - **S-64** Lens gate: call ≤ 1.25× plain mining, net ▲ < 0, Drift = Surge (`eventrun --call`).
 - **S-65** The Nexus draws a ring per structure built; the Lens ring dims on cooldown. **M15 done** after it.
 - Cut (D-175): Gate fast travel, ▲ → biome ore converter, an Anomaly on demand. Open: feats per world (Q-035).

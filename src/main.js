@@ -1,6 +1,7 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, WARD_COST, WARD_STOCK, WARD_MAX, WARD_R, SPIRE_WAKE_S, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, WARD_COST, WARD_STOCK, WARD_MAX, WARD_R, SPIRE_WAKE_S, RIFT_CALL_COST, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
+import { callBlock, callCooldown } from './rift.js';
 import { orderLabel } from './echo.js';
 import { burrowerRumble } from './burrower.js';
 import { canResearch, buyResearch } from './research.js';
@@ -169,7 +170,7 @@ function updateHud() {
   const lumenSeen = seen(g, 'lumen'); // S-10: ● appears once you have held one
   const oreSeen = [seen(g, 'tide'), seen(g, 'calx')]; // S-49: ≈ / ⬟ the same way (never in a 160 world: none there)
   const scanReady = g.scan.cooldown <= 0;
-  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, g.bank.tide, g.bank.calx, oreSeen.join(), total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.sink, g.craft.ward, g.craft.last, !!sinkAt(g), !!wardAt(g), g.ringNow, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught].join('|'); // S-28: the primed hint
+  const key = [g.buffs.join(), g.bank.shard, g.bank.prism, g.bank.lumen, lumenSeen, g.bank.tide, g.bank.calx, oreSeen.join(), total, cap, Math.ceil(g.player.integrity), g.inNexus(), input.usingTouch, g.stats.mined > 0, g.stats.upgrades, panelOpen, !!g.research.scanner, scanReady, unlockedModes(g).length, g.beamMode, g.craft.beacon, g.craft.relay, g.craft.sink, g.craft.ward, g.craft.last, !!sinkAt(g), !!wardAt(g), g.ringNow, primedHere(g), g.mode, !!g.wake, !!g.wakeBlock, !!relayAt(g), endingOpen, g.anomaly.near, !!g.research.echo, orderLabel(g), g.heat > 0.3 && !g.heatState.taught, g.nexusLevels.lens && callBlock(g)].join('|'); // S-28: the primed hint
   if (key !== lastHud) {
     lastHud = key;
     $('bank-shard').textContent = g.bank.shard;
@@ -193,6 +194,9 @@ function updateHud() {
     $('matrix-btn').classList.toggle('hidden', !g.inNexus());
     $('scan-btn').classList.toggle('hidden', !g.research.scanner); // S-11: shown once unlocked, dim while cooling down
     $('scan-btn').classList.toggle('cooling', !scanReady);
+    const lens = !!g.nexusLevels.lens, cb = lens ? callBlock(g) : 'lens'; // S-63: ✧ once the Lens is built, dim while it can't call
+    $('call-btn').classList.toggle('hidden', !lens); $('call-btn').classList.toggle('cooling', !!cb);
+    $('call-btn').title = `Call a rift: ${RIFT_CALL_COST} ▲ (${keys.K('call')})`;
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
     $('mode-btn').title = `Beam: ${BEAM_MODES[g.beamMode].name} (${keys.K('beamMode')} to switch)`;
     $('mode-name').textContent = BEAM_MODES[g.beamMode].name; // S-17: the button names the current mode
@@ -227,7 +231,8 @@ function updateHud() {
     if (ev === 'echo-order') { toast(`Echo: ${orderLabel(g)}`, 1400, NOW); persist(); } // S-43
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
-    if (ev === 'rift-open') toast('A rift opened nearby', 3200, KEEP); // S-57a
+    if (ev === 'rift-open') toast(g.rift.open && g.rift.open.called ? `Rift called — ${RIFT_CALL_COST} ▲` : 'A rift opened nearby', 3200, KEEP); // S-57a, S-63
+    if (ev === 'rift-call') toast(CALL_REFUSAL[g.callResult] ? CALL_REFUSAL[g.callResult](g) : 'No rift can open here', 1800, NOW); // S-63: nothing was spent
     if (ev === 'weather-end') toast(g.weather.was === 'storm' ? 'The storm passes' : 'The aurora fades', 2600, KEEP);
     if (ev === 'anomaly') { const k = ANOMALY_KINDS[g.lastBuff]; toast(`${k.name} — ${k.text} until you deposit`, 3200, KEEP); persist(); } // S-35
     if (ev === 'buffs-end') { buffFlash(g.endedBuffs); persist(); }
@@ -315,6 +320,9 @@ function researchRow(r) {
   });
   return row;
 }
+// S-63: why a Lens call was refused (nothing is spent)
+const CALL_REFUSAL = { nexus: () => 'No rift can open inside the Nexus', open: () => 'A rift is already open', busy: () => 'The caves are too restless to call a rift',
+  cooldown: g => `The Lens recharges — ${callCooldown(g)} s`, prisms: () => `A call needs ${RIFT_CALL_COST} ▲`, site: () => 'No rock here to open a rift in' };
 function upgradeRow(u, lvl, cost, affordable, onBuy, top = u.max) {
   const maxed = lvl >= top;
   const row = document.createElement('div');
@@ -366,7 +374,10 @@ function renderPanel() {
     for (const u of NEXUS_UPGRADES) {
       if (u.kiln && !chartOn(g)) continue; // S-52: no Chart row in a 160 world
       const lvl = g.nexusLevels[u.id];
-      list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => g.buyNexus(u.id)));
+      list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => {
+        const ok = g.buyNexus(u.id); // S-63: the Lens says how to call
+        if (ok && u.id === 'lens') toast(`Lens built — ${input.usingTouch ? 'tap ✧' : 'press ' + keys.K('call')} to call a rift (${RIFT_CALL_COST} ▲)`, 3200);
+        return ok; }));
     }
   } else {
     for (const u of UPGRADES) {
@@ -386,6 +397,7 @@ $('scan-btn').addEventListener('click', () => input.pressed.add('scan'));
 $('mode-btn').addEventListener('click', () => input.pressed.add('beamMode'));
 $('beacon-btn').addEventListener('click', () => input.pressed.add('place'));
 $('echo-btn').addEventListener('click', () => input.pressed.add('echoOrder')); // S-43
+$('call-btn').addEventListener('click', () => input.pressed.add('call')); // S-63
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -469,8 +481,8 @@ function frame(now) {
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
-    const scan = take('scan'), beamMode = take('beamMode'), place = take('place'), echoOrder = take('echoOrder'); // S-16: B / ✦ (and S-43 R / ◇) follow the same rule
-    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place, echoOrder };
+    const scan = take('scan'), beamMode = take('beamMode'), place = take('place'), echoOrder = take('echoOrder'), call = take('call'); // S-16: B / ✦ (and S-43 R / ◇) follow the same rule
+    const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place, echoOrder, call };
     if (!paused && !game.endSeq && !endingOpen) { // S-24: the world holds still under the sequence and the card
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));
