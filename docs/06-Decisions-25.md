@@ -38,3 +38,13 @@ alternatives). D-171 on.
   (7 / 8 by the boss each). Bosses are late goals; the band holds where the gate is defined (max build). Rejected:
   a softer flare / rim at low Beam (a second tuning per build), gating on mid (the max fight would go soft).
 - M14 closes → v1.9. Nothing new without a design D-xxx (D-119): Design 137 picks the next milestone.
+
+### D-174 — The Gyre's glow is stacked strokes, not shadowBlur (session 136, Debt from audit 134)
+- `perf.cjs` gets a `gyre` run (Surge, god, core pinned 3 cells west of seed 77's Gyre: awake, rim tell on, 2 tagged
+  swarms kept out). 1280 × 800, 4× CPU, 15 s: base 31.7 ms mean, shoal 33.2, surge 34.9, gyre 42.1 (p95 66.7);
+  with `drawGyre` skipped 36.8. Its 3 blurred shapes (core ring, hexagon, rim rect) were the ~5 ms.
+- Fix as D-160: each shape is stroked 3 times by `GYRE_GLOW` [[7, 0.15], [4, 0.35], [2, 1]] in 'lighter'; the clip
+  (B-091) went with the blur. After: 38.0 ms mean, p95 50.1. Key plate (Drift) keeps its stroke + fill, now
+  without the blur. Check: `gyre.cjs` mock-ctx draw sets no shadowBlur (fails on the old code).
+- Rejected: a cached glow sprite (the hexagon turns and the rim pulses: a sprite per angle); dropping the glow on
+  L0 only (one look per level is more code for the same win). The Crucible's flare uses the same blur: Debt.
