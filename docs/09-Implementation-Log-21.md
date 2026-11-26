@@ -56,3 +56,11 @@ Continues part 20 (it neared the 8 KB cap at session 147). Newest at the bottom;
 - D-189: band on Auto gain Drift / Surge (0.890 / 0.915); added-gain ratio keeps a 1.5 ceiling. Gate on the shipped
   code, 48 seeds × 5 min: PASS (Auto 0.98 × Mine, 0.83 / 0.67 × Defend damage, share 21 / 29 %), ~4.3 min.
 - `echoorder.cjs` awaits `gates.cjs` run('echobot.mjs', ['--orders']) (in SMOKE, prestarted beside the smoke). No bug.
+
+## Session 152 — Design: Echo play-test, S-72 build-ready (v1.11.93, D-190)
+- Play-test (Playwright, `?dev`, seed 0.42): Drift Deep d 60, Echo Auto mined a Lumen vein beside the core, stayed
+  54–90 px off, no blinks. Surge d 60, 30 s digging: 7 Glitches gave up (D-017) in the rock, 0 contacts, Auto 0 switches.
+  Screenshots viewed: Echo diamond + beam read clearly against the Deep palette.
+- Specs checked against code: `perf.cjs` has no `deep` run (S-72 adds it), `enemies` is emptied in Drift (hunters get
+  their own list), `world.breaks` is a counter (any break rebuilds), rng streams are a fixed list in `game.js`.
+  S-72 rewritten build-ready; S-73 names `game.hunters` / `dev.pincer()`; S-74 reports Auto's Defend share. Q-041 opened. No bug.

@@ -42,3 +42,14 @@ alternatives). D-187 on.
 - Workflow review (D-138): too much: audit Debt lines restating "perf / phone not re-measured" every audit (closed:
   re-measured when a change touches draw cost, `perf.cjs`); too little: shared test helpers (5 of 47 files had the pin).
   B-100 closed: unseen since B-101's pin (audits 144, 150).
+
+### D-190 — S-72 build-ready: hunters in their own list, any break rebuilds, `deep` perf run added (Design 152)
+- Play-test (Playwright, seed 0.42, Surge, Deep d 60, Echo Auto, 30 s digging): 7 Glitches gave up in the rock, none
+  touched the core, Auto never Defended. The Deep's tunnels are safe from beeliners: the gap M17 fills (D-182).
+- **`game.hunters`**, not `game.enemies`: Drift empties `enemies` every frame (`game.js` 262), and hunters live in both
+  modes. `beamFoes` adds them, so beam / Arc / Echo Defend / Auto need no other change. Mode switch keeps them.
+- **Rebuild on any break** (`world.breaks` is one counter; the Echo's rule, D-108), not "a break inside it": 0.08 ms a build.
+- **Perf baseline:** `perf.cjs` had no `deep` run (D-182 named one); S-72 adds `deep` (Surge d 60) and `hunt` beside it.
+- Spawn off screen by the camera rect, streams `tracer` / `pincer` added to the list (D-025). Tracer 0.8 × Glitch speed
+  stays below the core's (Q-041). Rejected: hunters in `enemies` with a Drift exception (every Drift clear would need it);
+  a dirty-region rebuild (a counter is all `world` keeps, and the build is cheap); comparing `hunt` to `surge` (Veil d 30, other cost).
