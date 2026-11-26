@@ -71,9 +71,13 @@ export function drawLightGlow(r, ctx, left, top, vw, vh) {
   x0 = Math.max(x0, left); y0 = Math.max(y0, top); x1 = Math.min(x1, left + vw); y1 = Math.min(y1, top + vh);
   const k = r.zoom * r.dpr / GLOW_DOWN, lw = Math.ceil((x1 - x0) * k) + 1, lh = Math.ceil((y1 - y0) * k) + 1;
   const L = r.glowLayer || (r.glowLayer = document.createElement('canvas'));
-  if (L.width < lw || L.height < lh) { L.width = Math.max(L.width, lw); L.height = Math.max(L.height, lh); }
+  // B-104: the layer keeps a 1-texel margin past lw × lh and is cleared whole every frame. Clearing only lw × lh left
+  // stale texels from an earlier, larger box just past the source rect, and mobile GPUs sample about one texel past it in
+  // the unsmoothed blit: faint lines flickered on the right / bottom edge of a Relay pool while the camera moved.
+  if (L.width < lw + 1 || L.height < lh + 1) { L.width = Math.max(L.width, lw + 1); L.height = Math.max(L.height, lh + 1); }
+  r.glowSize = [lw, lh]; // tests (glow.cjs)
   const g = L.getContext('2d');
-  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, lw, lh);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, L.width, L.height);
   g.globalCompositeOperation = 'lighter'; g.setTransform(k, 0, 0, k, -x0 * k, -y0 * k);
   for (const set of r.lightSets) for (const e of set) {
     const R = e.r, rgb = e.glow || GLOW_RGB;
