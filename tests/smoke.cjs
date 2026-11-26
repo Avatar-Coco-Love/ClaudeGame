@@ -87,6 +87,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await require('./rift.cjs').nodeChecks(check).catch(e => check('S-57a rift checks ran', false, e.message));
   await require('./lens.cjs').nodeChecks(check).catch(e => check('S-63 Lens checks ran', false, e.message));
+  await require('./nexusview.cjs').nodeChecks(check).catch(e => check('S-65 Nexus rings checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
   await require('./keys.cjs').nodeChecks(check).catch(e => check('S-39 keys checks ran', false, e.message));
@@ -408,6 +409,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('mote', () => require('./mote.cjs').browserChecks(browser, url, check, errors, process.env.MOTE_SHOT).catch(e => check('S-54 mote browser checks ran', false, e.message)));
     await T('rift', () => require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message)));
     await T('lens', () => require('./lens.cjs').browserChecks(browser, url, check, errors, process.env.LENS_SHOT).catch(e => check('S-63 Lens browser checks ran', false, e.message)));
+    await T('nexusview', () => require('./nexusview.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-65 Nexus rings browser checks ran', false, e.message)));
     await T('lock', () => require('./lock.cjs').browserChecks(browser, url, check, errors, process.env.LOCK_SHOT).catch(e => check('S-58 lock browser checks ran', false, e.message)));
     await T('tidelock', () => require('./tidelock.cjs').browserChecks(browser, url, check, errors, process.env.TIDE_SHOT).catch(e => check('S-59 tide lock browser checks ran', false, e.message)));
     await T('boss', () => require('./boss.cjs').browserChecks(browser, url, check, errors, process.env.BOSS_SHOT).catch(e => check('S-60a boss browser checks ran', false, e.message)));

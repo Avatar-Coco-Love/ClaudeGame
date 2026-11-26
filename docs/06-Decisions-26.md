@@ -31,3 +31,14 @@ alternatives). D-177 on.
 - Rejected: cost 40 (it gates the first calls on the bank, not the rate: Kiln's excess is the call rate); net value
   (spent ▲ taken off: Kiln 1.01, would pass at 90 s but hides that ▲ is cheap to the bot); a separate `lensrun.mjs`
   (`eventrun` is 100 lines and shares the pad, detour and bot).
+
+### D-179 — S-65 Nexus rings: unblurred hexagons outside the three, built order (session 141, Build)
+- `nexusview.js`: one 1.25 px hexagon per structure built (Radiance / Chart / Lens, any level), 78 px out then +16 px
+  (half a cell) in that order, so the rings pack with no gaps when the Chart is absent (a 160 world). Alpha 0.75; Lens
+  0.22 while `callCooldown` > 0 (other blocks, like "rift already open", don't dim it: cooldown is the spec's tell).
+  `shadowBlur` 0 inside the 'lighter' pass; the existing blurred clip box (112 px) stays as it was.
+- Purchase flash: `game.nexusFlash` 1 → 0 over 0.5 s (any Nexus row, off with reduced motion), a white hexagon from the
+  outermost ring. Radiance keeps its light sweep too; the core's S-4 ring stays Core Matrix / Research only.
+- Perf: +3 strokes at most (smoke counts them, none blurred); `perf.cjs` home builds no structure, so it is unchanged.
+- Rejected: fixed slots per structure (gaps in a 160 world read as missing), rings inside the 62 px one (crowded by
+  the cycle hue), level ticks per Radiance level (the Nexus panel shows levels already), a blurred glow (D-160).

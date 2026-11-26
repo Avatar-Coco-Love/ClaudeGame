@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.82 — 2026-11-26
+- **The Nexus reaches out (v1.10).** The Nexus now wears what you've built: a thin cyan ring for Radiance, a mint one for
+  the Chart and a violet-white one for the Lens. The Lens ring dims while a call recharges and brightens when you can
+  call again, and buying a Nexus upgrade sends a white ring out from the Nexus itself.
+
 ## v1.9.81 — 2026-11-26
 - **Lens tuned:** a rift can be called once every 150 s (was 90 s). Tested over many runs in Deep, Shoal and Kiln:
   calling on every cooldown now earns at most about a quarter more ore than plain mining, and always costs more ▲

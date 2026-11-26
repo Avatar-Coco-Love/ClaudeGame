@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.9.81';
+export const VERSION = '1.10.82';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -441,3 +441,9 @@ export const SWARM_N = 6, SWARM_FIRST_S = 20, SWARM_EVERY_S = [40, 20], SWARM_SP
 export const MOTE_R = 4, MOTE_HP = 2, MOTE_SPEED = 150, MOTE_STEER = 4, MOTE_COHESION = 0.6, MOTE_DMG = 4, MOTE_PREY_R = 6;
 export const MOTE_FIELD = 20; // cells: the BFS field the swarm flies in by (and spawns on)
 export const MOTE_TAKE = 1, MOTE_SCATTER = 3, MOTE_SCATTER_S = 1.2, MOTE_LOOT = 1, MOTE_TRAIL = 5, MOTE_RGB = '150, 255, 200'; // mint
+
+// S-65 (D-179): the Nexus grows on screen. One thin outer hexagon per Nexus Development structure built (Radiance, Chart,
+// Lens), from NEXUS_RING_BASE px out at NEXUS_RING_STEP (half a cell) steps, strokes only (no blur, D-160). A Lens on
+// cooldown draws at NEXUS_RING_DIM; a Nexus purchase plays the S-4 upgrade ring at the Nexus for NEXUS_FLASH_S.
+export const NEXUS_RING_BASE = 78, NEXUS_RING_STEP = 16, NEXUS_RING_ALPHA = 0.75, NEXUS_RING_DIM = 0.22, NEXUS_FLASH_S = 0.5;
+export const NEXUS_RING_RGB = { radiance: '46, 242, 255', chart: '150, 255, 200' }; // cyan, mint; Lens uses RIFT_RGB

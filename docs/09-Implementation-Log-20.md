@@ -10,3 +10,11 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   mine −35…−75 / run, Drift / Surge 0.97–1.05). The bot makes 2–3.4 calls / 10 min at 150 s (bank-limited early).
 - Observed: calls trade ◆ for ▲ / ● / biome ore (Kiln ⬟ 1.4 → 2.9 / min Surge), so the value ratio is mostly the
   ≈ / ⬟ weight 12. Kiln Surge 1.226 is close to the cap: a later pocket buff must re-run the gate.
+
+## Session 141 — Build: S-65 Nexus rings, M15 done (v1.10.82, D-179)
+- `src/nexusview.js` (`nexusRings`, `drawNexusRings`), called from `drawNexus` after the blurred rings; `game.nexusFlash`.
+- `tests/nexusview.cjs` (in smoke): 0 → 3 rings in order, half a cell apart, own hues; a 2nd Radiance level adds none;
+  Lens dim on cooldown, bright after; flash at the Nexus never the core, none with reduced motion; browser: +3 strokes,
+  no new blurred stroke. Screenshot viewed (all three built): rings read clearly at 1280×800, Lens outermost.
+- Observed: the hexagons rotate slowly in alternate directions, pulse with the Nexus; inside the deposit ring (176 px).
+- No bugs found.
