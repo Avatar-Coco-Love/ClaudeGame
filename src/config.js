@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.9.76';
+export const VERSION = '1.9.77';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -407,6 +407,8 @@ export const BOSS_WAKE_R = 10, BOSS_SURGE_FLARE_S = 4, BOSS_FLARE_DMG = 10, BOSS
 // sparks for the last GYRE_RIM_TELL_S); the whirlpool also pulls inward at GYRE_PULL px/s.
 export const GYRE_RING = 3, GYRE_R = 6, GYRE_SPEED = 45, GYRE_STEP_S = 1.2, GYRE_RGB = '120, 255, 200', BOSS_WAKES = [3, 4];
 export const GYRE_SWARM_S = 15, GYRE_SWARMS = 2, GYRE_RIM_PX = 8, BOSS_TOUCH_DMG = 12, GYRE_TOUCH_CD_S = 4, GYRE_RIM_TELL_S = 0.5, GYRE_PULL = 30;
+// Session 136 (D-174): the rim tell's glow as stacked strokes [lineWidth px, alpha ×] (was shadowBlur 12 over a 4-cell box).
+export const GYRE_RIM_GLOW = [[10, 0.15], [6, 0.3], [2, 1]];
 export const BOSS_RGB = { 3: GYRE_RGB, 4: BOSS_KEY_RGB };
 export const BOSS_CHART_ALPHA = 0.35; // S-62: an unseen lair's minimap octagon at Chart level 2 (faint)
 // S-53 Burrower (D-142, D-145, burrower.js): the Kiln creature, 256 worlds only, one at a time while the core is in the Kiln.

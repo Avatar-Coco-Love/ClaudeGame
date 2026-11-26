@@ -8,7 +8,7 @@
 // GYRE_RIM_PX of a standing body cell takes BOSS_TOUCH_DMG and a knockback outward, once per GYRE_TOUCH_CD_S; the body's
 // outline sparks mint for the GYRE_RIM_TELL_S before it can hit again. The whirlpool also pulls inward (GYRE_PULL).
 import { CELL, T, LAIR_HALF, GYRE_RING, GYRE_R, GYRE_SPEED, GYRE_STEP_S, GYRE_RGB, GYRE_SWARM_S, GYRE_SWARMS, GYRE_RIM_PX,
-  BOSS_TOUCH_DMG, GYRE_TOUCH_CD_S, GYRE_RIM_TELL_S, GYRE_PULL } from './config.js';
+  BOSS_TOUCH_DMG, GYRE_TOUCH_CD_S, GYRE_RIM_TELL_S, GYRE_PULL, GYRE_RIM_GLOW } from './config.js';
 import { PLATES, bossAwake } from './boss.js';
 import { spawnSwarm } from './mote.js';
 
@@ -106,21 +106,28 @@ export function drawGyre(r, ctx, B, still) {
   }
   ctx.stroke();
   r.gyreDashes = n; // tests read the count
-  const m = 2 * CELL + r.glowPad(12);
+  // Session 136 (D-174): only the small core ring + hexagon are blurred, clipped to their own reach (0.4 cell); the rim tell is
+  // stacked strokes (D-160 rule) and the key plate is unblurred, so the blur box is ~0.9 cell wide instead of 4 + pad.
+  const m = 0.4 * CELL + r.glowPad(12);
+  r.gyreGlowBox = 2 * m; // tests read the blurred box side (px, world)
+  ctx.save();
   ctx.beginPath(); ctx.rect(cx - m, cy - m, m * 2, m * 2); ctx.clip(); // a blur in 'lighter' is clipped to its reach (B-091)
   ctx.globalCompositeOperation = 'lighter';
-  ctx.strokeStyle = ctx.shadowColor = ctx.fillStyle = `rgb(${GYRE_RGB})`; ctx.shadowBlur = 12; ctx.lineJoin = 'round';
+  ctx.strokeStyle = ctx.shadowColor = `rgb(${GYRE_RGB})`; ctx.shadowBlur = 12; ctx.lineJoin = 'round';
   const pulse = still ? 1 : 0.7 + 0.3 * Math.sin(r.time * 1.6), turn = still ? 0 : r.time * 0.9;
   ctx.lineWidth = 2; ctx.globalAlpha = 0.6 * pulse;
   ctx.beginPath(); ctx.arc(cx, cy, CELL * 0.4, 0, Math.PI * 2); ctx.stroke();
   ctx.beginPath();
   for (let k = 0; k < 6; k++) { const a = turn + k * Math.PI / 3; ctx[k ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * CELL * 0.24, cy + Math.sin(a) * CELL * 0.24); }
   ctx.closePath(); ctx.stroke();
+  ctx.restore();
+  ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = ctx.fillStyle = `rgb(${GYRE_RGB})`;
   r.gyreRim = false;
   if (B.awake && B.touch <= GYRE_RIM_TELL_S) { // S-61b tell: the body's outline sparks before the rim can hit again
     r.gyreRim = true;
-    ctx.globalAlpha = still ? 0.8 : 0.55 + 0.45 * Math.sin(r.time * 24) ** 2; ctx.lineWidth = 2;
-    ctx.strokeRect((B.x - 1) * CELL - 3, (B.y - 1) * CELL - 3, 3 * CELL + 6, 3 * CELL + 6);
+    const a = still ? 0.8 : 0.55 + 0.45 * Math.sin(r.time * 24) ** 2, x = (B.x - 1) * CELL - 3, y = (B.y - 1) * CELL - 3, s = 3 * CELL + 6;
+    for (const [lw, k] of GYRE_RIM_GLOW) { ctx.globalAlpha = a * k; ctx.lineWidth = lw; ctx.strokeRect(x, y, s, s); }
   }
   const [i, j] = PLATES[B.lit], lp = still ? 1 : 0.6 + 0.4 * Math.sin(r.time * 5);
   if (!B.awake && w.get(B.x + i, B.y + j) === T.BOSS_PLATE) { // awake (S-61b) every plate cuts: no key mark
