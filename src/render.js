@@ -25,6 +25,7 @@ import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
 import { drawMotes } from './mote.js';
 import { drawArcs } from './arc.js';
+import { drawNexusRings } from './nexusview.js';
 
 const CHUNK_PX = CHUNK * CELL;
 const MAX_CACHED_CHUNKS = 48; // at k = 1; audit 84: scaled by 1/k² (chunk canvases are pre-scaled), never under what one view needs
@@ -258,6 +259,7 @@ export class Renderer {
       ctx.stroke(); ctx.restore();
     }
     ctx.restore();
+    drawNexusRings(ctx, this.game, t, pulse); // S-65: one thin unblurred hexagon per Nexus structure built
     const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
     grd.addColorStop(0, 'rgba(255,255,255,0.95)'); grd.addColorStop(0.4, `rgba(${hue},0.6)`); grd.addColorStop(1, `rgba(${hue},0)`);
     ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.fill();

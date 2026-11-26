@@ -1,6 +1,6 @@
 // Simulation: the core (player), beam, pickups, deposit, particles. Glitches: glitch.js; grid movement: body.js.
 // State flow mirrors the old movement lab lesson: intent -> target velocity -> collision-resolved realized velocity.
-import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, matrixCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, HEATSINK_STOCK, WARD_STOCK, RELAY_STREAK_PX,
+import { WORLD_SIZE_NEW, CELL, NEXUS_RADIUS, NEXUS_HEAL, GLITCH_FIRST_SPAWN_S, HITSTOP_S, HITSTOP_GAP_S, PICKUP_CAP, CORE_RING_S, NEXUS_FLASH_S, MATERIAL, RINGS, UPGRADES, NEXUS_UPGRADES, matrixCost, T, VAULT_LOOT, KINDS, emptyKinds, RESOURCE, BEAM_MODES, BEACON_STOCK, RELAY_STOCK, HEATSINK_STOCK, WARD_STOCK, RELAY_STREAK_PX,
   PLAYER_ACCEL, PLAYER_R, PARTICLE_CAP, CORE_REVEAL, SPAWN_OFFSET, ATTRACT_PULL, PICKUP_SETTLE_S, DEPOSIT_TICK_S, HURT_INVULN_S, HURT_KNOCKBACK,
   RESPAWN_INVULN_S, RESPAWN_CLEAR_PX, NEXUS_HUES } from './config.js';
 import { World, packBits, unpackBits, seededStream } from './world.js';
@@ -122,6 +122,7 @@ export class Game {
     this.ringsSeen = new Set([this.ringNow]);
     this.audio.setRing(this.ringNow);
     this.nexusPulse = 0; // 1 -> 0 after a Nexus Development purchase (ring burst in render.js)
+    this.nexusFlash = 0; // S-65: 1 -> 0 after any Nexus purchase (the S-4 upgrade ring, at the Nexus; nexusview.js)
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
     if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
     if (this.ended && Number.isFinite(this.endedAt) && !(this.records.cycles && this.records.cycles[this.cycle])) recordCycle(this); // B-058: ended before records existed
@@ -149,6 +150,7 @@ export class Game {
     this.stats.upgrades++;
     this.audio.upgrade();
     this.burst(this.nexus.x, this.nexus.y, 70, '#ffffff', 420);
+    if (this.motionOn()) this.nexusFlash = 1; // S-65: the upgrade ring plays at the Nexus, not the core
     if (id !== 'radiance') return true; // S-52 Chart: no light, no sweep
     this.revealQueue.push(...this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()));
     this.nexusPulse = 1;
@@ -264,6 +266,7 @@ export class Game {
     this.shake = Math.max(0, this.shake - dt * 30);
     this.nexusPulse = Math.max(0, this.nexusPulse - dt * 1.4);
     this.coreRing = Math.max(0, this.coreRing - dt / CORE_RING_S);
+    this.nexusFlash = Math.max(0, this.nexusFlash - dt / NEXUS_FLASH_S);
     const newly = this.world.reveal(p.x, p.y, CORE_REVEAL);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
     if (newly.length && markSpiresSeen(this, newly)) this.spireFound(); // S-27: first sight of a Spire (either mode)

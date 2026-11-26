@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 140** · **Version: v1.9.81** (session 140: Build; rotation: 141 Build, 142 Design, 144 Audit).
-**Scope (D-119, `01`):** M1–M14 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, D-173). **M15 The Nexus reaches out** (D-175, → v1.10): a recurring ▲ sink, S-63…S-65 in `07-Build-Specs-17.md`. Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-26_ · **Session counter: 141** · **Version: v1.10.82** (session 141: Build; rotation: 142 Design, 143 Build, 144 Audit).
+**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, v1.10 = M15 Nexus reaches out: Lens ▲ sink + rings, D-175…D-179). M16: not yet planned (Design 142). Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -12,6 +12,7 @@ _Last updated: 2026-11-26_ · **Session counter: 140** · **Version: v1.9.81** (
   Overdrive (S-50, D-140): a 256 world adds 2 levels past each max (`over`, `OVERDRIVE_COST` ◆ + ≈ + ⬟, `Game.topLevel`).
 - Nexus tab: Radiance (5 levels, ▲, D-009): +96 px light / level. Chart (S-52, D-143, `chart.js`, 256 only): L1 ≈24 ▲10 minimap current arrows (explored Shoal chunks), L2 ⬟24 ▲10 seen vents, bright in the tell.
   Lens (S-63, D-176, ▲ 40, all sizes): C / ❖ (D-177) calls a rift for ▲ 30 (150 s cooldown, unsaved; own site stream). Gate S-64 PASS (D-178, `eventrun --call`). `08-…-2`.
+  Rings (S-65, D-179, `nexusview.js`): one unblurred hexagon per structure built, Lens dim on cooldown; a Nexus buy flashes at the Nexus.
 - Modes: Drift (calm) and Surge (Glitches that chase you, contact damage, cargo scatters where you fall and can be recovered, the Nexus repels Glitches and heals you).
   A Glitch stuck 6 s fades out (D-017); kills drop a Prism half the time (D-018).
   Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
@@ -39,13 +40,13 @@ _Last updated: 2026-11-26_ · **Session counter: 140** · **Version: v1.9.81** (
 - Darkness/light, minimap (D-123), Nexus pointer, toasts, audio ceilings (`audio.cjs`). `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 24); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 26 from D-177; last D-178), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-20`; 129–133 archived in audit 139), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 26 from D-177; last D-179), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-20`; 129–133 archived in audit 139), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-64 built (M14 done, `07-…-15/16`, D-158). Next: S-65 Nexus look (`07-…-17`). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-65 built (M15 done, `07-…-17`). Next specs: Design 142. Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166; Lens gate `eventrun --call` ~95 s). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
   Swallowed test waits: `node -r ./tools/waitprobe.cjs` (D-172).
 
 ## Next step (one thing)
-Session 141 (Build): S-65 the Nexus grows on screen (`07-Build-Specs-17.md`); M15 done after it. Then 142 (Design).
+Session 142 (Design): play-test v1.10, re-read Q-032 / Q-035, choose M16 in `04` and spec its first 3–5 slices (new `07-Build-Specs-18.md`). Then 143 (Build).
