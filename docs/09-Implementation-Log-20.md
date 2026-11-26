@@ -27,3 +27,16 @@ Continues part 19 (it neared the 8 KB cap at session 139). Newest at the bottom;
   (~7 cells each side): a Spire + lair route of ~1.5k cells charts roughly a third, so `FEAT_CHART` starts at 0.35 and
   S-67 measures it. Anomaly sites recharge (300 s), so "every site" can't be derived: the feat is every *kind* (3).
 - Q-032 / Q-035 / Q-036 closed (D-180); Q-037 opened. Specs `07-Build-Specs-18.md`. No code change; no bugs found.
+
+## Session 143 — Inbox: owner asks for Echo modes / upgrades and smarter enemies (v1.10.84, D-181, D-182)
+- Inbox `2026-11-26-owner-feedback-echo-enemies.md` → `archive/`. Read against the code: the Echo has Gather / Guard
+  (`echo.js`), picks the nearest ore, fixed numbers; Guard already hits Burrowers / Motes, so "Guard (idle)" in Drift
+  was stale wording. Glitches beeline and fade (D-017); Echo and Motes each build their own BFS field.
+- **Adopted:** Mine / Defend / Auto (Auto = threat rule + 2 s hold, worth-first ore, soonest threat first; S-69);
+  Echo upgrades Focus / Volley / Tether in Research, ● 165 (S-70); an `echobot --orders` gate (S-71). Hunters: one
+  shared flow field (`flow.js`), the Tracer (tunnels, trail tell) and the Pincer pair (bounded A* intercept), both
+  modes with Surge / Drift faces, a gate (S-72…S-74). Order: M16 Echo, M17 Hunters, Feats → M18 (D-181).
+- **Rejected:** Feats first; an Attack order or a second Echo (Q-039); a learning Auto; per-enemy A* each frame;
+  reworking Glitches now (no play-test says they feel dumb; Q-038 asks after S-74); Surge-only hunters.
+- Q-022 closed (D-181); Q-038 / Q-039 opened. Specs `07-Build-Specs-19.md` / `-20.md`, roadmap `04-Roadmap-5.md`.
+  No code change; no bugs found.

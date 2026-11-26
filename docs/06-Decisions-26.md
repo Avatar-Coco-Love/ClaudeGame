@@ -58,3 +58,5 @@ alternatives). D-177 on.
 - Rejected: per-mode feats (pillar 2); feats that pay (an unlock twice, or Surge-first rewards); a Feats tab (a 5th tab
   for a list of 6; the Nexus tab is where the vertices are); "every Spire" (the ending already asks it); "both modes
   used" (pushes a Drift player into Surge); a Lumen Research sink; a 6th ring / bigger world (Q-025 perf, save size).
+
+Continued in `06-Decisions-27.md` (D-181 on).

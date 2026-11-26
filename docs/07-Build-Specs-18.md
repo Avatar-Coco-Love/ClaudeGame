@@ -1,6 +1,6 @@
 # 07 — Build Specs, part 18: M16 Feats — the world remembers (D-180)
 
-Plan in D-180 (Design 142). One slice per PR (D-063), each usable end to end (D-139). VERSION: M16 → 1.11.
+Plan in D-180 (Design 142). **Renumbered M18 (→ v1.13) by D-181**: the owner's Echo / hunter ask goes first. One slice per PR (D-063), each usable end to end (D-139). VERSION: M16 → 1.11.
 **Why:** after M15 a maxed late player has calls to spend ▲ on, but nothing says what is left to *do* in this world
 (Q-032's "out of goals", Q-035). Feats are a short fixed list of world goals that pay nothing: no layer unlocks
 anything twice, no mode earns more. At most **6** (one per vertex of the Nexus hexagon, S-68); the list never grows
