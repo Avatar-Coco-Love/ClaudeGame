@@ -49,7 +49,8 @@ Today the Echo (S-42/43, `echo.js`) has Gather / Guard, fixed numbers and picks 
   miner; under 15 % reopens Q-039). On a fail tune `ECHO_AUTO_HOLD`, then Focus (log each try in `09`). In `gates.cjs`.
 - Design 147 probe (16 seeds, before any tuning) already passes: Auto 0.97–0.99 × Mine, damage 1.02 / 0.83 × Defend;
   share Drift 23 / 29 %, Surge 17 / 22 % (L0 / L2). So S-71 is likely a gate with no tuning.
-- **M16 done** after S-71 passes.
+- Session 148 (D-187): split. S-71a = the measure (48 seeds, built); S-71b = the gate in smoke, after Q-040.
+- **M16 done** after S-71b passes.
 
 ## Cut (D-181)
 An Attack order, a second Echo (Q-039), upgrades past level 2, a learning Auto or weight sliders, an Echo that leaves

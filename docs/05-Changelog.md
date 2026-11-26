@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.10.89 — 2026-11-26
+- No change in play: a test bot now measures every Echo order in both modes over 48 worlds. It found the Echo adds a
+  little more ore in Drift than in Surge (where it spends time shooting for you), so that balance is up for a decision.
+
 ## v1.10.88 — 2026-11-26
 - No change in play: a design pass measured the Echo (it adds about a quarter to what you haul, and Auto mines as much
   as Mine while taking no more hits than Defend) and sharpened the plans for its test and for the coming hunters.

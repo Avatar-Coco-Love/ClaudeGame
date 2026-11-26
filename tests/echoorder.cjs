@@ -157,6 +157,13 @@ async function nodeChecks(check) {
       s.echoOrder === 'guard' && back === 'guard' && !!up && up.v === SAVE_FORMAT && fromOld === 'gather' && bad === 'gather',
       JSON.stringify({ saved: s.echoOrder, back, upV: up && up.v, fromOld, bad }));
   }
+  { // S-71a (D-187): the --orders measure runs every row and gives no verdict on too few seeds (the gate waits on Q-040)
+    const { ordersGate } = await import('../tools/echobot.mjs');
+    const r = ordersGate(1, 0.25), keys = Object.keys(r.rows);
+    check('S-71a echobot --orders: 10 rows (Surge none / Mine / Defend / Auto, Drift none / Auto × L0, L2), Auto switches counted, no verdict on 1 seed',
+      keys.length === 10 && keys.every(k => Number.isFinite(r.rows[k].gain) && Number.isFinite(r.rows[k].dmg)) &&
+      r.rows['surge auto L0'].sw > 0 && /no verdict/.test(r.lines.at(-1)), r.lines.slice(-3).join(' | '));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
