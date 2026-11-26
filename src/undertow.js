@@ -2,8 +2,9 @@
 // eases from the one it had to its chunk's over UNDERTOW_EASE_S (no snap at borders) and adds to the realized velocity
 // before collision (game.js); the intent and target velocity never see it (pillar 5). Pickups drift at UNDERTOW_PICKUP.
 // Same in Drift and Surge; Glitches and the Echo ignore it. `off` is a tools/tests flag (tools/haulrun.mjs).
-import { CELL, CHUNK, UNDERTOW_RING, UNDERTOW_CALM, UNDERTOW_SPEED, UNDERTOW_EASE_S, UNDERTOW_PICKUP, UNDERTOW_DASHES, UNDERTOW_RGB } from './config.js';
+import { CELL, CHUNK, LOCK_TIDE_MIN, UNDERTOW_RING, UNDERTOW_CALM, UNDERTOW_SPEED, UNDERTOW_EASE_S, UNDERTOW_PICKUP, UNDERTOW_DASHES, UNDERTOW_RGB } from './config.js';
 import { seededStream } from './world.js';
+import { tideSites } from './lock.js';
 
 /** Per-chunk flow (px/s) for a world: Float32Array pairs [vx, vy], zero outside the Shoal and in calm chunks. */
 export function undertowField(world) {
@@ -14,6 +15,10 @@ export function undertowField(world) {
     if (calm || world.ring(cx, cy) !== UNDERTOW_RING || world.profile.rings <= UNDERTOW_RING) continue;
     const a = dir * Math.PI / 4;
     flow[i * 2] = Math.cos(a) * sp; flow[i * 2 + 1] = Math.sin(a) * sp;
+  }
+  for (const L of tideSites(world)) { // S-59 (D-162): a Tide Lock's chunk is never calm
+    const k = L.chunk * 2;
+    if (!flow[k] && !flow[k + 1]) { flow[k] = L.hx * LOCK_TIDE_MIN; flow[k + 1] = L.hy * LOCK_TIDE_MIN; }
   }
   return flow;
 }

@@ -55,3 +55,13 @@ alternatives). D-158 on.
 - Rejected: pushing on to 3 after the summary (the 200k cap is the owner's, D-136, and the summary hides how close it
   is); asking subagents for shorter replies only (the cost was the subagent's own context, not its reply); lowering the
   standard run to 2 PRs for good (most runs do not compact; one data point).
+
+### D-162 — S-59 Tide Lock as specced; the hit's direction is the core's line (session 125, build; D-152)
+- An outer vault centred in the Shoal (`TIDE_RING`) is a Tide Lock (`lock.js` `tideSites`, one `rng['tidelock']` heading
+  draw per vault index). `undertow.js` gives its chunk a current: a calm draw becomes `LOCK_TIDE_MIN` 40 px/s on that
+  heading; a drawn current is kept, also when the chunk's centre lies just outside the Shoal (`undertow.cjs` allows it). The shell takes a hit (× 1) only when it points against the flow (dot < −0.5).
+- Direction of a hit: core centre → cell centre (beam, Wide, Arc, Pulse, Shatter); the Echo passes its own aim
+  (`world.hit(x, y, amt, dir)`). Other angles spark grey (`quenched`). Same in both modes; seed-only, unsaved.
+- Probe (top build holding station 6 cells downstream): 3.60 s vs a plain vault's 3.60 s (1.00×; ≤ 2× PASS).
+- Rejected: × 1.5 against the flow (no need: the rule is the cost, not time); per-ray aim for Wide (offsets of a few
+  degrees never cross the 120° cone's edge in practice); chevrons on every shell cell (hides which side is upstream).

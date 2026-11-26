@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.7.65';
+export const VERSION = '1.8.66';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -382,6 +382,9 @@ export const VENT_RGB = '255, 232, 205'; // warm white: the vent hexagon and its
 // 3 s × 2 meets the ≤ 2× time-to-open probe, D-159). The window opens with a flare: a core within VENT_R cells of the 7×7
 // footprint is shoved out and gains VENT_HEAT. Seed-only, unsaved.
 export const LOCK_SOFT_S = 3, LOCK_SOFT_MUL = 2, LOCK_RGB = '255, 150, 60', LOCK_SPARK = '#8a8f96'; // orange tell / dull grey spark
+// S-59 Tide Lock (D-162, lock.js): an outer vault centred in the Shoal. Its chunk always flows (a calm draw becomes LOCK_TIDE_MIN
+// px/s along a seeded heading); its shell takes beam damage only when the hit points against that flow (dot < LOCK_TIDE_DOT).
+export const LOCK_TIDE_MIN = 40, LOCK_TIDE_DOT = -0.5;
 // S-53 Burrower (D-142, D-145, burrower.js): the Kiln creature, 256 worlds only, one at a time while the core is in the Kiln.
 // First BURROW_FIRST_S in the Kiln, then BURROW_EVERY_S [min, + span] after the last one ended. Starts in rock 10–14 cells
 // out, moves one cell per BURROW_STEP_S through ROCK / DENSE / ore (or open floor), clearing each cell it leaves (no
