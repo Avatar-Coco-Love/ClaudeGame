@@ -315,7 +315,7 @@ function researchRow(r) {
     renderPanel(); persist();
     $('upgrade-list').querySelector(`[data-id="${r.id}"]`)?.classList.add('flash');
     if (r.id === 'wide') toast(input.usingTouch ? 'Wide Beam online — tap ⟂ to switch' : `Wide Beam online — press ${keys.K('beamMode')} to switch`, 3200);
-    if (r.id === 'echo') toast(input.usingTouch ? 'Echo online — tap ◇ to switch Gather / Guard' : `Echo online — press ${keys.K('echoOrder')} for Gather / Guard`, 3200); // S-43
+    if (r.id === 'echo') toast(input.usingTouch ? 'Echo online (Auto) — tap ◇ for Mine / Defend / Auto' : `Echo online (Auto) — press ${keys.K('echoOrder')} for Mine / Defend / Auto`, 3200); // S-43
     if (r.id === 'scanner') toast(input.usingTouch ? 'Scanner online — tap ◎ to ping' : `Scanner online — press ${keys.K('scan')} to ping`, 3200);
   });
   return row;
