@@ -65,4 +65,4 @@ Continues part 17 (sessions 124–125; 119–123 archived in audit 129). Newest 
 - Gate line: drift down 8/8, med 0.67 min, 0 deaths, overheats 15; surge down 8/8, med 0.69 min, 0 deaths (boss 0,
   Burrower 0, Glitch 0), burns 79, embers 0, kills 9. Ratio 1.059: PASS (16 seeds 1.033).
 - Observed: no ember is ever lobbed (the bot stands adjacent, inside BOSS_EMBER_OUT); the burns (~10 / fight, 10 dmg
-  each) never kill a top hull. Surge is no harder for a close fighter: Q-033 for Design 132.
+  each) never kill a top hull. Surge is no harder for a close fighter: Q-033 for Design 132. Smoke 611/611 (+1).
