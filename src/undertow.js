@@ -2,9 +2,11 @@
 // eases from the one it had to its chunk's over UNDERTOW_EASE_S (no snap at borders) and adds to the realized velocity
 // before collision (game.js); the intent and target velocity never see it (pillar 5). Pickups drift at UNDERTOW_PICKUP.
 // Same in Drift and Surge; Glitches and the Echo ignore it. `off` is a tools/tests flag (tools/haulrun.mjs).
+// S-61a: within GYRE_R cells of a live Gyre the whirlpool (gyre.js) replaces the chunk's flow (core, pickups, Motes).
 import { CELL, CHUNK, LOCK_TIDE_MIN, UNDERTOW_RING, UNDERTOW_CALM, UNDERTOW_SPEED, UNDERTOW_EASE_S, UNDERTOW_PICKUP, UNDERTOW_DASHES, UNDERTOW_RGB } from './config.js';
 import { seededStream } from './world.js';
 import { tideSites } from './lock.js';
+import { gyreCurrent } from './gyre.js';
 
 /** Per-chunk flow (px/s) for a world: Float32Array pairs [vx, vy], zero outside the Shoal and in calm chunks. */
 export function undertowField(world) {
@@ -32,16 +34,18 @@ function chunkAt(world, px, py) {
   return cx < 0 || cy < 0 || cx >= world.chunksW || cy >= world.chunksH ? -1 : cy * world.chunksW + cx;
 }
 
-/** Flow (px/s) of the chunk under a point, [0, 0] off the map, in calm water or with the flag off. */
+/** Flow (px/s) of the chunk under a point (a Gyre's whirlpool near one), [0, 0] off the map, in calm water or with the flag off. */
 export function flowAt(game, px, py) {
   const u = game.undertow, i = chunkAt(game.world, px, py);
-  return !u || u.off || i < 0 ? [0, 0] : [u.flow[i * 2], u.flow[i * 2 + 1]];
+  if (!u || u.off || i < 0) return [0, 0];
+  return gyreCurrent(game, px, py) || [u.flow[i * 2], u.flow[i * 2 + 1]];
 }
 
 /** Advances the core's eased current; returns it as { vx, vy } (px/s). */
 export function updateUndertow(game, dt) {
-  const u = game.undertow, p = game.player, i = u.off ? -1 : chunkAt(game.world, p.x, p.y);
+  const u = game.undertow, p = game.player, gyre = !u.off && gyreCurrent(game, p.x, p.y), i = u.off ? -1 : gyre ? -2 : chunkAt(game.world, p.x, p.y);
   if (i !== u.chunk) { u.chunk = i; u.from = [u.vx, u.vy]; u.to = flowAt(game, p.x, p.y); u.t = 0; }
+  if (gyre) u.to = gyre; // the whirlpool turns as the core goes round (eased in and out at its edge like a chunk border)
   u.t = Math.min(UNDERTOW_EASE_S, u.t + dt);
   const k = u.t / UNDERTOW_EASE_S;
   u.vx = u.from[0] + (u.to[0] - u.from[0]) * k; u.vy = u.from[1] + (u.to[1] - u.from[1]) * k;
@@ -80,7 +84,7 @@ export function drawUndertow(r, ctx, left, top, vw, vh) {
       const run = still ? 0.5 : ((r.time * sp / CP + h) % 1); // each dash crosses the chunk along the flow, then wraps
       let px = cx * CP + h2 * CP + ux * (run - 0.5) * CP, py = cy * CP + h * CP + uy * (run - 0.5) * CP;
       px = cx * CP + (((px - cx * CP) % CP) + CP) % CP; py = cy * CP + (((py - cy * CP) % CP) + CP) % CP;
-      if (w.solidAtPx(px, py)) continue;
+      if (w.solidAtPx(px, py) || gyreCurrent(g, px, py)) continue; // S-61a: the whirlpool draws its own
       ctx.moveTo(px - ux * 9, py - uy * 9); ctx.lineTo(px + ux * 9, py + uy * 9); n++;
     }
   }

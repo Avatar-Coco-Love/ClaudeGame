@@ -32,7 +32,7 @@ async function nodeChecks(check) {
       if (chooseSpires(seed, null, null, 256).some(s => cheb(s, B) - H - SPIRE_HALF - 1 < LAIR_CLEAR.spire)) bad.push(`${seed}: Spire`);
       stampSpires(plain, g.spires);
       let diff = 0;
-      for (let c = 0; c < w.cells.length; c++) if (w.cells[c] !== plain.cells[c] && !(Math.abs(c % 256 - B.x) <= H && Math.abs(Math.floor(c / 256) - B.y) <= H)) diff++;
+      for (let c = 0; c < w.cells.length; c++) if (w.cells[c] !== plain.cells[c] && !g.bosses.list.some(L => Math.abs(c % 256 - L.x) <= H && Math.abs(Math.floor(c / 256) - L.y) <= H)) diff++; // S-61a: the Gyre's lair too
       if (diff) bad.push(`${seed}: ${diff} cells changed outside the lair`);
       if (JSON.stringify(lairSite(plain, KILN_RING, an, vs)) !== JSON.stringify({ x: B.x, y: B.y, ring: B.ring, t: B.t })) bad.push(`${seed}: not seed-only`);
     }
@@ -42,7 +42,7 @@ async function nodeChecks(check) {
     }
     const small = make('drift', 4242, null), g160 = new Game({ seed: 4242, mode: 'drift', audio: quiet, size: 160 });
     check('S-60a lair: a seed-only 9 × 9 site in the Kiln on 30 / 30 seeds, clear of vaults (2) / vents + Anomalies (3) / Spires (6); nothing else moves; none in a 160 world',
-      bad.length === 0 && small.bosses.list.length === 1 && g160.bosses.list.length === 0, bad.slice(0, 4).join('; ') + ` (last draw ${maxT})`);
+      bad.length === 0 && small.bosses.list.length === 2 && small.bosses.list[0].name === 'Crucible' && g160.bosses.list.length === 0, bad.slice(0, 4).join('; ') + ` (last draw ${maxT})`);
   }
   check('S-60a: plate hp 16 and core hp 40 (MATERIAL = config), no yield; BOSS_LOOT 80 ◆ / 20 ▲ / 24 biome',
     MATERIAL[T.BOSS_PLATE].hp === C.BOSS_PLATE_HP && MATERIAL[T.BOSS_CORE].hp === C.BOSS_CORE_HP && C.BOSS_PLATE_HP === 16 && C.BOSS_CORE_HP === 40
@@ -152,7 +152,7 @@ async function nodeChecks(check) {
     const restored = platesLeft(back, BB) === 8 && !BB.down && back.world.get(BB.x, BB.y) === T.BOSS_CORE && PLATES.every(([i, j]) => back.world.damage[(BB.y + j) * 256 + BB.x + i] === 0);
     takeApart(g);
     const save2 = JSON.parse(JSON.stringify(g.toSave())), down = make('drift', 4242, upgradeSave(save2)), DB = down.bosses.list[0];
-    const stays = DB.down && down.world.get(DB.x, DB.y) === T.EMPTY && platesLeft(down, DB) === 0 && JSON.stringify(save2.bosses) === '[{"ring":4,"down":true}]';
+    const stays = DB.down && down.world.get(DB.x, DB.y) === T.EMPTY && platesLeft(down, DB) === 0 && JSON.stringify(save2.bosses) === '[{"ring":4,"down":true},{"ring":3,"down":false}]';
     check('S-60a save: a reload mid-fight restores every plate (no damage); a downed boss stays down (lair floor); only { ring, down } is saved', restored && stays, JSON.stringify({ restored, stays, saved: save2.bosses }));
     // an old (format 22) save: a Beacon placed on lair floor, the core standing in the lair, plates broken in its map
     const o = make(), ow = o.world, OB = o.bosses.list[0], bi = (OB.y + 3) * 256 + OB.x + 3;

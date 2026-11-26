@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.8.71';
+export const VERSION = '1.8.72';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -392,13 +392,19 @@ export const LOCK_TIDE_MIN = 40, LOCK_TIDE_DOT = -0.5;
 // (.spire). Floor, a BOSS_CORE centre ringed by 8 BOSS_PLATEs (hp in MATERIAL). Take-apart: only the lit plate takes damage;
 // the glow then moves to (i + 5) mod 8; the core cuts once all 8 are gone and bursts BOSS_LOOT (biome: the ring's ore). The core
 // flares like a vent (VENT_PERIOD_S, VENT_TELL_S tell) within BOSS_FLARE_R cells: shove + VENT_HEAT, no damage. Saved: down flags.
-export const LAIR_HALF = 4, LAIR_TRIES = 60, LAIR_D = { 4: [108, 118] }, LAIR_CLEAR = { vault: 2, site: 3, spire: 6 };
+export const LAIR_HALF = 4, LAIR_TRIES = 60, LAIR_D = { 3: [88, 100], 4: [108, 118] }, LAIR_CLEAR = { vault: 2, site: 3, spire: 6 };
 export const BOSS_CORE_HP = 40, BOSS_PLATE_HP = 16, BOSS_FLARE_R = 3, BOSS_LOOT = { shard: 80, prism: 20, biome: 24 };
-export const BOSS_KEY_RGB = '255, 120, 40', BOSS_NAMES = { 4: 'Crucible' }, BOSS_ORE = { 3: 'tide', 4: 'calx' };
+export const BOSS_KEY_RGB = '255, 120, 40', BOSS_NAMES = { 3: 'Gyre', 4: 'Crucible' }, BOSS_ORE = { 3: 'tide', 4: 'calx' };
 // S-60b Surge form (D-165): a live boss wakes in Surge while the core is within BOSS_WAKE_R cells: every plate cuts, in any order
 // (the core still waits for all 8); the flare cycles BOSS_SURGE_FLARE_S and also hurts BOSS_FLARE_DMG within BOSS_FLARE_R; every
 // BOSS_EMBER_S it lobs an ember (a Spitter bolt from BOSS_EMBER_OUT cells out) at a core in line of sight within BOSS_EMBER_R cells.
 export const BOSS_WAKE_R = 10, BOSS_SURGE_FLARE_S = 4, BOSS_FLARE_DMG = 10, BOSS_EMBER_S = 2, BOSS_EMBER_R = 10, BOSS_EMBER_OUT = 2.2;
+// S-61a Gyre (D-168, gyre.js): the Shoal boss (ring 3; same lair rules and stamp). Within GYRE_R cells of its core the Undertow
+// is replaced by a clockwise tangential current of GYRE_SPEED px/s. One plate is the mint key (GYRE_RGB); only it cuts. The
+// key steps one standing plate clockwise every GYRE_STEP_S (plates keep their damage). No flare. BOSS_WAKES: the rings whose
+// boss has a Surge form so far (the Gyre's comes in S-61b; until then Surge uses the take-apart rule).
+export const GYRE_RING = 3, GYRE_R = 6, GYRE_SPEED = 45, GYRE_STEP_S = 1.2, GYRE_RGB = '120, 255, 200', BOSS_WAKES = [4];
+export const BOSS_RGB = { 3: GYRE_RGB, 4: BOSS_KEY_RGB };
 // S-53 Burrower (D-142, D-145, burrower.js): the Kiln creature, 256 worlds only, one at a time while the core is in the Kiln.
 // First BURROW_FIRST_S in the Kiln, then BURROW_EVERY_S [min, + span] after the last one ended. Starts in rock 10–14 cells
 // out, moves one cell per BURROW_STEP_S through ROCK / DENSE / ore (or open floor), clearing each cell it leaves (no

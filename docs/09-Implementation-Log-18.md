@@ -66,3 +66,11 @@ Continues part 17 (sessions 124–125; 119–123 archived in audit 129). Newest 
   Burrower 0, Glitch 0), burns 79, embers 0, kills 9. Ratio 1.059: PASS (16 seeds 1.033).
 - Observed: no ember is ever lobbed (the bot stands adjacent, inside BOSS_EMBER_OUT); the burns (~10 / fight, 10 dmg
   each) never kill a top hull. Surge is no harder for a close fighter: Q-033 for Design 132. Smoke 611/611 (+1).
+
+## Session 131 — Build: S-61a, the Gyre (v1.8.72, D-168)
+- `src/gyre.js` (whirlpool current, key step, draw); `boss.js` per-ring branches; `undertow.js` `flowAt` + ease; config
+  GYRE_*, BOSS_WAKES, BOSS_RGB. `tests/gyre.cjs` (8 checks, smoke); `boss.cjs` now expects two lairs.
+- Measured: site on 30 / 30 seeds by draw 2; probe (mid build, beam 5 / range 3, riding 3.2 cells out): 56.0, 55.8,
+  56.7, 56.1 s (spec ≤ 90). Screenshot viewed: mint core + turning hexagon, key plate, ring dashes in the lair.
+- Observed: the key fill on the rose plate reads pale mint under the darkness (distinct, not loud); S-62 may revisit.
+  Smoke 620/620 (+9), 546 s.
