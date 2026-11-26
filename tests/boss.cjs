@@ -64,7 +64,7 @@ async function nodeChecks(check) {
   {
     const r = { drift: takeApart(make('drift')), surge: takeApart(make('surge')) }, d = r.drift, want = [d.order[0]];
     for (let k = 1; k < 8; k++) want.push(nextPlate(want[k - 1]));
-    check('S-60a take-apart: only the lit plate takes damage; the glow moves (i + 5) mod 8 over all 8; the core is immune until the 8th plate; Drift = Surge (interim)',
+    check('S-60a take-apart: only the lit plate takes damage; the glow moves (i + 5) mod 8 over all 8; the core is immune until the 8th plate; Surge out of BOSS_WAKE_R = Drift',
       JSON.stringify(d.order) === JSON.stringify(want) && new Set(d.order).size === 8 && d.leaks.length === 0 && d.coreDmg === 0 && JSON.stringify(r.drift) === JSON.stringify(r.surge), JSON.stringify(r));
     check('S-60a down: the core breaks once and bursts BOSS_LOOT once (80 ◆, 20 ▲, 24 ⬟), toast event, down = true',
       d.broke && d.loot.shard === 80 && d.loot.prism === 20 && d.loot.calx === 24 && d.again === 0 && d.down && d.ev && d.left === 0, JSON.stringify(d.loot));
@@ -77,23 +77,73 @@ async function nodeChecks(check) {
     check('S-60a: a mode switch keeps plate damage and the lit plate', w.damage[c] === 5 && B.lit === lit && w.cells[c] === T.BOSS_PLATE, JSON.stringify({ d: w.damage[c], lit, now: B.lit }));
   }
   /** Core `off` cells west of the boss core, just before a flare. */
-  const atFlare = (mode, off) => {
+  const atFlare = (mode, off, P = VENT_PERIOD_S) => {
     const g = make(mode), B = g.bosses.list[0], p = g.player;
     p.x = (B.x + 0.5 - off) * CELL; p.y = (B.y + 0.5) * CELL; p.vx = p.vy = 0; g.heat = 0; g.cargo.shard = 3;
-    g.stats.time = 20 * VENT_PERIOD_S - B.phase - VENT_FLARE_S - 1 / 120;
+    g.stats.time = 20 * P - B.phase - VENT_FLARE_S - 1 / 120;
     return g;
   };
   const step = (g, k) => { const out = []; for (let i = 0; i < k; i++) { g.enemies.length = 0; g.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null }); g.events.length = 0; out.push({ vx: +g.player.vx.toFixed(3), heat: +g.heat.toFixed(3) }); } return out; };
   {
     const r = {};
-    for (const mode of ['drift', 'surge']) {
-      const g = atFlare(mode, 2.5), hull = g.player.integrity, log = step(g, 30);
-      r[mode] = { vx: log[0].vx, heat: log[0].heat, hull: g.player.integrity === hull, cargo: g.cargo.shard === 3, flares: g.bosses.flares };
+    for (const [mode, P] of [['drift', VENT_PERIOD_S], ['surge', C.BOSS_SURGE_FLARE_S]]) {
+      const g = atFlare(mode, 2.5, P), hull = g.player.integrity, log = step(g, 30);
+      r[mode] = { vx: log[0].vx, heat: log[0].heat, hull: g.player.integrity === hull, lost: hull - g.player.integrity, cargo: g.cargo.shard === 3, flares: g.bosses.flares, burns: g.bosses.burns };
     }
-    const far = atFlare('drift', 3.6), farLog = step(far, 40);
-    check('S-60a flare: the core flares like a vent: a core 2.5 cells out is shoved out (+0.4 heat), once, no damage or cargo loss; Drift = Surge; 3.6 cells out untouched',
-      JSON.stringify(r.drift) === JSON.stringify(r.surge) && Math.abs(r.drift.vx + HURT_KNOCKBACK) < 1 && Math.abs(r.drift.heat - VENT_HEAT) < 1e-9 && r.drift.hull && r.drift.cargo && r.drift.flares === 1
+    const far = atFlare('drift', 3.6), farLog = step(far, 40), sfar = atFlare('surge', 3.6, C.BOSS_SURGE_FLARE_S), sh = sfar.player.integrity, sLog = step(sfar, 40);
+    check('S-60b flare: awake (Surge, 2.5 cells) the flare cycles every 4 s and deals 10 on top of the same shove + heat, once; 3.6 cells out (awake) untouched',
+      Math.abs(r.surge.vx + HURT_KNOCKBACK) < 1 && Math.abs(r.surge.heat - VENT_HEAT) < 1e-9 && r.surge.lost === C.BOSS_FLARE_DMG && r.surge.flares === 1 && r.surge.burns === 1
+        && sLog.every(e => e.vx === 0 && e.heat === 0) && sfar.player.integrity === sh && sfar.bosses.flares === 0, JSON.stringify({ surge: r.surge, far: sLog[0] }));
+    check('S-60a flare: the core flares like a vent: a core 2.5 cells out is shoved out (+0.4 heat), once, no damage or cargo loss (Drift); 3.6 cells out untouched',
+      r.drift.burns === 0 && Math.abs(r.drift.vx + HURT_KNOCKBACK) < 1 && Math.abs(r.drift.heat - VENT_HEAT) < 1e-9 && r.drift.hull && r.drift.cargo && r.drift.flares === 1
         && farLog.every(e => e.vx === 0 && e.heat === 0) && far.bosses.flares === 0, JSON.stringify({ ...r, far: farLog[0] }));
+  }
+  { // S-60b awake: any plate cuts only in Surge within BOSS_WAKE_R; a mode switch follows at once
+    const at = (mode, off) => { const g = make(mode), B = g.bosses.list[0]; g.player.x = (B.x + 0.5 - off) * CELL; g.player.y = (B.y + 0.5) * CELL; return { g, B }; };
+    const other = (g, B) => { const k = (B.lit + 1) % 8, [i, j] = PLATES[k], c = (B.y + j) * g.world.w + B.x + i; g.world.hit(B.x + i, B.y + j, 3); return g.world.damage[c]; };
+    const near = at('surge', 3), dr = at('drift', 3), far = at('surge', 12), sw = at('surge', 3); sw.g.setMode('drift');
+    const res = { surge: other(near.g, near.B), drift: other(dr.g, dr.B), far: other(far.g, far.B), switched: other(sw.g, sw.B) };
+    const any = at('surge', 3); for (const k of [3, 6, 1]) { const [i, j] = PLATES[(any.B.lit + k) % 8]; any.g.world.hit(any.B.x + i, any.B.y + j, 100); }
+    res.anyOrder = 8 - platesLeft(any.g, any.B); res.core = (any.g.world.hit(any.B.x, any.B.y, 5), any.g.world.damage[any.B.y * 256 + any.B.x]);
+    check('S-60b: awake (Surge ≤ 10 cells) any plate cuts, in any order (core still waits); Drift, Surge 12 cells out and a switch to Drift keep the lit-plate rule',
+      res.surge === 3 && res.drift === 0 && res.far === 0 && res.switched === 0 && res.anyOrder === 3 && res.core === 0, JSON.stringify(res));
+  }
+  { // S-60b embers: one every 2 s at a core in sight ≤ 10 cells (8 dmg); rock in the line stops it (none lobbed); rock after launch pops it
+    const run = (block, late) => {
+      const g = make('surge'), w = g.world, B = g.bosses.list[0], p = g.player;
+      p.x = (B.x + 0.5 - 4) * CELL; p.y = (B.y + 0.5) * CELL; p.vx = p.vy = 0; p.invuln = 0; const hull = p.integrity;
+      if (block) w.cells[B.y * w.w + B.x - 3] = T.ROCK;
+      let blocked = false;
+      for (let k = 0; k < 150; k++) {
+        if (late && g.bolts.length && !blocked) { blocked = true; w.cells[B.y * w.w + B.x - 3] = T.ROCK; }
+        g.enemies.length = 0; p.vx = p.vy = 0; p.x = (B.x + 0.5 - 4) * CELL; p.y = (B.y + 0.5) * CELL;
+        g.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null }); g.events.length = 0;
+      }
+      return { embers: g.bosses.embers, lost: hull - p.integrity, ember: g.bolts.every(b => b.ember) };
+    };
+    const open = run(false, false), wall = run(true, false), late = run(false, true);
+    check('S-60b ember: one per 2 s at a core in sight 4 cells out hits for 8; rock in the line = none lobbed; rock after launch stops it (no hit)',
+      open.embers === 1 && open.lost === C.BOLT_DMG && wall.embers === 0 && wall.lost === 0 && late.embers === 1 && late.lost === 0, JSON.stringify({ open, wall, late }));
+    const { wardTarget } = await import('../src/ward.js');
+    const g = make('surge'); g.bolts.push({ bolt: true, ember: true, x: g.player.x + 40, y: g.player.y, vx: 0, vy: 0, r: 5, hp: 0.5, flash: 0, life: 4 });
+    check('S-60b: a Ward ignores an ember (it bolts creatures only)', wardTarget(g, { x: g.player.x, y: g.player.y }) === null);
+  }
+  { // S-60b: a Surge death heals the live core and keeps broken plates; weather and rifts never start while awake
+    const g = make('surge'), w = g.world, B = g.bosses.list[0];
+    g.player.x = (B.x - 3) * CELL; g.player.y = (B.y + 0.5) * CELL;
+    for (const [i, j] of PLATES) w.destroy(B.x + i, B.y + j);
+    w.hit(B.x, B.y, 20); const was = w.damage[B.y * 256 + B.x]; g.destabilize();
+    check('S-60b: a Surge death heals the core to full; broken plates stay broken', was === 20 && w.damage[B.y * 256 + B.x] === 0 && platesLeft(g, B) === 0 && !B.down && w.get(B.x, B.y) === T.BOSS_CORE, `core ${was} -> ${w.damage[B.y * 256 + B.x]}`);
+    const ev = (near) => {
+      const h = make('surge'), HB = h.bosses.list[0], p = h.player;
+      const hold = () => { if (near) { p.x = (HB.x - 3) * CELL; p.y = (HB.y + 0.5) * CELL; } p.vx = p.vy = 0; p.invuln = 9; h.enemies.length = 0; h.bolts.length = 0; };
+      hold(); h.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null });
+      h.weather.start = h.stats.time + 0.05; h.rift.start = h.stats.time + 0.05;
+      for (let k = 0; k < 20; k++) { hold(); h.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null }); h.events.length = 0; }
+      return { weather: h.weather.kind, rift: !!h.rift.open };
+    };
+    const awake = ev(true), away = ev(false);
+    check('S-60b: a storm or rift due while the boss is awake never starts (both do away from it)', awake.weather === null && !awake.rift && away.weather === 'storm' && away.rift, JSON.stringify({ awake, away }));
   }
   { // saves: reload mid-fight restores the plates; a downed boss stays down; an old 256 save gets the lair; a 160 save none
     const g = make(), w = g.world, B = g.bosses.list[0];

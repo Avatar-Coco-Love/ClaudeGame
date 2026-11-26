@@ -6,9 +6,12 @@
 // core takes damage once every plate is gone; its break bursts BOSS_LOOT and sets `down` (the only saved state: a reload
 // mid-fight restores every plate). The core flares like a vent within BOSS_FLARE_R cells (shove + heat, no damage). A lair
 // first stamped into an older save refunds what was placed in it and moves a core standing in it to the Nexus.
+// S-60b Surge form (D-165): in Surge, with the core within BOSS_WAKE_R cells, the boss is awake: any plate cuts, the flare
+// cycles BOSS_SURGE_FLARE_S and hurts, embers (Spitter bolts, `ember`) fly at a core in sight. A death heals its core only.
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
-  WARD_COST } from './config.js';
+  WARD_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
+  BOLT_LIFE_S } from './config.js';
 import { World, seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 import { ventPhase } from './vent.js';
@@ -47,9 +50,9 @@ export function makeBosses(game) {
   const list = [];
   for (const ring of Object.keys(LAIR_D).map(Number)) {
     const s = lairSite(game.world, ring, game.anomaly.sites, game.vents.sites);
-    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1 });
+    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1, ember: BOSS_EMBER_S, awake: false });
   }
-  game.bosses = { list, flares: 0, refunds: 0 };
+  game.bosses = { list, flares: 0, refunds: 0, burns: 0, embers: 0 };
   if (!list.length) return;
   const w = game.world, prev = w.hitMul;
   w.hitMul = (x, y, type, dir) => type === T.BOSS_PLATE || type === T.BOSS_CORE ? bossMul(game, x, y, type) : prev ? prev(x, y, type, dir) : 1;
@@ -61,12 +64,27 @@ export const bossAt = (game, x, y) => (game.bosses ? game.bosses.list.find(B => 
 export const plateIndex = (B, x, y) => PLATES.findIndex(([i, j]) => B.x + i === x && B.y + j === y);
 export const platesLeft = (game, B) => PLATES.filter(([i, j]) => game.world.get(B.x + i, B.y + j) === T.BOSS_PLATE).length;
 
-/** The beam multiplier on a boss cell: the lit plate × 1, other plates × 0; the core × 0 while a plate stands. */
+/** S-60b: awake = Surge, live, and the core within BOSS_WAKE_R cells of the boss core (follows a mode switch at once). */
+export function bossAwake(game, B) {
+  if (game.mode !== 'surge' || B.down || game.endSeq) return false;
+  const p = game.player;
+  return Math.hypot(p.x - (B.x + 0.5) * CELL, p.y - (B.y + 0.5) * CELL) <= BOSS_WAKE_R * CELL;
+}
+const bossPhase = (game, B) => ventPhase(B, game.stats.time, bossAwake(game, B) ? BOSS_SURGE_FLARE_S : VENT_PERIOD_S);
+
+/** The beam multiplier on a boss cell: the lit plate × 1, other plates × 0 (× 1 while awake); the core × 0 while a plate stands. */
 export function bossMul(game, x, y, type) {
   const B = bossAt(game, x, y);
   if (!B || B.down) return 1;
   if (type === T.BOSS_CORE) return platesLeft(game, B) ? 0 : 1;
-  return plateIndex(B, x, y) === B.lit ? 1 : 0;
+  return bossAwake(game, B) || plateIndex(B, x, y) === B.lit ? 1 : 0;
+}
+
+/** S-60b: a core death (any mode) heals each live boss's core to full; broken plates stay broken (no grind, no free kill). */
+export function healBosses(game) {
+  const bs = game.bosses, w = game.world;
+  if (!bs) return;
+  for (const B of bs.list) if (!B.down) { w.damage[B.y * w.w + B.x] = 0; w.markDirty(B.x, B.y); B.ember = BOSS_EMBER_S; }
 }
 
 /** After a save is applied (or for a new world): stamp each lair (`raw`: the save's `bosses`, [{ ring, down }]). A lair
@@ -124,7 +142,7 @@ function onBroken(game, x, y) {
   if (!B || B.down || w.get(x, y) !== T.EMPTY) return;
   if (x === B.x && y === B.y) { down(game, B); return; }
   const k = plateIndex(B, x, y);
-  if (k < 0 || k !== B.lit) return;
+  if (k < 0 || k !== B.lit) return; // S-60b: an awake boss's other plates break without moving the glow
   for (let n = nextPlate(k), s = 0; s < 8; n = nextPlate(n), s++) {
     const [i, j] = PLATES[n];
     if (w.get(B.x + i, B.y + j) === T.BOSS_PLATE) { B.lit = n; return; }
@@ -142,22 +160,41 @@ function down(game, B) {
   game.notify('boss');
 }
 
-/** Once a frame, after the beam: the core's flare shoves + heats a core within BOSS_FLARE_R cells, once per cycle. */
-export function updateBosses(game) {
+/** Once a frame, after the beam: the core's flare shoves + heats a core within BOSS_FLARE_R cells, once per cycle; awake
+ *  (S-60b) it also hurts, and embers fly. `game.bossAwake` (any boss awake) keeps weather and rifts from starting. */
+export function updateBosses(game, dt = 0) {
   const bs = game.bosses, p = game.player;
+  game.bossAwake = false;
   if (!bs || !bs.list.length || game.endSeq) return;
   for (const B of bs.list) {
     if (B.down) continue;
-    const ph = ventPhase(B, game.stats.time), dx = p.x - (B.x + 0.5) * CELL, dy = p.y - (B.y + 0.5) * CELL, d = Math.hypot(dx, dy);
-    if (ph.tell > 0 && B.told !== ph.n && d <= VENT_HEAR_R * CELL) { B.told = ph.n; game.audio.ventTell(); }
-    if (ph.flare <= 0 || B.fired === ph.n || d > BOSS_FLARE_R * CELL) continue;
-    B.fired = ph.n; bs.flares++;
+    const awake = bossAwake(game, B), ph = bossPhase(game, B), key = (awake ? 's' : 'd') + ph.n;
+    const dx = p.x - (B.x + 0.5) * CELL, dy = p.y - (B.y + 0.5) * CELL, d = Math.hypot(dx, dy);
+    if (awake !== B.awake) { B.awake = awake; B.ember = BOSS_EMBER_S; }
+    if (awake) { game.bossAwake = true; emberStep(game, B, dx, dy, d, dt); }
+    if (ph.tell > 0 && B.told !== key && d <= VENT_HEAR_R * CELL) { B.told = key; game.audio.ventTell(); }
+    if (ph.flare <= 0 || B.fired === key || d > BOSS_FLARE_R * CELL) continue;
+    B.fired = key; bs.flares++;
     const ux = d > 1e-6 ? dx / d : Math.cos(p.angle), uy = d > 1e-6 ? dy / d : Math.sin(p.angle);
     p.vx += ux * HURT_KNOCKBACK; p.vy += uy * HURT_KNOCKBACK;
     game.heat = Math.min(1, game.heat + VENT_HEAT);
     if (game.heat >= 1 - 1e-9) overheat(game);
     game.addShake(4);
+    if (awake) { game.audio.bossThump(); if (p.invuln <= 0) { bs.burns++; game.hurtPlayer(BOSS_FLARE_DMG, 0, 0); } } // the shove above is the knockback
   }
+}
+
+/** S-60b: an awake boss's ember clock runs while the core is in sight within BOSS_EMBER_R cells; each BOSS_EMBER_S it lobs a
+ *  Spitter bolt from BOSS_EMBER_OUT cells out (past its own plates, so its body never stops it). Rock stops it, the beam pops it. */
+function emberStep(game, B, dx, dy, d, dt) {
+  const out = BOSS_EMBER_OUT * CELL, p = game.player;
+  if (d > BOSS_EMBER_R * CELL || d <= out + p.r) { B.ember = Math.max(B.ember, 0.4); return; }
+  const ux = dx / d, uy = dy / d, sx = (B.x + 0.5) * CELL + ux * out, sy = (B.y + 0.5) * CELL + uy * out;
+  if (game.world.raycast(sx, sy, ux, uy, d - out - p.r)) { B.ember = Math.max(B.ember, 0.4); return; }
+  if ((B.ember -= dt) > 0) return;
+  B.ember = BOSS_EMBER_S; game.bosses.embers++;
+  game.bolts.push({ bolt: true, ember: true, x: sx, y: sy, vx: ux * BOLT_SPEED, vy: uy * BOLT_SPEED, r: BOLT_R, hp: BOLT_HP, flash: 0, life: BOLT_LIFE_S });
+  game.audio.ember();
 }
 
 const octagon = (ctx, x, y, R) => { for (let k = 0; k < 8; k++) { const a = Math.PI / 8 + k * Math.PI / 4; ctx[k ? 'lineTo' : 'moveTo'](x + Math.cos(a) * R, y + Math.sin(a) * R); } ctx.closePath(); };
@@ -172,7 +209,7 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
   for (const B of bs.list) {
     const x0 = (B.x - LAIR_HALF) * CELL, y0 = (B.y - LAIR_HALF) * CELL, S = (2 * LAIR_HALF + 1) * CELL;
     if (B.down || x0 > left + vw || y0 > top + vh || x0 + S < left || y0 + S < top || !w.explored[B.y * w.w + B.x]) continue;
-    const cx = (B.x + 0.5) * CELL, cy = (B.y + 0.5) * CELL, ph = ventPhase(B, g.stats.time), m = BOSS_FLARE_R * CELL + r.glowPad(12);
+    const cx = (B.x + 0.5) * CELL, cy = (B.y + 0.5) * CELL, ph = bossPhase(g, B), m = BOSS_FLARE_R * CELL + r.glowPad(12);
     const pulse = still ? 1 : 0.7 + 0.3 * Math.sin(r.time * 1.6);
     ctx.save();
     ctx.beginPath(); ctx.rect(cx - m, cy - m, m * 2, m * 2); ctx.clip(); // a blur in 'lighter' is clipped to its reach (B-091)
@@ -180,12 +217,14 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
     ctx.strokeStyle = ctx.shadowColor = ctx.fillStyle = `rgb(${BOSS_KEY_RGB})`; ctx.shadowBlur = 12; ctx.lineJoin = 'round';
     ctx.lineWidth = 2; ctx.globalAlpha = Math.min(1, 0.55 * pulse + 0.4 * ph.tell + (ph.flare > 0 ? 0.4 : 0));
     ctx.beginPath(); octagon(ctx, cx, cy, CELL * 0.4); ctx.stroke();
-    if (w.get(B.x + PLATES[B.lit][0], B.y + PLATES[B.lit][1]) === T.BOSS_PLATE) {
-      const lp = still ? 1 : 0.6 + 0.4 * Math.sin(r.time * 5), px = (B.x + PLATES[B.lit][0]) * CELL, py = (B.y + PLATES[B.lit][1]) * CELL;
-      ctx.globalAlpha = 0.9 * lp; ctx.lineWidth = 2.5;
+    const lp = still ? 1 : 0.6 + 0.4 * Math.sin(r.time * 5);
+    PLATES.forEach(([i, j], k) => { // the lit plate; awake (S-60b) every standing plate cuts, so all glow, softer
+      if ((!B.awake && k !== B.lit) || w.get(B.x + i, B.y + j) !== T.BOSS_PLATE) return;
+      const px = (B.x + i) * CELL, py = (B.y + j) * CELL, a = B.awake ? 0.6 : 1;
+      ctx.globalAlpha = 0.9 * lp * a; ctx.lineWidth = 2.5;
       ctx.strokeRect(px + 3, py + 3, CELL - 6, CELL - 6);
-      ctx.globalAlpha = 0.18 * lp; ctx.fillRect(px + 3, py + 3, CELL - 6, CELL - 6);
-    }
+      ctx.globalAlpha = 0.35 * lp * a; ctx.fillRect(px + 3, py + 3, CELL - 6, CELL - 6); // D-164: the fill tints too, so a still frame reads
+    });
     if (ph.flare > 0) {
       const k = ph.flare, rad = BOSS_FLARE_R * CELL * (still ? 1 : 0.6 + 0.4 * (1 - k));
       ctx.globalAlpha = 0.16 * k; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fill();

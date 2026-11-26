@@ -92,7 +92,7 @@ function orb(R, key, rad, col) {
 
 /** Over the darkness: the SPITTER_TELL_S glow before each shot, and the bolts in flight (readable in the dark, D-002). */
 export function drawSpitterTells(R, ctx) {
-  const tell = orb(R, 'sp-tell', 6, SPITTER_COLORS[1]), bolt = orb(R, 'sp-bolt', BOLT_R * 0.8, SPITTER_COLORS[1]);
+  const tell = orb(R, 'sp-tell', 6, SPITTER_COLORS[1]), bolt = orb(R, 'sp-bolt', BOLT_R * 0.8, SPITTER_COLORS[1]), ember = orb(R, 'sp-ember', BOLT_R, '#ff6a28'); // S-60b ember: larger, redder
   for (const e of R.game.enemies) {
     if (!e.spitter || e.fade !== undefined || !e.alert || e.shot > SPITTER_TELL_S) continue;
     const k = 0.6 + (1 - e.shot / SPITTER_TELL_S) * 1.2;
@@ -101,7 +101,7 @@ export function drawSpitterTells(R, ctx) {
   }
   ctx.globalAlpha = 1;
   for (const b of R.game.bolts) {
-    const k = b.flash > 0 ? 1.4 : 1;
-    ctx.drawImage(bolt.canvas, b.x - bolt.half * k, b.y - bolt.half * k, bolt.half * 2 * k, bolt.half * 2 * k);
+    const k = b.flash > 0 ? 1.4 : 1, o = b.ember ? ember : bolt;
+    ctx.drawImage(o.canvas, b.x - o.half * k, b.y - o.half * k, o.half * 2 * k, o.half * 2 * k);
   }
 }

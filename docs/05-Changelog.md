@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.8.69 — 2026-11-26
+- **The Crucible wakes in Surge.** Come within 10 cells in Surge and every plate glows and takes your beam, in any
+  order. It fights back: its flare now comes every 4 s and burns (10), and it lobs embers at you when it can see you
+  (rock blocks them, your beam pops them). Die and its core heals, but broken plates stay broken. No storm or rift
+  starts mid-fight. Drift keeps the calm take-apart puzzle. New low thump and ember sounds.
+
 ## v1.8.68 — 2026-11-26
 - **The Crucible can be finished.** In the live game the glow stopped after the first plate broke, so no plate took
   damage and the boss could not be downed. Now the glow jumps across the body after every break, as intended.

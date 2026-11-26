@@ -21,7 +21,7 @@ import { makeHeat, updateHeat, overheated } from './heat.js';
 import { shatter } from './shatter.js';
 import { makeVents, updateVents } from './vent.js';
 import { makeLocks, updateLocks } from './lock.js';
-import { makeBosses, stampBosses, updateBosses } from './boss.js';
+import { makeBosses, stampBosses, updateBosses, healBosses } from './boss.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
 import { loadWards, updateWards } from './ward.js';
@@ -243,7 +243,7 @@ export class Game {
     updateWards(this, dt); // S-56: after the beam, before the creatures' passes, so a Ward kill pays this frame
     updateVents(this); // S-48b: after the beam, so a flare's +heat never meets this frame's cooling
     updateLocks(this); // S-58: the same, for a Flare Lock's window flare
-    updateBosses(this); // S-60a: the boss core's flare
+    updateBosses(this, dt); // S-60a: the boss core's flare (S-60b: awake in Surge, embers)
     updateBurrower(this, dt); // S-53: after the beam, so a kill on its last surfaced frame pays
     updateSwarm(this, dt); // S-54: after the beam, so a mote beamed this frame pays before it touches anything
     updateEcho(this, dt); // S-42: after the beam, so it knows whether the core is mining
@@ -429,6 +429,7 @@ export class Game {
     this.bolts = [];
     clearBurrower(this); // S-53
     clearSwarm(this); // S-54
+    healBosses(this); // S-60b: a live boss's core heals; broken plates stay broken
     this.notify('destabilized');
     if (this.wake) failWake(this); // S-23: a core death fails the Wake
   }
