@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.9.78 — 2026-11-26
+- No change in play yet: the next update is planned. Late on, Prisms pile up with nothing to buy, so the Nexus will
+  grow a Lens that calls a rift where you stand, for a Prism price, in both modes.
+
 ## v1.9.77 — 2026-11-26
 - Smoother Gyre fight. The awake Gyre's rim warning now glows with layered lines instead of a costly blur, so frames
   near the whirlpool stay closer to the rest of the Shoal. It looks the same: a sparking mint outline.
