@@ -111,7 +111,7 @@ async function nodeChecks(check) {
       JSON.stringify({ left: g.enemies.length, kills: g.stats.glitches - k0, wardLoot: g.pickups.length - p0, beamLoot: h.pickups.length - q0 }));
   }
   { // the Ward gate (D-153, D-154): the Kiln with 2 Wards kept at the dig site never turns the Burrower into income
-    const out = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, '../tools/biomefoe.mjs'), '--biome=kiln', '--wards=2'], { encoding: 'utf8' });
+    const out = await require('./gates.cjs').run('biomefoe.mjs', ['--biome=kiln', '--wards=2']);
     const line = out.split('\n').find(l => l.startsWith('gate')) || '';
     check('S-56 ward: biomefoe.mjs Kiln with 2 Wards stays ≤ 1.00 in each mode (8 seeds, B-092)', /PASS/.test(line), out.trim().split('\n').map(l => l.slice(0, 50)).join(' | '));
   }

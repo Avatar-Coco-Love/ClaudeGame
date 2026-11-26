@@ -123,7 +123,7 @@ async function nodeChecks(check) {
       g.swarm.motes.length === 0 && !/swarm|mote/i.test(save) && keys(g) === keys(make('surge')));
   }
   { // the weight gate (D-142, D-146): tools/biomefoe.mjs --biome=shoal, 8 seeds × 10 min
-    const out = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, '../tools/biomefoe.mjs'), '--biome=shoal', '--seeds=8'], { encoding: 'utf8' });
+    const out = await require('./gates.cjs').run('biomefoe.mjs', ['--biome=shoal', '--seeds=8']);
     const line = out.trim().split('\n').pop();
     check('S-54 mote: the biomefoe.mjs Shoal gate passes on 8 seeds (haul with / without 0.85–0.95 each mode, modes within 0.05)', /PASS/.test(line), out.trim().split('\n').map(l => l.slice(0, 60)).join(' | '));
   }

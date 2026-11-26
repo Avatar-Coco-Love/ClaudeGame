@@ -1,6 +1,6 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-26_ · **Session counter: 128** · **Version: v1.8.69** (session 128: Build; rotation: 129 Audit, 130 Build, 131 Build).
+_Last updated: 2026-11-26_ · **Session counter: 129** · **Version: v1.8.70** (session 129: Audit; rotation: 130 Build, 131 Build, 132 Design).
 **Scope (D-119, `01`):** M1–M13 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13 events + puzzles). M14 two-form bosses (1.9, D-158) under way: S-60a, S-60b1 ✅; `04-Roadmap-3.md`. Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
@@ -42,12 +42,12 @@ _Last updated: 2026-11-26_ · **Session counter: 128** · **Version: v1.8.69** (
 - Darkness/light, minimap (160-cell window, D-123), Nexus pointer, toasts, audio held to `audio.cjs` ceilings. Detail: `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another canvas finger). Phones: touch hints, no key badges, every button ≥ 44 px, landscape ◎⟂♪≡ top row (S-17, D-050, D-058), glyph-only ◎ ⟂ ≤ 700 px wide (D-064). With ≈ / ⬟ the phone bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 23); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 24 from D-164; last D-165), `03` questions (Q-xxx), `09` log (tail: `09-…-18`; 114–118 archived in audit 124), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 24 from D-164; last D-166), `03` questions (Q-xxx), `09` log (tail: `09-…-18`; 119–123 archived in audit 129), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-60b1 built (M13 done, `07-…-14`). M14: S-60b2…S-62 (`07-…-15/16`, D-158: Crucible / Gyre, one body, two forms). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
-- `node tests/smoke.cjs`: all passing (incl. `docs.cjs`, `audio.cjs`, `lock.cjs`, `boss.cjs`). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
+- `node tests/smoke.cjs`: all passing, ~530 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
 
 ## Next step (one thing)
-Session 129 (Audit): health check per `CLAUDE.md`. Session 130 (Build) then does S-60b2, the `bossrun.mjs` gate (`07-…-15`).
+Session 130 (Build): S-60b2, the `bossrun.mjs` gate (a boss route in `runBot`, lairs on, creatures live; `07-…-15`, D-165). A smoke gate goes in `tests/gates.cjs` `SMOKE`.

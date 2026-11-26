@@ -1,6 +1,6 @@
 # 09 — Implementation Log, part 18
 
-Continues part 17 (sessions 119–125). Newest at the bottom; read the tail only.
+Continues part 17 (sessions 124–125; 119–123 archived in audit 129). Newest at the bottom; read the tail only.
 
 ## Session 126 — Build: S-60a Crucible, the first boss slice (v1.8.67, D-163)
 - `boss.js` (lair site, stamp, take-apart, flare, draw, minimap mark); `T.BOSS_CORE` / `T.BOSS_PLATE`; save format 23.
@@ -45,3 +45,16 @@ Continues part 17 (sessions 119–125). Newest at the bottom; read the tail only
 - Screenshot viewed (seed 4242, Surge, 3.5 cells out): all 7 standing plates glow, the core octagon reads; awake vs
   Drift is clear (one lit plate vs all), but the awake glow is pink-dominant: S-60b2 may push it toward ember.
 - Smoke 609/609 (+7).
+
+## Session 129 — Audit: bot gates in parallel, per-file smoke timing, 09 archive (v1.8.70, D-166)
+- No subagent tool: sweeps in-session, newest code first (`boss.js` S-60a / b1: awake / heal / flare / ember paths,
+  death and mode switch, storm and rift guards; D-160…D-165 numbers match `config.js`). No new bug found.
+- Debt carried three audits, done: timed every smoke file (`T()` in `smoke.cjs`, TIME lines). Before: 620 s total;
+  node phase 188 s, of which the 4 bot gates (`eventrun` 72 s, `biomefoe` ×3 ~20 s each) ran back to back.
+- `tests/gates.cjs`: smoke prestarts the gates as child processes on spare cores (4 here); the tests await them.
+  After: 529 s total, node phase 105 s; gate output lines identical to the run before (seeded sims). New check
+  (`gates.cjs` vs the tests' calls, no `execFileSync` of a tool) fails on the old `rift.cjs` (checked).
+- Still slowest: `touch` 106 s, `quality` 46 s, the inline desktop / phone block 29 s, `ending` 26 s (`04` Debt).
+- Workflow review: too much: smoke wall time (two full runs = 19 min of a session); too little: no per-file timing,
+  so three audits deferred the fix for lack of a measurement. Now printed every run (D-166). Phone sweep: none (124).
+- `09` sessions 119–123 archived word for word (`archive/2026-11-26-09-sessions-119-123.md`). Smoke 610/610 (+1).
