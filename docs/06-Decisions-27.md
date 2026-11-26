@@ -66,3 +66,14 @@ alternatives). D-181 on.
   `game.echoLevels` is saved (format 25); load clamps 0…2, anything else 0 (B-037). New Cycle starts at 0 like Research.
 - Rejected: a fourth Research-style one-time unlock per level (no pips, 6 rows); levels on the Core Matrix (D-181 cut);
   keeping the old constants as level-0 aliases (two sources of one number).
+
+### D-186 — S-71 gate measures what the Echo adds; Q-039 closed: no; the Echo's field move goes to S-73 (Design 147)
+- Probe (`deep` route, mid, 16 seeds × 5 min): ore credit gives the Echo 55–77 % because the core's beam is mostly in
+  rock; with-vs-without gain gives 17–29 %. S-71's share is now 1 − no-Echo / with-Echo gain, band 15–35 % at level 2.
+- Damage is the mean over 16 seeds (2 × `GATE_SEEDS`): an 8-seed median moved 17.2 → 10.4 between seed sets.
+  Auto already sits at 0.97–0.99 × Mine's gain and 0.83–1.02 × Defend's damage, so no tuning is planned.
+- **Q-039: no** second Echo and no level 3: the max Echo adds 22–29 %, above the 15 % that would reopen it.
+- S-72 keeps the Echo on its own BFS; S-73 moves it onto `coreField`. S-72 (field + Tracer + perf run) was the biggest
+  M17 slice, and the move is a refactor with its own test risk. Field cost measured 0.08–0.1 ms at bound 32.
+- Rejected: ore-credit share with a higher cap (measures tunnelling, not the Echo); 8-seed medians (noise > effect);
+  a level 3 or second Echo (Q-039); moving the Echo in S-72 (two risks in one slice).
