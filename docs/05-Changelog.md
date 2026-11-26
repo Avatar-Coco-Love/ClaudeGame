@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.9.77 — 2026-11-26
+- Smoother Gyre fight. The awake Gyre's rim warning now glows with layered lines instead of a costly blur, so frames
+  near the whirlpool stay closer to the rest of the Shoal. It looks the same: a sparking mint outline.
+
 ## v1.9.76 — 2026-11-26
 - **Bosses complete (v1.9).** The Chart's second level now marks each boss lair you haven't found as a faint octagon
   on the minimap. A low two-note sting sounds when a boss wakes in Surge or when its first plate breaks in Drift.

@@ -184,6 +184,15 @@ async function browserChecks(browser, url, check, errors, shot) {
   const a = await pg.evaluate(() => { const g = window.__lumen.game, B = g.bosses.list.find(b => b.name === 'Gyre'); return { awake: B.awake, rim: window.__lumen.renderer.gyreRim, drawn: window.__lumen.renderer.bossDrawn }; });
   if (process.env.GYRE_SHOT2) await pg.screenshot({ path: process.env.GYRE_SHOT2 });
   check('S-61b: an awake Gyre (Surge) draws the rim tell while the rim is armed', a.awake && a.rim && a.drawn === 1, JSON.stringify(a));
+  const b = await pg.evaluate(async () => { // session 136 (D-174): the rim tell makes no shadowBlur draw; the blur box stays small
+    const R = window.__lumen.renderer, c = R.ctx, sr = c.strokeRect; let rects = 0, blurred = 0;
+    c.strokeRect = function (...q) { rects++; if (this.shadowBlur > 0) blurred++; return sr.apply(this, q); };
+    await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+    c.strokeRect = sr;
+    return { rects, blurred, box: R.gyreGlowBox, rim: R.gyreRim };
+  });
+  check('an awake Gyre draws its rim tell as strokes with no shadowBlur, blur box < 3 cells, was > 4 (session 136, D-174)',
+    b.rim && b.rects > 0 && b.blurred === 0 && b.box > 0 && b.box < 3 * CELL, JSON.stringify(b));
   await pg.close();
 }
 
