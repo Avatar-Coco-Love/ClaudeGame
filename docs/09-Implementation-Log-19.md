@@ -1,29 +1,6 @@
 # 09 — Implementation Log, part 19
 
-Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest at the bottom; read the tail only.
-
-## Session 132 — Design: boss play-test, Q-033, S-61b / S-62 re-check (v1.8.73, D-169, D-170)
-- Gate as is (`bossrun.mjs`, 8 seeds, top build): Drift 8/8 med 0.67 min, Surge 8/8 med 0.69, 0 deaths, burns 77,
-  embers 0, ratio 1.055 PASS (1.6 s wall).
-- Same route, other builds (scratch copy, not kept): mid: Drift med 1.12 / Surge 1.56 min, Surge deaths 8 (flare 7,
-  Glitch 1), burns 137, ratio 1.40; start: Drift med 3.51 min, Surge 0/8 down (147 deaths, flare 80). Embers fired only
-  at the start build (18), where the bot is knocked off its spot.
-- Playwright, seed 4242, Surge, god: core set 5 cells off the Crucible: awake, all plates cut-ready, 1 ember in 3.5 s.
-  Gyre at 3 cells: whirlpool dashes read well; still asleep in Surge (interim, `BOSS_WAKES` [4]). Screenshots viewed:
-  the Gyre's core hexagon reads olive under the darkness, dimmer than the mint key (S-62 may brighten it; not a bug).
-- Q-033 closed (D-169): no ember change. S-61b refined (D-170): the rim (8 px, 12 dmg, once / 4 s) replaces plain
-  contact, which a held core never meets (6 px gap); gate `--boss=gyre`, no Heat Sink. S-62 gains the mid-build line;
-  new Q-034. `02` trimmed (Weather / Anomalies / Echo detail → new `08-Systems-Reference-2.md`). No new bug.
-
-## Session 133 — Build: S-61b Gyre awake in Surge (v1.8.74, D-171)
-- `gyre.js` `surgeGyre` + `rimGap`, swarms via `mote.js` `spawnSwarm(.., true)` (groups: own centre / leash / loot);
-  `BOSS_WAKES` [3, 4]; inward pull in `gyreCurrent`; rim tell outline. Bot route `lair` option; `bossrun --boss=gyre`.
-- Gate gyre: Drift 8/8 med 0.69 min, Surge 8/8 med 0.66, deaths 0, swarms 16, rims 78, ratio 0.954 PASS (2 s wall).
-  Crucible gate unchanged (1.055). Shoal mote gate unchanged (0.907 / 0.890).
-- New checks fail on the old code (stash of `src/`: 3 FAIL + rimGap missing). Screenshot (seed 4242, Surge, 3 cells
-  off): key hidden, mint rim outline over the body, whirlpool dashes; reads clearly.
-- B-096 (flake, open): smoke run 1 failed `S-46b2 budget` new Game 154 ms under load (alone: 98 ms); run 2 626/626.
-  For audit 134: the throttled timing check shares CPU with the prestarted gates.
+Continues part 18 (sessions 129–133 archived word for word in audit 139: `archive/2026-11-26-09-sessions-129-133.md`, part 18 removed). Newest at the bottom; read the tail only.
 
 ## Session 134 — Audit: touch test 38 s faster (B-097), wait probe, 09 archive (v1.8.75, D-172)
 - No subagent tool: sweeps in-session, newest code first (`gyre.js` / `mote.js` S-61b: wake / sleep resets, rim
@@ -79,3 +56,21 @@ Continues part 18 (sessions 129–131; 124–128 archived in audit 134). Newest 
   no overlap; first try put ✧ first in the landscape row, over the bank panel at 568 / 740 (moved under the row).
   `touch.cjs` / `hud.cjs` now include ✧. Screenshots 360 × 640 and 640 × 360 viewed: ✧ violet, reads apart from ◇.
 - HUD key now includes the call state, else ✧ stayed hidden after the Lens (first browser run failed). No bugs logged.
+
+## Session 139 — Audit: Lens button ❖ (B-099), phone sweep, 09 archive (v1.9.80, D-177)
+- No subagent tool: sweeps in-session, newest code first (`rift.js` Lens: refusals, called / natural clocks, reload,
+  death, hitstop rule match their headers; D-171…D-176 numbers match `config.js`). No logic bug found.
+- B-099: ✧ was both the Lens button and the Lodestone Anomaly chip, same violet, in the same corner on a phone (seen in
+  the 320 × 568 Large screenshot). Now ❖ (glyph sheet compared at 44 px: ⊛ ⌖ thin, ◈ reads as ◇). New `lens.cjs`
+  check: no HUD button glyph is an Anomaly chip glyph; fails on the old `index.html`.
+- Phone sweep (scratch probe, not kept): 6 sizes × Normal / Large, Surge, all buttons, 3 chips, 5 banks: no overlap,
+  nothing off screen, ≥ 44 px. `touch.cjs` B-034 loop + 320 × 568 / 412 × 915 portrait (39 PASS alone). Its first
+  portrait run failed: ● 8888 at 320 overlaps the minimap by 13 px; a 256 world holds ~430–545 ● (3 seeds), so the
+  portrait case uses a 256 world's realistic top (◆ ▲ 8888, ● ≈ ⬟ 888), which fits.
+- `09` sessions 129–133 archived word for word (`archive/2026-11-26-09-sessions-129-133.md`, part 18 removed); `05`
+  v1.7.59–65 archived. Debt lines of audits 109–134 moved to the done archive; the slow-file items closed (D-177).
+- Workflow review: too much copying of the same Debt lines audit to audit (the slow files rode four audits); too
+  little: phone sweeps (two audits skipped). Change (D-177): a line carried three audits is fixed or closed.
+- Smoke: run 1 641/643 (S-38 / S-29 read VERSION while I bumped it mid-run: mine, not a bug); run 2 640/643:
+  **B-100** (flake, open): `facet.cjs` 320 × 568 primed Spire: mask set, hint empty, so the 2 later checks fail too;
+  3 standalone runs PASS; worlds are random (B-098), so seed or load. Run 3 643/643.

@@ -194,7 +194,7 @@ function updateHud() {
     $('matrix-btn').classList.toggle('hidden', !g.inNexus());
     $('scan-btn').classList.toggle('hidden', !g.research.scanner); // S-11: shown once unlocked, dim while cooling down
     $('scan-btn').classList.toggle('cooling', !scanReady);
-    const lens = !!g.nexusLevels.lens, cb = lens ? callBlock(g) : 'lens'; // S-63: ✧ once the Lens is built, dim while it can't call
+    const lens = !!g.nexusLevels.lens, cb = lens ? callBlock(g) : 'lens'; // S-63: ❖ once the Lens is built, dim while it can't call
     $('call-btn').classList.toggle('hidden', !lens); $('call-btn').classList.toggle('cooling', !!cb);
     $('call-btn').title = `Call a rift: ${RIFT_CALL_COST} ▲ (${keys.K('call')})`;
     $('mode-btn').classList.toggle('hidden', unlockedModes(g).length < 2); // S-13: only once there is a second mode
@@ -376,7 +376,7 @@ function renderPanel() {
       const lvl = g.nexusLevels[u.id];
       list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => {
         const ok = g.buyNexus(u.id); // S-63: the Lens says how to call
-        if (ok && u.id === 'lens') toast(`Lens built — ${input.usingTouch ? 'tap ✧' : 'press ' + keys.K('call')} to call a rift (${RIFT_CALL_COST} ▲)`, 3200);
+        if (ok && u.id === 'lens') toast(`Lens built — ${input.usingTouch ? 'tap ❖' : 'press ' + keys.K('call')} to call a rift (${RIFT_CALL_COST} ▲)`, 3200);
         return ok; }));
     }
   } else {
