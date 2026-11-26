@@ -73,3 +73,4 @@ Continues part 17 (sessions 124–125; 119–123 archived in audit 129). Newest 
 - Measured: site on 30 / 30 seeds by draw 2; probe (mid build, beam 5 / range 3, riding 3.2 cells out): 56.0, 55.8,
   56.7, 56.1 s (spec ≤ 90). Screenshot viewed: mint core + turning hexagon, key plate, ring dashes in the lair.
 - Observed: the key fill on the rose plate reads pale mint under the darkness (distinct, not loud); S-62 may revisit.
+  Smoke 620/620 (+9), 546 s.
