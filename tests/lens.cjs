@@ -125,7 +125,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.goto(url); await pg.waitForTimeout(200);
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
-  await pg.click('#new-world'); await pg.waitForTimeout(300);
+  await require('./spire.cjs').pinnedNewWorld(pg); await pg.waitForTimeout(300); // B-103: a random seed had no rock 14 cells east 1.7 % of the time (D-100: pin)
   const st = () => pg.evaluate(() => { const g = window.__lumen.game; return { hidden: document.getElementById('call-btn').classList.contains('hidden'),
     open: !!(g.rift.open && g.rift.open.called), prism: g.bank.prism, toast: document.getElementById('toast').textContent }; });
   await pg.evaluate(() => { const g = window.__lumen.game; g.bank.prism = 100; g.player.x += 14 * 32; g.stats.time = 30; });

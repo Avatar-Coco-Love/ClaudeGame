@@ -1,7 +1,7 @@
 # 03 — Open Questions
 
 Undecided only. Once a question is settled, remove it here and record the answer as a D-xxx entry in `06-Decisions.md` (cite the Q number).
-New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169, Q-032 / Q-035 / Q-036 by D-180, Q-022 by D-181.
+New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169, Q-032 / Q-035 / Q-036 by D-180, Q-022 by D-181, Q-039 by D-186.
 
 | ID | Question | Notes |
 |----|----------|-------|
@@ -16,4 +16,3 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-031 | Should a rift (S-57) also show on the Scanner ring or the Chart before it opens (a warning a few seconds ahead)? | Design 117. Leaning **no**: the toast + chevron at open is enough for a 45 s window; revisit if S-57a's bot rarely reaches one in time. |
 | Q-037 | Should a feat's rule show before it is near (e.g. Rift runner 0 / 5 from the start), or only once begun? | Design 142 (D-180). Leaning **show all**: a goal you can't see is not a goal; revisit if the S-66 screenshot reads as a chore list. |
 | Q-038 | Should Glitches follow the S-72 flow field too, instead of beelining and fading (D-017)? | Session 143 (D-182). Leaning **no**: the beeline is the tunnels' safety and the contrast that makes hunters read as smart. Ask in the play-test after S-74. |
-| Q-039 | A second Echo, or Echo levels past 2? | Session 143 (D-181; was Q-022's other half). Leaning **no**: one helper with three orders is the small complete system; revisit only if S-71 shows the max Echo is under 15 % of the haul. |

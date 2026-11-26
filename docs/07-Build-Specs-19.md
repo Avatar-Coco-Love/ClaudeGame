@@ -37,14 +37,18 @@ Today the Echo (S-42/43, `echo.js`) has Gather / Guard, fixed numbers and picks 
   10 s, Tether the cells it may pick; no Core Matrix stat moves; old save loads levels 0; a 3rd buy is refused. One
   screenshot (Research tab, Focus 2 / Volley 1).
 
-## S-71 — Echo gate: Auto earns its name (M16)
+## S-71 — Echo gate: Auto earns its name (M16; refined Design 147, D-186)
 **Save:** none.
-- `tools/echobot.mjs --orders`: the mine bot in Veil and Deep (tier ≥ 2 Glitches, Spitters on), 8 seeds
-  (`GATE_SEEDS`), Drift and Surge, Mine / Defend / Auto, Echo levels 0 and max, 5 min each. Reports ore value / min
-  (`VALUE`), damage taken / min and the Echo's share of the haul.
-- **Gate (PASS):** in Surge, Auto ≥ 0.9 × Mine's value and ≤ 1.1 × Defend's damage; Auto's value Drift / Surge in
-  0.8–1.25 (D-158's band); the max-level Echo's share of the haul ≤ 35 % (the core stays the miner). Tune
-  `ECHO_AUTO_HOLD`, `ORE_WORTH` use and the Focus levels (log each try in `09`). In `gates.cjs` (D-166).
+- `tools/echobot.mjs --orders`: surgebot's `deep` route (Spitter depth), mid build, 2 × `GATE_SEEDS` (16) seeds, 5 min.
+  Runs: Surge no Echo / Mine / Defend / Auto, Drift no Echo / Auto, each at Echo levels 0 and 2 (all rows), ~60 s.
+  Reports gain / min (banked + carried), **mean** damage / min (an 8-seed median swung 17 → 10), Auto's switches / min.
+- **Echo share = 1 − (no-Echo gain / with-Echo gain)**, not the ore it broke: the core's beam goes mostly into rock
+  while it tunnels, so ore credit reads 55–77 % for an Echo that adds ~25 %.
+- **Gate (PASS), Surge:** Auto gain ≥ 0.9 × Mine's; Auto damage ≤ 1.1 × Defend's. **Both:** Auto gain Drift / Surge
+  and the Echo's added gain Drift / Surge in 0.8–1.25 (D-158's band); level-2 share in 15–35 % (the core stays the
+  miner; under 15 % reopens Q-039). On a fail tune `ECHO_AUTO_HOLD`, then Focus (log each try in `09`). In `gates.cjs`.
+- Design 147 probe (16 seeds, before any tuning) already passes: Auto 0.97–0.99 × Mine, damage 1.02 / 0.83 × Defend;
+  share Drift 23 / 29 %, Surge 17 / 22 % (L0 / L2). So S-71 is likely a gate with no tuning.
 - **M16 done** after S-71 passes.
 
 ## Cut (D-181)
