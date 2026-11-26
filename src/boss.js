@@ -8,12 +8,13 @@
 // first stamped into an older save refunds what was placed in it and moves a core standing in it to the Nexus.
 // S-60b Surge form (D-165): in Surge, with the core within BOSS_WAKE_R cells, the boss is awake: any plate cuts, the flare
 // cycles BOSS_SURGE_FLARE_S and hurts, embers (Spitter bolts, `ember`) fly at a core in sight. A death heals its core only.
-// S-61a: the Shoal's Gyre shares all of this but the take-apart order, the flare and the look (gyre.js; list: Crucible first).
+// S-61a: the Shoal's Gyre shares all of this but the take-apart order, the flare and the look (gyre.js; list: Crucible first);
+// its Surge form (S-61b) is swarms, the rim and an inward pull instead of the flare and embers.
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
   WARD_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
-  BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, BOSS_WAKES, BOSS_RGB } from './config.js';
-import { stepGyre, gyreKeyBroke, drawGyre } from './gyre.js';
+  BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, GYRE_SWARM_S, BOSS_WAKES, BOSS_RGB } from './config.js';
+import { stepGyre, surgeGyre, gyreKeyBroke, drawGyre } from './gyre.js';
 import { World, seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
 import { ventPhase } from './vent.js';
@@ -52,9 +53,9 @@ export function makeBosses(game) {
   const list = [];
   for (const ring of Object.keys(LAIR_D).map(Number).sort((a, b) => b - a)) { // the Crucible (S-60) stays boss 0
     const s = lairSite(game.world, ring, game.anomaly.sites, game.vents.sites);
-    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1, ember: BOSS_EMBER_S, awake: false, step: GYRE_STEP_S });
+    if (s) list.push({ ...s, name: BOSS_NAMES[ring], down: false, lit: 0, phase: seededStream(game.world.seed, 'lair-flare-' + ring)() * VENT_PERIOD_S, fired: -1, told: -1, ember: BOSS_EMBER_S, awake: false, step: GYRE_STEP_S, swarmT: 0, touch: 0 });
   }
-  game.bosses = { list, flares: 0, refunds: 0, burns: 0, embers: 0, steps: 0 };
+  game.bosses = { list, flares: 0, refunds: 0, burns: 0, embers: 0, steps: 0, rims: 0 };
   if (!list.length) return;
   const w = game.world, prev = w.hitMul;
   w.hitMul = (x, y, type, dir) => type === T.BOSS_PLATE || type === T.BOSS_CORE ? bossMul(game, x, y, type) : prev ? prev(x, y, type, dir) : 1;
@@ -68,7 +69,7 @@ export const platesLeft = (game, B) => PLATES.filter(([i, j]) => game.world.get(
 
 /** S-60b: awake = Surge, live, and the core within BOSS_WAKE_R cells of the boss core (follows a mode switch at once). */
 export function bossAwake(game, B) {
-  if (game.mode !== 'surge' || B.down || game.endSeq || !BOSS_WAKES.includes(B.ring)) return false; // S-61a: no Gyre form yet
+  if (game.mode !== 'surge' || B.down || game.endSeq || !BOSS_WAKES.includes(B.ring)) return false;
   const p = game.player;
   return Math.hypot(p.x - (B.x + 0.5) * CELL, p.y - (B.y + 0.5) * CELL) <= BOSS_WAKE_R * CELL;
 }
@@ -86,7 +87,7 @@ export function bossMul(game, x, y, type) {
 export function healBosses(game) {
   const bs = game.bosses, w = game.world;
   if (!bs) return;
-  for (const B of bs.list) if (!B.down) { w.damage[B.y * w.w + B.x] = 0; w.markDirty(B.x, B.y); B.ember = BOSS_EMBER_S; }
+  for (const B of bs.list) if (!B.down) { w.damage[B.y * w.w + B.x] = 0; w.markDirty(B.x, B.y); B.ember = BOSS_EMBER_S; B.swarmT = GYRE_SWARM_S; }
 }
 
 /** After a save is applied (or for a new world): stamp each lair (`raw`: the save's `bosses`, [{ ring, down }]). A lair
@@ -171,7 +172,7 @@ export function updateBosses(game, dt = 0) {
   if (!bs || !bs.list.length || game.endSeq) return;
   for (const B of bs.list) {
     if (B.down) continue;
-    if (B.ring === GYRE_RING) { stepGyre(game, B, dt); continue; } // S-61a: no flare; the key steps
+    if (B.ring === GYRE_RING) { stepGyre(game, B, dt); surgeGyre(game, B, dt); continue; } // S-61a: no flare; the key steps (S-61b: Surge form)
     const awake = bossAwake(game, B), ph = bossPhase(game, B), key = (awake ? 's' : 'd') + ph.n;
     const dx = p.x - (B.x + 0.5) * CELL, dy = p.y - (B.y + 0.5) * CELL, d = Math.hypot(dx, dy);
     if (awake !== B.awake) { B.awake = awake; B.ember = BOSS_EMBER_S; }

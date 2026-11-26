@@ -7,6 +7,8 @@
 // hold. A touch of the hold (either mode) takes MOTE_TAKE items for good, never damage in Drift. After a touch a mote
 // scatters MOTE_SCATTER cells and returns. Beamed (`beamFoes` adds live motes): MOTE_LOOT ◆ each, and the swarm's last
 // mote pays the Glitch loot of its tier once, equal in both modes. Seeded (`rng.swarm`, `rng['swarm-loot']`); never saved.
+// S-61b: an awake Gyre releases swarms of its own (`spawnSwarm(..., true)`, motes tagged `boss`) into the same list; each
+// swarm (`grp`) keeps its own centre, leash and loot count, and the Shoal's own timer counts only the untagged one.
 import {
   CELL, RESOURCE, UNDERTOW_RING, GLITCH_HIT_CD_S, GLITCH_LOOT_SHARDS, GLITCH_PRISM_CHANCE, SWARM_N, SWARM_FIRST_S,
   SWARM_EVERY_S, SWARM_SPAWN_R, SWARM_LEASH, MOTE_R, MOTE_HP, MOTE_SPEED, MOTE_STEER, MOTE_COHESION, MOTE_DMG, MOTE_PREY_R,
@@ -20,7 +22,7 @@ import { BITE_ORDER } from './burrower.js';
  *  damage dealt), taken (items taken for good), carried (pickups lifted), dropped, kills (motes beamed), cleared (swarms
  *  beamed to the last mote). */
 export function makeSwarm() {
-  return { motes: [], field: new Int16Array(SIDE * SIDE), fx: 0, fy: 0, fieldT: 0, fieldVer: -1, timer: SWARM_FIRST_S, off: false, beamed: 0, tier: 1, swarms: 0, spawned: 0, touches: 0, hits: 0, taken: 0, carried: 0, dropped: 0, kills: 0, cleared: 0 };
+  return { motes: [], bossSwarms: 0, field: new Int16Array(SIDE * SIDE), fx: 0, fy: 0, fieldT: 0, fieldVer: -1, timer: SWARM_FIRST_S, off: false, beamed: 0, tier: 1, swarms: 0, spawned: 0, touches: 0, hits: 0, taken: 0, carried: 0, dropped: 0, kills: 0, cleared: 0 };
 }
 
 // The swarm's way in: a BFS distance field over open floor from the core's cell, MOTE_FIELD cells out (as the Echo's, S-42).
@@ -77,6 +79,27 @@ export function clearSwarm(game) {
   s.motes = []; s.timer = nextGap(game);
 }
 
+/** One swarm leaves (its leash): its carried pickups fall; the Shoal's own swarm starts a new gap. */
+function dropGroup(game, grp) {
+  const s = game.swarm;
+  for (const m of s.motes) if (m.grp === grp && m.carry) game.spawnPickup(m.x, m.y, m.carry);
+  s.motes = s.motes.filter(m => m.grp !== grp);
+  if (!grp.boss) s.timer = nextGap(game);
+}
+
+/** SWARM_N motes round (cx, cy) as one swarm (`boss`: an S-61b Gyre swarm, tagged). Returns its group. */
+export function spawnSwarm(game, cx, cy, boss = false) {
+  const s = game.swarm, grp = { tier: glitchTier(Math.hypot(cx - game.nexus.x, cy - game.nexus.y)), beamed: 0, boss };
+  s.swarms++; s.spawned += SWARM_N;
+  if (boss) s.bossSwarms++; else { s.tier = grp.tier; s.beamed = 0; }
+  for (let k = 0; k < SWARM_N; k++) {
+    const o = k / SWARM_N * Math.PI * 2;
+    s.motes.push({ mote: true, boss, grp, x: cx + Math.cos(o) * 6, y: cy + Math.sin(o) * 6, vx: 0, vy: 0, r: MOTE_R, hp: MOTE_HP, maxHp: MOTE_HP,
+      flash: 0, hitCd: 0, scatter: 0, sx: 0, sy: 0, prey: null, carry: null, trail: [] });
+  }
+  return grp;
+}
+
 function spawn(game) {
   const r = game.rng.swarm, w = game.world, p = game.player, pcx = Math.floor(p.x / CELL), pcy = Math.floor(p.y / CELL);
   for (let i = 0; i < 40; i++) {
@@ -85,13 +108,7 @@ function spawn(game) {
     if (w.get(x, y) !== T.EMPTY || fieldAt(game.swarm, x, y) < 0) continue; // open floor the swarm can fly in from
     const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
     if (Math.hypot(cx - game.nexus.x, cy - game.nexus.y) < NEXUS_RADIUS + CELL) continue;
-    const s = game.swarm;
-    s.tier = glitchTier(Math.hypot(cx - game.nexus.x, cy - game.nexus.y)); s.beamed = 0; s.swarms++; s.spawned += SWARM_N;
-    for (let k = 0; k < SWARM_N; k++) {
-      const o = k / SWARM_N * Math.PI * 2;
-      s.motes.push({ mote: true, x: cx + Math.cos(o) * 6, y: cy + Math.sin(o) * 6, vx: 0, vy: 0, r: MOTE_R, hp: MOTE_HP, maxHp: MOTE_HP,
-        flash: 0, hitCd: 0, scatter: 0, sx: 0, sy: 0, prey: null, carry: null, trail: [] });
-    }
+    spawnSwarm(game, cx, cy);
     return true;
   }
   return false;
@@ -115,12 +132,13 @@ function beamed(game, m) {
   game.burst(m.x, m.y, 8, `rgb(${MOTE_RGB})`, 140);
   if (m.carry) { game.spawnPickup(m.x, m.y, m.carry); s.dropped++; }
   if (!m.warded) for (let j = 0; j < MOTE_LOOT; j++) game.spawnPickup(m.x, m.y, 'shard'); // D-154: a Ward's kill: the carried item only
-  s.kills++; s.beamed++;
-  if (s.beamed === SWARM_N) { // the whole swarm: the Glitch loot once (not when a Ward takes the last mote, D-154)
+  const grp = m.grp;
+  s.kills++; grp.beamed++; if (!grp.boss) s.beamed = grp.beamed;
+  if (grp.beamed === SWARM_N) { // the whole swarm: the Glitch loot once (not when a Ward takes the last mote, D-154)
     game.audio.enemyDie();
     const prism = game.rng['swarm-loot']() < GLITCH_PRISM_CHANCE;
     if (!m.warded && prism) game.spawnPickup(m.x, m.y, 'prism');
-    if (!m.warded) for (let j = 0; j < GLITCH_LOOT_SHARDS + s.tier; j++) game.spawnPickup(m.x, m.y, 'shard');
+    if (!m.warded) for (let j = 0; j < GLITCH_LOOT_SHARDS + grp.tier; j++) game.spawnPickup(m.x, m.y, 'shard');
     s.cleared++;
   }
 }
@@ -163,20 +181,20 @@ export function updateSwarm(game, dt) {
     if (game.world.breaks !== s.fieldVer || Math.floor(p.x / CELL) !== s.fx || Math.floor(p.y / CELL) !== s.fy || (s.fieldT -= dt) <= 0) buildField(game, s);
   }
   if (s.motes.some(m => m.hp <= 0)) {
-    for (let i = s.motes.length - 1; i >= 0; i--) if (s.motes[i].hp <= 0) { beamed(game, s.motes[i]); s.motes.splice(i, 1); }
-    if (!s.motes.length) s.timer = nextGap(game); // the last mote just went: a full gap
+    let own = false;
+    for (let i = s.motes.length - 1; i >= 0; i--) if (s.motes[i].hp <= 0) { own = own || !s.motes[i].boss; beamed(game, s.motes[i]); s.motes.splice(i, 1); }
+    if (own && !s.motes.some(m => !m.boss)) s.timer = nextGap(game); // the Shoal swarm's last mote just went: a full gap
   }
-  if (!s.motes.length) {
-    if (!here || (s.timer -= dt) > 0) return;
-    if (!spawn(game)) { s.timer = 2; return; }
-  }
-  let cx = 0, cy = 0;
-  for (const m of s.motes) { cx += m.x; cy += m.y; }
-  cx /= s.motes.length; cy /= s.motes.length;
-  if (Math.hypot(cx - p.x, cy - p.y) > SWARM_LEASH * CELL) { clearSwarm(game); return; }
+  if (!s.motes.some(m => !m.boss) && here && (s.timer -= dt) <= 0 && !spawn(game)) s.timer = 2;
+  if (!s.motes.length) return;
+  const ctr = new Map(); // each swarm's centre (cohesion, leash)
+  for (const m of s.motes) { let c = ctr.get(m.grp); if (!c) ctr.set(m.grp, c = { x: 0, y: 0, n: 0 }); c.x += m.x; c.y += m.y; c.n++; }
+  for (const [grp, c] of ctr) { c.x /= c.n; c.y /= c.n; if (Math.hypot(c.x - p.x, c.y - p.y) > SWARM_LEASH * CELL) dropGroup(game, grp); }
+  if (!s.motes.length) return;
   const surge = game.mode === 'surge', chased = new Set();
   for (const m of s.motes) if (m.prey && !m.carry && game.pickups.includes(m.prey)) chased.add(m.prey); else m.prey = null;
   for (const m of s.motes) {
+    const { x: cx, y: cy } = ctr.get(m.grp);
     m.flash = Math.max(0, m.flash - dt); m.hitCd = Math.max(0, m.hitCd - dt);
     if (m.scatter > 0) { m.scatter -= dt; moveMote(game, m, m.sx, m.sy, MOTE_SPEED, cx, cy, dt); continue; }
     if (m.carry) { // drifts off with the current, away from the core

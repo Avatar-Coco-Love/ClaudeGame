@@ -104,7 +104,7 @@ export class Game {
     this.lastHitstop = -Infinity;
     this.coreRing = 0;   // 1 -> 0 after a Core Matrix purchase (ring on the core, render.js)
     // S-5 / D-025: gameplay randomness is seeded per draw; visual-only effects (particles, shake) stay on Math.random.
-    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot', 'swarm', 'swarm-loot', 'crucible', 'gyre'].map(k => [k, seededStream(seed, k)]));
+    this.rng = Object.fromEntries(['yield', 'pickup', 'glitch-spawn', 'glitch-wander', 'glitch-loot', 'burrower', 'burrower-loot', 'swarm', 'swarm-loot', 'crucible', 'gyre', 'gyre-swarm'].map(k => [k, seededStream(seed, k)]));
     this.undertow = makeUndertow(this.world); // S-47: Shoal currents from the seed (never saved)
     this.burrow = makeBurrow(); // S-53: the Kiln Burrower (never saved)
     this.swarm = makeSwarm(); // S-54: the Shoal mote swarm (never saved)

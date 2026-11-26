@@ -1,8 +1,9 @@
 // S-61a Gyre checks (D-168, gyre.js). smoke.cjs calls nodeChecks + browserChecks. Node: the lair site rules on 30 seeds (all in
 // the Shoal, clear of vaults / vents + Anomalies / Spires, seed-only); the key steps one standing plate clockwise every 1.2 s,
 // keeps every plate's damage, and only it cuts; the whirlpool runs clockwise at 45 px/s within 6 cells only and is gone once
-// the Gyre is down; Drift = Surge (no Surge form yet); loot ≈; an old save with only the Crucible gets the Gyre stamped.
+// the Gyre is down; loot ≈; an old save with only the Crucible gets the Gyre stamped.
 // Probe: a mid build riding the whirlpool takes it apart in ≤ 90 s. Browser: a seen Gyre draws (core, key, whirlpool dashes).
+// S-61b (D-170): the Surge form (any order, pull, rim + its delay, swarm cap + Drift clear) and the bossrun --boss=gyre gate.
 // Usage: node tests/gyre.cjs [--browser] (GYRE_SHOT=path.png)
 const quiet = new Proxy({}, { get: () => () => {} });
 
@@ -57,7 +58,8 @@ async function nodeChecks(check) {
     const d = run('drift'), s = run('surge'), steps = d.order.slice(1).every((k, i) => k === (d.order[i] + 1) % 8);
     check('S-61a key: steps one plate clockwise every 1.2 s (all 8 in turn), skips broken plates, passes on at once when it breaks; only the key cuts, the core waits; damage is kept',
       steps && d.leaks.length === 0 && d.core === 0 && d.kept === 5 && d.skip && d.passed, JSON.stringify(d));
-    check('S-61a interim: Surge (3 cells out) = Drift: never awake, the same key rule', JSON.stringify(d) === JSON.stringify(s) && !s.awake, JSON.stringify(s));
+    check('S-61b: awake in Surge (3 cells out) every plate cuts, in any order (Drift: only the key); the core still waits',
+      s.awake && !d.awake && s.leaks.length === 7 && s.core === 0, JSON.stringify(s));
     const seeds = new Set([4242, 7, 99, 31337, 5, 11, 2024, 8080].map(n => gyre(make('drift', n)).lit));
     check('S-61a: the first key is seeded (varies by seed; its own stream, the Crucible\'s start unchanged)', seeds.size > 1, [...seeds].join(','));
   }
@@ -77,6 +79,52 @@ async function nodeChecks(check) {
         && out[0] === r.outChunk[0] && out[1] === r.outChunk[1] && rode.dx > 20 && rode.u[0] > 40, JSON.stringify(r));
     check('S-61a down: BOSS_LOOT with ≈ (80 ◆, 20 ▲, 24 ≈), toast "Gyre"; the whirlpool stops (the chunk\'s own draw returns)',
       r.down && r.ev && r.name === 'Gyre' && loot.shard === 80 && loot.prism === 20 && loot.tide === 24 && after[0] === ch[0] && after[1] === ch[1], JSON.stringify(r));
+  }
+  { // S-61b pull + rim: only in Surge; the rim hits 12 once per 4 s with a knockback outward
+    const res = {};
+    for (const mode of ['drift', 'surge']) {
+      const g = make(mode), B = gyre(g), p = g.player, ox = (B.x + 0.5) * CELL, oy = (B.y + 0.5) * CELL;
+      p.x = ox; p.y = oy - 3 * CELL; idle(g, 1, () => { p.x = ox; p.y = oy - 3 * CELL; p.vx = p.vy = 0; });
+      const n = flowAt(g, ox, oy - 3 * CELL).map(v => +v.toFixed(3));
+      let hits = 0, kick = 0, last = 0, t9 = 0, first = -1;
+      const H = g.stat('hull'), at = () => { p.x = (B.x - 2 + 0.5) * CELL; p.y = oy; p.vx = p.vy = 0; p.invuln = 0; p.integrity = H; };
+      for (let k = 0; k < 600; k++) { // 10 s on the open cell beside the west plate (the bot's beam spot)
+        at(); g.update(1 / 60, { move: { x: 0, y: 0 }, fire: false, aim: null }); g.enemies.length = 0; g.events.length = 0;
+        if (p.integrity < H) { hits++; kick = Math.min(kick, p.vx); if (first < 0) first = k; if (k < 60 * 4.6) t9++; last = H - p.integrity; }
+      }
+      res[mode] = { n, hits, t9, first, dmg: last, kick: Math.round(kick), rims: g.bosses.rims };
+    }
+    const { rimGap } = await import('../src/gyre.js');
+    const d = res.drift, s = res.surge;
+    check('S-61b pull: awake in Surge the whirlpool also draws inward at 30 px/s (north of the core: [45, 30]); Drift none ([45, 0])',
+      s.n[0] === GYRE_SPEED && s.n[1] === C.GYRE_PULL && d.n[0] === GYRE_SPEED && d.n[1] === 0, JSON.stringify({ d: d.n, s: s.n }));
+    check('S-61b rim: beside the body in Surge 12 dmg + an outward knockback, at most once per 4 s (3 hits in 10 s, 2 in the first 4.6 s); Drift never',
+      s.hits === 3 && s.t9 === 2 && s.first === 0 && s.dmg === C.BOSS_TOUCH_DMG && s.kick < -100 && d.hits === 0 && d.rims === 0, JSON.stringify(res));
+    const g = make('surge'), B = gyre(g), p = g.player; p.x = (B.x - 2 + 0.5) * CELL; p.y = (B.y + 0.5) * CELL; const near = rimGap(g, B);
+    p.x -= CELL; const far = rimGap(g, B);
+    check('S-61b rim reach: the open cell beside a plate is in reach (gap ≤ 8 px), one cell farther is not', near <= C.GYRE_RIM_PX && far > C.GYRE_RIM_PX, JSON.stringify({ near, far }));
+  }
+  { // S-61b swarms: every 15 s awake, at the lair edge, at most 2 alive; a switch to Drift clears them
+    const g = make('surge'), B = gyre(g), p = g.player, s = g.swarm; g.god = true; s.off = false;
+    const at = () => { p.x = (B.x + 0.5 - 3) * CELL; p.y = (B.y + 0.5) * CELL; p.vx = p.vy = 0; };
+    const groups = () => new Set(s.motes.filter(m => m.boss).map(m => m.grp)).size;
+    let max = 0, firstAt = -1, edge = null;
+    for (let k = 0; k < 60 * 50; k++) {
+      idle(g, 1, at); max = Math.max(max, groups());
+      if (firstAt < 0 && s.bossSwarms) { firstAt = +(k / 60).toFixed(2); const m = s.motes.find(q => q.boss); edge = Math.max(Math.abs(Math.floor(m.x / CELL) - B.x), Math.abs(Math.floor(m.y / CELL) - B.y)); }
+    }
+    const r = { max, released: s.bossSwarms, firstAt, edge, tagged: s.motes.filter(m => m.boss).length };
+    g.setMode('drift'); r.afterDrift = s.motes.filter(m => m.boss).length;
+    const dg = make('drift'), dB = gyre(dg); dg.swarm.off = false;
+    idle(dg, 60 * 20, () => { dg.player.x = (dB.x + 0.5 - 3) * CELL; dg.player.y = (dB.y + 0.5) * CELL; }); r.drift = dg.swarm.bossSwarms;
+    check('S-61b swarms: awake, a tagged swarm leaves the lair edge every 15 s (first at 15 s), at most 2 alive (the 3rd is held); a switch to Drift clears them; none in Drift',
+      max === 2 && r.released === 2 && Math.abs(firstAt - 15) < 0.1 && edge === LAIR_HALF && r.afterDrift === 0 && r.drift === 0, JSON.stringify(r));
+  }
+  { // S-61b gate (D-170): tools/bossrun.mjs --boss=gyre, the world as played, GATE_SEEDS (8) seeds
+    const out = await require('./gates.cjs').run('bossrun.mjs', ['--boss=gyre']);
+    const line = out.split('\n').find(l => l.startsWith('gate')) || '';
+    check('S-61b: the bossrun.mjs --boss=gyre gate passes on 8 seeds (Surge / Drift time to down 0.8–1.25, Surge deaths median ≤ 1, every run down)',
+      /PASS/.test(line), out.trim().split('\n').map(l => l.slice(0, 70)).join(' | '));
   }
   { // an old save that only knows the Crucible (format 23 from S-60a) gets the Gyre stamped; a reload keeps the Gyre's down flag
     const g = make(), s = JSON.parse(JSON.stringify(g.toSave()));
@@ -131,6 +179,11 @@ async function browserChecks(browser, url, check, errors, shot) {
   const r = await pg.evaluate(() => ({ drawn: window.__lumen.renderer.bossDrawn, dashes: window.__lumen.renderer.gyreDashes }));
   if (shot) await pg.screenshot({ path: shot });
   check('S-61a: a seen Gyre draws its core, key and whirlpool dashes', has && r.drawn === 1 && r.dashes > 0, JSON.stringify({ has, ...r }));
+  await pg.evaluate(() => { const g = window.__lumen.game; g.setMode('surge'); g.player.integrity = 999; }); // S-61b: awake
+  await pg.waitForTimeout(400);
+  const a = await pg.evaluate(() => { const g = window.__lumen.game, B = g.bosses.list.find(b => b.name === 'Gyre'); return { awake: B.awake, rim: window.__lumen.renderer.gyreRim, drawn: window.__lumen.renderer.bossDrawn }; });
+  if (process.env.GYRE_SHOT2) await pg.screenshot({ path: process.env.GYRE_SHOT2 });
+  check('S-61b: an awake Gyre (Surge) draws the rim tell while the rim is armed', a.awake && a.rim && a.drawn === 1, JSON.stringify(a));
   await pg.close();
 }
 
