@@ -28,7 +28,8 @@ export const LEVELS = { start: {}, mid: { beam: 4, range: 3, thrust: 3, cargo: 4
 const WALL = new Set([T.BEDROCK, T.VAULT, T.CACHE, T.SPIRE, T.FACET, T.BOSS_PLATE, T.BOSS_CORE]); // never dug on a path (a boss cell only when aimed at, S-60b2)
 const ORE = new Set([T.CRYSTAL, T.PRISM, T.LUMEN]);
 const ANOMALY_DETOUR_S = 20;
-const dt = 1 / 60, REPLAN_S = 2, STUCK_S = 5, STUCK_PX = 8, FIGHT_PX = 160, RETREAT = 0.35, SPIRE_R = 24;
+export const RETREAT = 0.35; // the hull share at which the bot turns home to heal (huntrun's hull debt reads it)
+const dt = 1 / 60, REPLAN_S = 2, STUCK_S = 5, STUCK_PX = 8, FIGHT_PX = 160, SPIRE_R = 24;
 const audio = new Proxy({}, { get: () => () => {} });
 
 /** Binary-heap A* / Dijkstra over the grid (4-neighbour). Cost of entering a cell, in seconds: crossing time, plus the
@@ -110,15 +111,22 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
   const inNexusCell = i => Math.hypot(cx(i) - g.nexus.x, cy(i) - g.nexus.y) < NEXUS_RADIUS - CELL;
   const depositCell = i => inNexusCell(i) || g.relays.some(r => Math.hypot(cx(i) - r.x, cy(i) - r.y) < r.r * 0.6);
   /** Hurt (Surge): head for the Nexus and heal to full. Returns true while it is busy with that. */
-  let healing = false;
+  // S-74b2 (D-202): trips = heal retreats started, healS = seconds spent on them, the way back included (huntrun's hull debt).
+  // A trip runs from turning home until the core is back within BACK_PX of where it turned (≤ BACK_S after healing).
+  let healing = false, trips = 0, healS = 0, from = null, healedT = 0;
+  const BACK_PX = 4 * CELL, BACK_S = 60;
+  const back = () => { if (from && !healing && (Math.hypot(g.player.x - from.x, g.player.y - from.y) < BACK_PX || t - healedT >= BACK_S)) { healS += t - healedT; from = null; } };
   const retreat = () => {
     if (mode !== 'surge') return false;
     const p = g.player, max = g.stat('hull');
-    if (!healing && p.integrity < max * RETREAT) healing = true;
-    if (healing && g.inNexus() && p.integrity >= max) healing = false;
+    if (!healing && p.integrity < max * RETREAT) { healing = true; trips++; from = { x: p.x, y: p.y }; }
+    if (healing && g.inNexus() && p.integrity >= max) { healing = false; healedT = t; }
+    back();
     if (!healing) return false;
     setGoal('heal', inNexusCell);
-    if (drive() === 'skip') { setGoal('', null); healing = false; }
+    const t0 = t;
+    if (drive() === 'skip') { setGoal('', null); healing = false; from = null; }
+    healS += t - t0;
     return true;
   };
   const bankRun = () => { setGoal('bank', depositCell); const r = drive(); if (r === 'arrived') { for (let k = 0; k < 600 && g.cargoTotal() > 0 && t < capT; k++) tick(g.player); setGoal('', null); } return r; };
@@ -242,7 +250,7 @@ export function runBot({ seed, route = 'mine', build = 'mid', mode = 'surge', mi
     }
     Object.assign(out, { wakes, wakeFails, wakeHeld: relitT !== null, toRelit: relitT === null || primedT === null ? null : (relitT - primedT) / 60, primed: primedT !== null, toPrimed: primedT === null ? null : primedT / 60, holdDeaths, held: holdOk, fed: s ? s.fed : 0 });
   }
-  Object.assign(out, { kills: g.stats.glitches, deaths, stuck, skipped, minutes: t / 60, deathsMin: deaths / Math.max(t / 60, 1e-9), capped: t >= capT });
+  Object.assign(out, { trips, healS, hull: g.player.integrity / g.stat('hull'), kills: g.stats.glitches, deaths, stuck, skipped, minutes: t / 60, deathsMin: deaths / Math.max(t / 60, 1e-9), capped: t >= capT });
   return out;
 }
 

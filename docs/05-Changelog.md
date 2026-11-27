@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.104 — 2026-11-27
+- No change to play. Behind the scenes: the hunters' balance check now counts the time a hurt core still owes the
+  Nexus and judges the Deep, Shoal and Kiln together, ready for the final hunter tuning.
+
 ## v1.11.103 — 2026-11-27
 - No change to play. Design notes: the plan to finish tuning the hunters, judged over the Deep, Shoal and Kiln
   together, so they cost Drift and Surge players the same; two hunter oddities found in play-testing are queued.

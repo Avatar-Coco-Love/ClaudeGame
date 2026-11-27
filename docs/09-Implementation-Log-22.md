@@ -64,3 +64,14 @@ Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at th
   toast read clearly ("beam it to get it back"); screenshot viewed. **B-109** (open): it then sat 52 px from the core
   for the whole 6 s flee and faded with the loot, never getting away.
 - Specs: S-74b2 written (`07-…-20`); S-75 / S-76 re-read, still build-ready (no change since Design 157).
+
+## Session 163 — Build: S-74b2a, hunters' cost measure: hull debt + pooled gate (v1.11.104, D-203)
+- **B-108** (closed, no game bug): ablations on the Deep Surge run (8 seeds, cost %): base −5.8, hurt a no-op −0.2,
+  no damage but knockback + grace −4.6, damage without knockback −6.3. Over 32 seeds base −1.1 % (sets −5.8 / −0.7 /
+  +1.4 / +0.9): seed noise on an unpaid cost. Fighting hunters mines +3…6 % more cells (the beam cuts through to them).
+- `surgebot.mjs`: `trips`, `healS` (turn home → heal → back within 4 cells, ≤ 60 s), end `hull`; `RETREAT` exported.
+  First try priced heal time only (16 s/trip, debt ~9 s); second counted a still-open trip's wait (397 s, bug, fixed
+  before commit: the way back starts only after the heal).
+- `huntrun.mjs`: per-run hull debt, per-ring ratios as report, `pooled (...)` line + floor; gate verdict pooled.
+  Now: Surge −1.0 / +16.1 / +54.7 %, Drift +5.7 / +7.0 / +5.9 %, pooled 6.2 vs 21.8 (0.285) FAIL, floor FAIL (Deep Surge).
+- Smoke: `tracer.cjs` checks the pooled + floor line and the hull-debt report (new; the line did not exist before).

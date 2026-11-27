@@ -76,7 +76,7 @@ ring's mean retreat (`surgebot` reports seconds spent healing + trips); the Surg
 `HUNTER_TIER_MAX` 1 (the tier step of hunter damage stops at the Deep's; measured: Surge +17.6 → +9.3 % pooled,
 Kiln 52 → 31), then `TRACER_TAKE` 24 → ≤ 36 while no ring's Drift cost passes +12 %. (5) **B-109:** a Tracer that took
 cargo sat 52 px from a still core for its whole 6 s flee, then faded (play-test): find why, make it get away (test). `gates.cjs` runs the full
-gate; smoke checks the pooled line. VERSION 1.12.0. Rejected: see D-202.
+gate; smoke checks the pooled line. VERSION 1.12.0. Rejected: see D-202. **Split (Build 163, D-203):** 1–3 built (S-74b2a); S-74b2b = 4–5.
 
 ## Cut (D-182)
 Per-enemy A* every frame, flow fields for Glitches (Q-038), Surge-only hunters, a hunter that bores rock, a third hunter

@@ -146,6 +146,11 @@ async function nodeChecks(check) {
     const line = out.split('\n').find(l => l.startsWith('reach')) || '', gate = out.split('\n').find(l => l.startsWith('gate')) || '';
     check('S-74a hunters: where a ghost Glitch from the spawn gives up, Tracers still reach the core on ≥ 80 % (huntrun.mjs, Deep, 8 seeds)',
       / ok$/.test(line) && /reach PASS/.test(gate), line.slice(0, 220));
+    // S-74b2a (D-202): the cost half is pooled with a per-ring floor, and a Surge run below full hull pays hull debt
+    const pool = out.split('\n').find(l => l.startsWith('pooled (deep)')) || '', sl = out.split('\n').find(l => l.startsWith('deep surge:')) || '';
+    check('S-74b2a hunters: huntrun.mjs prints the pooled cost line (ratio + per-ring floor) and Surge hull debt (trip s, owed s)',
+      /Drift \/ Surge .*\(0\.8–1\.25\) (ok|FAIL); floor \(every face > 0 in every ring\) (ok|FAIL)/.test(pool) && /hull debt: end hull with [\d.]+ \/ without [\d.]+, trip \d+ s/.test(sl),
+      `${pool.slice(0, 160)} | ${(sl.match(/hull debt.*/) || [''])[0].slice(0, 120)}`);
   }
   { // the Echo in Auto turns to Defend at a Drift Tracer it can see
     const L = lab('drift'), g = L.g;
