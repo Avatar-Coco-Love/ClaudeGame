@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.108 — 2026-11-27
+- Planning update, no change in the game. The next touch layout (action buttons in an arc under your right thumb)
+  was measured on five phone sizes and corrected so no button lands on the Core Matrix button or the hint. Next up
+  after it and the map legend: a Decoy you can place to pull hunters off you for a few seconds, in both modes.
+
 ## v1.12.107 — 2026-11-27
 - Hunters finished (M17). In Drift, a thief you beam down no longer gives back everything it snatched: it spills most
   of it, but keeps its most valuable few pieces, so a theft always stings a little even when you win it back.

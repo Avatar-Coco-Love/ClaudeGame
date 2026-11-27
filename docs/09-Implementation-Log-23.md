@@ -27,3 +27,15 @@ Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
 - **B-110** (fixed): first full smoke 703/705: `craft.cjs` pressed B 100 ms after a teleport and no frame had read it
   (`placeResult` still 'nexus', nothing placed) under the added gate's load; it now waits for the result.
 
+
+## Session 167 — Design: play-test M17, S-75 / S-76 measured, S-66 split, Decoy specced (v1.12.108, D-207, D-208)
+- Play-test (`?dev`, Max all, 3 Tracers + a Pincer pair, 6 s each, screenshots viewed): Drift Shoal 1000 × 700:
+  thefts toast and the thieves flee, hold 30 → 25; Surge Kiln: Integrity 280 → 228, five hunters on the core read
+  as one violet blob (Debt watch, `04-…-4`); Drift Kiln on 390 × 844: 30 → 9 held, actions at y 186–236 (S-75 holds).
+- Measured S-75's arc rule (`?dev` off, touch, 5 viewports) against the real ⊕ / hint / minimap rects: slot 4 on ⊕
+  at 390 × 844 / 375 × 667 / 320 × 568, slot 5 on the hint at 568 × 320; 52 px arc step = 51.96 px chord; the arc
+  crossed the spec's stick circle; R 230 → outer 286 px. Fixed rule (keep rects, 54 px chord, R ≤ 215, third arc):
+  all five fit, farthest 251 px (❖ 292 at 568 × 320). S-76: landscape map leaves 40 px below, legend goes beside.
+- S-66 used format 25, which S-70 took: now 26 in S-66a; toast + ending row → S-66b.
+- Q-042 → yes (hunters cost ≥ 10 % in both modes): S-77a/b in `07-…-22`. Q-041 → no. Theft toast overpromises
+  since D-206 ("beam it to get it back"): fixed in S-77a.

@@ -18,22 +18,24 @@ without a design D-xxx.
 A 160 world has 4 (`profile.overdrive` / bosses decide it). Every feat is the same in Drift and Surge (one face, D-152;
 bosses have their two forms, D-158). A feat never unlocks, pays or speeds anything (pillar 4, D-009's layers untouched).
 
-## S-66 — Feats: derive, count, show (M16)
-**Save:** `stats.kinds` (0) and `stats.rifts` (0) → format 25 (upgrade step: both 0; `saveformat.cjs`, never pin the
-number). Everything else is derived from state already saved, so a feat can't desync from the world.
-- `src/feats.js`: `feats(game)` → `[{ id, name, rule, done, have, need }]` for this world's size (pure, from the game).
-  `checkFeats(game)` runs on deposit, cache break, boss down, Anomaly take, rift close, upgrade; a feat newly done
-  plays a toast "Feat: Quiet lairs (2 / 4)" and the deposit arpeggio's top note once. `game.featsSeen` (unsaved) is
-  filled on load, so a reload never re-toasts.
-- `anomaly.js` take sets `stats.kinds |= bit(kind)`; `rift.js` `closeRift` adds 1 to `stats.rifts` when `mined` = all
-  cells of that pocket (the tools' `r.mined` counter stays).
-- Nexus tab, below the rows: a **Feats n / N** heading and one line per feat (✓ when done, else ·; no Anomaly chip glyph, D-177; name, the rule and
-  progress like "Charted 21 % / 35 %", "Rift runner 2 / 5"). Text only, no buttons; readable at 320 × 568 Large text
-  (the sheet scrolls; check the rows above still show without scrolling at 360 × 640).
-- Ending card: a row "Feats n / N" after "Bosses".
-- Smoke: each feat's rule on a stubbed game (both sizes; a 160 world lists 4); kinds / rifts counters (a rift closed
-  with 8 of 9 mined does not count); toast once, none after a reload; Drift = Surge for every feat; old save loads
-  kinds / rifts 0; the ending row. One screenshot (Nexus tab, 360 × 640, two feats lit).
+## S-66a — Feats: derive, count, list (M18; split by Design 167, D-207)
+**Save:** `stats.kinds` (0) and `stats.rifts` (0) → the next format (26 today: S-70 took 25; upgrade step both 0,
+`saveformat.cjs`, never pin the number). Everything else is derived from saved state, so a feat can't desync.
+- `src/feats.js`: `feats(game)` → `[{ id, name, rule, done, have, need }]` for this world's size (pure). Names in code
+  today: `game.bosses.list[i].down`, `game.topLevel(u)`, `game.stats` (saved whole), `rift.js` `closeRift`.
+- `anomaly.js` take sets `stats.kinds |= bit(kind)`; `closeRift` adds 1 to `stats.rifts` when every cell of *that*
+  pocket was mined (count this close's cells; the tools' `r.mined` is a running total and stays).
+- Nexus tab, below the rows: a **Feats n / N** heading and one line per feat (✓ done, else ·; no Anomaly chip glyph,
+  D-177; name, rule, progress like "Charted 21 % / 35 %", "Rift runner 2 / 5"). Text only; all six from the start
+  (Q-037's leaning). Readable at 320 × 568 Large text (the sheet scrolls; the rows above show unscrolled at 360 × 640).
+- Smoke: each rule on a stubbed game (both sizes; a 160 world lists 4); kinds / rifts counters (8 of 9 mined does
+  not count); Drift = Surge for every feat; old save loads 0 / 0. One screenshot (Nexus tab, 360 × 640, two lit).
+
+## S-66b — Feats: the moment and the ending (M18)
+**Save:** none. `checkFeats(game)` runs on deposit, cache break, boss down, Anomaly take, rift close, upgrade; a feat
+newly done toasts "Feat: Quiet lairs (2 / 4)" and plays the deposit arpeggio's top note once. `game.featsSeen`
+(unsaved) is filled on load, so a reload never re-toasts. Ending card: "Feats n / N" after "Bosses".
+- Smoke: toast once, none after a reload or a mode switch; the ending row; audio: the note under the ceiling.
 
 ## S-67 — Feats probe: each one reachable, none trivial (M16)
 **Save:** none.
