@@ -67,6 +67,12 @@ S-72 (D-190) left these open; settled while building `src/flow.js` / `src/hunter
 - Rejected: a new hue (best found: pale mint 180,255,240, which then sits on Tide ore and the Shoal), a bigger dot
   (Glitch size is the rule for small foes).
 
+### D-199 — `02` capped at 7 KB (audit 159 workflow review)
+- `02` reached the 8 KB doc cap three times (Design 132, session 155, audit 159: 8074 bytes), each time trimmed by hand.
+  A rule broken twice gets a check: `tests/docs.cjs` now FAILs `02` over 7168 bytes. Audit 159 moved 14 system lines
+  word for word to `08-…-2` (8074 → ~6.2 KB). Builds keep one line per system in `02`; detail goes to `08`.
+- Rejected: a line cap only (60 lines still fit 8 KB of long lines); a new `02-…-2` (`02` is one handoff note).
+
 ### D-198 — The Echo reads the hunters' `coreField` (Build 158, S-73b; closes D-186's interim)
 - The Echo's own 24-cell BFS is gone: it calls `coreField(game)` (flow.js, 32-cell box) and treats steps > `ECHO_FIELD`
   (24) as unreachable, so its blink rule and path cap are unchanged. Hunters tick the field's 0.5 s clock when they run
