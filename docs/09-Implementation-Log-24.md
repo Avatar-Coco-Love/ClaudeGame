@@ -46,3 +46,4 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
 - D-210…D-214 vs code: match. Debt: audit 164 watch closed (three audits), Design 167 blob closed (Q-044 settled).
 - Workflow review (D-215): too little: no "every placed kind" checklist (rule added); too much: none new.
 - `09` sessions 164–168 archived word for word (`archive/2026-11-27-09-sessions-164-168.md`).
+- Smoke 733/733. Pitfall: bumping `VERSION` while smoke runs FAILs S-38 / S-29 (the version is read at the start); re-run clean.
