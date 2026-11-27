@@ -21,6 +21,12 @@ function run() {
   const STATUS_CAP = 7168, sBytes = Buffer.byteLength(status);
   check(`handoff (02) under ${STATUS_CAP} bytes`, sBytes <= STATUS_CAP, `${sBytes} bytes`);
   check('handoff (02) has exactly one Next step', (status.match(/^## Next step/gm) || []).length === 1);
+  // Audit 164 (D-204): 02's next step said "Build 164" where the rotation (CLAUDE.md) makes 164 an Audit. The next step
+  // names the next session's number and type; both must follow the counter: n = counter + 1, n % 5 = 2 Design, 4 Audit.
+  const counter = +(status.match(/Session counter: (\d+)/) || [])[1], next = (status.split(/^## Next step.*$/m)[1] || '').match(/\b(Build|Design|Audit) (\d+)/);
+  const due = n => (n % 5 === 2 ? 'Design' : n % 5 === 4 ? 'Audit' : 'Build');
+  check('handoff (02) next step names session counter + 1 and the type the rotation makes due', !!counter && !!next && +next[2] === counter + 1 && next[1] === due(counter + 1),
+    next ? `counter ${counter}, next "${next[0]}", due ${due(counter + 1)}` : `counter ${counter}, no "Build|Design|Audit n" in the next step`);
 
   const version = (fs.readFileSync(path.join(ROOT, 'src/config.js'), 'utf8').match(/VERSION = '([^']+)'/) || [])[1];
   const log = fs.readFileSync(path.join(ROOT, 'docs/05-Changelog.md'), 'utf8');

@@ -11,10 +11,10 @@ import {
   CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK,
   GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
   TRACER_S, TRACER_RETRY_S, TRACER_SPAWN, TRACER_CAP, TRACER_CAP_DEEP, TRACER_SPEED, TRACER_STEER, TRACER_LINE, TRACER_DMG,
-  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
+  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
-import { coreField, fieldAt, downhill, uphill, ringCells } from './flow.js';
+import { coreField, fieldAt, downhill, uphill, ringCells, aStar } from './flow.js';
 import { glitchTier } from './glitch.js';
 import { BITE_ORDER } from './burrower.js';
 import { moveBody, collides } from './body.js';
@@ -22,7 +22,7 @@ import { moveBody, collides } from './body.js';
 /** Spawner state (never saved). Counters are for tests: spawned, reached (first contact), gaveUp, kills, taken. */
 export function makeHunt(game) {
   return {
-    timer: gap(game), pincer: pgap(game), off: false, spawned: 0, reached: 0, gaveUp: 0, kills: 0, taken: 0,
+    timer: gap(game), pincer: pgap(game), off: false, spawned: 0, reached: 0, gaveUp: 0, kills: 0, taken: 0, runs: 0,
     pairs: 0, frame: 0, searchFrame: -1, searches: 0, capped: 0, nodesMax: 0, // S-73a: pincer pairs and flank searches
   };
 }
@@ -121,8 +121,8 @@ export function updateHunters(game, dt) {
     let gx, gy;
     if (e.flee > 0) { // Drift, after a touch: up the field, away from the core
       e.flee -= dt;
-      const up = uphill(f, cx, cy);
       if (fd < 0 || e.flee <= 0) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; }
+      const up = runStep(game, e, f, cx, cy) || uphill(f, cx, cy); // B-109: a way out, not the nearest nook
       [gx, gy] = up ? [(up[0] + 0.5) * CELL, (up[1] + 0.5) * CELL] : [e.x - dx, e.y - dy];
     } else {
       if (fd < 0) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; } // off the field: gives up (D-017's fade)
@@ -156,6 +156,27 @@ export function biteWorth(game, w) {
   const out = []; let got = 0;
   for (const k of BITE_ORDER) while (got < w && game.cargo[k] > 0) { game.cargo[k]--; out.push(k); got += ORE_WORTH[k] || 1; }
   return out;
+}
+
+/** B-109: the flee's way, found once a flee: an A* (≤ TRACER_FLEE_NODES, round the core's cells) to the farthest field
+ *  cell on the hunter's side of the core (any side if none), so it does not stop in a dead-end nook near the core (a
+ *  local high of the field, where `uphill` has no better neighbour). Returns the next waypoint, or null (then uphill). */
+function runStep(game, e, f, cx, cy) {
+  if (e.run === undefined) {
+    const sx = cx - f.cx, sy = cy - f.cy, far = ringCells(f, 1, 1e4);
+    let best = null, bs = -1;
+    for (let i = 0; i < far.length; i += 3) {
+      const sc = far[i + 2] + ((far[i] - f.cx) * sx + (far[i + 1] - f.cy) * sy >= 0 ? 1e5 : 0); // its side first, then farthest
+      if (sc > bs) { bs = sc; best = [far[i], far[i + 1], far[i + 2]]; }
+    }
+    const r = best && best[2] > Math.max(0, fieldAt(f, cx, cy)) ? aStar(f, cx, cy, best[0], best[1], TRACER_FLEE_NODES, [f.cx, f.cy], PINCER_AVOID_R, PINCER_AVOID_COST) : null;
+    e.run = r && r.path && r.path.length ? r.path : null; e.ri = 0; game.hunt.runs++;
+  }
+  const P = e.run;
+  if (!P) return null;
+  for (let i = e.ri; i < P.length; i += 2) if (P[i] === cx && P[i + 1] === cy) { e.ri = i + 2; break; }
+  if (e.ri >= P.length) { e.run = null; return null; }
+  return [P[e.ri], P[e.ri + 1]];
 }
 
 function touch(game, e, ux, uy) {

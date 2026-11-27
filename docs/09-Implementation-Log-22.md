@@ -1,16 +1,6 @@
 # 09 — Implementation Log, part 22
 
-Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at the bottom; read the tail only.
-
-## Session 158 — Build: S-73b, the Echo on the shared field + Pincer pips (v1.11.99, D-198)
-- `echo.js`: own BFS removed; `fieldAt` wraps flow.js's with the 24-step cap; the clock ticks from the Echo only with no
-  hunters alive. `pincer.js`: white pip in the cached dot sprite (lead filled r 3, flank 1.5 px ring at r × 0.5).
-- Checks: `pincer.cjs` (Echo + pair: same `game.flow`, no Echo field, ≤ 1 build a frame; fails on the old code, which
-  had `echo.field`); browser: pip pixels read from the sprites (lead 255, flank ring 251, hollow 160);
-  `colours.cjs`: pip white vs Deep / Shoal / Kiln edges + Prism, ≥ 25 under 4 visions (fails without `PINCER_PIP`).
-  `echo.cjs`, `echoorder.cjs` unchanged and passing.
-- Screenshot viewed (pair in the Deep cross, dense magenta rock): both pips read at a glance; the flank's ring sits
-  inside its hollow, the lead's dot is solid. The rose-on-magenta problem from Design 157 is gone.
+Sessions 154–158 archived word for word in audit 164 (`archive/2026-11-27-09-sessions-154-158.md`); part 21 removed. Newest at the bottom; read the tail only.
 
 ## Session 159 — Audit: hunters' perf with a Pincer pair, `02` cap check, 09 archive (v1.11.100, D-199)
 - No subagent tool: sweeps in-session, newest code first (`flow.js`, `hunter.js`, `pincer.js`, `echo.js` S-72…S-73b).
@@ -75,3 +65,15 @@ Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at th
 - `huntrun.mjs`: per-run hull debt, per-ring ratios as report, `pooled (...)` line + floor; gate verdict pooled.
   Now: Surge −1.0 / +16.1 / +54.7 %, Drift +5.7 / +7.0 / +5.9 %, pooled 6.2 vs 21.8 (0.285) FAIL, floor FAIL (Deep Surge).
 - Smoke: `tracer.cjs` checks the pooled + floor line and the hull-debt report (new; the line did not exist before).
+
+## Session 164 — Audit: B-109 thief gets away, rotation check on 02, 09 archive (v1.11.105, D-204)
+- 02 said "Build 164"; the rotation makes 164 an Audit (CLAUDE.md wins). New `docs.cjs` check FAILs on the old 02.
+- No subagent tool: sweep in-session, newest code first (`hunter.js` S-74b, `surgebot.mjs` / `huntrun.mjs`). No new bug.
+- **B-109 (fixed):** `uphill` stops at a local high of the field (a nook by the core). Repro on 30 natural Deep seeds
+  (still core, Drift): flee ends 78 / 98 / 150 px on 3 of 27, most at 12–20 field steps. Now a once-per-flee A* to the
+  farthest field cell on its side: 615–1027 px on all 27. `tracer.cjs` check: 1.6 cells on the old code, 21.3 now.
+- `huntrun.mjs --no-echo` after the fix (parted Pincers flee the new way too): Drift +0.8 / +5.7 / +12.7 %, Surge
+  +2.4 / +9.8 / +53.6 %, pooled 6.8 vs 20.3 (0.332) FAIL, floor ok (Deep Surge now > 0). S-74b2b tunes from here.
+- D-199…D-203 vs code: match (7 KB cap, `RETREAT` export, 4-cell / 60 s trip, take 24, flee × 1.5, no hunter loot).
+- Workflow review: too much: none new; too little: a check on 02's next step (added, D-204). Audit 154 debt closed.
+- `09` sessions 154–158 archived word for word (`archive/2026-11-27-09-sessions-154-158.md`); part 21 removed.
