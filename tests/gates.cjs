@@ -14,7 +14,7 @@ function run(tool, args = []) {
   return started.get(key);
 }
 // Every gate a smoke test awaits (same tool + args as the test, or it simply runs twice). Unawaited rejections are held.
-const SMOKE = [['eventrun.mjs'], ['eventrun.mjs', '--call'], ['biomefoe.mjs', '--biome=kiln'], ['biomefoe.mjs', '--biome=shoal', '--seeds=8'], ['biomefoe.mjs', '--biome=kiln', '--wards=2'], ['bossrun.mjs'], ['bossrun.mjs', '--boss=gyre'], ['echobot.mjs', '--orders'], ['huntrun.mjs', '--rings=deep', '--no-echo']];
+const SMOKE = [['eventrun.mjs'], ['eventrun.mjs', '--call'], ['biomefoe.mjs', '--biome=kiln'], ['biomefoe.mjs', '--biome=shoal', '--seeds=8'], ['biomefoe.mjs', '--biome=kiln', '--wards=2'], ['bossrun.mjs'], ['bossrun.mjs', '--boss=gyre'], ['echobot.mjs', '--orders'], ['huntrun.mjs', '--rings=deep', '--no-echo'], ['huntrun.mjs', '--no-echo']];
 function prestart() { for (const [t, ...a] of SMOKE) run(t, a).catch(() => {}); }
 
 /** Smoke check: every run(...) in a test file is in SMOKE (else prestart misses it and it runs back to back again), and no

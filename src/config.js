@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.11.106';
+export const VERSION = '1.12.107';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -470,6 +470,9 @@ export const TRACER_SPEED = 0.8, TRACER_STEER = 8, TRACER_LINE = 3, TRACER_DMG =
 export const TRACER_FLEE_NODES = 2000; // B-109: the flee's A* budget (to the farthest field cell on its side; else uphill)
 // S-74b2b (D-205): the tier step of a hunter's Surge damage stops at HUNTER_TIER_MAX (the Deep's tier); hp and speed keep the full tier.
 export const HUNTER_TIER_MAX = 1;
+// S-74b2b2 (D-206): a thief killed drops back only TRACER_RETURN of what it carries (the cheapest part; it keeps
+// floor(n × (1 − TRACER_RETURN)) of its best), so a Drift theft costs something even when the core kills it back.
+export const TRACER_RETURN = 0.85;
 export const TRACER_FLEE_MUL = 1.5; // S-74b (D-201): a Drift hunter's speed × this while it flees with what it took
 export const HUNTER_LOOT_SHARDS = 2, HUNTER_PRISM_CHANCE = 0; // S-74b (D-201), S-74b2b (D-205: 2, a Glitch's base): a hunter's Surge kill pays these, not a Glitch's loot
 export const TRACER_RGB = '150, 140, 255'; // cyan-violet
