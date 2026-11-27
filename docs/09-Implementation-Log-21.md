@@ -57,3 +57,13 @@ Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-s
 - First full smoke: 685/687: the rift `eventrun` and Kiln `biomefoe` gates FAILed (Tracers now spawn in their runs).
   Both tools set `hunt.off` like their other creatures (D-193); the hunters' cost is S-74's gate.
 - Not done here (S-74's job): tuning `TRACER_S` / speed against the haul gate.
+
+## Session 156 — Build: S-73a the Pincer pair (v1.11.97, D-194)
+- New `src/pincer.js` (flank target, `flankStep`, draw); `flow.js` `aStar` (heap, stamps, avoid cost, node cap);
+  `hunter.js` spawns pairs (`spawnPincer`, `hunt.pincer` timer, Deep+), kind-aware dmg / burst / draw, mate flees on a
+  kill; `dev.pincer()`; `tests/pincer.cjs` (8 checks) in smoke.
+- First cross run: 5 / 10 flanks never arrived: the 6 s stall rule faded them on the detour (field distance rose).
+  Fixed by counting path steps left (D-194); then 10 / 10 came in by the N arm while the lead took E.
+- 8 natural Deep seeds, 30 s Surge each: 6 pairs, 10 / 12 reached the core; A* max 736 nodes, never capped.
+- Screenshot viewed: lead (filled) in the E arm, flank (hollow) in the N arm, dotted line between; rose reads on the
+  Deep's magenta but not strongly (watch in Design 157).

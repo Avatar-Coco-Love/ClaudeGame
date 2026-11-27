@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.11.96';
+export const VERSION = '1.11.97';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -469,3 +469,13 @@ export const FLOW_FIELD = 32, FLOW_S = 0.5;
 export const TRACER_S = [40, 20], TRACER_RETRY_S = 5, TRACER_SPAWN = [16, 24], TRACER_CAP = 1, TRACER_CAP_DEEP = 2;
 export const TRACER_SPEED = 0.8, TRACER_STEER = 8, TRACER_LINE = 3, TRACER_DMG = 8, TRACER_TAKE = 1, TRACER_FLEE_S = 6, TRACER_TRAIL = 6;
 export const TRACER_RGB = '150, 140, 255'; // cyan-violet
+// S-73a (M17, D-194): the Pincer pair. Deep and out (ring ≥ 2), one pair every PINCER_S [min, + span] s, never while one
+// lives (none spawnable: retry in TRACER_RETRY_S). Both spawn on the Tracer's rule, PINCER_SPLIT cells (euclidean) apart.
+// The lead walks the field like a Tracer; the flank every PINCER_SEARCH_S runs A* (8-way, octile, ≤ PINCER_NODES nodes)
+// to the open cell nearest the core + its velocity × PINCER_AHEAD_S that is ≥ PINCER_APART cells from the lead's next
+// PINCER_LEAD_CELLS field cells (looked for ≤ PINCER_LOOK cells around that point); its A* pays PINCER_AVOID_COST more
+// per cell within PINCER_AVOID_R of those lead cells, so it goes round the lead. Surge PINCER_DMG + tier step each, Drift
+// TRACER_TAKE each. One killed: the other flees for PINCER_PART_S, then fades.
+export const PINCER_S = [70, 30], PINCER_SPLIT = 10, PINCER_SEARCH_S = 0.5, PINCER_NODES = 800, PINCER_AHEAD_S = 1.5;
+export const PINCER_APART = 4, PINCER_LEAD_CELLS = 8, PINCER_LOOK = 8, PINCER_DMG = 6, PINCER_PART_S = 3, PINCER_AVOID_R = 2, PINCER_AVOID_COST = 8;
+export const PINCER_RGB = '255, 110, 200'; // rose-violet
