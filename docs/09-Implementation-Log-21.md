@@ -54,4 +54,6 @@ Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-s
 - Perf (`ONLY=deep,hunt`, 4× CPU, 12 s): `hunt / deep` median 1.00×; field build max 3.2 ms with the first BFS
   (`for…of` + destructuring), 0.60 ms after unrolling over `world.cells` (D-193). Screenshot viewed: a Tracer at a
   tunnel corner, 5 trail dots fading down the shaft; violet reads apart from the cyan core.
+- First full smoke: 685/687: the rift `eventrun` and Kiln `biomefoe` gates FAILed (Tracers now spawn in their runs).
+  Both tools set `hunt.off` like their other creatures (D-193); the hunters' cost is S-74's gate.
 - Not done here (S-74's job): tuning `TRACER_S` / speed against the haul gate.

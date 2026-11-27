@@ -27,7 +27,7 @@ function run(seed, mode, rings, on, lens = null) { // lens: null (S-57a) | 'mine
   let game = null;
   const setup = g => { // biomefoe's pad: the ring's mid-distance cell on the axis farthest from vaults / Spires
     game = g; const w = g.world;
-    g.burrow.off = true; g.swarm.off = true;
+    g.burrow.off = true; g.swarm.off = true; g.hunt.off = true; // S-72: Tracers have their own gate (S-74, D-193)
     const cells = []; for (let i = 0; i < w.w * w.h; i++) if (w.rings[i] === rings.ring) cells.push(Math.hypot(i % w.w - w.cx, ((i / w.w) | 0) - w.cy));
     cells.sort((a, b) => a - b); const d = cells[cells.length >> 1];
     let best = null, bd = -1;

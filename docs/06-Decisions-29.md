@@ -19,6 +19,9 @@ S-72 (D-190) left these open; settled while building `src/flow.js` / `src/hunter
   outside a Wake. Tracer kills do not count as Glitches in `stats` (the ending's Glitch count stays Glitches).
 - **Perf runs:** `deep` / `hunt` carve the same 1-cell tunnel cross (26 cells each way) at d 60, so Tracers can spawn and
   walk; measured `hunt / deep` median 1.00×.
+- **Older gates isolate their feature:** `eventrun.mjs` and `biomefoe.mjs` set `hunt.off` (as they already turn off
+  the other creatures): with Tracers on, both FAILed (rift Deep Surge on/off 1.009; Kiln Drift 0.837). The hunters' own
+  cost is S-74's gate.
 - Rejected: a field rebuilt on the 0.5 s clock only (hunters lag the core by cells; the clear-line rule only covers 3);
   a fixed screen size for off screen (a phone's view is far smaller than a desktop's); letting a Drift Tracer re-hunt
   after a touch (a thief that never leaves reads as Surge damage in Drift, against D-152).
