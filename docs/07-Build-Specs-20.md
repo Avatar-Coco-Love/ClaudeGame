@@ -48,6 +48,9 @@ gets only the calls (one `updateHunters(this, dt)` line after `updateBurrower`, 
 
 **Split (Build 156, D-194):** S-73a = the pair (built: A* also pays +8 within 2 cells of the lead's cells, spawn split
 10 cells, the flank's give-up clock counts path steps left). **S-73b** = the Echo onto `coreField` + the shared-build check.
+**S-73b also (Design 157, D-197):** each Pincer dot gets a white pip (lead: a filled 3 px centre; flank: a 1.5 px
+white ring inside its hollow): rose vs the Deep's dense edge is ΔE 8 (needs 25), so it reads by light, not hue.
+`colours.cjs` adds the pair pip white vs Deep / Shoal / Kiln edges and Prism ore. Screenshot against dense rock.
 
 ## S-74 — Hunters gate (M17)
 **Save:** none.

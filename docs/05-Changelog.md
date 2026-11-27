@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.98 — 2026-11-27
+- No change in play: on phones the action buttons are planned to move down to an arc by your right thumb (measured:
+  today they sit out of its reach), the big map will get a legend, and Pincers will get a white centre so they stand
+  out against the Deep's magenta rock.
+
 ## v1.11.97 — 2026-11-27
 - **Pincer pairs** now hunt from the Deep outward: two rose dots joined by a dotted line. One follows your tunnels; the
   other (hollow) works out where you are heading and comes in from another side. Surge: each hits for less than a

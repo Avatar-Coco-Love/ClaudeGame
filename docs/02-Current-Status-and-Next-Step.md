@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-27_ · **Session counter: 156** · **Version: v1.11.97**
-**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, v1.10 = M15 Nexus reaches out: Lens ▲ sink + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189). Next (D-181, `04-…-5`): M17 Hunters (`07-…-20`; S-72, S-73a built; S-73b, S-74 next), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105).
+_Last updated: 2026-11-27_ · **Session counter: 157** · **Version: v1.11.98**
+**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5, v1.5 = M10, v1.6 = M11, v1.7 = M12, v1.8 = M13, v1.9 = M14 two-form bosses, v1.10 = M15 Nexus reaches out: Lens ▲ sink + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189). Next (D-181, `04-…-5`): M17 Hunters (`07-…-20`; S-72, S-73a built; S-73b, S-74 next), S-75 / S-76 (`07-…-21`), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105).
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -41,9 +41,9 @@ _Last updated: 2026-11-27_ · **Session counter: 156** · **Version: v1.11.97**
 - Darkness/light, minimap (D-123; tap / N: map view, D-191), Nexus pointer, toasts, audio ceilings (`audio.cjs`). `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Phones: no key badges, buttons ≥ 44 px, landscape ◎⟂♪≡ top row, glyph-only ◎ ⟂ ≤ 700 px (D-050, D-058, D-064); bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Saves carry a format number (now 25); old formats are upgraded on load (`src/save.js`); malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 29 from D-193; last D-194), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-21`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 29 from D-193; last D-197), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-21`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-65, S-69…S-72, S-73a built. Next: S-73b, S-74 (M17, `07-…-20`), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-65, S-69…S-72, S-73a built. Next: S-73b, S-74 (M17, `07-…-20`), S-75, S-76 (`07-…-21`), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160).
@@ -51,4 +51,4 @@ _Last updated: 2026-11-27_ · **Session counter: 156** · **Version: v1.11.97**
   Swallowed test waits: `node -r ./tools/waitprobe.cjs`.
 
 ## Next step (one thing)
-Design 157: owner asks in `04-…-5` (HUD reach, enemy tiers, attack / defend); check Pincer rose vs the Deep. Then Build 158: S-73b.
+Build 158: S-73b (`07-…-20`): the Echo onto `coreField` (one shared field build) + the Pincer white pip (D-197).

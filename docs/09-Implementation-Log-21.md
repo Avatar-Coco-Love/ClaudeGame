@@ -67,3 +67,13 @@ Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-s
 - 8 natural Deep seeds, 30 s Surge each: 6 pairs, 10 / 12 reached the core; A* max 736 nodes, never capped.
 - Screenshot viewed: lead (filled) in the E arm, flank (hollow) in the N arm, dotted line between; rose reads on the
   Deep's magenta but not strongly (watch in Design 157).
+
+## Session 157 — Design: owner asks triaged, HUD reach measured (v1.11.98, D-195…D-197)
+- Phone sweep (`?dev`, Max all + Echo, touch): action centres 610–713 px from the bottom-right corner at 390 × 844,
+  335–418 at 320 × 568, 387–545 at 844 × 390, 326–413 at 568 × 320 (natural reach ≈ 275). No page errors.
+  Screenshot (390 × 844): all actions in the top quarter, the bottom-right empty. → S-75 thumb arc, S-76 map legend
+  (`07-Build-Specs-21.md`), slotted after S-74 (D-195).
+- Deep Surge play-test (cross tunnel at d 60, `dev.pincer()`): the pair closed 15 → 0 cells in ~4.5 s. Screenshot:
+  the hollow flank beside magenta dense rock nearly vanished. ΔE (worst of 4 visions) rose vs Deep dense edge 8; a
+  bright-colour sweep finds nothing ≥ 25 from every edge / ore / creature → white pip, folded into S-73b (D-197).
+- Owner's enemy tiers and attack / defend list triaged (D-196): next tier picked after M18; Decoy kept as Q-042.

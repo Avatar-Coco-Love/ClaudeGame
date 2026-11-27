@@ -13,18 +13,19 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 ## M17 — Hunters (D-182, `07-Build-Specs-20.md`) → v1.12
 - ✅ **S-72** `src/flow.js` BFS field + the Tracer (`game.hunters`): follows you through tunnels, both modes (Build 155, v1.11.96, D-193).
 - ✅ **S-73a** The Pincer pair: lead down the field, flank by bounded A* round the lead to where you are heading (Build 156, v1.11.97, D-194).
-- **S-73b** The Echo moves onto `coreField` (D-186): one field build shared with the hunters.
+- **S-73b** The Echo moves onto `coreField` (D-186): one field build shared with the hunters; the Pincer white pip (D-197).
 - **S-74** `huntrun.mjs` gate: Drift / Surge cost 0.8–1.25, Tracers reach where Glitches give up, perf `hunt` ≤ 1.1×. **M17 done.**
 - Cut (D-182): per-enemy A* each frame, Glitches on the field (Q-038), Surge-only hunters, a third kind, saved hunters.
 
-## Owner feedback, session 153 (for Design 157 to spec or cut)
+## Owner asks, session 153 (triaged Design 157, D-195…D-197) → v1.12 patches, after S-74, before S-66
 - ✅ Map view (v1.11.94, D-191): tap the minimap / N for a 3–4× map, world held; the tap no longer aims.
-- **HUD layout review:** measure thumb reach on phones (portrait + landscape); candidates: actions (◎ ⟂ ◇ ❖ ✦) in an
-  arc by the right thumb, menu / mute out of the play area, a minimap legend in the map view.
-- **Smarter enemies, in tiers:** beeliners (Glitch) < flow-field followers (Tracer, S-72) < coordinators (Pincer, S-73);
-  candidates after M17: an enemy that reads your beam (dodges the line), one that waits at the Nexus mouth, packs that retreat when hurt.
-- **New ways to attack and defend:** candidates to weigh against D-182 / D-153 (Wards): a decoy light, a shield pulse,
-  a beam mode that pushes, traps / mines placed like Wards. Each must work in Drift and Surge alike (pillar).
+- **S-75** Thumb arc (`07-…-21`): on touch the actions sit on arcs round the bottom-right grip (measured: today
+  610–713 px away on a 390 × 844 phone; natural reach ≈ 275).
+- **S-76** Map legend (`07-…-21`): the big map names the marks it drew.
+- Pincer white pip: folded into S-73b (D-197).
+- **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also
+  weighed: a Nexus-mouth camper, packs that retreat when hurt (both Surge-only today).
+- **Decoy** craft: Q-042, after S-74's numbers. Cut (D-196): traps / mines (a second Ward), a push beam, a shield pulse.
 
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
 - **S-66** Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (next format), Nexus tab list, ending row.

@@ -37,3 +37,32 @@ S-72 (D-190) left these open; settled while building `src/flow.js` / `src/hunter
 - One search a frame across all flanks (`hunt.frame`); the hunter field is `hunter: 'lead' | 'flank'` (the S-72 key), not `kind`.
 - Rejected: blocking the lead's cells outright (no other way in a dead-end tunnel → no flank at all); searching every
   frame (D-182 cut); the flank's own BFS field (a second build a frame).
+
+### D-195 — HUD reach: a thumb arc on touch, a map legend (Design 157, owner ask of session 153)
+- **Measured:** on a 390 × 844 phone the actions sit 610–713 px from the bottom-right grip (natural reach ≈ 275 px);
+  every viewport tested puts them at stretch or past (`07-…-21` table). The owner's worry holds.
+- **S-75:** on touch the actions move to arcs round the bottom-right corner (R 180–230, then + 56), most used
+  innermost; ♪ ≡ and the minimap stay top-right. **S-76:** the big map gets a legend of the marks it drew.
+- **Slot:** both after S-74 and before S-66, as v1.12 patches, no milestone (D-181's order stands: M17 closes first;
+  Feats keep M18 → 1.13).
+- Rejected: a bottom-edge row (the resting aim thumb hits it), a radial menu (two taps for the beam mode), a new
+  milestone for UI (shifts M18's version for two small slices), leaving it (a measured reach fault on every phone).
+
+### D-196 — Enemy tiers and new attack / defend tools: triage (Design 157)
+- **Tiers** stand as the owner put them: beeliners (Glitch) < field followers (Tracer) < coordinators (Pincer).
+  After M18, one next tier is picked by play-test, not now; the candidates stay in `04-…-5`. Of them, "reads your
+  beam" is the leaning (it works on hunters, which exist in both modes; a Nexus-mouth camper and a retreating pack
+  are Surge-only today, Glitches are not in Drift).
+- **Attack / defend:** the one candidate kept is a **Decoy** (a craft placed like a Ward that hunters' fields aim at
+  for a few seconds: in Drift it saves cargo, in Surge integrity — equal in both, D-002). Q-042 asks whether it
+  earns a slot after S-74's numbers. Cut: traps / mines (a second Ward, D-153), a push beam (a 5th beam mode, a longer
+  list not a deeper one), a shield pulse (damage only: Drift's hunters steal, so it would be a Surge tool).
+- Rejected: speccing a fourth enemy now (M17's gate has not measured the three), keeping all four tool ideas open.
+
+### D-197 — The Pincer gets a white pip (Design 157)
+- Measured (CIE76, worst of 4 visions): Pincer rose vs the Deep's dense edge ΔE 8, vs Prism ore similar family; a
+  sweep of bright colours finds none ≥ 25 from every ring edge, ore and creature (the palette is full). The play-test
+  screenshot: the hollow flank against magenta dense rock nearly vanished.
+- So it reads by light: a white pip in each dot (filled for the lead, a ring for the flank), folded into S-73b.
+- Rejected: a new hue (best found: pale mint 180,255,240, which then sits on Tide ore and the Shoal), a bigger dot
+  (Glitch size is the rule for small foes).
