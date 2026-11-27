@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.11.105';
+export const VERSION = '1.11.106';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -466,10 +466,12 @@ export const NEXUS_RING_RGB = { radiance: '46, 242, 255', chart: '150, 255, 200'
 // ◆-worth (ORE_WORTH, most valuable first, ≥ 1 item; S-74b) and it flees up the field (TRACER_FLEE_S at most, then fades); killed, it drops what it took.
 export const FLOW_FIELD = 32, FLOW_S = 0.5;
 export const TRACER_S = [40, 20], TRACER_RETRY_S = 5, TRACER_SPAWN = [16, 24], TRACER_CAP = 1, TRACER_CAP_DEEP = 2;
-export const TRACER_SPEED = 0.8, TRACER_STEER = 8, TRACER_LINE = 3, TRACER_DMG = 8, TRACER_TAKE = 24, TRACER_FLEE_S = 6, TRACER_TRAIL = 6;
+export const TRACER_SPEED = 0.8, TRACER_STEER = 8, TRACER_LINE = 3, TRACER_DMG = 8, TRACER_TAKE = 30, TRACER_FLEE_S = 6, TRACER_TRAIL = 6;
 export const TRACER_FLEE_NODES = 2000; // B-109: the flee's A* budget (to the farthest field cell on its side; else uphill)
+// S-74b2b (D-205): the tier step of a hunter's Surge damage stops at HUNTER_TIER_MAX (the Deep's tier); hp and speed keep the full tier.
+export const HUNTER_TIER_MAX = 1;
 export const TRACER_FLEE_MUL = 1.5; // S-74b (D-201): a Drift hunter's speed × this while it flees with what it took
-export const HUNTER_LOOT_SHARDS = 0, HUNTER_PRISM_CHANCE = 0; // S-74b (D-201): a hunter's Surge kill pays these, not a Glitch's loot
+export const HUNTER_LOOT_SHARDS = 2, HUNTER_PRISM_CHANCE = 0; // S-74b (D-201), S-74b2b (D-205: 2, a Glitch's base): a hunter's Surge kill pays these, not a Glitch's loot
 export const TRACER_RGB = '150, 140, 255'; // cyan-violet
 // S-73a (M17, D-194): the Pincer pair. Deep and out (ring ≥ 2), one pair every PINCER_S [min, + span] s, never while one
 // lives (none spawnable: retry in TRACER_RETRY_S). Both spawn on the Tracer's rule, PINCER_SPLIT cells (euclidean) apart.

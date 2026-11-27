@@ -11,7 +11,7 @@ import {
   CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK,
   GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
   TRACER_S, TRACER_RETRY_S, TRACER_SPAWN, TRACER_CAP, TRACER_CAP_DEEP, TRACER_SPEED, TRACER_STEER, TRACER_LINE, TRACER_DMG,
-  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
+  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
 import { coreField, fieldAt, downhill, uphill, ringCells, aStar } from './flow.js';
@@ -61,7 +61,7 @@ export function makeTracer(game, cx, cy, kind = 'tracer') {
   const x = (cx + 0.5) * CELL, y = (cy + 0.5) * CELL, hp = T.hp[0] + tier * T.hp[1];
   return {
     hunter: kind, x, y, r: GLITCH_R, vx: 0, vy: 0, tier, hp, maxHp: hp, speed: TRACER_SPEED * (T.speed[0] + tier * T.speed[1]),
-    dmg: (kind === 'tracer' ? TRACER_DMG : PINCER_DMG) + tier * T.dmg[1], flash: 0, hitCd: 0.5, spin: 0, best: Infinity, stall: 0, flee: 0, carry: [], trail: [cx, cy], met: false,
+    dmg: (kind === 'tracer' ? TRACER_DMG : PINCER_DMG) + Math.min(tier, HUNTER_TIER_MAX) * T.dmg[1], flash: 0, hitCd: 0.5, spin: 0, best: Infinity, stall: 0, flee: 0, carry: [], trail: [cx, cy], met: false,
   };
 }
 
