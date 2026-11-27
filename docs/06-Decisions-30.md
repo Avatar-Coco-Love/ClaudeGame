@@ -3,6 +3,15 @@
 Continues `06-Decisions-29.md` (part 29 neared the 8 KB cap at D-199; same rules: supersede, never edit; list rejected
 alternatives). D-200 on.
 
+### D-201 — S-74b1: the hunters' cost levers and a quieter measure; the gate waits for Q-043 (Build 161)
+- Drift: a touch takes 24 ◆-worth, richest first (`biteWorth`), fleeing at 1.5 × speed: Drift cost 0 → +6 % all rings.
+- Surge: hunters pay no kill loot (Glitches still do): loot made the Surge cost ≤ 0 (they paid to be met).
+- `huntrun` runs without natural Glitches: their deaths swung hauls ±10 % per ring, more than the hunters' cost.
+- Split: S-74b1 = these; S-74b2 = the gate after Q-043. Surge cost tracks hull vs ring (Deep ~0, Kiln +52 % from heat
+  + heal trips), which no hunter number moves evenly.
+- Rejected: Drift take 100+ worth to chase Kiln (Deep / Shoal Drift would far outweigh Surge); Surge damage scaled per
+  ring (a second tier rule); 20-min runs (gate defined on 10, D-200; costs still out of band); widening the band.
+
 ### D-200 — S-74 split: the gate's measure first (S-74a), the tuning after (S-74b) (Build 160)
 - **Split:** S-74a ships `tools/huntrun.mjs` (Deep / Shoal / Kiln, Drift and Surge, hunters on vs off, 8 seeds × 10 min)
   and gates only the reach half in smoke (`tracer.cjs`, Deep). The cost half FAILs on the first run, so it is reported

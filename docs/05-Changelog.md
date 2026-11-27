@@ -3,6 +3,14 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.102 — 2026-11-27
+- **Drift hunters bite harder:** a Tracer or Pincer that touches you now snatches up to 24 ◆-worth of your hold (the
+  richest ore first, not one item) and runs off faster. Beam it before it gets away to get it all back.
+- **Surge hunters pay less:** a hunter you destroy in Surge drops no Shards or Prism (a Glitch still does), so hunting
+  them is no longer a way to farm.
+- Behind the scenes: the hunters' cost measure now runs without Surge's Glitches (their deaths drowned it out) and
+  reports how often an Auto Echo turns to Defend with hunters about.
+
 ## v1.11.101 — 2026-11-27
 - **Fix:** in Surge, being destroyed by a Tracer or Pincer while another hunter was near could freeze the game. It no
   longer does: you respawn at the Nexus as usual.

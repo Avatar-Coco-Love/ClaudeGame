@@ -134,8 +134,8 @@ async function nodeChecks(check) {
     const dmg2 = hp2 - g.player.integrity;
     check(`S-73a pincer: Surge contact ${want} each (6 + tier step)`, Math.abs(dmg - want) < 1e-6 && Math.abs(dmg2 - want) < 1e-6, JSON.stringify({ dmg, dmg2, want }));
   }
-  { // Drift: a touch takes 1 item each; one killed, the other flees, then fades and is gone
-    const L = cross('drift'), g = L.g; g.cargo.shard = 5;
+  { // Drift: a touch takes TRACER_TAKE worth each (S-74b); one killed, the other flees, then fades and is gone
+    const L = cross('drift'), g = L.g; g.cargo.shard = 5 + 2 * C.TRACER_TAKE; const each = Array(C.TRACER_TAKE).fill('shard').join();
     const a = near(L, 'lead', 14), b = near(L, 'flank', -14); a.mate = b; b.mate = a; b.searchT = 0; b.pi = 0;
     const hp = g.player.integrity; frame(L, 3);
     const took = { a: a.carry.join(), b: b.carry.join(), left: g.cargo.shard, hp: g.player.integrity === hp };
@@ -143,9 +143,9 @@ async function nodeChecks(check) {
     const fled = b.flee > 0 && b.part === true && b.flee <= PINCER_PART_S;
     let gone = -1; for (let i = 0; i < 8 * 60; i++) { frame(L); if (!g.hunters.includes(b)) { gone = i / 60; break; } }
     const saved = JSON.stringify(g.toSave());
-    check('S-73a pincer: Drift takes 1 item each, no damage; the lead killed, the flank flees then fades (gone in ≤ 3 s + fade); nothing saved',
-      took.a === 'shard' && took.b === 'shard' && took.left === 3 && took.hp && fled && gone > 0 && gone <= PINCER_PART_S + C.GLITCH_FADE_S + 0.1 && !/hunter|pincer|flank/i.test(saved),
-      JSON.stringify({ took, fled, gone }));
+    check(`S-73a pincer: Drift takes ${C.TRACER_TAKE} ◆ worth each, no damage; the lead killed, the flank flees then fades (gone in ≤ 3 s + fade); nothing saved`,
+      took.a === each && took.b === each && took.left === 5 && took.hp && fled && gone > 0 && gone <= PINCER_PART_S + C.GLITCH_FADE_S + 0.1 && !/hunter|pincer|flank/i.test(saved),
+      JSON.stringify({ took: { ...took, a: took.a.length, b: took.b.length }, fled, gone }));
   }
 }
 

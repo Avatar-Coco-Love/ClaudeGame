@@ -2,21 +2,21 @@
 // at the first wall, D-017). They live in `game.hunters` (not `game.enemies`, which Drift empties), so they hunt in both
 // modes; `beamFoes` (spitter.js) adds them, so the beam, Arc, Wards and the Echo see them with no other change. The
 // Tracer walks the core's flow field (flow.js) downhill; with a clear line ≤ TRACER_LINE cells it steers straight.
-// Faces (D-152): Surge contact damage, kill drops as a Glitch (D-018); Drift a touch takes cargo and it flees up the
+// Faces (D-152): Surge contact damage, a kill pays HUNTER_* loot (S-74b, D-201); Drift a touch takes cargo worth TRACER_TAKE and it flees up the
 // field, killed it drops what it took. The Nexus repels and burns it like a Glitch. A mode switch keeps them; core death,
 // the ending and New Cycle (a new Game) clear them. Seeded (`rng.tracer`, `rng['glitch-loot']`); never saved.
 // S-73a (D-194): the Pincer pair (`hunter: 'lead' | 'flank'`, Deep and out, `rng.pincer`) spawns and moves here too;
 // pincer.js picks the flank's A* way and draws the pair.
 import {
-  CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK, GLITCH_PRISM_CHANCE,
-  GLITCH_LOOT_SHARDS, GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
+  CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK,
+  GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
   TRACER_S, TRACER_RETRY_S, TRACER_SPAWN, TRACER_CAP, TRACER_CAP_DEEP, TRACER_SPEED, TRACER_STEER, TRACER_LINE, TRACER_DMG,
-  TRACER_TAKE, TRACER_FLEE_S, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
+  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
 import { coreField, fieldAt, downhill, uphill, ringCells } from './flow.js';
 import { glitchTier } from './glitch.js';
-import { biteCargo } from './mote.js';
+import { BITE_ORDER } from './burrower.js';
 import { moveBody, collides } from './body.js';
 
 /** Spawner state (never saved). Counters are for tests: spawned, reached (first contact), gaveUp, kills, taken. */
@@ -140,7 +140,8 @@ export function updateHunters(game, dt) {
       e.hp -= dt * GLITCH_NEXUS_BURN;
     }
     const k = Math.min(1, dt * TRACER_STEER);
-    e.vx += (tx * e.speed - e.vx) * k; e.vy += (ty * e.speed - e.vy) * k;
+    const sp = e.speed * (e.flee > 0 ? TRACER_FLEE_MUL : 1); // S-74b (D-201): it runs faster than it hunts
+    e.vx += (tx * sp - e.vx) * k; e.vy += (ty * sp - e.vy) * k;
     moveBody(game.world, e, e.vx * dt, e.vy * dt, true);
     e.spin = Math.atan2(e.vy, e.vx);
     if (e.flee <= 0 && d < e.r + p.r && e.hitCd <= 0) {
@@ -148,6 +149,13 @@ export function updateHunters(game, dt) {
       if (!list.length) return; // B-107: a Surge death in touch() cleared the list (as B-007's Glitch guard)
     }
   }
+}
+
+/** S-74b (D-201): take cargo, the most valuable first (BITE_ORDER), until its ORE_WORTH reaches `w` (at least one item). */
+export function biteWorth(game, w) {
+  const out = []; let got = 0;
+  for (const k of BITE_ORDER) while (got < w && game.cargo[k] > 0) { game.cargo[k]--; out.push(k); got += ORE_WORTH[k] || 1; }
+  return out;
 }
 
 function touch(game, e, ux, uy) {
@@ -159,7 +167,7 @@ function touch(game, e, ux, uy) {
     if (p.invuln <= 0) game.hurtPlayer(e.dmg, ux, uy);
     return;
   }
-  const took = biteCargo(game, TRACER_TAKE); // Drift: no damage; it snatches and runs
+  const took = biteWorth(game, TRACER_TAKE); // Drift: no damage; it snatches and runs (S-74b: by worth, D-201)
   e.carry.push(...took); h.taken += took.length;
   if (took.length) game.notify('tracer-take');
   e.flee = TRACER_FLEE_S; e.vx = -ux * e.speed; e.vy = -uy * e.speed;
@@ -173,10 +181,10 @@ function die(game, e) {
   game.burst(e.x, e.y, 22, `rgb(${isPincer(e) ? PINCER_RGB : TRACER_RGB})`, 220); game.audio.enemyDie(); game.addShake(4);
   for (const k of e.carry) game.spawnPickup(e.x, e.y, k); // what it took, back (a Ward's kill too: D-154 keeps carried items)
   if (game.mode !== 'surge') return; // Drift: only what it took (D-152)
-  const prism = game.rng['glitch-loot']() < GLITCH_PRISM_CHANCE; // drawn either way (D-025)
+  const prism = game.rng['glitch-loot']() < HUNTER_PRISM_CHANCE; // drawn either way (D-025)
   if (e.warded) return; // D-154: a Ward's kill pays no loot
   if (prism) game.spawnPickup(e.x, e.y, 'prism');
-  for (let j = 0; j < GLITCH_LOOT_SHARDS + e.tier; j++) game.spawnPickup(e.x, e.y, 'shard');
+  for (let j = 0; j < HUNTER_LOOT_SHARDS; j++) game.spawnPickup(e.x, e.y, 'shard'); // S-74b (D-201): less than a Glitch's
 }
 
 // ---------- drawing (render.js) ----------

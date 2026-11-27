@@ -63,6 +63,7 @@ white ring inside its hollow): rose vs the Deep's dense edge is ΔE 8 (needs 25)
 
 **Split (Build 160, D-200):** S-74a = `huntrun.mjs` (build `mid`; reach gated where a ghost Glitch gives up; built).
 **S-74b** = tune until the cost half passes (first run: Drift ≈ 0 %, Surge −5…+11 %), plus the Echo row; then M17 done.
+**Split (Build 161, D-201):** S-74b1 = levers + Echo row (built). **S-74b2** = the cost gate's form (Q-043), then tune.
 
 ## Cut (D-182)
 Per-enemy A* every frame, flow fields for Glitches (Q-038), Surge-only hunters, a hunter that bores rock, a third hunter
