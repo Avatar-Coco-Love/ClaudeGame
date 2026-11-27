@@ -42,3 +42,7 @@ placed, stock 0; `saveformat.cjs`, never pin the number).
   goes below 0 (hunters still matter). Tune `DECOY_HOLD_S`, `DECOY_R` and the cost in that order; log tries in `09`.
 - Bounds (D-213): hold ≤ 6 s, `DECOY_R` ≤ 8, cost ≥ ▲2 ◆10. If no setting inside them passes, ship the measure as a
   report row (not a gate), log the gap in `09` and split the fix into S-77b2 (no new lure rules in this PR).
+
+## S-77b2 — the Decoy's fix (split by D-214; spec in Design 177, Q-045)
+- Built 173: the measure fails inside the bounds (price ~3× the hunter cost it cuts). This slice picks one fix from
+  Q-045, measures it with `huntrun --decoy`, and turns `tracer.cjs`'s S-77b report row into the gate above.

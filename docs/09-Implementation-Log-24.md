@@ -29,3 +29,11 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
   the cost. No pip (D-213).
 - S-77b (`07-…-22`): bot places on its own cell, reports seconds lured per Decoy, tuning bounds + a split rule.
 - No bugs found.
+
+## Session 173 — Build: S-77b Decoy measure, as a report (v1.12.114, D-214)
+- `huntrun.mjs --decoy`: a third run per seed (hunters on, Decoys), the bot's cue skips a cell holding a Relay / Sink /
+  Ward / Decoy (B there picks it up). Smoke's full huntrun gate now runs with `--decoy` (+~35 s, same process).
+- Observed (8 seeds, 3 rings, both modes): defaults hold 4 / R 6 / ▲4 ◆20 — saving −421 % Drift, −596 % Surge; tries:
+  hold 6 → −522 / −471; hold 6 R 8 → −680 / −598; hold 6 R 8 ▲2 ◆10 → −246 / −184. The other rows are unchanged by the
+  Decoy runs (pooled 12.4 % / 12.2 %, D-206). Drift thefts with Decoys drop (Kiln 1003 → 525), Surge kills stay.
+- New check fails on the old tool (no `--decoy` rows). No bugs found.

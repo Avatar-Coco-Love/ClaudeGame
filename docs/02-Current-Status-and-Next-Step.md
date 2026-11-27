@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-27_ · **Session counter: 172** · **Version: v1.12.113**
-**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189; v1.12 = M17 Hunters, `07-…-20`, D-193…D-206). Next (D-181, `04-…-5`): S-77b Decoy gate (`07-…-22`, D-208), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
+_Last updated: 2026-11-27_ · **Session counter: 173** · **Version: v1.12.114**
+**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189; v1.12 = M17 Hunters, `07-…-20`, D-193…D-206). Next (D-181, `04-…-5`): S-77b2 Decoy fix (Q-045, D-214; spec Design 177), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -25,14 +25,14 @@ _Last updated: 2026-11-27_ · **Session counter: 172** · **Version: v1.12.113**
 - Lumen ● (S-10) buys Research (S-11): Scanner ping (S-12), beam modes Wide / Pulse / Arc (S-13, S-14, S-21, S-55: `arc.js`, 0.8× ray + 2 jumps × 0.5 to the same kind ≤ 2 cells, D-151). Detail: `08`.
 - Crafting (S-16, `craft.js`): Beacons (light), Relays (remote deposit, S-22/S-34), Heat Sinks (S-51, D-141, `heatsink.js`: Kiln heat gain × 0.4 within 5 cells),
   Wards (S-56, D-153/154, `ward.js`: ▲8 ◆30, 1.2 hp / 0.8 s at the nearest creature ≤ 4 cells; no loot), Decoys (S-77a, D-212,
-  `decoy.js`: ▲4 ◆20, a hunter seeing one ≤ 6 cells circles it 4 s, then it is spent). `08`.
+  `decoy.js`: ▲4 ◆20, a hunter seeing one ≤ 6 cells circles it 4 s, then it is spent). S-77b (D-214): `huntrun --decoy` measure, a report: at its price it costs ~3× what it saves. `08`.
 - Vaults (S-9), Spires (S-19/S-27/S-20/S-28: found, fed, facet puzzle), Wake (S-23/S-31), Ending (S-24), New Cycle (S-29). Detail: `08`.
 - Darkness/light, minimap (D-123; tap / N: map, D-191; legend of the kinds drawn, S-76, D-211, `maplegend.js`), Nexus pointer, toasts, audio ceilings. `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Touch: the actions sit on a thumb arc round the bottom-right corner (S-75, D-209, `thumbarc.js`), round the safe-area corner (B-112, D-210). Phones: no key badges, buttons ≥ 44 px, landscape ◎⟂♪≡ top row, glyph-only ◎ ⟂ ≤ 700 px (D-050, D-058, D-064); bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Format number (now 26), old formats upgraded on load; malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 32 from D-212; last D-213), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-24`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 32 from D-212; last D-214), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-24`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-65, S-69…S-76, S-77a built (M17 done). Next: S-77b (`07-…-22`), S-66a…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-65, S-69…S-76, S-77a/b built (M17 done). Next: S-77b2 (`07-…-22`, Q-045), S-66a…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160; `pack` = hunters + a Pincer pair, 1.00× of `deep`, audit 159).
@@ -40,4 +40,4 @@ _Last updated: 2026-11-27_ · **Session counter: 172** · **Version: v1.12.113**
   Swallowed test waits: `node -r ./tools/waitprobe.cjs`.
 
 ## Next step (one thing)
-Build 173: S-77b `huntrun --decoy` gate (`07-…-22`; bounds + split rule, D-213). Design 172 settled Q-044 (no pip).
+Audit 174 (counter % 5 == 4, CLAUDE.md). Build 173 shipped S-77b as a report (D-214); S-77b2's fix waits for Design 177 (Q-045).
