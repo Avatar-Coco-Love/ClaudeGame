@@ -40,3 +40,19 @@ that is ≥ 4 cells from the lead's next 8 field cells; +8 cost within 2 cells o
 clock counts path steps left. Surge 6 + tier step, Drift 1 item each; one killed → the other flees 3 s, then fades.
 Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `PINCER_PIP`).
 `pincer.js` (flank way, draw), `dev.pincer()`, `tests/pincer.cjs`.
+
+## Ring foes, events, bosses, hunters (moved from `02` word for word, audit 159)
+  Spitters (S-32, D-096, `spitter.js`): 1 in 4 natural spawns at tier ≥ 2; hold 200 px, bolt every 2.2 s with a clear line (8 dmg, rock stops it, beam pops it).
+- Rift (S-57a, D-156, `rift.js`): every 240–360 s (waits out weather), 45 s, a 3 × 3 rock pocket 8–12 cells out in the core's ring turns to ore (×2 yield; Shoal / Kiln 3 + 6 ▲), reverts unmined; unsaved, both modes; shimmer, minimap dot, toast; S-57b (D-157): edge chevron while off screen, open / close chimes. Gate PASS (D-156). `08`.
+- Locks (`lock.js`, `world.hitMul`): Flare (S-58, D-159, Kiln outer vault: shell × 0, × 2 in the last 3 s of 8 s) / Tide (S-59, D-162, Shoal: only against the flow).
+- Crucible (S-60a, D-163, `boss.js`): seed-only Kiln lair stamped by the Game; only the lit plate of 8 cuts, then (i + 5) mod 8; core flares; saved `bosses` [{ ring, down }]. B-095 fixed (D-164).
+  Surge (S-60b1, D-165): awake ≤ 10 cells: any plate, 4 s flare + 10 dmg, embers; death heals the core. Gate `bossrun.mjs` PASS (S-60b2, D-167). Q-033 closed (D-169).
+- Gyre (S-61a, D-168, `gyre.js`): Shoal lair, whirlpool 45 px/s ≤ 6 cells (`flowAt`); mint key steps clockwise / 1.2 s.
+  Surge (S-61b, D-171): any plate; tagged mote swarms / 15 s (≤ 2, `spawnSwarm`), rim 12 dmg / 4 s (≤ 8 px), pull 30; gate `--boss=gyre` PASS.
+  Perf (D-174): `perf.cjs` run `gyre`; only the core ring is blurred, rim tell = strokes (1.33× → ~1.1× of shoal).
+  Marks (S-62, D-173): Chart L2 shows unseen lairs faint; sting on wake / first Drift plate; ending "Bosses n / 2" (256). Q-034: no.
+- Tracer (S-72, D-193, `hunter.js`, `flow.js`, `game.hunters`): Veil+, walks the core's BFS field; Surge hits, Drift steals 1 item.
+  Pincer pair (S-73a, D-194, `pincer.js`, `aStar`): Deep+, lead on the field, flank by A* round the lead; white pips (S-73b, D-197).
+  The Echo reads the same `coreField` (S-73b, D-198: one build, its path cap 24 kept). `08-…-2`.
+- Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core; Surge lunge 22 / Drift bites 4 cargo; unsaved. Gate `biomefoe.mjs` PASS (`GATE_SEEDS` 8, D-155).
+- Motes (S-54, D-150, `mote.js`): Shoal swarm of 6, 40–60 s, ride the current; Surge 4 dmg, a touch takes 1 item, Drift carries loose ore; gate PASS.

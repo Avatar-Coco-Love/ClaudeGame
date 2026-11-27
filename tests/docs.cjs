@@ -17,6 +17,9 @@ function run() {
 
   const status = fs.readFileSync(path.join(ROOT, 'docs/02-Current-Status-and-Next-Step.md'), 'utf8');
   check('handoff (02) under 60 lines', status.split('\n').length <= 60, `${status.split('\n').length} lines`);
+  // Audit 159 (D-199): 02 hit 8 KB three times (Design 132, session 155, audit 159); a 7 KB cap leaves a build's growth room.
+  const STATUS_CAP = 7168, sBytes = Buffer.byteLength(status);
+  check(`handoff (02) under ${STATUS_CAP} bytes`, sBytes <= STATUS_CAP, `${sBytes} bytes`);
   check('handoff (02) has exactly one Next step', (status.match(/^## Next step/gm) || []).length === 1);
 
   const version = (fs.readFileSync(path.join(ROOT, 'src/config.js'), 'utf8').match(/VERSION = '([^']+)'/) || [])[1];

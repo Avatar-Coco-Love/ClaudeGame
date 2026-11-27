@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.100 — 2026-11-27
+- No change in play: a health check. Measured that a Pincer pair hunting on top of two Tracers and your Echo costs no
+  frame time, and tidied the project notes.
+
 ## v1.11.99 — 2026-11-27
 - **Pincers** now carry a white centre (a dot in the lead, a ring in the flank), so the pair stands out against the
   Deep's magenta rock. Your **Echo** now follows the same map of your tunnels the hunters use: it keeps up around

@@ -1,38 +1,6 @@
 # 09 — Implementation Log, part 21
 
-Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-sessions-144-149.md`); part 20 removed. Newest at the bottom; read the tail only.
-
-## Session 150 — Audit: every test's New World pinned + a check (v1.10.91, D-188), 09 archive
-- No subagent tool: sweeps in-session, newest code first. `light.js` B-104 fix: the whole-layer clear is bounded by the
-  quarter-res layer (grows only), fine. D-184…D-187 vs `config.js` (`ECHO_ORDERS`, `ECHO_AUTO_HOLD` 2): match.
-- **Queued check (B-101, B-103):** `tests/pinworld.cjs` — `newWorld(page, tap, r)` pins Math.random for the click;
-  `run()` in smoke flags raw `#new-world` clicks with no nearby pin / `any-seed:` note. Old tree: 55 hits (FAIL);
-  42 files converted mechanically, `spire.cjs` `pinnedNewWorld` now wraps it (same 0.42 seed).
-- B-100 closed (unseen since the Spire pin, two audits). `09` sessions 139–143 archived word for word
-  (`archive/2026-11-26-09-sessions-139-143.md`), part 19 removed. Workflow review in D-188. No game bug found.
-
-## Session 151 — Build: S-71b, Q-040 settled, the Echo gate in smoke (v1.11.92, D-189; M16 done)
-- Probe of Q-040's lean (Defend mines while its shot reloads, idle once ready; 48 seeds, hold 2 s): Defend gain
-  36.4 / 36.8 → 37.1 / 37.1, damage 13.3 / 8.9; added gain Drift / Surge L0 1.329, L2 1.229. Not ≤ 1.25: reverted.
-- D-189: band on Auto gain Drift / Surge (0.890 / 0.915); added-gain ratio keeps a 1.5 ceiling. Gate on the shipped
-  code, 48 seeds × 5 min: PASS (Auto 0.98 × Mine, 0.83 / 0.67 × Defend damage, share 21 / 29 %), ~4.3 min.
-- `echoorder.cjs` awaits `gates.cjs` run('echobot.mjs', ['--orders']) (in SMOKE, prestarted beside the smoke). No bug.
-
-## Session 152 — Design: Echo play-test, S-72 build-ready (v1.11.93, D-190)
-- Play-test (Playwright, `?dev`, seed 0.42): Drift Deep d 60, Echo Auto mined a Lumen vein beside the core, stayed
-  54–90 px off, no blinks. Surge d 60, 30 s digging: 7 Glitches gave up (D-017) in the rock, 0 contacts, Auto 0 switches.
-  Screenshots viewed: Echo diamond + beam read clearly against the Deep palette.
-- Specs checked against code: `perf.cjs` has no `deep` run (S-72 adds it), `enemies` is emptied in Drift (hunters get
-  their own list), `world.breaks` is a counter (any break rebuilds), rng streams are a fixed list in `game.js`.
-  S-72 rewritten build-ready; S-73 names `game.hunters` / `dev.pincer()`; S-74 reports Auto's Defend share. Q-041 opened. No bug.
-
-## Session 153 — Owner feedback: the map view (v1.11.94, D-191)
-- Owner (chat): minimap too small / congested; a tap on it aims the beam; buttons could sit better; how smart can
-  enemies get; new ways to attack and defend. Took the concrete bug first (this PR); the rest went to `04-…-5`
-  ("Owner feedback, session 153") for Design 157. S-72 (smarter hunters, already planned) follows Audit 154.
-- B-105 (fixed): `#hud { pointer-events: none }` let a tap on the minimap reach the canvas and start the aim stick.
-- `mapview.cjs`: desktop click / N / Escape, phone tap (844×390): map 560 / 358 px vs minimap 140 / 112, world time
-  held, no aim stick. Screenshots viewed (desktop, phone after teleports 20 / 40 / 60): four lit pockets read apart.
+Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-sessions-144-149.md`), 150–153 in audit 159 (`archive/2026-11-27-09-sessions-150-153.md`); part 20 removed. Newest at the bottom; read the tail only.
 
 ## Session 154 — Audit: B-106 key clash, map view re-fits, phone sweep, old debt closed (v1.11.95, D-192)
 - No subagent tool: sweeps in-session, newest code first (D-191 map view). Edge cases: death / hitstop / Escape /
