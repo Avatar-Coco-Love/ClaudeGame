@@ -15,3 +15,15 @@ Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
 - Observed: hp is the lever on both faces (a Drift thief killed returns all it took); damage barely moves the Kiln.
 - `tracer.cjs`: a tier-3 Tracer hits 14, hp 4.5 (FAILs on the old code: 26). Damage checks in `tracer` / `pincer`
   use the capped step. No visual change (no screenshot).
+
+## Session 166 — Build: S-74b2b2, Deep floor + Drift ceiling; M17 done (v1.12.107, D-206)
+- Lever: a killed thief drops back `TRACER_RETURN` of its carry, keeping its best. Tries (`huntrun.mjs --no-echo`):
+  - 0.5, Deep only: Drift 15.1 % / Surge 0.6 %. 0.75: pooled 18.0 / 12.2 (1.474), Drift 15.5 / 23.1 / 15.3.
+  - **0.85: pooled 12.4 / 12.2 (1.011) ok; Drift 6.6 / 12.8 / 16.5, Surge 0.6 / 9.1 / 26.1; floor ok.** Kept.
+- Observed: Drift cost is steep in the return share (0.75 → 0.85 halves Deep Drift); Shoal Drift jumps between tries
+  (12.8 ↔ 23.1 %), seed noise in what the bot kills back. Deep Surge 0.6 % is thin but > 0 (hull debt carries it).
+- Ceiling call: 18 % per ring (D-206), gated. `tracer.cjs`: the drop check FAILs on the old code (all returned);
+  new check runs the full 3-ring gate (≈ 44 s, beside the smoke). No visual change (no screenshot).
+- **B-110** (fixed): first full smoke 703/705: `craft.cjs` pressed B 100 ms after a teleport and no frame had read it
+  (`placeResult` still 'nexus', nothing placed) under the added gate's load; it now waits for the result.
+

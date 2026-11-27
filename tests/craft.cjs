@@ -82,8 +82,9 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload) {
   await pg.keyboard.press('b'); await pg.waitForTimeout(100);
   const inRing = await pg.evaluate(() => ({ r: window.__lumen.game.placeResult, toast: document.getElementById('toast').textContent, btn: document.getElementById('beacon-btn').textContent }));
   // Walk out: teleport 12 cells east (a carved room), place, then step 9 cells further east so the beacon is lit only by itself.
-  const b = await pg.evaluate(() => { const { game: g, dev } = window.__lumen; dev.teleport(12, 0); return { x: g.player.x, y: g.player.y }; });
-  await pg.keyboard.press('b'); await pg.waitForTimeout(100);
+  const b = await pg.evaluate(() => { const { game: g, dev } = window.__lumen; dev.teleport(12, 0); g.placeResult = null; return { x: g.player.x, y: g.player.y }; });
+  // B-110: under load a fixed 100 ms could pass before a frame read the key (placeResult still the ring's 'nexus'); wait for it
+  await pg.keyboard.press('b'); await pg.waitForFunction(() => window.__lumen.game.placeResult != null, null, { timeout: 3000 }).catch(() => {});
   const placed = await pg.evaluate(() => ({ r: window.__lumen.game.placeResult, n: window.__lumen.game.beacons.length, lights: window.__lumen.renderer.extraLights.length }));
   const lit = async () => pg.evaluate(([bx, by, f]) => {
     const { game: g, dev } = window.__lumen; dev.teleport(21, 0);

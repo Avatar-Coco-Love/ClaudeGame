@@ -11,7 +11,7 @@ import {
   CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK,
   GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
   TRACER_S, TRACER_RETRY_S, TRACER_SPAWN, TRACER_CAP, TRACER_CAP_DEEP, TRACER_SPEED, TRACER_STEER, TRACER_LINE, TRACER_DMG,
-  TRACER_TAKE, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
+  TRACER_TAKE, TRACER_RETURN, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
 import { coreField, fieldAt, downhill, uphill, ringCells, aStar } from './flow.js';
@@ -200,7 +200,8 @@ function die(game, e) {
   const m = e.mate; // S-73a: one of a pair down: the other flees, then fades
   if (m && m.fade === undefined && m.hp > 0 && game.hunters.includes(m)) { m.flee = PINCER_PART_S; m.part = true; }
   game.burst(e.x, e.y, 22, `rgb(${isPincer(e) ? PINCER_RGB : TRACER_RGB})`, 220); game.audio.enemyDie(); game.addShake(4);
-  for (const k of e.carry) game.spawnPickup(e.x, e.y, k); // what it took, back (a Ward's kill too: D-154 keeps carried items)
+  const kept = Math.floor(e.carry.length * (1 - TRACER_RETURN)); // D-206: it keeps its most valuable part (carry is best first)
+  for (const k of e.carry.slice(kept)) game.spawnPickup(e.x, e.y, k); // the rest, back (a Ward's kill too: D-154, D-206)
   if (game.mode !== 'surge') return; // Drift: only what it took (D-152)
   const prism = game.rng['glitch-loot']() < HUNTER_PRISM_CHANCE; // drawn either way (D-025)
   if (e.warded) return; // D-154: a Ward's kill pays no loot

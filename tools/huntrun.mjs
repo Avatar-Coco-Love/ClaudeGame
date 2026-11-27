@@ -131,15 +131,18 @@ for (const ringKey of rings) {
   if (c.drift !== undefined && c.surge !== undefined) console.log(`${ringKey}: Drift / Surge time cost ${c.surge > 0 && c.drift > 0 ? (c.drift / c.surge).toFixed(3) : 'n/a (a cost ≤ 0)'} (report; the gate is pooled, D-202)`);
 }
 // D-202: the cost gate is pooled over the rings run (sum of hauls), Drift / Surge in 0.8–1.25; floor: each face costs > 0
-// in every ring (a free face fails, D-200). A cost ≤ 0 has no ratio.
+// in every ring (a free face fails, D-200). A cost ≤ 0 has no ratio. D-206: ceiling, no ring's Drift cost past DRIFT_CEIL.
+const DRIFT_CEIL = 0.18;
 let costPass = null;
 if (pool.drift && pool.surge) {
   const pd = pool.drift.off / Math.max(1e-9, pool.drift.on) - 1, ps = pool.surge.off / Math.max(1e-9, pool.surge.on) - 1;
   const q = pd > 0 && ps > 0 ? pd / ps : NaN, band = q >= 0.8 && q <= 1.25;
   const free = rings.flatMap(k => modes.filter(m => !(cost[k][m] > 0)).map(m => `${k} ${m}`));
-  costPass = band && !free.length;
+  const hot = rings.filter(k => cost[k].drift > DRIFT_CEIL);
+  costPass = band && !free.length && !hot.length;
   console.log(`pooled (${rings.join(' + ')}): Drift ${pct(pd)}, Surge ${pct(ps)}, Drift / Surge ${Number.isNaN(q) ? 'n/a (a cost ≤ 0)' : q.toFixed(3)} (0.8–1.25) ${band ? 'ok' : 'FAIL'}; ` +
-    `floor (every face > 0 in every ring) ${free.length ? `FAIL: ${free.join(', ')}` : 'ok'}`);
+    `floor (every face > 0 in every ring) ${free.length ? `FAIL: ${free.join(', ')}` : 'ok'}; ` +
+    `ceiling (Drift ≤ ${pct(DRIFT_CEIL)} in every ring) ${hot.length ? `FAIL: ${hot.join(', ')}` : 'ok'}`);
 }
 const pc = (a, b) => (100 * a / Math.max(1, b)).toFixed(0), blind = tot.blindMet / Math.max(1, tot.blind), rok = blind >= 0.8;
 console.log(`reach: Tracers ${pc(tot.met, tot.tracers)} % of ${tot.tracers} that met or gave up, a ghost Glitch from the same spots ${pc(tot.ghost, tot.tracers)} % (report); ` +

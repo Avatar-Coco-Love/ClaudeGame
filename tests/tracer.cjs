@@ -15,7 +15,7 @@ async function nodeChecks(check) {
   const { makeGlitch } = await import('../src/glitch.js');
   const { beamFoes } = await import('../src/spitter.js');
   const C = await import('../src/config.js');
-  const { CELL, T, GLITCH_TIER, TRACER_DMG, TRACER_SPEED, TRACER_SPAWN, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, TRACER_TAKE, TRACER_FLEE_MUL, ORE_WORTH } = C;
+  const { CELL, T, GLITCH_TIER, TRACER_DMG, TRACER_SPEED, TRACER_SPAWN, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, TRACER_TAKE, TRACER_RETURN, TRACER_FLEE_MUL, ORE_WORTH } = C;
   const still = { move: { x: 0, y: 0 }, fire: false, aim: null };
   /** A stub 40 × 30 maze 30 cells east of the Nexus: the core's room (3 × 3) at the top left, a 1-cell tunnel east, south
    *  and back west to a cell 10 rows under the room, with rock between (a Glitch there sees the core through it). */
@@ -103,9 +103,10 @@ async function nodeChecks(check) {
     frame(L, 20); const fast = Math.hypot(tr.vx, tr.vy) > tr.speed * (1 + TRACER_FLEE_MUL) / 2;
     const away = Math.hypot(tr.x - g.player.x, tr.y - g.player.y);
     tr.hp = 0; const n0 = g.pickups.length; frame(L);
-    const drop = g.pickups.slice(n0).map(p => p.kind);
-    check(`S-74b tracer: Drift touch takes ${TRACER_TAKE} worth (Tide first, then ◆), no damage, flees at × ${TRACER_FLEE_MUL}; killed, it drops what it took (only)`,
-      ev && took.tide === 0 && took.carry.join() === want && took.shard === 40 - took.carry.length + 1 && took.hp && took.flee && fast && away > 20 && drop.join() === want && !g.hunters.length,
+    const drop = g.pickups.slice(n0).map(p => p.kind), w = want.split(','), kept = Math.floor(w.length * (1 - TRACER_RETURN));
+    check(`S-74b tracer: Drift touch takes ${TRACER_TAKE} worth (Tide first, then ◆), no damage, flees at × ${TRACER_FLEE_MUL}; killed, it drops ${TRACER_RETURN} of it, the cheapest (only; S-74b2b2, D-206)`,
+      ev && took.tide === 0 && took.carry.join() === want && took.shard === 40 - took.carry.length + 1 && took.hp && took.flee && fast && away > 20 &&
+      kept >= 1 && drop.join() === w.slice(kept).join() && !drop.includes('tide') && !g.hunters.length,
       JSON.stringify({ ev, took: { ...took, carry: took.carry.length }, fast, away, drop: drop.length }));
   }
   { // B-109: touched from the room's west side (no way out there), it flees round the core and down the tunnel, not
@@ -166,9 +167,14 @@ async function nodeChecks(check) {
       / ok$/.test(line) && /reach PASS/.test(gate), line.slice(0, 220));
     // S-74b2a (D-202): the cost half is pooled with a per-ring floor, and a Surge run below full hull pays hull debt
     const pool = out.split('\n').find(l => l.startsWith('pooled (deep)')) || '', sl = out.split('\n').find(l => l.startsWith('deep surge:')) || '';
-    check('S-74b2a hunters: huntrun.mjs prints the pooled cost line (ratio + per-ring floor) and Surge hull debt (trip s, owed s)',
-      /Drift \/ Surge .*\(0\.8–1\.25\) (ok|FAIL); floor \(every face > 0 in every ring\) (ok|FAIL)/.test(pool) && /hull debt: end hull with [\d.]+ \/ without [\d.]+, trip \d+ s/.test(sl),
+    check('S-74b2a hunters: huntrun.mjs prints the pooled cost line (ratio + per-ring floor + Drift ceiling) and Surge hull debt (trip s, owed s); S-74b2b2 (D-206): Deep floor + ceiling ok',
+      /Drift \/ Surge .*\(0\.8–1\.25\) (ok|FAIL); floor \(every face > 0 in every ring\) ok; ceiling \(Drift ≤ 18\.0 % in every ring\) ok/.test(pool) && /hull debt: end hull with [\d.]+ \/ without [\d.]+, trip \d+ s/.test(sl),
       `${pool.slice(0, 160)} | ${(sl.match(/hull debt.*/) || [''])[0].slice(0, 120)}`);
+    // S-74b2b2 (D-206): the full cost gate, pooled over Deep + Shoal + Kiln: band, floor and Drift ceiling pass (M17 done)
+    const full = await require('./gates.cjs').run('huntrun.mjs', ['--no-echo']);
+    const fl = full.split('\n').find(l => l.startsWith('pooled (deep + shoal + kiln)')) || '', fg = full.split('\n').find(l => l.startsWith('gate:')) || '';
+    check('S-74b2b2 hunters: the pooled cost gate passes over Deep + Shoal + Kiln (Drift / Surge 0.8–1.25, every face > 0, Drift ≤ 18 % per ring; huntrun.mjs, 8 seeds)',
+      /cost PASS/.test(fg) && / ok; floor .* ok; ceiling .* ok$/.test(fl), fl.slice(0, 220));
   }
   { // the Echo in Auto turns to Defend at a Drift Tracer it can see
     const L = lab('drift'), g = L.g;
