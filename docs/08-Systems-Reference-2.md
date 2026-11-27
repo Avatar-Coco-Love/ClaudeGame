@@ -18,3 +18,16 @@ when the system changes). Moved in Design 132 for `02` headroom.
   `RIFT_CALL_COST` ▲ 30 and opens a rift now (own stream `rng['rift-call']`, `open.called`, closes at t0 + 45 s; a natural
   one due meanwhile is skipped). Refused, nothing spent: Nexus ring, open rift, weather / Wake / ending / awake boss,
   `RIFT_CALL_CD` 150 s (unsaved; D-178), < 30 ▲, no site. ❖ dims while refused. `tests/lens.cjs`.
+
+## Cell types (moved from `02`, session 155)
+Rock, dense rock, crystal (→ Shards ◆), prism (→ Prisms ▲, farther out), Lumen (●), Tide ≈ / Calx ⬟ (Shoal / Kiln,
+S-49, D-135; spent on Overdrive), vault shell + cache, Spire shell / core / facet, boss core / plate, and a bedrock border.
+
+## Tracer (S-72, D-190, D-193)
+Veil and out, 1 at a time (2 from the Deep), every `TRACER_S` 40–60 s, on a field cell 16–24 steps out and off screen.
+`flow.js`: one 4-way BFS from the core's cell, 32 cells out, rebuilt on any break, a core cell change or every 0.5 s;
+`downhill` (8-way, no corner cuts). 0.8 × the tier's Glitch speed, a Glitch's hp; straight at the core with a clear line
+≤ 3 cells; fades if its field distance stalls 6 s or it leaves the field. Surge: 8 + tier step dmg, Glitch loot. Drift:
+a touch takes 1 item (`biteCargo`) and it flees up the field (≤ 6 s); a kill gives the item back. `dev.tracer()`;
+`perf` runs `deep` / `hunt`; `tests/tracer.cjs`.
+

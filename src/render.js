@@ -24,6 +24,7 @@ import { drawBosses } from './boss.js';
 import { drawEcho } from './echo.js';
 import { drawBurrower, drawBurrowerTell } from './burrower.js';
 import { drawMotes } from './mote.js';
+import { drawHunters } from './hunter.js';
 import { drawArcs } from './arc.js';
 import { drawNexusRings } from './nexusview.js';
 
@@ -205,6 +206,7 @@ export class Renderer {
     drawSpitterTells(this, ctx); // S-32: the shot tell and bolts read through the dark
     drawBurrowerTell(this, ctx); // S-53: the surfacing tell reads through the dark
     drawMotes(this, ctx); // S-54: motes glow, so they read through the dark
+    drawHunters(this, ctx); // S-72: Tracers + their trail, likewise
     this.drawScan(ctx);
     ctx.restore();
 

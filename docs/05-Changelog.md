@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.96 — 2026-11-27
+- **Tracers** now hunt you from the Veil outward: a violet chevron with a dotted trail that follows the tunnels to you
+  instead of giving up at the first wall (one at a time, two from the Deep out). In Surge it hits like a Glitch and
+  drops a Glitch's loot; in Drift it snatches one item and runs — beam it to get the item back.
+
 ## v1.11.95 — 2026-11-27
 - If you had bound N to another action before the map arrived, your binding now stays and the Map takes a free key
   (it used to reset both). The big map re-fits when the window is resized or the phone turned while it is open.

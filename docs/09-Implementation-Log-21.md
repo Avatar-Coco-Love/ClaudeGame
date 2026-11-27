@@ -44,3 +44,16 @@ Sessions 144–149 archived word for word in audit 154 (`archive/2026-11-27-09-s
 - Phone sweep (scratch script, `?dev`, Max all + Echo + full bank): 320×568, 390×844, 844×390, 568×320: no HUD overlap,
   no button < 44 px, no page scroll, no page errors; screenshots viewed (320 portrait, 844 / 568 landscape + map).
 - D-191 vs code: match (`MAP_MAX_PX` 560, N, world held). `09` 144–149 archived; part 20 removed. Debt closed (D-192).
+
+## Session 155 — Build: S-72 flow field + the Tracer (v1.11.96, D-193)
+- New `src/flow.js` (core BFS field, `downhill` / `uphill`, `ringCells`) and `src/hunter.js` (Tracer: spawn rule,
+  field walk, faces, draw); `game.hunters` + `game.hunt`, streams `tracer` / `pincer`; `beamFoes` adds hunters;
+  `biteCargo` exported from `mote.js`; `dev.tracer()`; toast on the first Drift snatch. `tests/tracer.cjs` (9 checks).
+- Maze stub (1-cell tunnel, 48-step path): the Glitch gave up with no hit; the Tracer arrived in 13.5 s vs a 17.6 s
+  bound. Spawn rule on 50 seeds (core 30–40 cells out on natural floor): 46 spawned, all 16–24 steps, open, off screen.
+- Perf (`ONLY=deep,hunt`, 4× CPU, 12 s): `hunt / deep` median 1.00×; field build max 3.2 ms with the first BFS
+  (`for…of` + destructuring), 0.60 ms after unrolling over `world.cells` (D-193). Screenshot viewed: a Tracer at a
+  tunnel corner, 5 trail dots fading down the shaft; violet reads apart from the cyan core.
+- First full smoke: 685/687: the rift `eventrun` and Kiln `biomefoe` gates FAILed (Tracers now spawn in their runs).
+  Both tools set `hunt.off` like their other creatures (D-193); the hunters' cost is S-74's gate.
+- Not done here (S-74's job): tuning `TRACER_S` / speed against the haul gate.

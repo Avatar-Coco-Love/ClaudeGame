@@ -45,6 +45,7 @@ function run(seed, mode, creature) {
   let game = null;
   const setup = g => {
     game = g; const w = g.world;
+    g.hunt.off = true; // S-72: the ring's own creature only; Tracers have their own gate (S-74, D-193)
     if (!creature) biome.off(g);
     // The ring's mid-distance cell on the axis farthest from vaults / Spires; a 3×3 pad there and the Relay on it.
     const cells = []; for (let i = 0; i < w.w * w.h; i++) if (w.rings[i] === biome.ring) cells.push(Math.hypot(i % w.w - w.cx, ((i / w.w) | 0) - w.cy));
