@@ -543,4 +543,4 @@ const dev = createDev({ game: () => game, persist, modeChanged() {
   $('integrity-row').classList.toggle('hidden', game.mode !== 'surge');
   if (panelOpen) renderPanel();
 } });
-window.__lumen = { get game() { return game; }, renderer, input, settings, audio, music, dev, quality }; // debug handle for tests + bots
+window.__lumen = { get game() { return game; }, renderer, input, settings, audio, music, dev, quality, mapView }; // debug handle for tests + bots

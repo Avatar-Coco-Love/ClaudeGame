@@ -25,7 +25,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ Map view (v1.11.94, D-191): tap the minimap / N for a 3–4× map, world held; the tap no longer aims.
 - ✅ **S-75** Thumb arc: on touch the actions sit on arcs round the bottom-right grip, clear of ⊕ / hint / minimap;
   farthest 251 px on 390 × 844 (was 610–713) (Build 168, v1.12.109, D-209).
-- **S-76** Map legend (`07-…-21`): the big map names the marks it drew (beside it in landscape, D-207).
+- ✅ **S-76** Map legend: the big map names the kinds it drew, in their glyphs; columns beside it in landscape, wrapped under it in portrait (Build 170, v1.12.111, D-211).
 - **S-77a** Decoy craft + lure, **S-77b** `huntrun --decoy` gate (`07-…-22`, Q-042 → yes, D-208).
 - Pincer white pip: folded into S-73b (D-197).
 - **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also

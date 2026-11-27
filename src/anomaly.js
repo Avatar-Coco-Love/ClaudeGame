@@ -104,12 +104,13 @@ export function siteMapState(game, i) {
 }
 
 /** S-37: a seen site is a small dot in its kind's colour on the minimap; a recharging one is hollow. */
-export function drawAnomalyMarks(m, g, sc) {
+export function drawAnomalyMarks(m, g, sc, note) {
   m.save(); m.lineWidth = 1.25;
   g.anomaly.sites.forEach((s, i) => {
     const st = siteMapState(g, i);
     if (!st) return;
     const col = `rgb(${ANOMALY_KINDS[s.kind].rgb})`;
+    if (note) note('anomaly', (s.x + 0.5) * CELL, (s.y + 0.5) * CELL, col); // S-76 legend
     m.beginPath(); m.arc((s.x + 0.5) * CELL * sc, (s.y + 0.5) * CELL * sc, 2.25, 0, Math.PI * 2);
     if (st === 'charged') { m.fillStyle = col; m.fill(); } else { m.strokeStyle = col; m.stroke(); }
   });
