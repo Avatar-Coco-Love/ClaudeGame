@@ -1,10 +1,10 @@
-// S-75 thumb arc checks (D-207). smoke.cjs calls nodeChecks and browserChecks. Node: `arcSlots` on six phone / tablet
+// S-75 thumb arc checks (D-207). smoke.cjs calls nodeChecks and browserChecks. Node: `arcSlots` on eight phone / tablet
 // viewports with the keep rects measured in the browser (Design 167 rule): every centre within reach of the bottom-right
 // corner (≤ 275 px, ≤ 300 on the third arc), ≥ 8 px from each edge, ≥ 52 px apart, right of w / 2 + 24, ≥ 8 px clear of
 // each keep rect and of the 140 px grip disc. Browser (touch, all five buttons + ⊕): the real buttons obey the same, and
 // overlap no HUD box or each other; on a desktop the five keep their old place. Usage: node tests/thumbarc.cjs [--browser]
 // (ARC_SHOT=dir for one screenshot per orientation)
-const VPS = [[390, 844], [320, 568], [844, 390], [568, 320], [375, 667], [768, 1024], [640, 360]];
+const VPS = [[390, 844], [320, 568], [844, 390], [568, 320], [375, 667], [768, 1024], [640, 360], [1024, 768]];
 // Keep rects measured with Max all + Echo + Lens + a Beacon, in the Nexus (session 168, Pixel 7 touch): ⊕, minimap, ♪ ≡,
 // bank panel; arcSlots' caller adds the reserved hint box.
 const KEEP = {
@@ -15,6 +15,7 @@ const KEEP = {
   '375x667': [[116, 537, 259, 583], [267, 12, 363, 108], [267, 114, 363, 158], [12, 12, 176, 94]],
   '768x1024': [[312, 908, 456, 954], [616, 12, 756, 152], [660, 158, 756, 202], [12, 12, 222, 100]],
   '640x360': [[248, 244, 392, 290], [528, 12, 628, 112], [424, 12, 520, 56], [12, 12, 233, 117]],
+  '1024x768': [[440, 652, 584, 698], [872, 12, 1012, 152], [916, 158, 1012, 202], [12, 12, 222, 100]], // audit 169: tablet landscape
 };
 const rect = ([l, t, r, b]) => ({ l, t, r, b });
 const hintBox = (w, h) => ({ l: w / 2 - 150, r: w / 2 + 150, t: h - 76, b: h - 22 });
@@ -53,7 +54,7 @@ async function nodeChecks(check) {
       if (n === 5) far[`${w}x${h}`] = Math.round(Math.max(...cs.map(c => corner(c, w, h))));
     }
   }
-  check('S-75 thumb arc: 1–5 slots on six viewports within reach (≤ 275, third arc ≤ 300), on screen, ≥ 52 apart, clear of keep rects + grip',
+  check('S-75 thumb arc: 1–5 slots on eight viewports within reach (≤ 275, third arc ≤ 300), on screen, ≥ 52 apart, clear of keep rects + grip',
     out.length === 0, out.join(' | ') || JSON.stringify(far));
   const a = arcSlots(390, 844, 5), b = arcSlots(390, 844, 5);
   check('S-75 arcSlots is pure (same input, same slots; 54 px chord ≥ 52)', JSON.stringify(a) === JSON.stringify(b) && a.length === 5 &&
@@ -101,6 +102,21 @@ async function browserChecks(browser, url, check, errors, shots) {
   check('S-75 browser (touch, all five + ⊕ shown): the real buttons on the arc, ≥ 44 px, in reach, clear of ⊕ / minimap / ♪ ≡ / bank / hint / grip / each other',
     out.length === 0, out.join(' | ') || '');
   if (process.env.ARC_KEEP) console.log(JSON.stringify(seen));
+  // B-112 (audit 169): on a notched phone the arc turns round the safe corner. The probe's padding stands in for
+  // env(safe-area-inset-*): landscape notch right 47 + home bar 21, portrait home bar 34.
+  const ins = [];
+  for (const [w, h, r, b] of [[844, 390, 47, 21], [390, 844, 0, 34]]) {
+    await pg.setViewportSize({ width: w + 1, height: h }); await pg.waitForTimeout(150);
+    await pg.evaluate(([r, b]) => { const p = document.getElementById('safe-probe'); if (p) { p.style.paddingRight = r + 'px'; p.style.paddingBottom = b + 'px'; } }, [r, b]);
+    await pg.setViewportSize({ width: w, height: h }); await pg.waitForTimeout(250);
+    const m = await measure(pg), keep = Object.values(m.keep).filter(Boolean);
+    const cs = m.btns.map(q => ({ x: (q.l + q.r) / 2, y: (q.t + q.b) / 2 }));
+    const bad = [...judge(cs, w, h, keep, 5), ...m.btns.filter(q => q.r > w - r - 8 || q.b > h - b - 8).map(q => `box ${Math.round(q.r)},${Math.round(q.b)} in the inset`)];
+    if (bad.length) ins.push(`${w}×${h} inset ${r}/${b}: ${bad.join(', ')}`);
+    await pg.evaluate(() => { const p = document.getElementById('safe-probe'); if (p) p.style.paddingRight = p.style.paddingBottom = ''; });
+  }
+  check('S-75 / B-112 notched phone: the arc keeps every button ≥ 8 px inside the safe-area insets, all rules still met',
+    ins.length === 0, ins.join(' | '));
   // ⟂ names the new mode above itself for 1 s on a switch (touch: the button is glyph-only)
   await pg.setViewportSize({ width: 390, height: 844 }); await pg.waitForTimeout(200);
   const nm = () => pg.evaluate(() => { const n = document.getElementById('mode-name'), b = n.getBoundingClientRect(), m = document.getElementById('mode-btn').getBoundingClientRect();

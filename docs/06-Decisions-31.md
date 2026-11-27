@@ -53,3 +53,16 @@ alternatives). D-206 on.
   that pinned ◎ ⟂ in the top-right row / column now pin ♪ ≡ there and ◎ ⟂ on the arc (`touch.cjs`).
 - Rejected: laying out only the buttons shown in the Nexus (⊕'s place would move them on every dock), a second
   label element for the mode name (the existing `mode-name` floats above ⟂ on touch).
+
+### D-210 — Audit 169: the thumb arc turns round the safe corner (B-112); tablet checked; old watch closed
+- `layoutArc` reads the right / bottom safe-area insets from a hidden probe padded with `env()` and lays the arc round
+  (w − right, h − bottom). Without it, on a notched phone in landscape ⟂ sat under the notch (box right 836 of 844 with a
+  47 px inset) and ❖ on the home bar. `thumbarc.cjs` fakes the insets on the probe; it fails on the old code.
+- 1024 × 768 tablet landscape measured (all five on the 215 px arc, every rule met; 1180 × 820, 1366 × 1024, 820 × 1180
+  too): added to the arc check's viewports. Screenshot viewed.
+- Audit 159's watch line closed (carried three audits). Hunter blob → Q-044, not a slice now.
+- D-205…D-209 vs code: match (tier max 1, take 30, return 0.85, arc constants and order).
+- Workflow review: too little: touch layout checks ran only at bare viewports, never with a notch; now one inset case
+  per orientation. Too much: none new.
+- Rejected: CSS-only insets on each button (the arc is placed by inline left / top, so CSS can't move it), reading
+  `visualViewport` (it does not report the notch), a top inset (the arc never reaches the top on a phone).
