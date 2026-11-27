@@ -39,3 +39,16 @@ Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at th
   the old code (stashed: "reading 'flash'"), passes now.
 - Smoke: `tracer.cjs` awaits `huntrun.mjs --rings=deep` (prestarted in `gates.cjs`, ~20 s) and checks the reach line.
 - `05` v1.9.76–v1.9.81 archived word for word (`archive/changelog-v1.9.76-v1.9.81.md`); `06` part 30 started.
+
+## Session 161 — Build: S-74b1, hunter cost levers + measure + Echo row (v1.11.102, D-201)
+- Levers: Drift touch takes `TRACER_TAKE` = 24 ◆-worth (`biteWorth`, ORE_WORTH, richest first); flee at
+  `TRACER_FLEE_MUL` 1.5 × speed; Surge kill loot `HUNTER_LOOT_SHARDS` 0 / `HUNTER_PRISM_CHANCE` 0 (draw kept, D-025).
+- `huntrun.mjs`: natural Glitches off (`--glitches=on` restores); now Drift-off = Surge-off haul exactly. Echo row
+  (Auto, hunters on; `--no-echo` in smoke). Tries (8 seeds, Drift / Surge cost %, Deep / Shoal / Kiln):
+  base −0.3/+0.5/+2.7 vs +11/−2/−5 · take 12 + no ◆: −3/+1.5/+2.9 vs +11/−10/−8 · Glitches off: −3/+1.5/+2.9 vs
+  −9/+10/+46 · take 24 + flee 1.5 + no ▲: **+5.7/+7.0/+5.9 vs −5.8/+12/+52** · same at 20 min: Deep +10.8 vs +1.4,
+  Shoal +11.5 vs +21.5. Echo row: Defend share 5–7 % (Design 152 saw 0), costs −15…−28 % (it mines).
+- Observed: per-seed haul swings ±25 % (route luck); Surge cost is the hull vs ring, not hunter numbers: Deep (tier 2,
+  14 dmg, 160 hp) ~0 retreats; Kiln heat + 26 dmg forces long Nexus heal trips (+52 %); Shoal and Kiln share tier 3.
+  No hunter lever fixes all three rings at once → cost still FAIL; Q-043 for Design 162. Reach still PASS (92 %).
+- Tests: `tracer.cjs` theft by worth + flee speed, Surge no loot; `pincer.cjs` 24 worth each (both FAIL on old code).

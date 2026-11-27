@@ -27,8 +27,8 @@ S-49, D-135; spent on Overdrive), vault shell + cache, Spire shell / core / face
 Veil and out, 1 at a time (2 from the Deep), every `TRACER_S` 40–60 s, on a field cell 16–24 steps out and off screen.
 `flow.js`: one 4-way BFS from the core's cell, 32 cells out, rebuilt on any break, a core cell change or every 0.5 s;
 `downhill` (8-way, no corner cuts). 0.8 × the tier's Glitch speed, a Glitch's hp; straight at the core with a clear line
-≤ 3 cells; fades if its field distance stalls 6 s or it leaves the field. Surge: 8 + tier step dmg, Glitch loot. Drift:
-a touch takes 1 item (`biteCargo`) and it flees up the field (≤ 6 s); a kill gives the item back. `dev.tracer()`;
+≤ 3 cells; fades if its field distance stalls 6 s or it leaves the field. Surge: 8 + tier step dmg, no loot (S-74b, D-201). Drift:
+a touch takes 24 ◆-worth (`biteWorth`, most valuable first) and it flees up the field at × 1.5 (≤ 6 s); a kill gives it back. `dev.tracer()`;
 `perf` runs `deep` / `hunt`; `tests/tracer.cjs`.
 
 
@@ -37,7 +37,7 @@ Deep and out, one pair every `PINCER_S` 70–100 s, never while one lives; both 
 apart (`hunter: 'lead' | 'flank'`, `mate`). Lead: the Tracer's walk. Flank: every 0.5 s (one search a frame across all
 flanks, `hunt.frame`) `flow.js` `aStar` (8-way, octile, ≤ 800 nodes) to the field cell nearest core + velocity × 1.5 s
 that is ≥ 4 cells from the lead's next 8 field cells; +8 cost within 2 cells of them; no path → the field. Its give-up
-clock counts path steps left. Surge 6 + tier step, Drift 1 item each; one killed → the other flees 3 s, then fades.
+clock counts path steps left. Surge 6 + tier step, Drift 24 worth each; one killed → the other flees 3 s, then fades.
 Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `PINCER_PIP`).
 `pincer.js` (flank way, draw), `dev.pincer()`, `tests/pincer.cjs`.
 
@@ -51,7 +51,7 @@ Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `P
   Surge (S-61b, D-171): any plate; tagged mote swarms / 15 s (≤ 2, `spawnSwarm`), rim 12 dmg / 4 s (≤ 8 px), pull 30; gate `--boss=gyre` PASS.
   Perf (D-174): `perf.cjs` run `gyre`; only the core ring is blurred, rim tell = strokes (1.33× → ~1.1× of shoal).
   Marks (S-62, D-173): Chart L2 shows unseen lairs faint; sting on wake / first Drift plate; ending "Bosses n / 2" (256). Q-034: no.
-- Tracer (S-72, D-193, `hunter.js`, `flow.js`, `game.hunters`): Veil+, walks the core's BFS field; Surge hits, Drift steals 1 item.
+- Tracer (S-72, D-193, `hunter.js`, `flow.js`, `game.hunters`): Veil+, walks the core's BFS field; Surge hits, Drift steals 24 worth.
   Pincer pair (S-73a, D-194, `pincer.js`, `aStar`): Deep+, lead on the field, flank by A* round the lead; white pips (S-73b, D-197).
   The Echo reads the same `coreField` (S-73b, D-198: one build, its path cap 24 kept). `08-…-2`.
 - Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core; Surge lunge 22 / Drift bites 4 cargo; unsaved. Gate `biomefoe.mjs` PASS (`GATE_SEEDS` 8, D-155).

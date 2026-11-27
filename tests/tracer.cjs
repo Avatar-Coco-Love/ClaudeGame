@@ -15,7 +15,7 @@ async function nodeChecks(check) {
   const { makeGlitch } = await import('../src/glitch.js');
   const { beamFoes } = await import('../src/spitter.js');
   const C = await import('../src/config.js');
-  const { CELL, T, GLITCH_TIER, TRACER_DMG, TRACER_SPEED, TRACER_SPAWN, GLITCH_LOOT_SHARDS } = C;
+  const { CELL, T, GLITCH_TIER, TRACER_DMG, TRACER_SPEED, TRACER_SPAWN, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, TRACER_TAKE, TRACER_FLEE_MUL, ORE_WORTH } = C;
   const still = { move: { x: 0, y: 0 }, fire: false, aim: null };
   /** A stub 40 × 30 maze 30 cells east of the Nexus: the core's room (3 × 3) at the top left, a 1-cell tunnel east, south
    *  and back west to a cell 10 rows under the room, with rock between (a Glitch there sees the core through it). */
@@ -93,29 +93,30 @@ async function nodeChecks(check) {
     const tr = makeTracer(L.g, L.ox + 3, L.oy + 2); Object.assign(tr, { x: L.g.player.x + 14, y: L.g.player.y, hitCd: 0 });
     L.g.hunters.push(tr); return tr;
   };
-  { // Drift: a touch takes 1 item (most valuable first), no damage; it flees; killed, it drops the item
-    const L = lab('drift'), g = L.g; g.cargo.shard = 3; g.cargo.tide = 1;
+  { // Drift: a touch takes TRACER_TAKE worth (most valuable first; S-74b, D-201), no damage; it flees faster; killed, it drops what it took
+    const L = lab('drift'), g = L.g; g.cargo.shard = 40; g.cargo.tide = 1;
+    const want = ['tide', ...Array(Math.max(0, TRACER_TAKE - ORE_WORTH.tide)).fill('shard')].join();
     const tr = near(L), hp = g.player.integrity;
     let ev = false;
     for (let i = 0; i < 3 && !g.hunt.taken; i++) { pin(L); g.update(1 / 60, still); ev = ev || g.events.includes('tracer-take'); g.events.length = 0; }
     const took = { tide: g.cargo.tide, shard: g.cargo.shard, carry: [...tr.carry], hp: g.player.integrity === hp, flee: tr.flee > 0 };
-    frame(L, 20);
+    frame(L, 20); const fast = Math.hypot(tr.vx, tr.vy) > tr.speed * (1 + TRACER_FLEE_MUL) / 2;
     const away = Math.hypot(tr.x - g.player.x, tr.y - g.player.y);
     tr.hp = 0; const n0 = g.pickups.length; frame(L);
     const drop = g.pickups.slice(n0).map(p => p.kind);
-    check('S-72 tracer: Drift touch takes 1 item (Tide first), no damage, flees; killed, it drops that item (only)',
-      ev && took.tide === 0 && took.shard === 3 && took.carry.join() === 'tide' && took.hp && took.flee && away > 20 && drop.join() === 'tide' && !g.hunters.length,
-      JSON.stringify({ ev, took, away, drop }));
+    check(`S-74b tracer: Drift touch takes ${TRACER_TAKE} worth (Tide first, then ◆), no damage, flees at × ${TRACER_FLEE_MUL}; killed, it drops what it took (only)`,
+      ev && took.tide === 0 && took.carry.join() === want && took.shard === 40 - took.carry.length + 1 && took.hp && took.flee && fast && away > 20 && drop.join() === want && !g.hunters.length,
+      JSON.stringify({ ev, took: { ...took, carry: took.carry.length }, fast, away, drop: drop.length }));
   }
-  { // Surge: contact = 8 + the Glitch tier step, knockback; kill drops the Glitch loot (2 + tier ◆, maybe ▲)
+  { // Surge: contact = 8 + the Glitch tier step, knockback; kill drops the hunter loot (S-74b, D-201: HUNTER_LOOT_SHARDS ◆, ▲ at HUNTER_PRISM_CHANCE)
     const L = lab('surge'), g = L.g; g.player.invuln = 0;
     const tr = near(L), hp = g.player.integrity;
     frame(L, 2);
     const dmg = hp - g.player.integrity, want = TRACER_DMG + tr.tier * GLITCH_TIER.dmg[1];
     tr.hp = 0; const n0 = g.pickups.length; frame(L);
     const drop = g.pickups.slice(n0).map(p => p.kind), shards = drop.filter(k => k === 'shard').length;
-    check(`S-72 tracer: Surge contact ${want} damage (8 + tier step), kill drops ${GLITCH_LOOT_SHARDS} + tier ◆ (and maybe a ▲)`,
-      Math.abs(dmg - want) < 1e-6 && shards === GLITCH_LOOT_SHARDS + tr.tier && drop.length - shards <= 1 && g.hunt.kills === 1, JSON.stringify({ dmg, want, drop }));
+    check(`S-74b tracer: Surge contact ${want} damage (8 + tier step), kill drops ${HUNTER_LOOT_SHARDS} ◆${HUNTER_PRISM_CHANCE ? ' (and maybe a ▲)' : ', no ▲'}`,
+      Math.abs(dmg - want) < 1e-6 && shards === HUNTER_LOOT_SHARDS && drop.length - shards <= (HUNTER_PRISM_CHANCE ? 1 : 0) && g.hunt.kills === 1, JSON.stringify({ dmg, want, drop }));
   }
   { // the field: rebuilt on a break; a mode switch keeps the Tracer; core death clears it; never saved
     const L = lab('surge'), g = L.g, f = coreField(g), b0 = f.builds, wall = [L.ox + 2, L.oy + 4];
@@ -141,7 +142,7 @@ async function nodeChecks(check) {
       !err && !g.hunters.length, JSON.stringify({ err, left: g.hunters.length }));
   }
   { // S-74a (D-200): the reach half of the Hunters gate, tools/huntrun.mjs in the Deep on GATE_SEEDS (8) seeds; the cost half is reported (S-74b)
-    const out = await require('./gates.cjs').run('huntrun.mjs', ['--rings=deep']);
+    const out = await require('./gates.cjs').run('huntrun.mjs', ['--rings=deep', '--no-echo']);
     const line = out.split('\n').find(l => l.startsWith('reach')) || '', gate = out.split('\n').find(l => l.startsWith('gate')) || '';
     check('S-74a hunters: where a ghost Glitch from the spawn gives up, Tracers still reach the core on ≥ 80 % (huntrun.mjs, Deep, 8 seeds)',
       / ok$/.test(line) && /reach PASS/.test(gate), line.slice(0, 220));

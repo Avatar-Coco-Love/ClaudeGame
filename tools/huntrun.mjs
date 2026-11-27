@@ -6,18 +6,22 @@
 // recovery). Gate 1: Drift cost / Surge cost in 0.8–1.25 per ring, pooled over GATE_SEEDS seeds (D-158's two-faces rule).
 // Gate 2 (reach): at each Tracer spawn a ghost Glitch is flown from the same spot at the frozen core (D-017's beeline and
 // give-up, the tier's Glitch speed); Tracers make first contact on ≥ 80 % of spawns, the ghost on < 30 %.
-// Usage: node tools/huntrun.mjs [--rings=deep,shoal,kiln] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--build=mid|max|start] [--v]
+// S-74b (D-201): natural Glitches off in all runs (--glitches=on restores them); one Auto Echo row per ring and mode (--no-echo).
+// Usage: node tools/huntrun.mjs [--rings=deep,shoal,kiln] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--build=mid|max|start] [--glitches=on] [--no-echo] [--v]
 import { runBot } from './surgebot.mjs';
 import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, GLITCH_R, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, TRACER_SPEED } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
 import { moveBody } from '../src/body.js';
 import { fieldAt } from '../src/flow.js';
+import { echoDoing } from '../src/echo.js';
 const GATE_SEEDS = 8; // B-092 / D-155: the seed count gate verdicts are defined on (biomefoe.mjs runs on import)
 
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.slice(k.length + 3) : d; };
 const RINGS = { deep: { ring: 2, ore: ['shard', 'prism', 'lumen'] }, shoal: { ring: UNDERTOW_RING, ore: ['shard', 'prism', 'tide'] }, kiln: { ring: KILN_RING, ore: ['shard', 'prism', 'calx'] } };
 const rings = arg('rings', 'deep,shoal,kiln').split(','), seeds = Number(arg('seeds', GATE_SEEDS)), minutes = Number(arg('minutes', 10));
 const modes = arg('mode', 'drift,surge').split(','), BUILD = arg('build', 'mid'), V = process.argv.includes('--v');
+const ECHO = !process.argv.includes('--no-echo'); // S-74b: the Auto Echo row (report); --no-echo skips it
+const GLITCHES = arg('glitches', 'off') === 'on'; // S-74b (D-201): Surge's Glitches off by default, so the gap is the hunters'
 const WEIGHT = { shard: 1, prism: 4, lumen: 4, tide: 12, calx: 12 };
 const worth = o => Object.entries(o).reduce((a, [k, n]) => a + (WEIGHT[k] || 0) * n, 0);
 
@@ -36,13 +40,15 @@ export function ghostReaches(world, x, y, speed, core) {
   return false;
 }
 
-function run(seed, mode, ringKey, hunters) {
+function run(seed, mode, ringKey, hunters, echo = false) {
   const R = RINGS[ringKey], ore = new Set(R.ore); let game = null;
-  const seen = new Set(), spawns = [];
+  const seen = new Set(), spawns = []; let ticks = 0, defend = 0;
   const setup = g => {
     game = g; const w = g.world;
     g.burrow.off = true; g.swarm.off = true; // the ring's own creature has its gate (biomefoe); this one is the hunters'
     if (!hunters) g.hunt.off = true;
+    if (echo) g.echoOrder = 'auto'; // S-74b: the Echo row (reported, not gated): Auto's Defend share with hunters on
+    if (!GLITCHES) g.spawnTimer = Infinity; // no natural Glitches: their deaths swamp the hunters' cost (seed noise ±10 %)
     const cells = []; for (let i = 0; i < w.w * w.h; i++) if (w.rings[i] === R.ring) cells.push(Math.hypot(i % w.w - w.cx, ((i / w.w) | 0) - w.cy));
     cells.sort((a, b) => a - b); const d = cells[cells.length >> 1];
     let best = null, bd = -1;
@@ -57,6 +63,7 @@ function run(seed, mode, ringKey, hunters) {
     g.bank0 = { ...g.bank };
   };
   const onTick = g => {
+    if (g.echo) { ticks++; if (echoDoing(g, g.echo) === 'defend') defend++; }
     for (const e of g.hunters) if (!seen.has(e)) { // a new hunter: fly its ghost Glitch now
       seen.add(e); const p = g.player;
       spawns.push({ e, ghost: e.hunter === 'tracer' ? ghostReaches(g.world, e.x, e.y, e.speed / TRACER_SPEED, { x: p.x, y: p.y, r: p.r }) : null });
@@ -68,13 +75,13 @@ function run(seed, mode, ringKey, hunters) {
       else if (!g.hunters.includes(e)) s.end = 'killed';
     }
   };
-  const r = runBot({ seed, route: 'mine', build: BUILD, mode, minutes, weather: 'off', anomaly: 'off', setup, onTick,
+  const r = runBot({ seed, route: 'mine', build: BUILD, mode, minutes, weather: 'off', anomaly: 'off', echo, setup, onTick,
     ore: i => game.world.rings[i] === R.ring && ore.has(ORE_KIND[game.world.cells[i]]) });
   const banked = {}; for (const k in game.bank) banked[k] = game.bank[k] - (game.bank0[k] || 0);
   // Reach is judged on Tracers that met the core or gave up; one beamed down on its way says nothing about its path.
   const tr = spawns.filter(s => s.ghost !== null && (s.end === 'met' || s.end === 'stall' || s.end === 'off')), ends = {};
   for (const s of spawns) { const k = `${s.ghost === null ? 'pincer' : 'tracer'} ${s.end || 'alive'}`; ends[k] = (ends[k] || 0) + 1; }
-  return { ...r, haul: worth(banked) + worth(game.cargo), hunt: { ...game.hunt }, tracers: tr.length, met: tr.filter(s => s.end === 'met').length,
+  return { ...r, haul: worth(banked) + worth(game.cargo), hunt: { ...game.hunt }, ticks, defend, tracers: tr.length, met: tr.filter(s => s.end === 'met').length,
     ghost: tr.filter(s => s.ghost).length, blind: tr.filter(s => !s.ghost).length, blindMet: tr.filter(s => !s.ghost && s.end === 'met').length, ends };
 }
 
@@ -95,6 +102,11 @@ for (const ringKey of rings) {
     console.log(`${ringKey} ${mode}: time cost ${(100 * cost[mode]).toFixed(1)} % (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
       `hunters ${sum(on, r => r.hunt.spawned)} (pairs ${sum(on, r => r.hunt.pairs)}), reached ${sum(on, r => r.hunt.reached)}, gave up ${sum(on, r => r.hunt.gaveUp)}, kills ${sum(on, r => r.hunt.kills)}, taken ${sum(on, r => r.hunt.taken)}, ` +
       `Tracers met ${sum(on, r => r.met)}/${sum(on, r => r.tracers)} (ghost Glitch ${sum(on, r => r.ghost)}), ends ${ends(on)}, deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}`);
+    if (ECHO) { // S-74b: the same seeds with hunters on and an Auto Echo along (reported, not gated)
+      const ec = []; for (let k = 1; k <= seeds; k++) ec.push(run(k * 7919, mode, ringKey, true, true));
+      console.log(`${ringKey} ${mode} + Auto Echo: time cost ${(100 * (sum(off, r => r.haul) / Math.max(1e-9, sum(ec, r => r.haul)) - 1)).toFixed(1)} %, ` +
+        `Defend share ${(100 * sum(ec, r => r.defend) / Math.max(1, sum(ec, r => r.ticks))).toFixed(1)} % (report)`);
+    }
   }
   if (cost.drift !== undefined && cost.surge !== undefined) {
     // A cost ≤ 0 (hunters pay more in loot than they take) has no ratio: the face does nothing, so it fails.
