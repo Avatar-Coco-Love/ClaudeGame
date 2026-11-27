@@ -52,3 +52,15 @@ Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at th
   14 dmg, 160 hp) ~0 retreats; Kiln heat + 26 dmg forces long Nexus heal trips (+52 %); Shoal and Kiln share tier 3.
   No hunter lever fixes all three rings at once → cost still FAIL; Q-043 for Design 162. Reach still PASS (92 %).
 - Tests: `tracer.cjs` theft by worth + flee speed, Surge no loot; `pincer.cjs` 24 worth each (both FAIL on old code).
+
+## Session 162 — Design: Q-043 settled (pooled cost gate), S-74b2 specced (v1.11.103, D-202)
+- `huntrun.mjs --no-echo` (42 s) reproduces session 161 exactly. Pooled over the rings: Drift +6.2 %, Surge +17.6 %
+  (ratio 0.35, FAIL). Try (not shipped): hunter damage tier step capped at 1 → Surge −6.7 / +4.8 / +30.9 %, +9.3 pooled.
+- Deep, per seed (paired on/off): Drift 7 19 6 −10 2 9 −3 29 % (sd 12), Surge −7 −20 −2 −11 −4 −21 7 7 % (sd 11).
+  End hull, Surge, with / without hunters: Deep 0.65 / 1.00, Shoal 0.73, Kiln 0.90: the 10-min run never pays Deep's
+  damage (retreat at 0.35) → hull debt in D-202.
+- **B-108** (open): Deep Surge hauls more with hunters (6 of 8 seeds) though kills pay nothing. Cause unknown; S-74b2 step 1.
+- Play-test (`?dev`, Drift, Deep, still core, 8◆ 4▲ 3●): a Tracer reached in 4.5 s, took all 4 ▲ + 3 ● (28 worth), the
+  toast read clearly ("beam it to get it back"); screenshot viewed. **B-109** (open): it then sat 52 px from the core
+  for the whole 6 s flee and faded with the loot, never getting away.
+- Specs: S-74b2 written (`07-…-20`); S-75 / S-76 re-read, still build-ready (no change since Design 157).

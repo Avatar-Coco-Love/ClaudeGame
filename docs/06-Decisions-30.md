@@ -29,3 +29,17 @@ alternatives). D-200 on.
   not 1 item), Surge loot from hunters, `TRACER_S` / `PINCER_S`.
 - Rejected: gating the cost half now as-is (fails: needs tuning first); widening the band (hides a Drift face that
   does nothing); the ghost < 30 % as written (the spawns are fine; the bot's dig sites are open rooms).
+
+### D-202 — Hunters' cost gate is pooled over the three rings, with a floor and hull debt (session 162, design; Q-043)
+- **Pooled:** S-74b2's gate is Drift / Surge time cost in 0.8–1.25 over Deep + Shoal + Kiln together (sum of hauls,
+  same 8 seeds). One player crosses all three; per ring, Kiln's heat is Kiln's cost, not the hunter's. Per-ring
+  ratios stay in the report.
+- **Floor:** each face costs > 0 in every ring (D-200's rule that a free face fails, now per ring).
+- **Hull debt:** a Surge run that ends below full hull owes the retreat it has not paid yet, in time (deficit
+  / (1 − RETREAT) × the ring's mean retreat). Measured: Deep ends at 0.65 hull with hunters vs 1.00 without.
+- Measured (Design 162, 8 seeds, 10 min, `mid`): pooled Drift +6.2 %, Surge +17.6 % (ratio 0.35). With the hunters'
+  damage tier step capped at the Deep's: Surge +9.3 % pooled (Shoal 12 → 5, Kiln 52 → 31), Deep still −6.7 %.
+  Paired per-seed cost sd ≈ 11 % (Deep), so a per-ring 8-seed verdict carries ± 4 % of noise.
+- Rejected: per ring (no lever set fits all three: Shoal and Kiln share tier 3, the gap is heat); per-ring hunter
+  numbers (three tables the player can't read); a wider band (hides a free face); longer runs only (20 min: Deep
+  Surge +1.4 %, still the window, not the hunter).
