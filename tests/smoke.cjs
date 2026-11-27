@@ -113,6 +113,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./burrower.cjs').nodeChecks(check).catch(e => check('S-53 burrower checks ran', false, e.message));
   await require('./mote.cjs').nodeChecks(check).catch(e => check('S-54 mote checks ran', false, e.message));
   await require('./tracer.cjs').nodeChecks(check).catch(e => check('S-72 tracer checks ran', false, e.message));
+  await require('./pincer.cjs').nodeChecks(check).catch(e => check('S-73a pincer checks ran', false, e.message));
   times.push(['(node phase)', Date.now() - t0]);
   const tb = Date.now();
   await new Promise(r => server.listen(0, r));
@@ -413,6 +414,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('burrower', () => require('./burrower.cjs').browserChecks(browser, url, check, errors, process.env.BURROW_SHOT).catch(e => check('S-53 burrower browser checks ran', false, e.message)));
     await T('mote', () => require('./mote.cjs').browserChecks(browser, url, check, errors, process.env.MOTE_SHOT).catch(e => check('S-54 mote browser checks ran', false, e.message)));
     await T('tracer', () => require('./tracer.cjs').browserChecks(browser, url, check, errors, process.env.TRACER_SHOT).catch(e => check('S-72 tracer browser checks ran', false, e.message)));
+    await T('pincer', () => require('./pincer.cjs').browserChecks(browser, url, check, errors, process.env.PINCER_SHOT).catch(e => check('S-73a pincer browser checks ran', false, e.message)));
     await T('rift', () => require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message)));
     await T('lens', () => require('./lens.cjs').browserChecks(browser, url, check, errors, process.env.LENS_SHOT).catch(e => check('S-63 Lens browser checks ran', false, e.message)));
     await T('mapview', () => require('./mapview.cjs').browserChecks(browser, url, check, errors, process.env.MAP_SHOT).catch(e => check('D-191 map view browser checks ran', false, e.message)));

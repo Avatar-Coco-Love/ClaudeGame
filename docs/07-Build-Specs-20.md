@@ -46,6 +46,9 @@ gets only the calls (one `updateHunters(this, dt)` line after `updateBurrower`, 
 - Smoke (`pincer.cjs`): on a stub cross of tunnels the flank arrives from a different tunnel than the lead on ≥ 8 of 10
   seeds; A* stops at 800 nodes; no frame runs two searches; the Echo and hunters share one field build; mode faces; the flee. One screenshot (both closing in).
 
+**Split (Build 156, D-194):** S-73a = the pair (built: A* also pays +8 within 2 cells of the lead's cells, spawn split
+10 cells, the flank's give-up clock counts path steps left). **S-73b** = the Echo onto `coreField` + the shared-build check.
+
 ## S-74 — Hunters gate (M17)
 **Save:** none.
 - `tools/huntrun.mjs`: the mine bot, 8 seeds (`GATE_SEEDS`), Deep / Shoal / Kiln, Drift and Surge, 10 min, hunters on

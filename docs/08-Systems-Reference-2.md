@@ -31,3 +31,11 @@ Veil and out, 1 at a time (2 from the Deep), every `TRACER_S` 40–60 s, on a fi
 a touch takes 1 item (`biteCargo`) and it flees up the field (≤ 6 s); a kill gives the item back. `dev.tracer()`;
 `perf` runs `deep` / `hunt`; `tests/tracer.cjs`.
 
+
+## Pincer pair (S-73a, D-194)
+Deep and out, one pair every `PINCER_S` 70–100 s, never while one lives; both on the Tracer's spawn rule, ≥ 10 cells
+apart (`hunter: 'lead' | 'flank'`, `mate`). Lead: the Tracer's walk. Flank: every 0.5 s (one search a frame across all
+flanks, `hunt.frame`) `flow.js` `aStar` (8-way, octile, ≤ 800 nodes) to the field cell nearest core + velocity × 1.5 s
+that is ≥ 4 cells from the lead's next 8 field cells; +8 cost within 2 cells of them; no path → the field. Its give-up
+clock counts path steps left. Surge 6 + tier step, Drift 1 item each; one killed → the other flees 3 s, then fades.
+`pincer.js` (flank way, draw), `dev.pincer()`, `tests/pincer.cjs`.
