@@ -40,7 +40,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @media (max-width: 700px) { .chip:not(.echo) .chip-name { display: none; } } /* the order chip keeps its word: ◇ alone says nothing */
 #integrity-fill { height: 100%; width: 100%; background: #ff7a3d; box-shadow: 0 0 8px #ff7a3d; }
 .top-right { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-#minimap { width: 140px; height: 140px; border: 1px solid var(--line); border-radius: 10px; image-rendering: pixelated; }
+#minimap { width: 140px; height: 140px; border: 1px solid var(--line); border-radius: 10px; image-rendering: pixelated; pointer-events: auto; cursor: zoom-in; } /* D-191: catches its own taps */
+#mapview { position: fixed; inset: 0; z-index: 30; background: rgba(2,3,10,.82); display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; cursor: zoom-out; }
+#bigmap { background: #03040c; border: 1px solid var(--line); border-radius: 12px; image-rendering: pixelated; }
+#mapview small { color: var(--dim); font-size: calc(12px * var(--ts)); }
+@media (pointer: coarse) { #mapview .map-key { display: none; } }
 .buttons { display: flex; gap: 6px; }
 .buttons button { width: 36px; height: 36px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: calc(16px * var(--ts)); }
 #hint { position: absolute; bottom: max(22px, calc(env(safe-area-inset-bottom) + 10px)); left: 50%; transform: translateX(-50%); padding: 8px 14px;

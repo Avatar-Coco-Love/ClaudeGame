@@ -41,14 +41,16 @@ export function miniWindow(w, px, py, size) {
   return { sc: size / win, ox: clamp(px - win / 2, w.w * CELL - win), oy: clamp(py - win / 2, w.h * CELL - win), win };
 }
 
-export function drawMinimap(r) {
-  const m = r.mctx, g = r.game, w = g.world;
+/** Draws into the HUD minimap, or (D-191) into another canvas: the map view. Only the minimap sets `r.miniWin`. */
+export function drawMinimap(r, canvas = r.minimap, m = r.mctx) {
+  const g = r.game, w = g.world;
   if (r.miniDirty) { r.miniCtx.putImageData(r.miniData, 0, 0); r.miniDirty = false; }
-  const size = r.minimap.width;
+  const size = canvas.width;
   m.setTransform(1, 0, 0, 1, 0, 0);
   m.clearRect(0, 0, size, size);
   m.fillStyle = 'rgba(3,4,12,0.85)'; m.fillRect(0, 0, size, size);
-  const { sc, ox, oy, win } = r.miniWin = miniWindow(w, g.player.x, g.player.y, size);
+  const mw = miniWindow(w, g.player.x, g.player.y, size), { sc, ox, oy, win } = mw;
+  if (canvas === r.minimap) r.miniWin = mw;
   m.imageSmoothingEnabled = false;
   m.drawImage(r.mini, ox / CELL, oy / CELL, win / CELL, win / CELL, 0, 0, size, size);
   m.translate(-ox * sc, -oy * sc); // every mark below draws at x * sc as before; those outside the window fall off the canvas
@@ -62,7 +64,7 @@ export function drawMinimap(r) {
     m.fillRect((q.x + 0.5) * CELL * sc - rr, (q.y + 0.5) * CELL * sc - rr, rr * 2, rr * 2);
   }
   m.globalAlpha = 1;
-  drawChartMarks(m, g, sc, r.miniWin); // S-52: charted currents / seen vents (Nexus Chart), under the placed marks
+  drawChartMarks(m, g, sc, mw); // S-52: charted currents / seen vents (Nexus Chart), under the placed marks
   m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
   m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown

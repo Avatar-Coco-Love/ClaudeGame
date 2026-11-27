@@ -53,3 +53,14 @@ alternatives). D-187 on.
 - Spawn off screen by the camera rect, streams `tracer` / `pincer` added to the list (D-025). Tracer 0.8 × Glitch speed
   stays below the core's (Q-041). Rejected: hunters in `enemies` with a Drift exception (every Drift clear would need it);
   a dirty-region rebuild (a counter is all `world` keeps, and the build is cheap); comparing `hunt` to `surge` (Veil d 30, other cost).
+
+### D-191 — The map view: tap the minimap (or N) for a 3–4× map that holds the world still (owner feedback, session 153)
+- Owner: the minimap is too small and crowded to read on a phone, and a tap on it aims the beam (`#hud` passes every
+  touch through to the canvas). Now `#minimap` takes its own pointer events; a tap / click / `map` key (N, rebindable)
+  opens `#mapview`: the same `drawMinimap` into a canvas of min(560, 92 % width, height − 40) px. Marks keep their pixel
+  size, so the same 160-cell window spreads out 3–4×. The world holds still while open (as under the ending card), since
+  the map can open anywhere, Surge included; the Matrix (Nexus-only, safe) still does not pause.
+- Rejected: a bigger HUD minimap (the phone top row has no room: `touch.cjs` layouts); a smaller window on the minimap
+  (D-123's "the Nexus is always in the window" would need an edge arrow, and it still crowds at 96 px); pinch zoom
+  (a second gesture system); a live (unpaused) map (reading it in Surge would cost Integrity).
+- Known edge: a player who bound N to another action gets both reset by `cleanKeys` (clash → defaults). Rare; logged.

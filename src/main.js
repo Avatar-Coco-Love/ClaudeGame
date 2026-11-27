@@ -24,6 +24,7 @@ import { createDev } from './dev.js';
 import { registerOffline } from './pwa.js';
 import { setupKeys } from './keysui.js';
 import { Quality, GRAPHICS } from './quality.js';
+import { MapView } from './mapview.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -40,6 +41,7 @@ const canvas = $('game');
 const audio = new Audio(), music = new Music(audio); // S-44: the bed plays under audio.master
 const input = new Input(canvas);
 const renderer = new Renderer(canvas, $('minimap'));
+const mapView = new MapView(renderer, $('mapview'), $('bigmap')); // D-191
 let game = null;
 let paused = true;
 let panelOpen = false;
@@ -57,7 +59,7 @@ const keys = setupKeys({ settings, saveSettings, input, changed() { lastHud = ''
 
 // ---------- title screen ----------
 function showTitle() {
-  paused = true;
+  paused = true; mapView.close();
   $('title').classList.remove('hidden');
   $('hud').classList.add('hidden');
   const save = store.read();
@@ -403,6 +405,7 @@ $('mode-btn').addEventListener('click', () => input.pressed.add('beamMode'));
 $('beacon-btn').addEventListener('click', () => input.pressed.add('place'));
 $('echo-btn').addEventListener('click', () => input.pressed.add('echoOrder')); // S-43
 $('call-btn').addEventListener('click', () => input.pressed.add('call')); // S-63
+$('minimap').addEventListener('click', () => input.pressed.add('map')); // D-191: the minimap catches its taps (never the beam)
 document.querySelectorAll('#matrix .tabs button').forEach(b => b.addEventListener('click', () => { panelTab = b.dataset.tab; renderPanel(); }));
 $('matrix-close').addEventListener('click', closePanel);
 document.querySelectorAll('#matrix .mode-toggle button').forEach(b => b.addEventListener('click', () => {
@@ -480,15 +483,16 @@ function frame(now) {
       endSkip = false;
     }
     if (input.consume('mute')) $('mute-btn').click();
-    if (input.consume('matrix')) panelOpen ? closePanel() : openPanel();
-    if (input.consume('escape')) { if (settingsOpen) closeSettings(); else if (endingOpen) closeEnding(); else if (panelOpen) closePanel(); }
+    if (input.consume('map')) { if (mapView.open) mapView.close(); else if (!paused && !panelOpen && !endingOpen && !game.endSeq) mapView.show(); } // D-191
+    if (input.consume('matrix')) { mapView.close(); panelOpen ? closePanel() : openPanel(); }
+    if (input.consume('escape')) { if (mapView.open) mapView.close(); else if (settingsOpen) closeSettings(); else if (endingOpen) closeEnding(); else if (panelOpen) closePanel(); }
     if (panelOpen && !game.inNexus()) closePanel();
     const sp = renderer.worldToScreen(game.player.x, game.player.y);
     // S-11/S-13: F or Q pressed while paused or under the Matrix is dropped, never queued; during a hitstop it waits (B-024).
     const take = k => (paused || panelOpen || game.hitstop <= 0) && input.consume(k);
     const scan = take('scan'), beamMode = take('beamMode'), place = take('place'), echoOrder = take('echoOrder'), call = take('call'); // S-16: B / ✦ (and S-43 R / ◇) follow the same rule
     const intent = (paused || panelOpen) ? { move: { x: 0, y: 0 }, aim: null, fire: false, cancel: true } : { ...input.read(sp), scan, beamMode, place, echoOrder, call };
-    if (!paused && !game.endSeq && !endingOpen) { // S-24: the world holds still under the sequence and the card
+    if (!paused && !game.endSeq && !endingOpen && !mapView.open) { // S-24: the world holds still under the sequence and the card (D-191: and the map)
       if (game.hitstop > 0) game.hitstop -= dt; // S-4: a yield-cell break (or a cache, D-048) freezes the sim for a few frames
       else renderer.revealed(game.update(dt, intent));
       updateHud();
@@ -499,8 +503,9 @@ function frame(now) {
       audio.beam(false); game.beam.charge = 0; // S-14: pausing drops a Pulse charge unfired
     }
     renderer.draw(dt, input);
+    mapView.draw(); // D-191
     // S-41 (D-109): the real (unclamped) gap between played frames, which includes the browser's canvas raster
-    if (!paused && !game.endSeq && !endingOpen && quality.sample(gap)) renderer.setQuality(quality.level);
+    if (!paused && !game.endSeq && !endingOpen && !mapView.open && quality.sample(gap)) renderer.setQuality(quality.level);
   }
   // S-44: the music bed follows the world (silent on the title and under the Ending sequence / card).
   music.update(dt, game && !game.demo && !paused ? { ring: game.ringNow, mode: game.mode, wake: !!game.wake, ending: endingOpen || !!game.endSeq, rumble: burrowerRumble(game) } : null);

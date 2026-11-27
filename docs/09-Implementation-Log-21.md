@@ -64,3 +64,11 @@ Continues part 20 (it neared the 8 KB cap at session 147). Newest at the bottom;
 - Specs checked against code: `perf.cjs` has no `deep` run (S-72 adds it), `enemies` is emptied in Drift (hunters get
   their own list), `world.breaks` is a counter (any break rebuilds), rng streams are a fixed list in `game.js`.
   S-72 rewritten build-ready; S-73 names `game.hunters` / `dev.pincer()`; S-74 reports Auto's Defend share. Q-041 opened. No bug.
+
+## Session 153 — Owner feedback: the map view (v1.11.94, D-191)
+- Owner (chat): minimap too small / congested; a tap on it aims the beam; buttons could sit better; how smart can
+  enemies get; new ways to attack and defend. Took the concrete bug first (this PR); the rest went to `04-…-5`
+  ("Owner feedback, session 153") for Design 157. S-72 (smarter hunters, already planned) follows Audit 154.
+- B-105 (fixed): `#hud { pointer-events: none }` let a tap on the minimap reach the canvas and start the aim stick.
+- `mapview.cjs`: desktop click / N / Escape, phone tap (844×390): map 560 / 358 px vs minimap 140 / 112, world time
+  held, no aim stick. Screenshots viewed (desktop, phone after teleports 20 / 40 / 60): four lit pockets read apart.
