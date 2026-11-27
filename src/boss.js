@@ -12,7 +12,7 @@
 // its Surge form (S-61b) is swarms, the rim and an inward pull instead of the flare and embers.
 import { CELL, T, VAULT_HALF, VENT_PERIOD_S, VENT_HEAT, HURT_KNOCKBACK, VENT_HEAR_R, LAIR_HALF, LAIR_TRIES, LAIR_D, LAIR_CLEAR,
   BOSS_FLARE_R, BOSS_LOOT, BOSS_KEY_RGB, BOSS_NAMES, BOSS_ORE, PLAYER_R, SPAWN_OFFSET, BEACON_COST, RELAY_COST, HEATSINK_COST,
-  WARD_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
+  WARD_COST, DECOY_COST, BOSS_WAKE_R, BOSS_SURGE_FLARE_S, BOSS_FLARE_DMG, BOSS_EMBER_S, BOSS_EMBER_R, BOSS_EMBER_OUT, BOLT_SPEED, BOLT_R, BOLT_HP,
   BOLT_LIFE_S, GYRE_RING, GYRE_STEP_S, GYRE_SWARM_S, BOSS_WAKES, BOSS_RGB, BOSS_CHART_ALPHA } from './config.js';
 import { stepGyre, surgeGyre, gyreKeyBroke, drawGyre } from './gyre.js';
 import { World, seededStream, vaultSites, insideBorder } from './world.js';
@@ -130,7 +130,7 @@ function toNexus(game) { const p = game.player; p.x = game.nexus.x; p.y = game.n
 
 /** Placed things in a lair new to this save go back to the bank as their craft cost. */
 function refund(game, B) {
-  const w = game.world, rows = [[game.beacons, { prism: BEACON_COST }], [game.relays, RELAY_COST], [game.sinks, HEATSINK_COST], [game.wards, WARD_COST]];
+  const w = game.world, rows = [[game.beacons, { prism: BEACON_COST }], [game.relays, RELAY_COST], [game.sinks, HEATSINK_COST], [game.wards, WARD_COST], [game.decoys, DECOY_COST]]; // B-113: Decoys too (S-77a)
   for (const [list, cost] of rows) for (let k = list.length - 1; k >= 0; k--) {
     const c = list[k].i;
     if (!inLair(B, c % w.w, Math.floor(c / w.w))) continue;

@@ -37,3 +37,12 @@ alternatives). D-212 on.
   `--decoy`), the gate line says "decoy FAIL (report)", config unchanged; S-77b2 owns the fix (Q-045), no new lure rule here.
 - Rejected: a looser gate (D-213), a price under ▲2 ◆10 or a hold past 6 s (outside the bounds), a smarter bot cue in
   this PR (a measure change is S-77b2's call, else the gate is tuned to the bot, not the Decoy).
+
+### D-215 — Audit 174: placed-list sweeps name every kind; two debt lines closed
+- B-113: `boss.js` `refund` listed Beacons / Relays / Sinks / Wards but not Decoys (S-77a added a fifth list), so a
+  Decoy in a lair new to its save stayed on the rebuilt floor or plate. Now refunded at `DECOY_COST`; `boss.cjs` check
+  fails on the old code. Rule: a new placeable is added to every placed-list loop (craft `blocked`, hud notes, refund).
+- Debt: audit 164's watch closed (three audits, D-210's rule); Design 167's hunter blob closed (Q-044, D-213).
+- D-210…D-214 vs code: match (`DECOY_R` 6, hold 4 s, near 0.6, orbit 0.45 at 4 rad/s, `lureNo` never retaken).
+- Workflow review: too little: no list of "every placed kind" to grep when a placeable lands (rule above); too much:
+  none new. Rejected: a shared `PLACED_LISTS` helper now (5 call sites with different shapes; a refactor, not a fix).

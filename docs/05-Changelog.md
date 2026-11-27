@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.115 — 2026-11-27
+- Fix: in the rare case a save loses its record of a boss lair, a Decoy you had placed inside that lair now comes back
+  to you as its full price (▲4 ◆20), like every other placed thing, instead of being lost in the rebuilt lair.
+
 ## v1.12.114 — 2026-11-27
 - No change in play: the game's own tests now measure the Decoy over many runs in both modes. It does pull hunters off
   you for 3–4 seconds each time, but at its price it costs far more than it saves, so a later update fixes that.
