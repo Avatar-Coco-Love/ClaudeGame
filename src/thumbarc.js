@@ -43,12 +43,25 @@ export function keepRects(doc, w, h) {
   return out;
 }
 
-/** Place the visible action buttons on the arc (touch), or clear the inline placement (mouse / keyboard). */
+/** The right / bottom safe-area insets (notch, home bar; B-112, audit 169), read from a hidden probe padded with env().
+ *  Tests set the probe's padding inline to stand in for a notched phone. */
+export function safeInsets(doc) {
+  let p = doc.getElementById('safe-probe');
+  if (!p) { p = doc.createElement('div'); p.id = 'safe-probe';
+    p.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;' +
+      'padding-right:env(safe-area-inset-right,0px);padding-bottom:env(safe-area-inset-bottom,0px)';
+    doc.body.appendChild(p); }
+  const cs = getComputedStyle(p);
+  return { r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0 };
+}
+
+/** Place the visible action buttons on the arc (touch), or clear the inline placement (mouse / keyboard). The arc turns
+ *  round the safe corner (w − right inset, h − bottom inset), so no button sits under a notch or the home bar (B-112). */
 export function layoutArc(doc, touch, w = innerWidth, h = innerHeight) {
   const btns = ARC_ORDER.map(id => doc.getElementById(id));
   if (!touch) { for (const b of btns) { b.style.left = b.style.top = ''; } return []; }
   const shown = btns.filter(b => !b.classList.contains('hidden'));
-  const slots = arcSlots(w, h, shown.length, keepRects(doc, w, h));
+  const ins = safeInsets(doc), slots = arcSlots(w - ins.r, h - ins.b, shown.length, keepRects(doc, w, h));
   shown.forEach((b, i) => { const s = slots[i] || slots[slots.length - 1] || { x: w - 60, y: h - 200 };
     b.style.left = `${s.x - ARC.box / 2}px`; b.style.top = `${s.y - ARC.box / 2}px`; });
   return slots;

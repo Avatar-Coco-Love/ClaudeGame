@@ -1,6 +1,18 @@
 # 09 — Implementation Log, part 23
 
-Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
+Sessions 159–163 archived word for word in audit 169 (`archive/2026-11-27-09-sessions-159-163.md`); session 164 moved here from part 22 (removed). Newest at the bottom; read the tail only.
+
+## Session 164 — Audit: B-109 thief gets away, rotation check on 02, 09 archive (v1.11.105, D-204)
+- 02 said "Build 164"; the rotation makes 164 an Audit (CLAUDE.md wins). New `docs.cjs` check FAILs on the old 02.
+- No subagent tool: sweep in-session, newest code first (`hunter.js` S-74b, `surgebot.mjs` / `huntrun.mjs`). No new bug.
+- **B-109 (fixed):** `uphill` stops at a local high of the field (a nook by the core). Repro on 30 natural Deep seeds
+  (still core, Drift): flee ends 78 / 98 / 150 px on 3 of 27, most at 12–20 field steps. Now a once-per-flee A* to the
+  farthest field cell on its side: 615–1027 px on all 27. `tracer.cjs` check: 1.6 cells on the old code, 21.3 now.
+- `huntrun.mjs --no-echo` after the fix (parted Pincers flee the new way too): Drift +0.8 / +5.7 / +12.7 %, Surge
+  +2.4 / +9.8 / +53.6 %, pooled 6.8 vs 20.3 (0.332) FAIL, floor ok (Deep Surge now > 0). S-74b2b tunes from here.
+- D-199…D-203 vs code: match (7 KB cap, `RETREAT` export, 4-cell / 60 s trip, take 24, flee × 1.5, no hunter loot).
+- Workflow review: too much: none new; too little: a check on 02's next step (added, D-204). Audit 154 debt closed.
+- `09` sessions 154–158 archived word for word (`archive/2026-11-27-09-sessions-154-158.md`); part 21 removed.
 
 ## Session 165 — Build: S-74b2b1, hunter tuning first slice (v1.11.106, D-205)
 - Tries, `huntrun.mjs --no-echo`, 8 seeds, pooled Drift / Surge % (ratio), Deep / Shoal / Kiln:
@@ -52,3 +64,14 @@ Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
   375 × 667): moved above the core. Two S-17 position checks superseded (D-209). S-38 / S-29 FAILs were a race (VERSION
   bumped mid-run).
 - Observed: in portrait the top-right now holds only the minimap and ♪ ≡; the top quarter is free for the toast.
+
+## Session 169 — Audit: B-112 arc under the notch, tablet landscape, 09 archive (v1.12.110, D-210)
+- No subagent tool: sweep in-session, newest code first (`thumbarc.js`, `main.js` `placeArc`, S-75 CSS).
+- Tablet landscape (02's first look): 1024 × 768, 1180 × 820, 1366 × 1024, 820 × 1180 all pass every arc rule, farthest
+  215 px; screenshot 1024 × 768 viewed: the arc hugs the corner, ⊕ and the hint clear. 1024 × 768 joins the check.
+- **B-112 (fixed):** the arc ignored `env(safe-area-inset-*)` (the page sets `viewport-fit=cover`): on a notched phone
+  in landscape ⟂'s box ended 8 px from the edge, under a 47 px notch. Now the arc turns round the safe corner; the new
+  inset check in `thumbarc.cjs` FAILs on the old code (844 × 390: boxes 836 / 371 in the inset).
+- D-205…D-209 vs code: match. Audit 159's watch closed (three audits); hunter blob asked as Q-044.
+- Workflow review (D-210): too little: no notch case in touch checks (added); too much: none new.
+- `09` sessions 159–163 archived word for word (`archive/2026-11-27-09-sessions-159-163.md`); part 22 removed.

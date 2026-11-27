@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.110 — 2026-11-27
+- Phones with a notch or a home bar: the action-button arc now bends round the screen's safe corner, so in landscape no
+  button hides under the notch or the home bar. Checked on tablets in landscape too (1024 × 768).
+
 ## v1.12.109 — 2026-11-27
 - Phones and tablets: the action buttons (beam mode, Scanner, place, Echo order, rift call) now sit in an arc right
   under your aiming thumb in the bottom-right corner, instead of at the top of the screen. They never cover the Core
