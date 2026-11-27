@@ -64,3 +64,13 @@ alternatives). D-187 on.
   (D-123's "the Nexus is always in the window" would need an edge arrow, and it still crowds at 96 px); pinch zoom
   (a second gesture system); a live (unpaused) map (reading it in Surge would cost Integrity).
 - Known edge: a player who bound N to another action gets both reset by `cleanKeys` (clash → defaults). Rare; logged.
+
+### D-192 — Audit 154: late key actions take a free key on a clash; debt lines carried > 3 audits close; workflow review
+- B-106: `cleanKeys` reset both actions when an older saved key set held N (D-191's known edge). Actions added after
+  S-39 (`LATE_ACTIONS`: echoOrder, call, map) that a saved set lacks now take the first free `SPARE_CODES` key on a
+  clash; the player's own choice stays. Rejected: leaving the reset (loses a deliberate binding silently); unbinding Map
+  (the minimap tap still works, but the key list would show a blank).
+- Workflow review: too little follow-through on audit 150's rule (a line carried three audits is fixed or closed): the
+  audit 59–104 lines in `04-…-2` / `04-…-4` had ridden 10+ audits. Closed now, archived word for word in the debt-done
+  file; reopened only when a play-test hits one. Too much: none found (one PR per session held; smoke ~10 min is fine
+  run in the background). Rejected: re-triaging each old line (hours of re-measuring for watch items nobody hit).

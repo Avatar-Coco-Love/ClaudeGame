@@ -5,32 +5,7 @@ Known debt and watch items (moved out of `04-Roadmap.md` in audit 34 to stay und
 
 ## Debt
 - Newer audit leftovers continue in `04-Roadmap-4.md` (this part is near the 8 KB cap).
-- **Audit 99 leftovers** (sweeps in-session, no subagent tool; fixed: B-087 heat reset on a destabilize, toast plate,
-  B-086 closed with a guard, D-131). Vents have no sound (a tell tone needs `audio.cjs` ceilings; done, audit 109). Perf / mobile: not re-measured this audit beyond the d 110 runs.
-- **Audit 94 leftovers** (sweeps in-session; B-084 fixed in #101: glow blit unsmoothed, D-126). Kiln reads dim outside
-  the core's light (session 93; S-48 may warm it). Perf: holes frame still +2.3 ms for the light holes themselves. **B-085** `glow.cjs` "outside" floor read 3.7 once in a
-  full smoke (usual 3.2, 285 isolated seeds never): find what lights it (not the glow: off = on).
-- **Audit 84 leftovers** (5 sweeps; fixed in #91: chunk pre-scale D-116, B-076…B-080). Bug (weather after a reload) fixed in
-  #92 (B-081, D-117). Perf:
-  `drawLight` 15 ms at ×4 (L2 covers); pickups 15 with 300; GC ~6 MB/s (`pickupSprite` keys, `cargoRoom`/`buffMul`,
-  `castBeam` Map/Set); Echo field rebuilds on any break anywhere (≤ 0.3 ms ×4). Touch: short landscape sheets done in #93
-  (D-118).
-  Code: numbers to config (`VAULT_HALF`, `BORDER`, craft `SPIRE_HALF` done in #92): quality 1000 / 0.98 / 0.9, Glitch steer 3 / 0.4 / 0.9 / 12 tries, "moving > 20"
-  ×3, autosave 10 s, DPR max 2, beam hit pad 4, music ramp/resync constants; `echo.js` repeats the core's steer step
-  (`game.js` 173–190: a shared helper). (Exports, `GLITCH_SIZE`, D-107 drift: #96, D-121.)
-- **Audit 74 leftovers** (5 sweeps; fixed in #80: SW `?query` offline launch, Anomaly take during a Relay deposit,
-  pickup rotate, toast vs 3 chips, canvas/hint insets). Perf (×4, 1280×800): `light.js` unsmoothed blit done at L2 (S-41, #85); `drawGrid` re-strokes ~7 ms/frame (bake a `CanvasPattern`); `terrain.js` `paintChunk`
-  repaints a whole chunk per broken cell (~10 ms; Wide → 20–30 ms spikes: repaint a 3×3 clip); `touch.cjs` 65 s, ~25 s
-  of `waitForTimeout` (wait on conditions). Touch: chips ≤ 700 px are glyph-only, name only in `title` (short label or
-  tap to re-toast); overlays ignore side insets. Code: H2/H3 below still open; `VAULT_HALF` hard-coded 3 in `world.js`.
-- **Audit 69 leftovers:** Watch: ~6 % of seeds put another Spire < 24 cells from Spire 0 (gap ≥ 12 allowed), so one look can find two
-  ("(2/5)" first); fine in play, but any test that approaches a Spire must pin its seed (D-100).
-- **Audit 64 leftovers:** a reload mid-ending never shows the card by itself (reachable from the Matrix; needs a saved
-  "seen" flag → save bump); the overview lines' `shadowBlur 18` drives its p95 (draw twice instead, D-051); the ⊕↑ "↑"
-  renders small (a `.lift` size); tests pin 255-scaled dark values (ending.cjs) and CELL as 32 (reclaim.cjs); B-055's
-  check can't fire a trusted key repeat; "Best of N cycles" counts unfinished cycles.
-- **Audit 59 leftovers:** touch: a full-HUD overlap check for the Wake toasts/hint (`touch.cjs` covers death + mode lines
-  only); the Wake tune leans on lane order (south-first let a still core hold): recheck with `wakeprobe` on any change.
+- Audit 59–99 leftovers: closed in audit 154 (D-192, carried > 3 audits), archived word for word in `archive/2026-11-24-04-debt-done.md`.
 - Done items are archived word for word in `archive/2026-11-24-04-debt-done.md`.
 - **Scanner button reach (watch, session 21):** ◎ sits under the minimap, top right; a thumb on a big phone must stretch for it.
   If a play-test says so, try a slot above the left stick's zone.

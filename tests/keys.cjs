@@ -20,6 +20,11 @@ async function nodeChecks(check) {
     c.scan === 'KeyF' && c.mine === 'Space' && c.up === 'KeyZ' && c.left === 'KeyA' && c.beamMode === 'KeyQ' && c.place === 'KeyB'
       && !('bogus' in c) && JSON.stringify(cleanKeys('junk')) === JSON.stringify(d) && clash.scan === 'KeyF' && clash.matrix === 'KeyE',
     JSON.stringify({ c, clash }));
+  // B-106 (audit 154): a save from before D-191 with call (or any action) on N kept it; the new Map key took a free one.
+  const old = { ...d, call: 'KeyN' }; delete old.map;
+  const up = cleanKeys(old), upv = Object.values(up);
+  check('B-106 cleanKeys: an older save with N bound keeps its choice; Map (added later) takes a free key, no clash',
+    up.call === 'KeyN' && up.map && up.map !== 'KeyN' && up.map !== 'KeyC' && new Set(upv).size === upv.length && up.scan === 'KeyF', JSON.stringify(up));
   check('S-39 eventCode prefers e.code; key-only events map to codes; labels',
     eventCode({ code: 'KeyW', key: 'z' }) === 'KeyW' && eventCode({ key: 'Enter' }) === 'Enter' && eventCode({ key: 'g' }) === 'KeyG'
       && eventCode({ key: ' ' }) === 'Space' && keyLabel('KeyG') === 'G' && keyLabel('ShiftLeft') === 'Shift' && moveLabel(d) === 'WASD');
