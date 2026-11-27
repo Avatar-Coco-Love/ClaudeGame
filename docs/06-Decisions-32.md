@@ -14,3 +14,13 @@ alternatives). D-212 on.
 - Colour peach `255, 198, 170` (lowest ΔE 35 vs Ward / Tracer / Pincer, all 4 visions), glyph ◈, map mark a diamond.
 - Rejected: a per-frame line re-check (flip-flop at corners), a per-hunter hold (a second hunter would outlast the
   Decoy's 4 s promise), luring the Echo's foes or bosses (spec: hunters only).
+
+### D-213 — Design 172: no count pip for stacked hunters (Q-044); S-77b gets bounds
+- Q-044 → **no**. Five Tracers forced onto the core (390 × 844, Surge) do read as one violet blob, but natural play caps
+  hunters at 4 (`TRACER_CAP_DEEP` 2 + one Pincer pair), each touch shows on the hull bar (Surge) or the cargo bar and
+  theft toast (Drift), so the cost is read where it is paid. Revisit only if a later enemy tier lifts the cap.
+- Decoy play-test (S-77a, real tunnel, both modes): +3.9 s to first touch from one Decoy, equal in Drift and Surge; no
+  rule change. S-77b's bot places on its own cell; its tuning has bounds (hold ≤ 6 s, R ≤ 8, cost ≥ ▲2 ◆10), and a miss
+  inside them ships the measure as a report and splits the fix (S-77b2), never a looser gate.
+- Rejected: a count pip (HUD clutter for a case natural play rarely makes), a fan-out draw offset (draws hunters where
+  they are not: intent vs realized), unbounded tuning (a 10 s Decoy is a hunter off-switch, D-208's "buys seconds").

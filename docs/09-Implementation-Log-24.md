@@ -20,3 +20,12 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
   Surge give the same frames; a wall between, a fleeing thief, a Glitch: not lured. Browser shot viewed: chevron on the
   peach ◈ with the draining hold arc. Peach `255, 198, 170`: lowest ΔE 35 vs Ward / Tracer / Pincer under all 4 visions.
 - The legend gains Decoy (13 kinds; `mapview.cjs` fit check still passes at 320 × 568 and 568 × 320, Large text too).
+
+## Session 172 — Design: Decoy play-test, Q-044 settled (v1.12.113, D-213)
+- Decoy (S-77a) in the live game: Deep, a bent 22-cell tunnel, a Tracer at the far end, the core still. No Decoy: touch
+  at 5.3 s. A Decoy 3 cells toward it when it is 12 cells out: lured 0.7 s later (the bend), touch at 9.2 s. Drift and
+  Surge to the 0.02 s. `decoy.cjs` shot viewed: chevron circling the peach ◈, hold arc readable.
+- Q-044: five Tracers on the core at 390 × 844, shot viewed: one violet blob. Natural cap is 4; hull / cargo bars carry
+  the cost. No pip (D-213).
+- S-77b (`07-…-22`): bot places on its own cell, reports seconds lured per Decoy, tuning bounds + a split rule.
+- No bugs found.

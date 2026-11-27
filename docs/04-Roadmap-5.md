@@ -27,7 +27,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
   farthest 251 px on 390 × 844 (was 610–713) (Build 168, v1.12.109, D-209).
 - ✅ **S-76** Map legend: the big map names the kinds it drew, in their glyphs; columns beside it in landscape, wrapped under it in portrait (Build 170, v1.12.111, D-211).
 - ✅ **S-77a** Decoy craft + lure: ◈ ▲4 ◆20, lures a hunter in sight ≤ 6 cells for 4 s (Build 171, v1.12.112, D-212).
-- **S-77b** `huntrun --decoy` gate (`07-…-22`, Q-042 → yes, D-208).
+- **S-77b** `huntrun --decoy` gate (`07-…-22`, Q-042 → yes, D-208; bounds + split rule, D-213). Q-044 count pip: cut (D-213).
 - Pincer white pip: folded into S-73b (D-197).
 - **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also
   weighed: a Nexus-mouth camper, packs that retreat when hurt (both Surge-only today).
