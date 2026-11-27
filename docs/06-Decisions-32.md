@@ -24,3 +24,16 @@ alternatives). D-212 on.
   inside them ships the measure as a report and splits the fix (S-77b2), never a looser gate.
 - Rejected: a count pip (HUD clutter for a case natural play rarely makes), a fan-out draw offset (draws hunters where
   they are not: intent vs realized), unbounded tuning (a 10 s Decoy is a hunter off-switch, D-208's "buys seconds").
+
+### D-214 — Build 173: S-77b's Decoy measure ships as a report; the fix splits to S-77b2
+- `huntrun.mjs --decoy` (8 seeds, Deep / Shoal / Kiln, both modes, `--no-echo`): one Decoy per hunter first within 12
+  cells, dropped on the bot's cell, stock refilled at each deposit, ◆-eq price off the haul after hull debt. At today's
+  numbers it uses 7.6–12.1 Decoys a run, holds 2.8–3.7 hunter-s each and spends 275–437 ◆-eq a run, about 3× the hunter
+  cost it is meant to cut: saving −421 % Drift / −596 % Surge (gate ≥ 25 %). Before its price it saves some (Kiln Surge
+  26.1 % → 16.5 %), never the whole cost.
+- Tries inside D-213's bounds (logged in `09`): hold 6; hold 6 + R 8; hold 6 + R 8 + ▲2 ◆10. Best −246 % / −184 %:
+  even the floor price is ~2× the cost, and a longer hold or reach lures more hunters but saves no more haul.
+- So (D-213's split rule): the measure is a report row in smoke (`tracer.cjs`, rows + same Deep rows as without
+  `--decoy`), the gate line says "decoy FAIL (report)", config unchanged; S-77b2 owns the fix (Q-045), no new lure rule here.
+- Rejected: a looser gate (D-213), a price under ▲2 ◆10 or a hold past 6 s (outside the bounds), a smarter bot cue in
+  this PR (a measure change is S-77b2's call, else the gate is tuned to the bot, not the Decoy).
