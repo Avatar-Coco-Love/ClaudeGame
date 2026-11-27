@@ -24,4 +24,6 @@ Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
   (12.8 ↔ 23.1 %), seed noise in what the bot kills back. Deep Surge 0.6 % is thin but > 0 (hull debt carries it).
 - Ceiling call: 18 % per ring (D-206), gated. `tracer.cjs`: the drop check FAILs on the old code (all returned);
   new check runs the full 3-ring gate (≈ 44 s, beside the smoke). No visual change (no screenshot).
+- **B-110** (fixed): first full smoke 703/705: `craft.cjs` pressed B 100 ms after a teleport and no frame had read it
+  (`placeResult` still 'nexus', nothing placed) under the added gate's load; it now waits for the result.
 
