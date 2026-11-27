@@ -67,13 +67,19 @@ function groups() {
     for (const o of [...res, amber]) pairs.push([e, { ...o, shape: 'cell' }]);
     for (const o of ring) if (o.r > e.r) pairs.push([e, o]); // Kiln < Shoal alphabetically: each cross pair once
   }
-  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length, ring: ring.length } };
+  // S-73b (D-197): the Pincer's white pip vs the Deep / Shoal / Kiln edges it crosses and Prism ore (colour alone).
+  const pipM = src.match(/PINCER_PIP = '([^']+)'/), pip = pipM && { id: 'pincer pip', c: pipM[1], shape: 'cell' }, under = [];
+  for (const m of src.matchAll(/name: '(Deep|Shoal|Kiln)',.*?rockEdge: '(#[0-9a-f]{6})'.*?denseEdge: '(#[0-9a-f]{6})'/g))
+    under.push({ id: `${m[1]} rock`, c: m[2], shape: 'cell' }, { id: `${m[1]} dense`, c: m[3], shape: 'cell' });
+  const prism = res.find(r => r.id === 'prism');
+  if (pip) for (const o of [...under, { ...prism, shape: 'cell' }]) pairs.push([pip, o]);
+  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length, ring: ring.length, pip: pip ? under.length + 1 : 0 } };
 }
 
 function run() {
   const out = [], { pairs, shapes, counts } = groups();
-  out.push({ name: 'colours: read 3 Anomaly kinds, 5 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges from config.js',
-    ok: counts.anomaly === 3 && counts.res === 5 && counts.glitch === 4 && counts.ring === 4, detail: JSON.stringify(counts) });
+  out.push({ name: 'colours: read 3 Anomaly kinds, 5 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges, the Pincer pip vs 6 edges + Prism from config.js',
+    ok: counts.anomaly === 3 && counts.res === 5 && counts.glitch === 4 && counts.ring === 4 && counts.pip === 7, detail: JSON.stringify(counts) });
   const missing = Object.keys(shapes).filter(k => !shapes[k]);
   out.push({ name: 'colours: each claimed shape is still in the draw code (hexagram, ◆ ▲ ● ≈ ⬟ pickups, Glitch star, Spitter rhombus)',
     ok: !missing.length, detail: missing.join(', ') });

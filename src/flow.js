@@ -1,7 +1,7 @@
 // S-72 (M17, D-190): the core's flow field. One 4-way BFS over open floor from the core's cell, FLOW_FIELD cells out
 // (a (2 × FLOW_FIELD + 1)² box), rebuilt every FLOW_S s or when `world.breaks` changed (any break, the Echo's rule, D-108).
-// Hunters walk it downhill to the core (`downhill`), or uphill to flee (`uphill`). Built only while a hunter lives
-// (`coreField(game)` is called from hunter.js); the Echo keeps its own field until S-73b (D-186). Never saved.
+// Hunters walk it downhill to the core (`downhill`), or uphill to flee (`uphill`). Built only while a hunter or the Echo lives
+// (`coreField(game)` is called from hunter.js and, since S-73b (D-198), echo.js: one shared build). Never saved.
 // S-73a (D-194): `aStar` — the Pincer flank's bounded search over the field's reachable cells.
 import { CELL, FLOW_FIELD, FLOW_S } from './config.js';
 

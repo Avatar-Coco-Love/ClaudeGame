@@ -1,9 +1,10 @@
-// S-73a Pincer pair checks (M17, D-194; pincer.js, hunter.js, flow.js aStar). smoke.cjs calls nodeChecks + browserChecks.
+// S-73a / S-73b Pincer pair checks (M17, D-194; pincer.js, hunter.js, flow.js aStar). smoke.cjs calls nodeChecks + browserChecks.
 // Node: on a stub cross of tunnels joined by an outer ring, the flank (spawned behind the lead) arrives from a different
 // tunnel than the lead on ≥ 8 of 10 seeds (a flank that only walks the field: the lead's tunnel); A* stops at its node
 // cap; no frame runs two searches and the pair costs one field build a frame; spawns (50 Deep seeds: ≥ PINCER_SPLIT apart,
 // 16–24 steps, off screen); Deep only, never while one lives; Surge 6 + tier step each, Drift 1 item each; one killed,
-// the other flees and fades; nothing saved. Browser: the pair closing in, joined by its dotted line.
+// the other flees and fades; nothing saved. Browser: the pair closing in, joined by its dotted line; each dot's
+// white pip (S-73b); the Echo shares the hunters' field (S-73b).
 // Usage: node tests/pincer.cjs [--browser] (PINCER_SHOT=path.png)
 const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
@@ -82,6 +83,14 @@ async function nodeChecks(check) {
     for (let i = 0; i < 120; i++) { const s = h.searches, b = f.builds; frame(L); if (h.searches - s > 1) two++; builds = Math.max(builds, f.builds - b); }
     check('S-73a pincer: never two A* searches in one frame (two flanks), ≤ 1 field build a frame',
       two === 0 && h.searches - s0 >= 6 && builds <= 1, JSON.stringify({ two, searches: h.searches - s0, builds }));
+  }
+  { // S-73b (D-198): the Echo reads the same coreField object; with a pair and the Echo alive, still ≤ 1 build a frame
+    const L = cross(), g = L.g; g.research.echo = true;
+    pair(L, [10, 0], [12, 3]);
+    let builds = 0, same = true; const f = coreField(g);
+    for (let i = 0; i < 90; i++) { const b = f.builds; frame(L); same = same && g.flow === f && !!g.echo && !('field' in g.echo); builds = Math.max(builds, f.builds - b); }
+    check('S-73b pincer: the Echo and the hunters share one field (no Echo field of its own), ≤ 1 build a frame',
+      same && builds <= 1, JSON.stringify({ same, builds, echo: !!g.echo }));
   }
   { // spawns on 50 Deep seeds: both 16–24 steps out, off screen, ≥ PINCER_SPLIT apart
     let made = 0; const bad = [];
@@ -168,6 +177,14 @@ async function browserChecks(browser, url, check, errors, shot) {
   if (shot) await pg.screenshot({ path: shot });
   const n = await pg.evaluate(() => window.__pcLines);
   check('S-73a pincer: the pair is drawn, joined by its dotted line', n >= 1, JSON.stringify({ n }));
+  const pip = await pg.evaluate(() => { // S-73b (D-197): the white pip, read from the cached sprites
+    const S = window.__lumen.renderer.sprites, px = (k, f) => { const c = S[k] && S[k].canvas; if (!c) return null;
+      const g = c.getContext('2d'), m = c.width / 2, d = g.getImageData(Math.round(m + f * m), Math.round(m), 1, 1).data; return Math.min(d[1], d[2]); };
+    const s = S['pc-flank-0'], ring = s ? 0.5 * 11 * 0.8 / s.half : 0;
+    return { lead: px('pc-lead-0', 0), flankRing: px('pc-flank-0', ring), flankCore: px('pc-flank-0', 0) };
+  });
+  check('S-73b pincer: each dot carries a white pip (lead: a filled centre, flank: a ring inside its hollow)',
+    pip.lead >= 230 && pip.flankRing >= 200 && pip.flankCore < pip.flankRing, JSON.stringify(pip));
   await pg.close();
 }
 

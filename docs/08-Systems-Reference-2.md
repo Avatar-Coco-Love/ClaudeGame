@@ -10,7 +10,7 @@ when the system changes). Moved in Design 132 for `02` headroom.
   (beam ×1.5), Lodestone (reach ×2, pull ×1.5), Ballast (cargo ×1.5) via `stat()`; kinds stack; end when a deposit banks
   all cargo; recharge 300 s. Saved `anomalies` + `buffs` (format 15). Chip `#buffs`. Bot: `surgebot --anomaly`.
   S-37 (D-102): minimap sites, Scanner marks, end tone, hint line.
-- Echo (S-42, D-112, `echo.js`, 30 ●): follows by BFS, blinks back when stranded, Gathers ore at 0.5× beam dps. Bot `tools/echobot.mjs`.
+- Echo (S-42, D-112, `echo.js`, 30 ●): follows down the core's shared `coreField` (S-73b, D-198; path cap 24), blinks back when stranded, Gathers ore at 0.5× beam dps. Bot `tools/echobot.mjs`.
   Orders (S-43, D-113; S-69, D-184): R / ◇ cycles Mine → Defend → Auto (ids gather / guard / auto; 0.8 hp / 0.8 s,
   closing bolt first, then soonest to the core ≤ 140 px); Auto: threat → Defend, 2 s calm → Mine; chip in the
   `#buffs` row; saved `echoOrder` (format 16). `tests/echoorder.cjs`; `ECHO=guard tools/wakeprobe.mjs` (no Wake cut).
@@ -38,4 +38,5 @@ apart (`hunter: 'lead' | 'flank'`, `mate`). Lead: the Tracer's walk. Flank: ever
 flanks, `hunt.frame`) `flow.js` `aStar` (8-way, octile, ≤ 800 nodes) to the field cell nearest core + velocity × 1.5 s
 that is ≥ 4 cells from the lead's next 8 field cells; +8 cost within 2 cells of them; no path → the field. Its give-up
 clock counts path steps left. Surge 6 + tier step, Drift 1 item each; one killed → the other flees 3 s, then fades.
+Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `PINCER_PIP`).
 `pincer.js` (flank way, draw), `dev.pincer()`, `tests/pincer.cjs`.

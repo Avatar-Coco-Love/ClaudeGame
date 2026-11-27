@@ -4,7 +4,7 @@
 // field cells, costing PINCER_AVOID_COST more within PINCER_AVOID_R cells of them (so it goes round the lead), and follows that path (no target or over budget: the field, like the lead). One search a frame at most
 // (`hunt.frame`), so pairs never stack searches. Spawn, faces, flee and loot live in hunter.js; this file chooses the
 // flank's way and draws the pair. Seeded (`rng.pincer`); never saved.
-import { CELL, RESOURCE, GLITCH_R, GLITCH_FADE_S, PINCER_SEARCH_S, PINCER_NODES, PINCER_AHEAD_S, PINCER_APART, PINCER_LEAD_CELLS, PINCER_LOOK, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_RGB } from './config.js';
+import { CELL, RESOURCE, GLITCH_R, GLITCH_FADE_S, PINCER_SEARCH_S, PINCER_NODES, PINCER_AHEAD_S, PINCER_APART, PINCER_LEAD_CELLS, PINCER_LOOK, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_RGB, PINCER_PIP, PINCER_PIP_R } from './config.js';
 import { fieldAt, downhill, aStar } from './flow.js';
 
 /** The lead's next `n` field cells from (x, y), downhill (flat [x, y, …]; stops at the core's cell or a dead end). */
@@ -55,7 +55,7 @@ export function flankStep(game, e, f, cx, cy, dt) {
 
 // ---------- drawing (render.js via drawHunters) ----------
 /** A pincer: a rose-violet dot (Glitch size, cached glow sprite, D-051), the flank with a hollow core so the two read
- *  apart; a dotted line joins the pair while both live. No limbs (D-002). */
+ *  apart, each with a white pip (S-73b); a dotted line joins the pair while both live. No limbs (D-002). */
 function dotSprite(R, kind, white) {
   const r = GLITCH_R * 0.8;
   return R.glowSprite(`pc-${kind}-${white ? 1 : 0}`, r + 2 + 18 / (R.zoom * R.dpr), g => {
@@ -63,6 +63,11 @@ function dotSprite(R, kind, white) {
     g.strokeStyle = g.fillStyle = g.shadowColor = white ? '#ffffff' : `rgb(${PINCER_RGB})`;
     g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.stroke();
     g.globalAlpha = kind === 'lead' ? 0.85 : 0.25; g.fill();
+    // S-73b (D-197): a white pip reads by light where the rose hue sits on the Deep's dense edge (ΔE 8):
+    // the lead a filled centre, the flank a thin ring inside its hollow.
+    g.globalAlpha = 1; g.shadowBlur = 4; g.strokeStyle = g.fillStyle = g.shadowColor = `rgb(${PINCER_PIP})`;
+    g.beginPath(); g.arc(0, 0, kind === 'lead' ? PINCER_PIP_R : r * 0.5, 0, Math.PI * 2);
+    if (kind === 'lead') g.fill(); else { g.lineWidth = 1.5; g.stroke(); }
   });
 }
 

@@ -66,3 +66,11 @@ S-72 (D-190) left these open; settled while building `src/flow.js` / `src/hunter
 - So it reads by light: a white pip in each dot (filled for the lead, a ring for the flank), folded into S-73b.
 - Rejected: a new hue (best found: pale mint 180,255,240, which then sits on Tide ore and the Shoal), a bigger dot
   (Glitch size is the rule for small foes).
+
+### D-198 — The Echo reads the hunters' `coreField` (Build 158, S-73b; closes D-186's interim)
+- The Echo's own 24-cell BFS is gone: it calls `coreField(game)` (flow.js, 32-cell box) and treats steps > `ECHO_FIELD`
+  (24) as unreachable, so its blink rule and path cap are unchanged. Hunters tick the field's 0.5 s clock when they run
+  a frame; with none alive the Echo ticks it. One build a frame at most (`pincer.cjs`). `ECHO_FIELD_S` removed.
+- Side effect kept: the field now also rebuilds when the core changes cell (the Echo's was up to 0.5 s stale).
+- Rejected: a second, smaller box for the Echo (two builds a frame, what S-73 set out to remove); a per-frame tick
+  guard in flow.js (a frame counter on the game for one clock; the hunters-first order already holds).

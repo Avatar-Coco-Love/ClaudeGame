@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.11.98';
+export const VERSION = '1.11.99';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -244,7 +244,6 @@ export const RESEARCH = [
 // S-42 Echo (D-108, echo.js): follows down a BFS field from the core's cell, blinks back when stranded, Gathers exposed ore.
 export const ECHO_R = 6;                 // px collision radius
 export const ECHO_FIELD = 24;            // cells: the field's bound (box and path length)
-export const ECHO_FIELD_S = 0.5;         // s between field rebuilds (and on any cell break within the bound)
 export const ECHO_HOLD = [1.5, 3];       // cells from the core: the spot it settles in
 export const ECHO_SPEED_MUL = 1.15;      // × the core's Thrusters speed
 export const ECHO_BLINK_CELLS = 10;      // path distance past which it blinks
@@ -479,3 +478,4 @@ export const TRACER_RGB = '150, 140, 255'; // cyan-violet
 export const PINCER_S = [70, 30], PINCER_SPLIT = 10, PINCER_SEARCH_S = 0.5, PINCER_NODES = 800, PINCER_AHEAD_S = 1.5;
 export const PINCER_APART = 4, PINCER_LEAD_CELLS = 8, PINCER_LOOK = 8, PINCER_DMG = 6, PINCER_PART_S = 3, PINCER_AVOID_R = 2, PINCER_AVOID_COST = 8;
 export const PINCER_RGB = '255, 110, 200'; // rose-violet
+export const PINCER_PIP = '255, 255, 255', PINCER_PIP_R = 3; // S-73b (D-197): the white pip (lead: filled r px; flank: a ring)

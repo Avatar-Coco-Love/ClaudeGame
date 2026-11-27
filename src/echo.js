@@ -3,10 +3,11 @@
 // It never takes damage and Glitches ignore it. Owning it is `research.echo`; its live state is never saved.
 // S-43: `game.echoOrder` (saved) picks what it does at rest: Gather ore or Guard the core (bolts at Glitches / Spitter bolts).
 // S-69 (D-184): ids gather / guard / auto read Mine / Defend / Auto; Auto Defends on a threat, back to Mine after ECHO_AUTO_HOLD.
-import { CELL, ORE_KIND, PLAYER_ACCEL, ECHO_R, ECHO_FIELD, ECHO_FIELD_S, ECHO_HOLD, ECHO_SPEED_MUL, ECHO_BLINK_CELLS,
+import { CELL, ORE_KIND, PLAYER_ACCEL, ECHO_R, ECHO_FIELD, ECHO_HOLD, ECHO_SPEED_MUL, ECHO_BLINK_CELLS,
   ECHO_STUCK_S, ECHO_STUCK_PX, ECHO_FADE_S, ECHO_PICK_S,
   ECHO_ORDERS, ECHO_GUARD_DMG, ECHO_SHOT_S, ECHO_AUTO_S, ECHO_AUTO_HOLD, ORE_WORTH } from './config.js';
 import { collides, moveBody } from './body.js';
+import { coreField, fieldAt as flowAt } from './flow.js';
 import { beamFoes } from './spitter.js';
 import { echoStat } from './echolevels.js';
 
@@ -34,7 +35,6 @@ export const echoDoing = (game, e) => {
   return o === 'auto' ? e.auto : o === 'guard' ? 'defend' : 'mine';
 };
 
-const SIDE = 2 * ECHO_FIELD + 1;
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const AROUND = [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]; // blink spots, fixed order (D-025: no draw)
 
@@ -42,38 +42,18 @@ const AROUND = [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1,
 function makeEcho(game) {
   if (!game.research.echo) return null;
   const e = { x: 0, y: 0, r: ECHO_R, vx: 0, vy: 0, targetVx: 0, targetVy: 0, angle: game.player.angle, alpha: 0,
-    blink: { phase: 'in', t: 0 }, field: new Int16Array(SIDE * SIDE), fx: 0, fy: 0, fieldT: 0, fieldVer: -1,
+    blink: { phase: 'in', t: 0 },
     watch: { on: false }, target: null, pickT: 0, beam: null, blinks: 0, paused: false, guardT: 0, shot: null, shots: 0,
     auto: 'mine', autoT: 0, calmT: 0, switches: 0 }; // S-69 Auto state (unsaved)
   placeBeside(game, e);
-  buildField(game, e);
   return e;
 }
 
-/** Field distance (cells) from the core's cell to cell (x, y); -1 = outside the field or not reachable within it. */
-function fieldAt(e, x, y) {
-  const lx = x - e.fx + ECHO_FIELD, ly = y - e.fy + ECHO_FIELD;
-  return lx < 0 || ly < 0 || lx >= SIDE || ly >= SIDE ? -1 : e.field[ly * SIDE + lx];
-}
-
-function buildField(game, e) {
-  const w = game.world, p = game.player, f = e.field;
-  e.fx = Math.floor(p.x / CELL); e.fy = Math.floor(p.y / CELL); e.fieldT = ECHO_FIELD_S; e.fieldVer = w.breaks;
-  f.fill(-1);
-  const q = [ECHO_FIELD * SIDE + ECHO_FIELD];
-  f[q[0]] = 0;
-  for (let h = 0; h < q.length; h++) {
-    const i = q[h], d = f[i];
-    if (d >= ECHO_FIELD) continue;
-    const lx = i % SIDE, ly = (i - lx) / SIDE;
-    for (const [dx, dy] of N4) {
-      const nx = lx + dx, ny = ly + dy;
-      if (nx < 0 || ny < 0 || nx >= SIDE || ny >= SIDE) continue;
-      const j = ny * SIDE + nx;
-      if (f[j] >= 0 || w.solid(e.fx + nx - ECHO_FIELD, e.fy + ny - ECHO_FIELD)) continue;
-      f[j] = d + 1; q.push(j);
-    }
-  }
+/** Path distance (cells) from the core's cell to cell (x, y) on the shared `coreField` (S-73b, D-198); -1 = outside, not
+ *  reachable, or past the Echo's own path cap ECHO_FIELD (D-186 kept). */
+function fieldAt(f, x, y) {
+  const v = flowAt(f, x, y);
+  return v > ECHO_FIELD ? -1 : v;
 }
 
 /** A body of radius r can slide straight from (ax, ay) to (bx, by): sampled every 4 px. */
@@ -108,14 +88,14 @@ export function updateEcho(game, dt) {
   e.beam = null;
   if (e.shot && (e.shot.t -= dt) <= 0) e.shot = null;
   e.guardT = Math.max(0, e.guardT - dt);
-  if (w.breaks !== e.fieldVer) buildField(game, e); // a cell broke (any cell: a bounded rebuild is cheap, D-108)
-  else if ((e.fieldT -= dt) <= 0) buildField(game, e);
+  // S-73b (D-198): the core's one shared field (flow.js); hunters tick its clock when they run this frame.
+  const f = coreField(game, game.hunters && game.hunters.length ? 0 : dt);
 
   if (e.blink) { // fade out, jump beside the core, fade in; no movement or mining meanwhile
     e.blink.t += dt;
     if (e.blink.phase === 'out') {
       e.alpha = Math.max(0, 1 - e.blink.t / ECHO_FADE_S);
-      if (e.blink.t >= ECHO_FADE_S) { placeBeside(game, e); buildField(game, e); e.blink = { phase: 'in', t: 0 }; }
+      if (e.blink.t >= ECHO_FADE_S) { placeBeside(game, e); e.blink = { phase: 'in', t: 0 }; }
     } else {
       e.alpha = Math.min(1, e.blink.t / ECHO_FADE_S);
       if (e.blink.t >= ECHO_FADE_S) { e.blink = null; e.alpha = 1; }
@@ -126,7 +106,7 @@ export function updateEcho(game, dt) {
   // Pauses: the Ending sequence and the Nexus ring hold it still (no mining). A stranded Echo still blinks back in the
   // ring (B-077: a core death respawns there, far from the Echo); only the Ending skips the blink check.
   e.paused = !!game.endSeq || game.inNexus();
-  const d = Math.hypot(p.x - e.x, p.y - e.y), fd = fieldAt(e, Math.floor(e.x / CELL), Math.floor(e.y / CELL));
+  const d = Math.hypot(p.x - e.x, p.y - e.y), fd = fieldAt(f, Math.floor(e.x / CELL), Math.floor(e.y / CELL));
   let tx = 0, ty = 0, follow = false;
   if (!game.endSeq && (fd < 0 || fd > ECHO_BLINK_CELLS)) { startBlink(game, e); return; }
   if (!e.paused) {
@@ -137,7 +117,7 @@ export function updateEcho(game, dt) {
         const cx = Math.floor(e.x / CELL), cy = Math.floor(e.y / CELL);
         let best = fd;
         for (const [dx, dy] of N4) {
-          const v = fieldAt(e, cx + dx, cy + dy);
+          const v = fieldAt(f, cx + dx, cy + dy);
           if (v >= 0 && v < best) { best = v; gx = (cx + dx + 0.5) * CELL; gy = (cy + dy + 0.5) * CELL; }
         }
       }
@@ -158,7 +138,7 @@ export function updateEcho(game, dt) {
 
   // Stuck: following, but < ECHO_STUCK_PX closer (straight line or path, whichever moved more) in ECHO_STUCK_S.
   if (follow) {
-    const nd = Math.hypot(p.x - e.x, p.y - e.y), nf = fieldAt(e, Math.floor(e.x / CELL), Math.floor(e.y / CELL));
+    const nd = Math.hypot(p.x - e.x, p.y - e.y), nf = fieldAt(f, Math.floor(e.x / CELL), Math.floor(e.y / CELL));
     if (!e.watch.on) e.watch = { on: true, t: 0, s0: nd, f0: nf };
     e.watch.t += dt;
     if (e.watch.t >= ECHO_STUCK_S) {
