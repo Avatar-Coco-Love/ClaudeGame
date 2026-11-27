@@ -11,3 +11,12 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
 - Test pitfall: a fake Beacon without `r` threw in the light pass (non-finite gradient); the test now builds one
   shaped like `makeBeacon`'s.
 - `mapview.cjs` +2 checks (kinds drawn = kinds listed; 12 kinds × 2 viewports × Large text, on screen, clear, no scroll).
+
+## Session 171 — Build: S-77a Decoy craft + lure (v1.12.112, D-212)
+- `decoy.js`: craft / place / pick up like a Ward; `lureGoal` is the one call in `hunter.js` (non-fleeing branch, before
+  the field); `updateDecoys` runs the held clock before the hunters. Save format +1 (craft.decoy, decoys).
+- Observed (stub room, `decoy.cjs`): a Tracer 5 cells south of a Decoy turns north at once (vy −111, vx 0), arrives at
+  1.35 s, circles within 0.32 cell, Decoy spent at 5.37 s (held 4.02 s), then it walks west to the core. Drift and
+  Surge give the same frames; a wall between, a fleeing thief, a Glitch: not lured. Browser shot viewed: chevron on the
+  peach ◈ with the draining hold arc. Peach `255, 198, 170`: lowest ΔE 35 vs Ward / Tracer / Pincer under all 4 visions.
+- The legend gains Decoy (13 kinds; `mapview.cjs` fit check still passes at 320 × 568 and 568 × 320, Large text too).

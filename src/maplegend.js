@@ -1,7 +1,7 @@
 // S-76 map legend: beside the big map (D-191), the kinds of mark drawn on it this open, each as its own glyph in its
 // colour + one word, in a fixed order. Only kinds present show (a full legend would list things not met yet). The kinds
 // come from drawMinimap's `kinds` Map (kind → colours drawn), so there is no second scan of the world.
-import { BEACON_RGB, RELAY_RGB, HEATSINK_RGB, WARD_RGB, RIFT_RGB, UNDERTOW_RGB, VENT_RGB, SPIRE_MARK_COLOR, ANOMALY_KINDS, BOSS_RGB } from './config.js';
+import { BEACON_RGB, RELAY_RGB, HEATSINK_RGB, WARD_RGB, DECOY_RGB, RIFT_RGB, UNDERTOW_RGB, VENT_RGB, SPIRE_MARK_COLOR, ANOMALY_KINDS, BOSS_RGB } from './config.js';
 
 const rgb = s => `rgb(${s})`;
 const poly = (m, x, y, r, n, a0) => { m.beginPath(); for (let k = 0; k < n; k++) { const t = a0 + k * Math.PI * 2 / n; m[k ? 'lineTo' : 'moveTo'](x + Math.cos(t) * r, y + Math.sin(t) * r); } m.closePath(); };
@@ -17,6 +17,7 @@ const GLYPH = {
   relay: (m, x, y) => { m.strokeStyle = rgb(RELAY_RGB); m.lineWidth = 1.5; disc(m, x, y, 3.5); m.stroke(); },
   sink: (m, x, y) => { m.fillStyle = rgb(HEATSINK_RGB); poly(m, x, y, 3, 5, -Math.PI / 2); m.fill(); },
   ward: (m, x, y) => { m.strokeStyle = m.fillStyle = rgb(WARD_RGB); m.lineWidth = 1; disc(m, x, y, 3); m.stroke(); m.fillRect(x - 0.75, y - 0.75, 1.5, 1.5); },
+  decoy: (m, x, y) => { m.strokeStyle = rgb(DECOY_RGB); m.lineWidth = 1.25; m.beginPath(); m.moveTo(x, y - 3); m.lineTo(x + 3, y); m.lineTo(x, y + 3); m.lineTo(x - 3, y); m.closePath(); m.stroke(); },
   anomaly: (m, x, y, c) => { m.fillStyle = c; disc(m, x, y, 2.25); m.fill(); },
   rift: (m, x, y) => { m.fillStyle = rgb(RIFT_RGB); disc(m, x, y, 3); m.fill(); },
   lair: (m, x, y, c) => { m.strokeStyle = c; m.lineWidth = 1.25; poly(m, x, y, 4, 8, Math.PI / 8); m.stroke(); },
@@ -24,7 +25,7 @@ const GLYPH = {
 };
 /** The legend's kinds, in order, with their one word. */
 export const LEGEND = [['nexus', 'Nexus'], ['ping', 'Ping'], ['current', 'Current'], ['vent', 'Vent'], ['beacon', 'Beacon'],
-  ['relay', 'Relay'], ['sink', 'Heat Sink'], ['ward', 'Ward'], ['anomaly', 'Anomaly'], ['rift', 'Rift'], ['lair', 'Lair'], ['spire', 'Spire']];
+  ['relay', 'Relay'], ['sink', 'Heat Sink'], ['ward', 'Ward'], ['decoy', 'Decoy'], ['anomaly', 'Anomaly'], ['rift', 'Rift'], ['lair', 'Lair'], ['spire', 'Spire']];
 const GLYPH_PX = 16, GLYPH_SCALE = 1.6, MAX_DOTS = 4, STEP = { lair: 15 }; // px between side-by-side colours (an octagon is wide)
 
 /** Every kind with sample colours: what the legend shows in a world that has them all (tests). */

@@ -49,7 +49,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   await legendChecks(browser, url, check, errors, shot);
 }
 
-// S-76: the legend lists exactly the kinds drawn (a Beacon placed adds it); all 12 kinds fit at 320 × 568 and 568 × 320,
+// S-76: the legend lists exactly the kinds drawn (a Beacon placed adds it); all 13 kinds (S-77a: + Decoy) fit at 320 × 568 and 568 × 320,
 // Large text on and off: on screen, clear of the map and of each other, no page scroll, portrait ≤ 4 lines.
 async function legendChecks(browser, url, check, errors, shot) {
   const pg = await browser.newPage({ viewport: { width: 320, height: 568 }, hasTouch: true, isMobile: true });
@@ -81,11 +81,11 @@ async function legendChecks(browser, url, check, errors, shot) {
       const lines = new Set(es.map(e => Math.round(e.top))).size, se = document.scrollingElement;
       return { n: es.length, on, clear, apart, smallOk, lines, scroll: se.scrollWidth > innerWidth || se.scrollHeight > innerHeight };
     }, large);
-    const ok = r.n === 12 && r.on && r.clear && r.apart && r.smallOk && !r.scroll && (w > h || r.lines <= 4);
+    const ok = r.n === 13 && r.on && r.clear && r.apart && r.smallOk && !r.scroll && (w > h || r.lines <= 4);
     fit.push(ok ? '' : `${w}x${h}${large ? 'L' : ''} ${JSON.stringify(r)}`);
     if (shot && !large) await pg.screenshot({ path: shot.replace(/(\.png)?$/, `-legend-${w}x${h}.png`) });
   }
-  check('S-76 legend: all 12 kinds at 320×568 and 568×320, Large text on and off: on screen, clear of the map, the close line and each other, no scroll, portrait ≤ 4 lines',
+  check('S-76 legend: all 13 kinds at 320×568 and 568×320, Large text on and off: on screen, clear of the map, the close line and each other, no scroll, portrait ≤ 4 lines',
     fit.every(f => !f), fit.filter(Boolean).join(' | '));
   await pg.close();
 }
