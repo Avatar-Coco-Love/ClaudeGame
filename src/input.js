@@ -24,8 +24,8 @@ export class Input {
         // Enter on a focused button is that button's click, not a Core Matrix toggle (B-003).
         if (act === 'matrix' || ((code === 'Enter' || code === 'NumpadEnter') && !(e.target instanceof HTMLButtonElement))) this.pressed.add('matrix');
         if (code === 'Escape') this.pressed.add('escape');
-        // mute; scan (S-11, ignored until unlocked); beamMode (S-13); place (S-16, refused with a toast when there is none); echoOrder (S-43); call (S-63)
-        if (act === 'mute' || act === 'scan' || act === 'beamMode' || act === 'place' || act === 'echoOrder' || act === 'call') this.pressed.add(act);
+        // map (D-191); mute; scan (S-11, ignored until unlocked); beamMode (S-13); place (S-16, refused with a toast when there is none); echoOrder (S-43); call (S-63)
+        if (act === 'mute' || act === 'scan' || act === 'beamMode' || act === 'place' || act === 'echoOrder' || act === 'call' || act === 'map') this.pressed.add(act);
       }
       this.keys.add(code);
       if (code === this.bindings.mine || code === 'Space' || code.startsWith('Arrow')) e.preventDefault();

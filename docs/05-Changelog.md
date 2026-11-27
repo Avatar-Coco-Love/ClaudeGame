@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.11.94 — 2026-11-27
+- **Tap the minimap (or press N) to open a big map** in the middle of the screen, 3–4× larger, so its marks no longer
+  crowd each other. The world holds still while you read it; tap anywhere to close. A tap on the minimap no longer
+  swings the beam toward it.
+
 ## v1.11.93 — 2026-11-26
 - No change in play: the first hunter that follows you through your own tunnels (the Tracer) is now fully planned,
   after a play-test showed the Deep's Glitches give up in the rock long before they reach you.

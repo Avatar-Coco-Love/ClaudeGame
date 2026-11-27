@@ -31,7 +31,7 @@
       <div class="bar-row hidden" id="integrity-row"><label>Integrity</label><div class="bar"><div id="integrity-fill"></div></div><span id="integrity-text">100</span></div>
     </div>
     <div class="top-right">
-      <canvas id="minimap" width="140" height="140"></canvas>
+      <canvas id="minimap" width="140" height="140" title="Map (N)" aria-label="Open the map"></canvas>
       <div class="buttons"><button id="mute-btn" title="Mute (M)">♪</button><button id="menu-btn" title="Menu">≡</button></div>
       <div class="pair"><button id="scan-btn" class="hidden" title="Scanner ping (F)" aria-label="Scanner ping">◎ <kbd data-key="scan">F</kbd></button><button id="echo-btn" class="hidden" title="Echo order (R)" aria-label="Switch Echo order">◇ <kbd data-key="echoOrder">R</kbd></button><button id="call-btn" class="hidden" title="Call a rift (C)" aria-label="Call a rift">❖ <kbd data-key="call">C</kbd></button></div> <!-- S-43: ◇ sits left of ◎ (portrait column) -->
       <button id="mode-btn" class="hidden" title="Beam mode (Q)" aria-label="Switch beam mode"><span id="mode-glyph">⟂</span><span class="mode-name" id="mode-name">Focus</span> <kbd data-key="beamMode">Q</kbd></button>
@@ -41,6 +41,7 @@
     <button id="matrix-btn" class="hidden">Core Matrix <kbd data-key="matrix">E</kbd></button>
     <div id="toast"></div>
   </div>
+  <div id="mapview" class="hidden" aria-label="Map — tap to close"><canvas id="bigmap" width="140" height="140"></canvas><small>Tap to close<span class="map-key"> · <kbd data-key="map">N</kbd></span></small></div>
 
   <div id="matrix" class="hidden">
     <div class="sheet">
