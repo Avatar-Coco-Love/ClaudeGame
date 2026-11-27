@@ -108,6 +108,17 @@ async function nodeChecks(check) {
       ev && took.tide === 0 && took.carry.join() === want && took.shard === 40 - took.carry.length + 1 && took.hp && took.flee && fast && away > 20 && drop.join() === want && !g.hunters.length,
       JSON.stringify({ ev, took: { ...took, carry: took.carry.length }, fast, away, drop: drop.length }));
   }
+  { // B-109: touched from the room's west side (no way out there), it flees round the core and down the tunnel, not
+    // into the room's corner (a local high of the field, where uphill stops: 1–2 cells from the core on the old code)
+    const L = lab('drift'), g = L.g; g.cargo.shard = 40;
+    const tr = makeTracer(g, L.ox + 1, L.oy + 2); Object.assign(tr, { x: g.player.x - 14, y: g.player.y, hitCd: 0 }); g.hunters.push(tr);
+    let far = 0, end = 0, t = 0;
+    for (; t < 10 && g.hunters.includes(tr) && (tr.fade === undefined || !g.hunt.taken); t += 1 / 60) {
+      frame(L); if (tr.flee > 0) { end = Math.hypot(tr.x - g.player.x, tr.y - g.player.y) / CELL; far = Math.max(far, end); }
+    }
+    check('B-109 tracer: a Drift thief gets away (≥ 8 cells from a still core when its flee ends), not stuck in a nook by the core',
+      g.hunt.taken > 0 && end >= 8 && g.hunt.runs === 1, JSON.stringify({ taken: g.hunt.taken, end: +end.toFixed(1), far: +far.toFixed(1), runs: g.hunt.runs }));
+  }
   { // Surge: contact = 8 + the Glitch tier step, knockback; kill drops the hunter loot (S-74b, D-201: HUNTER_LOOT_SHARDS ◆, ▲ at HUNTER_PRISM_CHANCE)
     const L = lab('surge'), g = L.g; g.player.invuln = 0;
     const tr = near(L), hp = g.player.integrity;

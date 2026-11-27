@@ -55,3 +55,13 @@ alternatives). D-200 on.
   (ratio 0.285, FAIL); floor FAIL (Deep Surge ≤ 0). Tuning must raise the Deep's Surge cost, not only lower Kiln's.
 - Rejected: heal time only (16 s: a quarter of the trip); the paired difference only (an off run below full hull
   would pay the on run); a 32-seed gate (4× the smoke's run time).
+
+### D-204 — B-109: a flee follows an A* way out; 02's next step is checked against the rotation (audit 164)
+- **B-109 fixed:** a fleeing hunter (Drift thief, a parted Pincer) finds once an A* way (≤ `TRACER_FLEE_NODES` 2000,
+  round the core's cells) to the farthest field cell on its side of the core (any side if none); `uphill` only when
+  the way is done or none. Cause: `uphill` stops at a local high of the field, a nook 1–2 cells from the core
+  (play-test 52 px; test 1.6 cells on the old code, 21 now; 27 natural Deep seeds: ends 78–1027 px → 615–1027).
+- **Rotation check:** `docs.cjs` FAILs when 02's next step does not name "<type> <counter + 1>" with the type due
+  (it said "Build 164"; 164 is an Audit). Audit 164 took B-109 from S-74b2b, so S-74b2b = step 4 (tuning).
+- Rejected: a second BFS from the core's far side per flee (a field per hunter); flee along the trail (6 cells, too
+  short); a straight run away from the core (walls); letting it fade early (the loot would vanish by the core).

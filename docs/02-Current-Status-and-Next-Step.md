@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-27_ · **Session counter: 163** · **Version: v1.11.104**
-**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189). Next (D-181, `04-…-5`): M17 Hunters (`07-…-20`; S-72, S-73a/b, S-74a, S-74b1, S-74b2a built; S-74b2b next, D-202 / D-203), S-75 / S-76 (`07-…-21`), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
+_Last updated: 2026-11-27_ · **Session counter: 164** · **Version: v1.11.105**
+**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189). Next (D-181, `04-…-5`): M17 Hunters (`07-…-20`; S-72, S-73a/b, S-74a, S-74b1, S-74b2a built, B-109 fixed in audit 164; S-74b2b next, D-202…D-204), S-75 / S-76 (`07-…-21`), M18 Feats (`07-…-18`). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -29,7 +29,7 @@ _Last updated: 2026-11-27_ · **Session counter: 163** · **Version: v1.11.104**
 - Darkness/light, minimap (D-123; tap / N: map, D-191), Nexus pointer, toasts, audio ceilings. `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Phones: no key badges, buttons ≥ 44 px, landscape ◎⟂♪≡ top row, glyph-only ◎ ⟂ ≤ 700 px (D-050, D-058, D-064); bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Format number (now 25), old formats upgraded on load; malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 30 from D-200; last D-203), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-22`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 30 from D-200; last D-204), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-22`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
 - Specs (1 PR each, D-063): S-1…S-65, S-69…S-74b2a built. Next: S-74b2b (M17, `07-…-20`), S-75, S-76 (`07-…-21`), S-66…S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
@@ -39,5 +39,5 @@ _Last updated: 2026-11-27_ · **Session counter: 163** · **Version: v1.11.104**
   Swallowed test waits: `node -r ./tools/waitprobe.cjs`.
 
 ## Next step (one thing)
-Build 164: S-74b2b (`07-…-20` steps 4–5, D-202 / D-203): tune until `huntrun.mjs`'s pooled gate + floor pass (now
-0.285, Deep Surge −1.0 %): `HUNTER_TIER_MAX` 1, then `TRACER_TAKE` ≤ 36; then B-109 (a thief that never gets away). M17 → 1.12.0.
+Build 165: S-74b2b (`07-…-20` step 4, D-202…D-204; B-109 done in audit 164): tune until `huntrun.mjs`'s pooled gate
+passes (now 0.332, floor ok): `HUNTER_TIER_MAX` 1, then `TRACER_TAKE` ≤ 36 (no ring's Drift cost past +12 %). M17 → 1.12.0.

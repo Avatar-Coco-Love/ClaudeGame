@@ -17,7 +17,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-74a** `huntrun.mjs`: the measure; reach gate in smoke (Tracers 94 % where a Glitch gives up); B-107 fixed (Build 160, v1.11.101, D-200).
 - ✅ **S-74b1** cost levers (Drift 24 worth + flee 1.5×, Surge no loot), Glitches off in the measure, Echo row (Defend 5–7 %) (Build 161, v1.11.102, D-201).
 - ✅ **S-74b2a** the measure: B-108 closed (bot accounting + seed noise), hull debt (trip incl. the way back), pooled gate + floor (Build 163, v1.11.104, D-203).
-- **S-74b2b** (D-202, D-203): tune (cap the damage tier step, then the take) until the pooled gate + floor pass; B-109. Perf `hunt` / `pack` 1.00× (audit 159). **M17 done.**
+- **S-74b2b** (D-202, D-203): tune (cap the damage tier step, then the take) until the pooled gate + floor pass (B-109 fixed in audit 164). Perf `hunt` / `pack` 1.00× (audit 159). **M17 done.**
 - Cut (D-182): per-enemy A* each frame, Glitches on the field (Q-038), Surge-only hunters, a third kind, saved hunters.
 
 ## Owner asks, session 153 (triaged Design 157, D-195…D-197) → v1.12 patches, after S-74, before S-66
