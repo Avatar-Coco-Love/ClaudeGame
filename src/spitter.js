@@ -63,9 +63,11 @@ function boltPop(game, b, n) { game.burst(b.x, b.y, n, SPITTER_COLORS[1], 120); 
 /** What the beam can hit: live Glitches, then bolts, then a surfaced S-53 Burrower, then S-54 motes (either mode). */
 export function beamFoes(game) {
   const b = game.burrow && game.burrow.b, up = b && b.state === 'up' ? b : null, motes = game.swarm ? game.swarm.motes : [];
-  if (!game.bolts.length && !up && !motes.length) return game.enemies;
+  const hunters = game.hunters || []; // S-72: Tracers (both modes)
+  if (!game.bolts.length && !up && !motes.length && !hunters.length) return game.enemies;
   const out = game.enemies.concat(game.bolts);
   if (up) out.push(up);
+  if (hunters.length) out.push(...hunters);
   return motes.length ? out.concat(motes) : out;
 }
 

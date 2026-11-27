@@ -4,6 +4,7 @@
 import { UPGRADES, NEXUS_UPGRADES, CELL, RESEARCH, BORDER } from './config.js';
 import { UNBREAKABLE, insideBorder } from './world.js';
 import { relightSpire } from './spire.js';
+import { spawnTracer } from './hunter.js';
 
 const ROOM = 1; // carve (2*ROOM+1)² cells: a 3×3 room around the teleport target
 
@@ -35,6 +36,8 @@ export function createDev(ui) {
       ui.persist();
       return { x, y };
     },
+    /** S-72: a Tracer out now on the spawn rule (ignores ring, cap and timer); returns it or null. */
+    tracer() { return spawnTracer(g()); },
     /** S-42: grant the Echo (it appears beside the core next frame). */
     echo() { g().research.echo = true; g().echoOrder = 'auto'; ui.persist(); return true; }, // S-69: as bought, starts in Auto
     /** S-47: Undertow on / off (tools and by-hand comparison; not saved). */

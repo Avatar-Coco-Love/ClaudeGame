@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.11.95';
+export const VERSION = '1.11.96';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -457,3 +457,15 @@ export const MOTE_TAKE = 1, MOTE_SCATTER = 3, MOTE_SCATTER_S = 1.2, MOTE_LOOT = 
 // cooldown draws at NEXUS_RING_DIM; a Nexus purchase plays the S-4 upgrade ring at the Nexus for NEXUS_FLASH_S.
 export const NEXUS_RING_BASE = 78, NEXUS_RING_STEP = 16, NEXUS_RING_ALPHA = 0.75, NEXUS_RING_DIM = 0.22, NEXUS_FLASH_S = 0.5;
 export const NEXUS_RING_RGB = { radiance: '46, 242, 255', chart: '150, 255, 200' }; // cyan, mint; Lens uses RIFT_RGB
+
+// S-72 (M17, D-190, D-193): hunters. FLOW_FIELD cells: the core's BFS field (flow.js), rebuilt every FLOW_S or on any break.
+// The Tracer: Veil and out (the core's ring ≥ 1), TRACER_CAP at a time (TRACER_CAP_DEEP from the Deep out), one every
+// TRACER_S [min, + span] s, spawned on a field cell TRACER_SPAWN steps away whose centre is off screen (none: retry in
+// TRACER_RETRY_S). Speed TRACER_SPEED × the tier's Glitch speed, hp a Glitch's; straight at the core with a clear line
+// ≤ TRACER_LINE cells, else down the field. Gives up (D-017's fade) when its field distance hasn't dropped for
+// GLITCH_GIVE_UP_S, or off the field. Surge contact TRACER_DMG + the Glitch tier step; Drift a touch takes TRACER_TAKE
+// item(s) and it flees up the field (TRACER_FLEE_S at most, then fades); killed, it drops what it took.
+export const FLOW_FIELD = 32, FLOW_S = 0.5;
+export const TRACER_S = [40, 20], TRACER_RETRY_S = 5, TRACER_SPAWN = [16, 24], TRACER_CAP = 1, TRACER_CAP_DEEP = 2;
+export const TRACER_SPEED = 0.8, TRACER_STEER = 8, TRACER_LINE = 3, TRACER_DMG = 8, TRACER_TAKE = 1, TRACER_FLEE_S = 6, TRACER_TRAIL = 6;
+export const TRACER_RGB = '150, 140, 255'; // cyan-violet

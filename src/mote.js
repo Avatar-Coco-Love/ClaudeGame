@@ -116,10 +116,15 @@ function spawn(game) {
 
 /** A touch of the hold: MOTE_TAKE items, most valuable first (the Burrower's order), gone for good. */
 function take(game) {
-  let n = 0;
-  for (const k of BITE_ORDER) while (n < MOTE_TAKE && game.cargo[k] > 0) { game.cargo[k]--; n++; }
+  const n = biteCargo(game, MOTE_TAKE).length;
   game.swarm.taken += n;
   if (n) game.notify('mote-take');
+}
+/** S-72: the bite, shared with the Drift Tracer (hunter.js): up to `n` items, most valuable first; returns their kinds. */
+export function biteCargo(game, n) {
+  const out = [];
+  for (const k of BITE_ORDER) while (out.length < n && game.cargo[k] > 0) { game.cargo[k]--; out.push(k); }
+  return out;
 }
 
 function scatterFrom(game, m, x, y) {
