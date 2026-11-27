@@ -118,7 +118,7 @@ async function browserChecks(browser, url, check, errors, plantSaveAndReload, sh
     val: document.querySelector('#upgrade-list [data-id="relay"] .u-val').textContent, dis: document.querySelector('#upgrade-list [data-id="relay"] .buy').disabled,
     bank: { ...window.__lumen.game.bank } }));
   if (shot) await pg.screenshot({ path: shot + '-tab.png' });
-  check('Craft tab: a Relay row (then the S-51 Heat Sink row, 256 world, then the S-56 Ward row); crafting spends 12▲ + 40◆ and then locks (S-22)', tab.rows === 'beacon,relay,sink,ward' && /Carried 1\/1/.test(tab.val) && tab.dis
+  check('Craft tab: a Relay row (then the S-51 Heat Sink row, 256 world, then the S-56 Ward and S-77a Decoy rows); crafting spends 12▲ + 40◆ and then locks (S-22)', tab.rows === 'beacon,relay,sink,ward,decoy' && /Carried 1\/1/.test(tab.val) && tab.dis
     && tab.bank.prism === 8 && tab.bank.shard === 10, JSON.stringify(tab));
   await pg.keyboard.press('Escape'); await pg.waitForTimeout(100);
   const btn = await pg.evaluate(() => document.getElementById('beacon-btn').textContent.replace(/\s+/g, ''));
