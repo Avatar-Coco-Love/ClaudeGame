@@ -167,6 +167,14 @@ async function nodeChecks(check) {
     const s160 = new Game({ seed: 4242, mode: 'drift', audio: quiet, size: 160 }).toSave();
     check('S-60a old save: a format-22 256 save gets the lair (plates stamped over its map, a Beacon in it refunded, the core moved to the Nexus); a 160 save gets none',
       old.v && old.plates === 8 && old.beacons === 0 && old.prism === BEACON_COST && old.refunds === 1 && old.core && JSON.stringify(s160.bosses) === '[]', JSON.stringify(old));
+    // audit 174 (B-113): a current save whose lair record is unreadable (B-037: loads empty) refunds a Decoy on lair floor too
+    const d = JSON.parse(JSON.stringify(o.toSave()));
+    const dbr = new Uint8Array(ow.broken); dbr[bi] = 1;
+    d.broken = packBits(dbr); d.decoys = [bi]; d.bank.prism = 0; d.bank.shard = 0; d.bosses = 'junk';
+    const dg = make('drift', 4242, upgradeSave(d));
+    const dec = { decoys: dg.decoys.length, prism: dg.bank.prism, shard: dg.bank.shard, refunds: dg.bosses.refunds };
+    check('B-113 lair refund: a Decoy placed in a lair new to its save goes back to the bank as its craft cost, like a Ward',
+      dec.decoys === 0 && dec.prism === C.DECOY_COST.prism && dec.shard === C.DECOY_COST.shard && dec.refunds === 1, JSON.stringify(dec));
   }
   { // probe: a mid build (beam 5, range 3) walks to a standpoint 3.4 cells out from the lit plate and beams it, then the core
     const res = [];

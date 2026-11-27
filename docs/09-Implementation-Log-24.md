@@ -37,3 +37,12 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
   hold 6 → −522 / −471; hold 6 R 8 → −680 / −598; hold 6 R 8 ▲2 ◆10 → −246 / −184. The other rows are unchanged by the
   Decoy runs (pooled 12.4 % / 12.2 %, D-206). Drift thefts with Decoys drop (Kiln 1003 → 525), Surge kills stay.
 - New check fails on the old tool (no `--decoy` rows). No bugs found.
+
+## Session 174 — Audit: B-113 Decoy lair refund, debt closed, 09 archive (v1.12.115, D-215)
+- No subagent tool: sweep in-session, newest code first (`decoy.js`, `maplegend.js`, `huntrun.mjs --decoy`). Edge cases:
+  death and mode switch keep Decoys (saved, like Wards); a held Decoy's clock runs once a frame before the hunters.
+- **B-113 (fixed):** `boss.js` `refund` skipped `game.decoys`. A current save with an unreadable lair record and a
+  Decoy on lair floor kept it (decoys 1, bank 0); now refunded ▲4 ◆20. New `boss.cjs` check FAILed on the old code.
+- D-210…D-214 vs code: match. Debt: audit 164 watch closed (three audits), Design 167 blob closed (Q-044 settled).
+- Workflow review (D-215): too little: no "every placed kind" checklist (rule added); too much: none new.
+- `09` sessions 164–168 archived word for word (`archive/2026-11-27-09-sessions-164-168.md`).
