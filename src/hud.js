@@ -8,6 +8,7 @@ import { drawAnomalyMarks } from './anomaly.js';
 import { drawBossMarks } from './boss.js';
 import { drawSinkMarks } from './heatsink.js';
 import { drawWardMarks } from './ward.js';
+import { drawDecoyMarks } from './decoy.js';
 import { drawChartMarks } from './chart.js';
 import { drawRiftMark } from './rift.js';
 
@@ -58,7 +59,7 @@ export function drawMinimap(r, canvas = r.minimap, m = r.mctx, kinds = null) {
     if (col) kinds.get(k).add(col);
   });
   if (note) { note('nexus', g.nexus.x, g.nexus.y);
-    for (const [k, list] of [['beacon', g.beacons], ['relay', g.relays], ['sink', g.sinks], ['ward', g.wards]]) for (const q of list) note(k, q.x, q.y); }
+    for (const [k, list] of [['beacon', g.beacons], ['relay', g.relays], ['sink', g.sinks], ['ward', g.wards], ['decoy', g.decoys]]) for (const q of list) note(k, q.x, q.y); }
   m.imageSmoothingEnabled = false;
   m.drawImage(r.mini, ox / CELL, oy / CELL, win / CELL, win / CELL, 0, 0, size, size);
   m.translate(-ox * sc, -oy * sc); // every mark below draws at x * sc as before; those outside the window fall off the canvas
@@ -82,6 +83,7 @@ export function drawMinimap(r, canvas = r.minimap, m = r.mctx, kinds = null) {
   for (const q of g.relays) { m.beginPath(); m.arc(q.x * sc, q.y * sc, 3.5, 0, Math.PI * 2); m.stroke(); }
   drawSinkMarks(m, g, sc); // S-51: placed Heat Sinks, a lilac pentagon, always shown
   drawWardMarks(m, g, sc); // S-56: placed Wards, a lime ring, always shown
+  drawDecoyMarks(m, g, sc); // S-77a: placed Decoys, a peach diamond, always shown
   drawAnomalyMarks(m, g, sc, note); // S-37: seen sites, filled when charged, hollow while recharging
   drawRiftMark(m, g, sc); // S-57a: an open rift's pocket
   if (note && g.rift && g.rift.open) note('rift', (g.rift.open.x + 0.5) * CELL, (g.rift.open.y + 0.5) * CELL);

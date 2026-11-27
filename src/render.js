@@ -7,6 +7,7 @@ import { paintMiniCell, drawMinimap, drawNexusPointer, drawRiftPointer, drawStic
 import { drawBeacons, drawRelays } from './craft.js';
 import { drawSinks } from './heatsink.js';
 import { drawWards } from './ward.js';
+import { drawDecoys } from './decoy.js';
 import { drawSpireBreath, drawSpireFeed } from './spire.js';
 import { drawLight, drawLightGlow } from './light.js';
 import { endingView, drawOverview } from './ending.js';
@@ -185,6 +186,7 @@ export class Renderer {
     drawRelays(this, ctx, left, top, vw, vh); // S-22
     drawSinks(this, ctx, left, top, vw, vh); // S-51
     drawWards(this, ctx, left, top, vw, vh); // S-56
+    drawDecoys(this, ctx, left, top, vw, vh); // S-77a
     this.drawCrack(ctx);
     drawShatter(this, ctx); // S-47b: a faint line from a broken Shoal cell into the one it cracked
     this.drawPickups(ctx, left, top, vw, vh);

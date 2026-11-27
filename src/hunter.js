@@ -14,6 +14,7 @@ import {
   TRACER_TAKE, TRACER_RETURN, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
+import { lureGoal } from './decoy.js';
 import { coreField, fieldAt, downhill, uphill, ringCells, aStar } from './flow.js';
 import { glitchTier } from './glitch.js';
 import { BITE_ORDER } from './burrower.js';
@@ -126,12 +127,16 @@ export function updateHunters(game, dt) {
       [gx, gy] = up ? [(up[0] + 0.5) * CELL, (up[1] + 0.5) * CELL] : [e.x - dx, e.y - dy];
     } else {
       if (fd < 0) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; } // off the field: gives up (D-017's fade)
-      const seen = d <= TRACER_LINE * CELL && !game.world.raycast(e.x, e.y, dx / d, dy / d, d);
-      const way = e.hunter === 'flank' ? flankStep(game, e, f, cx, cy, dt) : null; // S-73a: the flank's A* way, else the field
-      const togo = way ? e.togo : fd; // progress: steps left (a flank on its detour counts its path, not the field)
-      if (togo < e.best) { e.best = togo; e.stall = 0; } else if ((e.stall += dt) >= GLITCH_GIVE_UP_S) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; }
-      const down = seen ? null : way || downhill(f, cx, cy);
-      [gx, gy] = down ? [(down[0] + 0.5) * CELL, (down[1] + 0.5) * CELL] : [p.x, p.y];
+      const lure = lureGoal(game, e, dt); // S-77a: a Decoy in sight pulls it off the field (decoy.js); the flank's A* waits
+      if (lure) [gx, gy] = lure;
+      else {
+        const seen = d <= TRACER_LINE * CELL && !game.world.raycast(e.x, e.y, dx / d, dy / d, d);
+        const way = e.hunter === 'flank' ? flankStep(game, e, f, cx, cy, dt) : null; // S-73a: the flank's A* way, else the field
+        const togo = way ? e.togo : fd; // progress: steps left (a flank on its detour counts its path, not the field)
+        if (togo < e.best) { e.best = togo; e.stall = 0; } else if ((e.stall += dt) >= GLITCH_GIVE_UP_S) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; }
+        const down = seen ? null : way || downhill(f, cx, cy);
+        [gx, gy] = down ? [(down[0] + 0.5) * CELL, (down[1] + 0.5) * CELL] : [p.x, p.y];
+      }
     }
     let tx = gx - e.x, ty = gy - e.y; const td = Math.hypot(tx, ty) || 1; tx /= td; ty /= td;
     const nd = Math.hypot(e.x - game.nexus.x, e.y - game.nexus.y);

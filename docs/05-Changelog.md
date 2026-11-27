@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.112 — 2026-11-27
+- New craft: the **Decoy** ◈ (▲4 ◆20, carry 2, up to 3 out). Drop one in a tunnel: a hunter that sees it within 6 cells
+  leaves your trail, circles it for 4 seconds, then the Decoy pops and the hunt resumes. Same in Drift and Surge; Glitches
+  ignore it, and a thief already running with your cargo doesn't stop. Shown on the map and in its legend.
+- The Tracer theft hint now says "beam it to win most of it back" (a killed thief keeps its best share).
+
 ## v1.12.111 — 2026-11-27
 - The big map (tap the minimap or press N) now has a legend: each kind of mark on it this time, its own symbol in its
   colour plus one word (Nexus, Beacon, Anomaly, Spire …). Only marks you have met show. Beside the map in landscape,
