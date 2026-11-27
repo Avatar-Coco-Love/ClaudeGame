@@ -24,3 +24,18 @@ Part 21 holds sessions 154–157 (150–153 archived in audit 159). Newest at th
 - Workflow review: `02` hit 8 KB a third time (8074 bytes) → 7 KB check in `docs.cjs` (FAILs on the old `02`,
   D-199); 14 system lines moved word for word to `08-…-2`. Too much: per-build `02` lines; too little: nothing new.
 - `09` sessions 150–153 archived word for word (`archive/2026-11-27-09-sessions-150-153.md`).
+
+## Session 160 — Build: S-74a, the Hunters gate's measure + B-107 (v1.11.101, D-200)
+- `tools/huntrun.mjs`: biomefoe's pad + Relay setup in Deep / Shoal / Kiln, creature / weather / Anomalies off, hunters
+  on vs off, 8 seeds × 10 min, ~80 s all rings. Per hunter it records how it ended (met / killed / stall / off / parted)
+  and flies a ghost Glitch from each Tracer spawn at the frozen core.
+- First run at `max`: 75 % of hunters beamed down before contact, costs ≤ 0 (Surge +loot). Moved to `mid` (D-200).
+  `mid`, 8 seeds: Drift cost −0.3 / +0.5 / +2.7 %, Surge +11.3 / −2.3 / −4.8 % (Deep / Shoal / Kiln) → cost FAIL.
+  Reach: Tracers 87 % of 333 that met or gave up; ghost Glitch 40 % (open dig rooms); where the ghost gives up,
+  Tracers 94 % of 199 → PASS. Pincers end mostly "parted" (mate beamed, the other flees).
+- **B-107** (found by the gate's Shoal Surge run): a Surge death from a hunter's touch cleared `game.hunters` mid-loop;
+  the next index was undefined and `updateHunters` threw. In the browser the throw skips `requestAnimationFrame`, so the
+  game froze. Fix: return when the list is empty after `touch` (B-007's Glitch guard). `tracer.cjs` check fails on
+  the old code (stashed: "reading 'flash'"), passes now.
+- Smoke: `tracer.cjs` awaits `huntrun.mjs --rings=deep` (prestarted in `gates.cjs`, ~20 s) and checks the reach line.
+- `05` v1.9.76–v1.9.81 archived word for word (`archive/changelog-v1.9.76-v1.9.81.md`); `06` part 30 started.

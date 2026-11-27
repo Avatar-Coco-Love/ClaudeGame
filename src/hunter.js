@@ -143,7 +143,10 @@ export function updateHunters(game, dt) {
     e.vx += (tx * e.speed - e.vx) * k; e.vy += (ty * e.speed - e.vy) * k;
     moveBody(game.world, e, e.vx * dt, e.vy * dt, true);
     e.spin = Math.atan2(e.vy, e.vx);
-    if (e.flee <= 0 && d < e.r + p.r && e.hitCd <= 0) touch(game, e, dx / d, dy / d);
+    if (e.flee <= 0 && d < e.r + p.r && e.hitCd <= 0) {
+      touch(game, e, dx / d, dy / d);
+      if (!list.length) return; // B-107: a Surge death in touch() cleared the list (as B-007's Glitch guard)
+    }
   }
 }
 
