@@ -3,8 +3,7 @@
 // tap there no longer aims the beam. While the map is open the world holds still (like the ending card): reading it in
 // Surge should never cost Integrity. A tap anywhere, the key again or Escape closes it.
 import { drawMinimap } from './hud.js';
-
-export const MAP_MAX_PX = 560; // the map view's largest side (CSS px; the canvas is drawn 1:1, so marks keep their size)
+import { MAP_MAX_PX } from './config.js';
 
 export class MapView {
   constructor(renderer, root, canvas) {
@@ -14,14 +13,15 @@ export class MapView {
   }
   /** The side that fits: 92 % of the width, the height less 40 px for the close line, at most MAP_MAX_PX. */
   side() { return Math.max(140, Math.min(MAP_MAX_PX, Math.floor(innerWidth * 0.92), innerHeight - 40)); }
-  show() {
+  show() { this.open = true; this.root.classList.remove('hidden'); this.draw(); }
+  /** Audit 154: re-fit on every draw, so a phone turned while the map is open never pushes it off screen. */
+  fit() {
     const s = this.side();
+    if (this.canvas.width === s) return;
     this.canvas.width = this.canvas.height = s;
     this.canvas.style.width = this.canvas.style.height = s + 'px';
-    this.open = true; this.root.classList.remove('hidden');
-    this.draw();
   }
   close() { if (!this.open) return; this.open = false; this.root.classList.add('hidden'); }
   toggle() { this.open ? this.close() : this.show(); }
-  draw() { if (this.open && this.renderer.game) drawMinimap(this.renderer, this.canvas, this.ctx); }
+  draw() { if (!this.open || !this.renderer.game) return; this.fit(); drawMinimap(this.renderer, this.canvas, this.ctx); }
 }

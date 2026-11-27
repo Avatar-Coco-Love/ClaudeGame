@@ -10,6 +10,9 @@ export const KEY_ACTIONS = [
   ['map', 'Map', 'KeyN'], // D-191: the map view (also a tap on the minimap)
 ];
 const FIXED_CODES = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Enter', 'NumpadEnter', 'Tab']; // Tab keeps moving focus
+// B-106: free keys for an action whose default a saved choice already holds (first unused wins).
+const LATE_ACTIONS = ['echoOrder', 'call', 'map']; // added after S-39: older saved bindings lack them
+const SPARE_CODES = ['KeyG', 'KeyH', 'KeyT', 'KeyV', 'KeyX', 'KeyZ', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'KeyJ', 'KeyK', 'KeyL'];
 const CODE_RE = /^[A-Za-z][A-Za-z0-9]{1,23}$/;
 
 export function defaultKeys() { return Object.fromEntries(KEY_ACTIONS.map(([a, , c]) => [a, c])); }
@@ -21,6 +24,13 @@ export function cleanKeys(k) {
   for (const a of Object.keys(d)) {
     const c = k[a];
     if (typeof c === 'string' && CODE_RE.test(c) && !FIXED_CODES.includes(c)) out[a] = c;
+  }
+  // B-106: an action added after S-39 (LATE_ACTIONS: D-191's Map on N) that an older save lacks, whose default a kept
+  // choice already uses, takes a free key instead, so the player's own binding survives (the rule below would reset both).
+  for (const a of LATE_ACTIONS) {
+    if (a in k || !Object.keys(out).some(b => b !== a && out[b] === out[a])) continue;
+    const used = new Set(Object.values(out)), free = SPARE_CODES.find(c => !used.has(c));
+    if (free) out[a] = free;
   }
   // Never two actions on one key: if cleaning left a clash, the clashing entries go back to their defaults.
   const codes = Object.values(out);

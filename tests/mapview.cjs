@@ -21,6 +21,11 @@ async function browserChecks(browser, url, check, errors, shot) {
     await pg.mouse.click(20, 400); await pg.waitForTimeout(150);
     const b = await st(pg); await pg.waitForTimeout(300); const b2 = await st(pg);
     await pg.keyboard.press('KeyN'); await pg.waitForTimeout(150); const c = await st(pg);
+    await pg.setViewportSize({ width: 900, height: 420 }); await pg.waitForTimeout(150); // audit 154: resized (or a phone turned) while open
+    const fit = await pg.evaluate(() => ({ h: document.getElementById('bigmap').getBoundingClientRect().height, bottom: document.querySelector('#mapview small').getBoundingClientRect().bottom }));
+    await pg.setViewportSize({ width: 1280, height: 800 }); await pg.waitForTimeout(100);
+    check('Audit 154 map: resized while open, it re-fits (560 → ≤ 380 px at 900×420, the close line stays on screen)',
+      c.open && fit.h <= 380 && fit.h >= 300 && fit.bottom <= 420, JSON.stringify(fit));
     await pg.keyboard.press('Escape'); await pg.waitForTimeout(150); const e = await st(pg);
     check('D-191 map: a click on the minimap opens the map (≥ 3× its side, core drawn), no beam, world held; a click closes it; N opens, Escape closes',
       a.open && a.side >= 3 * a.mini && a.gold > 0 && !a.firing && a2.t === a.t && !b.open && b2.t > b.t && c.open && !e.open,
