@@ -65,3 +65,13 @@ alternatives). D-200 on.
   (it said "Build 164"; 164 is an Audit). Audit 164 took B-109 from S-74b2b, so S-74b2b = step 4 (tuning).
 - Rejected: a second BFS from the core's far side per flee (a field per hunter); flee along the trail (6 cells, too
   short); a straight run away from the core (walls); letting it fade early (the loot would vanish by the core).
+
+### D-205 — S-74b2b1: hunter damage tier capped, take 30, Surge kills pay 2 ◆ (Build 165)
+- `HUNTER_TIER_MAX` 1 caps only the tier step of a hunter's Surge **damage**; hp and speed keep the core's full tier
+  (capping hp or speed too makes the Drift thief easy to kill back: Drift cost fell to ≈ 0–4 % in every ring).
+- `TRACER_TAKE` 24 → 30; `HUNTER_LOOT_SHARDS` 0 → 2 (a Glitch's base Shards; supersedes D-201's "no loot" in part):
+  the Kiln's Surge cost came from fighting tier-3 hp (33 % before debt with damage capped), not from damage.
+- Measure (`huntrun.mjs --no-echo`): pooled Drift 10.2 % / Surge 12.2 % = 0.830, in band; floor still FAILs on Deep
+  Drift (−1.0 %: the bot kills Deep thieves and takes it all back). Shoal / Kiln Drift 14 / 16 % pass the spec's +12 %.
+- Split: S-74b2b1 (this); S-74b2b2 = the Deep floor + a call on the +12 % ceiling. M17 → 1.12.0 waits for it.
+- Rejected: take 36 (Shoal Drift 18 %, 0.756), a tier cap of 2 on hp + damage (0.175–0.239), cap on all stats (Drift ≈ 0).

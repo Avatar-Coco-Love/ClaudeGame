@@ -129,7 +129,7 @@ async function nodeChecks(check) {
   { // Surge: 6 + the tier step each
     const L = cross('surge'), g = L.g; g.player.invuln = 0;
     const e = near(L, 'lead', 14), hp = g.player.integrity; frame(L, 2);
-    const dmg = hp - g.player.integrity, want = PINCER_DMG + e.tier * GLITCH_TIER.dmg[1];
+    const dmg = hp - g.player.integrity, want = PINCER_DMG + Math.min(e.tier, C.HUNTER_TIER_MAX) * GLITCH_TIER.dmg[1];
     g.player.invuln = 0; const f = near(L, 'flank', -14); f.searchT = 0; f.pi = 0; const hp2 = g.player.integrity; frame(L, 2);
     const dmg2 = hp2 - g.player.integrity;
     check(`S-73a pincer: Surge contact ${want} each (6 + tier step)`, Math.abs(dmg - want) < 1e-6 && Math.abs(dmg2 - want) < 1e-6, JSON.stringify({ dmg, dmg2, want }));

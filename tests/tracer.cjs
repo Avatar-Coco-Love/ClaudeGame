@@ -123,11 +123,18 @@ async function nodeChecks(check) {
     const L = lab('surge'), g = L.g; g.player.invuln = 0;
     const tr = near(L), hp = g.player.integrity;
     frame(L, 2);
-    const dmg = hp - g.player.integrity, want = TRACER_DMG + tr.tier * GLITCH_TIER.dmg[1];
+    const dmg = hp - g.player.integrity, want = TRACER_DMG + Math.min(tr.tier, C.HUNTER_TIER_MAX) * GLITCH_TIER.dmg[1];
     tr.hp = 0; const n0 = g.pickups.length; frame(L);
     const drop = g.pickups.slice(n0).map(p => p.kind), shards = drop.filter(k => k === 'shard').length;
     check(`S-74b tracer: Surge contact ${want} damage (8 + tier step), kill drops ${HUNTER_LOOT_SHARDS} ◆${HUNTER_PRISM_CHANCE ? ' (and maybe a ▲)' : ', no ▲'}`,
       Math.abs(dmg - want) < 1e-6 && shards === HUNTER_LOOT_SHARDS && drop.length - shards <= (HUNTER_PRISM_CHANCE ? 1 : 0) && g.hunt.kills === 1, JSON.stringify({ dmg, want, drop }));
+  }
+  { // S-74b2b (D-205): a hunter's damage tier step stops at HUNTER_TIER_MAX; hp and speed keep the core's full tier (Kiln = 3)
+    const L = lab('surge'), g = L.g, nx = g.nexus.x; g.nexus.x = g.player.x - 3.5 * C.GLITCH_TIER_PX;
+    const e = makeTracer(g, L.ox, L.oy); g.nexus.x = nx;
+    const want = TRACER_DMG + C.HUNTER_TIER_MAX * GLITCH_TIER.dmg[1], hp = GLITCH_TIER.hp[0] + 3 * GLITCH_TIER.hp[1];
+    check(`S-74b2b hunters: a tier-3 Tracer hits for ${want} (tier step capped at ${C.HUNTER_TIER_MAX}), hp ${hp.toFixed(1)} (full tier)`,
+      e.tier === 3 && Math.abs(e.dmg - want) < 1e-6 && Math.abs(e.hp - hp) < 1e-6, JSON.stringify({ tier: e.tier, dmg: e.dmg, hp: e.hp }));
   }
   { // the field: rebuilt on a break; a mode switch keeps the Tracer; core death clears it; never saved
     const L = lab('surge'), g = L.g, f = coreField(g), b0 = f.builds, wall = [L.ox + 2, L.oy + 4];
