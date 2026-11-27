@@ -61,6 +61,9 @@ white ring inside its hollow): rose vs the Deep's dense edge is ΔE 8 (needs 25)
   Also report Auto's Defend share with hunters on (Design 152 play-test: 30 s of Deep Surge, 7 Glitches gave up, Auto
   never Defended; hunters should give it work). Then the play-test asks Q-038 (should Glitches use the field too?).
 
+**Split (Build 160, D-200):** S-74a = `huntrun.mjs` (build `mid`; reach gated where a ghost Glitch gives up; built).
+**S-74b** = tune until the cost half passes (first run: Drift ≈ 0 %, Surge −5…+11 %), plus the Echo row; then M17 done.
+
 ## Cut (D-182)
 Per-enemy A* every frame, flow fields for Glitches (Q-038), Surge-only hunters, a hunter that bores rock, a third hunter
 kind, saved hunters.

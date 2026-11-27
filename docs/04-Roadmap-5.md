@@ -14,7 +14,8 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-72** `src/flow.js` BFS field + the Tracer (`game.hunters`): follows you through tunnels, both modes (Build 155, v1.11.96, D-193).
 - ✅ **S-73a** The Pincer pair: lead down the field, flank by bounded A* round the lead to where you are heading (Build 156, v1.11.97, D-194).
 - ✅ **S-73b** The Echo moves onto `coreField`: one field build shared with the hunters; the Pincer white pip (Build 158, v1.11.99, D-197, D-198).
-- **S-74** `huntrun.mjs` gate: Drift / Surge cost 0.8–1.25, Tracers reach where Glitches give up, perf `hunt` ≤ 1.1×. **M17 done.**
+- ✅ **S-74a** `huntrun.mjs`: the measure; reach gate in smoke (Tracers 94 % where a Glitch gives up); B-107 fixed (Build 160, v1.11.101, D-200).
+- **S-74b** tune the cost half to PASS (Drift / Surge 0.8–1.25; now Drift ≈ 0, Surge ±), Echo row + Auto Defend share. Perf `hunt` / `pack` 1.00× (audit 159). **M17 done.**
 - Cut (D-182): per-enemy A* each frame, Glitches on the field (Q-038), Surge-only hunters, a third kind, saved hunters.
 
 ## Owner asks, session 153 (triaged Design 157, D-195…D-197) → v1.12 patches, after S-74, before S-66

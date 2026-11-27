@@ -2,7 +2,8 @@
 // Node: in a stub maze (a 1-cell tunnel around a wall) a beelining Glitch gives up while a Tracer from the same spot
 // reaches the core within 1.3 × path / speed; spawn cells are reachable (16–24 steps), open and off screen on 50 seeds;
 // Veil and out only; Drift theft + the item back on a kill; Surge damage and Glitch loot; the field rebuilds on a break;
-// a mode switch keeps it; core death clears it; the Echo in Auto turns to Defend at a Drift Tracer; nothing saved.
+// a mode switch keeps it; core death clears it (B-107: one from a touch does not throw); the Echo in Auto turns to
+// Defend at a Drift Tracer; nothing saved; S-74a: the huntrun.mjs reach gate.
 // Browser: a Tracer rounding a corner, trail drawn. Usage: node tests/tracer.cjs [--browser] (TRACER_SHOT=path.png)
 const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
@@ -128,6 +129,22 @@ async function nodeChecks(check) {
     g.destabilize();
     check('S-72 tracer: the field rebuilds on a break (not otherwise); a mode switch keeps the Tracer; core death clears it; nothing saved',
       same && rebuilt && kept && !g.hunters.length && !/hunter|tracer/i.test(saved), JSON.stringify({ same, rebuilt, kept, left: g.hunters.length }));
+  }
+  { // B-107 (S-74a): a Surge death from a hunter's touch cleared the list mid-loop; the next index read undefined and threw
+    // (in the browser that skipped requestAnimationFrame: the game froze). Two Tracers on a 1-hp core, the later one touches first.
+    const L = lab('surge'), g = L.g, p = g.player;
+    const a = makeTracer(g, L.start[0], L.start[1]), b = makeTracer(g, L.start[0], L.start[1]);
+    for (const e of [a, b]) Object.assign(e, { x: p.x, y: p.y, hitCd: 0 });
+    g.hunters.push(a, b); p.integrity = 0.5; p.invuln = 0;
+    let err = null; try { g.update(1 / 60, still); } catch (e) { err = e.message; }
+    check('B-107 tracer: a Surge core death from a hunter touch with another hunter in the list does not throw; the list is cleared',
+      !err && !g.hunters.length, JSON.stringify({ err, left: g.hunters.length }));
+  }
+  { // S-74a (D-200): the reach half of the Hunters gate, tools/huntrun.mjs in the Deep on GATE_SEEDS (8) seeds; the cost half is reported (S-74b)
+    const out = await require('./gates.cjs').run('huntrun.mjs', ['--rings=deep']);
+    const line = out.split('\n').find(l => l.startsWith('reach')) || '', gate = out.split('\n').find(l => l.startsWith('gate')) || '';
+    check('S-74a hunters: where a ghost Glitch from the spawn gives up, Tracers still reach the core on ≥ 80 % (huntrun.mjs, Deep, 8 seeds)',
+      / ok$/.test(line) && /reach PASS/.test(gate), line.slice(0, 220));
   }
   { // the Echo in Auto turns to Defend at a Drift Tracer it can see
     const L = lab('drift'), g = L.g;
