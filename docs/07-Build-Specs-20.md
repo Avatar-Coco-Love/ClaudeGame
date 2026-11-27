@@ -65,6 +65,19 @@ white ring inside its hollow): rose vs the Deep's dense edge is ΔE 8 (needs 25)
 **S-74b** = tune until the cost half passes (first run: Drift ≈ 0 %, Surge −5…+11 %), plus the Echo row; then M17 done.
 **Split (Build 161, D-201):** S-74b1 = levers + Echo row (built). **S-74b2** = the cost gate's form (Q-043), then tune.
 
+## S-74b2 — Pooled cost gate + hull debt, then tune (M17 done; Design 162, D-202)
+**Save:** none. Order, one PR: (1) **B-108:** find why Deep Surge hauls *more* with hunters (−6.5 % ± 3.8, 6 of 8
+seeds below 0, no loot). A game bug gets a test that fails on the old code; a bot artefact is fixed in `surgebot.mjs`.
+(2) `huntrun.mjs` **hull debt:** a run ending below full hull owes time: `(deficit on − off) / (1 − RETREAT)` × that
+ring's mean retreat (`surgebot` reports seconds spent healing + trips); the Surge haul is scaled by 600 / (600 + owed).
+(Measured: Deep ends at 0.65 hull with hunters vs 1.00 without, 10 min, so a 10-min run never pays its damage.)
+(3) **Gate:** pooled over Deep + Shoal + Kiln (sum of hauls), Drift / Surge cost in 0.8–1.25; floor: each face costs
+> 0 in every ring (a free face fails); per-ring ratios reported. (4) Tune, each try in `09`: first
+`HUNTER_TIER_MAX` 1 (the tier step of hunter damage stops at the Deep's; measured: Surge +17.6 → +9.3 % pooled,
+Kiln 52 → 31), then `TRACER_TAKE` 24 → ≤ 36 while no ring's Drift cost passes +12 %. (5) **B-109:** a Tracer that took
+cargo sat 52 px from a still core for its whole 6 s flee, then faded (play-test): find why, make it get away (test). `gates.cjs` runs the full
+gate; smoke checks the pooled line. VERSION 1.12.0. Rejected: see D-202.
+
 ## Cut (D-182)
 Per-enemy A* every frame, flow fields for Glitches (Q-038), Surge-only hunters, a hunter that bores rock, a third hunter
 kind, saved hunters.
