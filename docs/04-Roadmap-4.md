@@ -13,3 +13,5 @@ Continues the Debt list of `04-Roadmap-2.md` (near the 8 KB cap at audit 104). A
   S-74b2a; fixed: B-109 the thief that never got away, D-204; 02's next step checked against the rotation). Open
   (watch): the flee A* frame measured ≤ 3 ms whole update (Node, once per theft); `surgebot` heal trips if the core
   dies mid-trip (not seen). Phone sweep due at audit 169 (last 154). Rule: a line carried three audits is closed.
+- **Design 167 play-test:** five hunters on the core in Surge merge into one violet blob (count unreadable). Watch:
+  check at audit 169 whether a fan-out offset or a count pip is worth a slice (not a bug: they do stack).

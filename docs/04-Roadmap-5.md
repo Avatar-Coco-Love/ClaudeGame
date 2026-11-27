@@ -21,18 +21,20 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-74b2b2** a killed thief keeps its best 15 %, Drift ceiling 18 % per ring: pooled 1.011, floor + ceiling ok, full gate in smoke (Build 166, v1.12.107, D-206). **M17 done.**
 - Cut (D-182): per-enemy A* each frame, Glitches on the field (Q-038), Surge-only hunters, a third kind, saved hunters.
 
-## Owner asks, session 153 (triaged Design 157, D-195…D-197) → v1.12 patches, after S-74, before S-66
+## Owner asks, session 153 (triaged Design 157, D-195…D-197) → v1.12 patches, after S-74, before S-66a
 - ✅ Map view (v1.11.94, D-191): tap the minimap / N for a 3–4× map, world held; the tap no longer aims.
-- **S-75** Thumb arc (`07-…-21`): on touch the actions sit on arcs round the bottom-right grip (measured: today
-  610–713 px away on a 390 × 844 phone; natural reach ≈ 275).
-- **S-76** Map legend (`07-…-21`): the big map names the marks it drew.
+- **S-75** Thumb arc (`07-…-21`, rule fixed by D-207): on touch the actions sit on arcs round the bottom-right grip,
+  clear of ⊕ / hint / minimap (measured: today 610–713 px away on a 390 × 844 phone; with the arc ≤ 251).
+- **S-76** Map legend (`07-…-21`): the big map names the marks it drew (beside it in landscape, D-207).
+- **S-77a** Decoy craft + lure, **S-77b** `huntrun --decoy` gate (`07-…-22`, Q-042 → yes, D-208).
 - Pincer white pip: folded into S-73b (D-197).
 - **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also
   weighed: a Nexus-mouth camper, packs that retreat when hurt (both Surge-only today).
-- **Decoy** craft: Q-042, after S-74's numbers. Cut (D-196): traps / mines (a second Ward), a push beam, a shield pulse.
+- Decoy: settled yes (D-208), S-77 above. Cut (D-196): traps / mines (a second Ward), a push beam, a shield pulse.
 
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
-- **S-66** Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (next format), Nexus tab list, ending row.
+- **S-66a** Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 26), Nexus tab list.
+- **S-66b** A feat done toasts once (no re-toast on reload); ending row (split, D-207).
 - **S-67** `tools/featrun.mjs`: tune `FEAT_CHART` / `FEAT_RIFTS`; gate Drift / Surge 0.8–1.25.
 - **S-68** The Nexus lights one hexagon vertex per feat done.
 - Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.
