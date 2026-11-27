@@ -66,3 +66,14 @@ alternatives). D-206 on.
   per orientation. Too much: none new.
 - Rejected: CSS-only insets on each button (the arc is placed by inline left / top, so CSS can't move it), reading
   `visualViewport` (it does not report the notch), a top inset (the arc never reaches the top on a phone).
+
+### D-211 — Build 170: the map legend (S-76) comes from the draw's own marks
+- `drawMinimap(r, canvas, ctx, kinds)`: given a Map, a `note(kind, x, y, colour)` records each mark drawn inside the
+  window (a 256 world's map shows a 160 window: a Spire outside it is not on the map, so not in the legend). Anomaly,
+  lair and Spire helpers take `note`; placed things, pings, rift and the chart counts are noted in `hud.js`.
+- `maplegend.js` draws each glyph with the map's own shape at 1.6× on a small canvas (side by side for each colour
+  seen: ore pings, Anomaly kinds, the two lairs). Built on open and when the size or Large text changes, not per frame.
+- Layout: landscape, an absolute column right of the map, overflow to one left of it; portrait, a wrapped row under
+  the map, with 100 px reserved off the map's side (≤ 4 lines at 320 × 568, Large text too).
+- Rejected: a fixed full legend (spoils discovery), text glyphs (⬟ ⯃ are missing from many phone fonts), a second
+  world scan on open, putting the legend on the small minimap (no room).

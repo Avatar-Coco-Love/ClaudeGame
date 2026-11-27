@@ -247,7 +247,7 @@ export function drawBosses(r, ctx, left, top, vw, vh) {
 
 /** Minimap: a hollow octagon in the boss's colour at a seen lair, filled once the boss is down. S-62: the Chart's level 2
  *  also draws each unseen lair, faint (`g.chartLairs` counts them for tests). */
-export function drawBossMarks(m, g, sc) {
+export function drawBossMarks(m, g, sc, note) {
   const bs = g.bosses, w = g.world;
   g.chartLairs = 0;
   if (!bs || !bs.list.length) return;
@@ -259,6 +259,7 @@ export function drawBossMarks(m, g, sc) {
     m.strokeStyle = m.fillStyle = `rgb(${BOSS_RGB[B.ring]})`;
     m.globalAlpha = seen ? 1 : BOSS_CHART_ALPHA;
     if (!seen) g.chartLairs++;
+    if (note) note('lair', (B.x + 0.5) * CELL, (B.y + 0.5) * CELL, m.strokeStyle); // S-76 legend
     m.beginPath(); octagon(m, (B.x + 0.5) * CELL * sc, (B.y + 0.5) * CELL * sc, 4);
     if (B.down && seen) m.fill(); else m.stroke();
   }

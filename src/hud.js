@@ -41,8 +41,9 @@ export function miniWindow(w, px, py, size) {
   return { sc: size / win, ox: clamp(px - win / 2, w.w * CELL - win), oy: clamp(py - win / 2, w.h * CELL - win), win };
 }
 
-/** Draws into the HUD minimap, or (D-191) into another canvas: the map view. Only the minimap sets `r.miniWin`. */
-export function drawMinimap(r, canvas = r.minimap, m = r.mctx) {
+/** Draws into the HUD minimap, or (D-191) into another canvas: the map view. Only the minimap sets `r.miniWin`.
+ *  S-76: `kinds` (a Map, the map view's legend) records each kind of mark drawn inside the window → the colours it used. */
+export function drawMinimap(r, canvas = r.minimap, m = r.mctx, kinds = null) {
   const g = r.game, w = g.world;
   if (r.miniDirty) { r.miniCtx.putImageData(r.miniData, 0, 0); r.miniDirty = false; }
   const size = canvas.width;
@@ -51,6 +52,13 @@ export function drawMinimap(r, canvas = r.minimap, m = r.mctx) {
   m.fillStyle = 'rgba(3,4,12,0.85)'; m.fillRect(0, 0, size, size);
   const mw = miniWindow(w, g.player.x, g.player.y, size), { sc, ox, oy, win } = mw;
   if (canvas === r.minimap) r.miniWin = mw;
+  const note = kinds && ((k, x, y, col) => { // x, y in world px; a mark outside the window is not on the map
+    if (x < ox || x > ox + win || y < oy || y > oy + win) return;
+    if (!kinds.has(k)) kinds.set(k, new Set());
+    if (col) kinds.get(k).add(col);
+  });
+  if (note) { note('nexus', g.nexus.x, g.nexus.y);
+    for (const [k, list] of [['beacon', g.beacons], ['relay', g.relays], ['sink', g.sinks], ['ward', g.wards]]) for (const q of list) note(k, q.x, q.y); }
   m.imageSmoothingEnabled = false;
   m.drawImage(r.mini, ox / CELL, oy / CELL, win / CELL, win / CELL, 0, 0, size, size);
   m.translate(-ox * sc, -oy * sc); // every mark below draws at x * sc as before; those outside the window fall off the canvas
@@ -62,19 +70,23 @@ export function drawMinimap(r, canvas = r.minimap, m = r.mctx) {
     const rr = q.type === T.CACHE || q.kind ? 2.25 : 1.5; // S-12: a cache blip is white and 1.5x an ore blip (S-37: an Anomaly's, its colour)
     m.globalAlpha = a; m.fillStyle = q.kind ? `rgb(${ANOMALY_KINDS[q.kind].rgb})` : q.type === T.CACHE ? '#ffffff' : RESOURCE[ORE_KIND[q.type]].color;
     m.fillRect((q.x + 0.5) * CELL * sc - rr, (q.y + 0.5) * CELL * sc - rr, rr * 2, rr * 2);
+    if (note) note('ping', (q.x + 0.5) * CELL, (q.y + 0.5) * CELL, m.fillStyle);
   }
   m.globalAlpha = 1;
   drawChartMarks(m, g, sc, mw); // S-52: charted currents / seen vents (Nexus Chart), under the placed marks
+  if (note && g.chartArrows && g.nexusLevels.chart) note('current', g.nexus.x, g.nexus.y); // chart lists hold in-window chunks only
+  if (note && g.chartVents && (g.nexusLevels.chart || 0) >= 2) note('vent', g.nexus.x, g.nexus.y);
   m.fillStyle = BEACON_COLOR; // S-16: placed beacons, always shown
   for (const b of g.beacons) { m.beginPath(); m.arc(b.x * sc, b.y * sc, 2, 0, Math.PI * 2); m.fill(); }
   m.strokeStyle = RELAY_COLOR; m.lineWidth = 1.5; // S-22: placed Relays, a cyan ring, always shown
   for (const q of g.relays) { m.beginPath(); m.arc(q.x * sc, q.y * sc, 3.5, 0, Math.PI * 2); m.stroke(); }
   drawSinkMarks(m, g, sc); // S-51: placed Heat Sinks, a lilac pentagon, always shown
   drawWardMarks(m, g, sc); // S-56: placed Wards, a lime ring, always shown
-  drawAnomalyMarks(m, g, sc); // S-37: seen sites, filled when charged, hollow while recharging
+  drawAnomalyMarks(m, g, sc, note); // S-37: seen sites, filled when charged, hollow while recharging
   drawRiftMark(m, g, sc); // S-57a: an open rift's pocket
-  drawBossMarks(m, g, sc); // S-60a: a seen lair, hollow; filled once down
-  drawSpireMarks(m, g, sc); // S-27: a hollow hexagon at each found Spire, always shown after
+  if (note && g.rift && g.rift.open) note('rift', (g.rift.open.x + 0.5) * CELL, (g.rift.open.y + 0.5) * CELL);
+  drawBossMarks(m, g, sc, note); // S-60a: a seen lair, hollow; filled once down
+  drawSpireMarks(m, g, sc, note); // S-27: a hollow hexagon at each found Spire, always shown after
   m.fillStyle = '#ffd23d';
   m.beginPath(); m.arc(g.player.x * sc, g.player.y * sc, 2.5, 0, Math.PI * 2); m.fill();
   m.setTransform(1, 0, 0, 1, 0, 0);

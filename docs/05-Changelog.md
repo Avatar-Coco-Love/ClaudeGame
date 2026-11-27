@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.111 — 2026-11-27
+- The big map (tap the minimap or press N) now has a legend: each kind of mark on it this time, its own symbol in its
+  colour plus one word (Nexus, Beacon, Anomaly, Spire …). Only marks you have met show. Beside the map in landscape,
+  under it in portrait.
+
 ## v1.12.110 — 2026-11-27
 - Phones with a notch or a home bar: the action-button arc now bends round the screen's safe corner, so in landscape no
   button hides under the notch or the home bar. Checked on tablets in landscape too (1024 × 768).

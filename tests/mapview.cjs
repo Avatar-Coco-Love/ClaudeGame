@@ -46,6 +46,48 @@ async function browserChecks(browser, url, check, errors, shot) {
       a.open && !a.aim && a.side >= 3 * a.mini && !b.open, JSON.stringify({ a, b: b.open }));
     await pg.close();
   }
+  await legendChecks(browser, url, check, errors, shot);
+}
+
+// S-76: the legend lists exactly the kinds drawn (a Beacon placed adds it); all 12 kinds fit at 320 × 568 and 568 × 320,
+// Large text on and off: on screen, clear of the map and of each other, no page scroll, portrait ≤ 4 lines.
+async function legendChecks(browser, url, check, errors, shot) {
+  const pg = await browser.newPage({ viewport: { width: 320, height: 568 }, hasTouch: true, isMobile: true });
+  pg.on('pageerror', e => errors.push('maplegend: ' + e.message));
+  await pg.goto(url); await pg.waitForTimeout(200);
+  await require('./spire.cjs').pinnedNewWorld(pg); await pg.waitForTimeout(300);
+  const listed = () => pg.evaluate(() => { const L = window.__lumen; L.mapView.close(); L.mapView.show();
+    return { shown: [...document.querySelectorAll('.maplegend .lg')].map(e => e.dataset.kind), drawn: [...L.mapView.kinds.keys()] }; });
+  const a = await listed();
+  await pg.evaluate(() => { const g = window.__lumen.game; window.__lumen.mapView.close(); const w = g.world, cx = Math.floor(g.player.x / 32), cy = Math.floor(g.player.y / 32), i = cy * w.w + cx + 1; g.beacons.push({ i, x: (cx + 1.5) * 32, y: (cy + 0.5) * 32, r: 140 }); });
+  const b = await listed();
+  await pg.evaluate(() => window.__lumen.mapView.close());
+  const closed = await pg.evaluate(() => [...document.querySelectorAll('.maplegend')].every(e => !e.offsetParent || !e.getClientRects().length));
+  const same = x => x.shown.length === x.drawn.length && x.drawn.every(k => x.shown.includes(k));
+  check('S-76 legend: lists exactly the kinds drawn (Nexus, no Beacon); a Beacon placed adds "Beacon"; hidden while the map is closed',
+    same(a) && a.shown.includes('nexus') && !a.shown.includes('beacon') && same(b) && b.shown.includes('beacon') && closed, JSON.stringify({ a, b, closed }));
+  const fit = [];
+  for (const [w, h] of [[320, 568], [568, 320]]) for (const large of [false, true]) {
+    await pg.setViewportSize({ width: w, height: h }); await pg.waitForTimeout(100);
+    const r = await pg.evaluate(async large => {
+      const { allKinds } = await import('./src/maplegend.js'), L = window.__lumen;
+      document.documentElement.classList.toggle('text-large', large);
+      L.mapView.close(); L.mapView.show(); L.mapView.buildLegend(allKinds());
+      const m = document.getElementById('bigmap').getBoundingClientRect(), es = [...document.querySelectorAll('.maplegend .lg')].map(e => e.getBoundingClientRect());
+      const hit = (p, q) => p.left < q.right && p.right > q.left && p.top < q.bottom && p.bottom > q.top;
+      const on = es.every(e => e.left >= 0 && e.top >= 0 && e.right <= innerWidth && e.bottom <= innerHeight);
+      const clear = es.every(e => !hit(e, m)), apart = es.every((e, i) => es.every((f, j) => i === j || !hit(e, f)));
+      const close = document.querySelector('#mapview small').getBoundingClientRect(), smallOk = close.bottom <= innerHeight && es.every(e => !hit(e, close));
+      const lines = new Set(es.map(e => Math.round(e.top))).size, se = document.scrollingElement;
+      return { n: es.length, on, clear, apart, smallOk, lines, scroll: se.scrollWidth > innerWidth || se.scrollHeight > innerHeight };
+    }, large);
+    const ok = r.n === 12 && r.on && r.clear && r.apart && r.smallOk && !r.scroll && (w > h || r.lines <= 4);
+    fit.push(ok ? '' : `${w}x${h}${large ? 'L' : ''} ${JSON.stringify(r)}`);
+    if (shot && !large) await pg.screenshot({ path: shot.replace(/(\.png)?$/, `-legend-${w}x${h}.png`) });
+  }
+  check('S-76 legend: all 12 kinds at 320×568 and 568×320, Large text on and off: on screen, clear of the map, the close line and each other, no scroll, portrait ≤ 4 lines',
+    fit.every(f => !f), fit.filter(Boolean).join(' | '));
+  await pg.close();
 }
 
 module.exports = { browserChecks };

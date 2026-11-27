@@ -160,11 +160,12 @@ export function drawSpireBreath(r, ctx, left, top, vw, vh) {
 }
 
 /** Minimap mark: a violet-white hexagon at each seen Spire's centre (a broken one too, D-069): hollow, filled once relit. */
-export function drawSpireMarks(m, g, sc) {
+export function drawSpireMarks(m, g, sc, note) {
   m.save(); m.strokeStyle = SPIRE_MARK_COLOR; m.lineWidth = 1.25;
   for (const s of g.spires) {
     if (!s.seen) continue;
     const x = (s.x + 0.5) * CELL * sc, y = (s.y + 0.5) * CELL * sc;
+    if (note) note('spire', (s.x + 0.5) * CELL, (s.y + 0.5) * CELL); // S-76 legend
     m.beginPath();
     for (let k = 0; k < 6; k++) { const t = Math.PI / 6 + k * Math.PI / 3; m[k ? 'lineTo' : 'moveTo'](x + Math.cos(t) * 3.5, y + Math.sin(t) * 3.5); }
     m.closePath(); m.stroke();
