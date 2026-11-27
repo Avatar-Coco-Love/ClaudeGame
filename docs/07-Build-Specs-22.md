@@ -31,8 +31,14 @@ placed, stock 0; `saveformat.cjs`, never pin the number).
 
 ## S-77b — Decoy measure: worth its cost, equal in both modes
 **Save:** none.
-- `huntrun.mjs --decoy`: the bot drops a Decoy when a hunter is first seen within 12 cells (stock refilled at each
-  deposit, cost charged to its haul), 8 seeds, Deep / Shoal / Kiln, both modes, `--no-echo`.
+- `huntrun.mjs --decoy`: the bot drops a Decoy on its own cell (it does not walk to place one) when a hunter is first
+  seen within 12 cells (stock refilled at each deposit, cost charged to its haul), 8 seeds, Deep / Shoal / Kiln, both
+  modes, `--no-echo`. Report per ring and mode: Decoys used, seconds lured per Decoy, cost with / without.
+- Design 172 play-test (D-213): a still core, a Tracer down a bent 22-cell tunnel, a Decoy 3 cells toward it at 12 cells:
+  first touch 5.3 s → 9.2 s in both modes (+3.9 s, about the hold); the bend delays the lure 0.7 s. Expect the saving to
+  track `DECOY_HOLD_S`, so tune it first.
 - **Gate (PASS, in smoke beside `tracer.cjs`'s, D-166):** the hunter cost with Decoys falls by ≥ 25 % of today's in
   each mode, net of the Decoys' cost; the Drift / Surge saving ratio is in 0.8–1.25 (D-158's band); no ring's cost
   goes below 0 (hunters still matter). Tune `DECOY_HOLD_S`, `DECOY_R` and the cost in that order; log tries in `09`.
+- Bounds (D-213): hold ≤ 6 s, `DECOY_R` ≤ 8, cost ≥ ▲2 ◆10. If no setting inside them passes, ship the measure as a
+  report row (not a gate), log the gap in `09` and split the fix into S-77b2 (no new lure rules in this PR).
