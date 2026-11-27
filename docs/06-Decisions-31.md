@@ -39,3 +39,17 @@ alternatives). D-206 on.
   hunts the miner who stops, as leaned.
 - Rejected: a lasting Decoy (hunters stop mattering), luring Glitches (Surge-only), a field per Decoy (D-198), Decoy
   after M18 (M17's loop would stay open across a milestone, D-181), "later" for Q-042 (its own condition is met).
+
+### D-209 — Build 168: S-75 thumb arc as built
+- `src/thumbarc.js` holds the pure `arcSlots` and the DOM step `layoutArc` (not `hud.js`, which only draws the canvas
+  HUD); `main.js` re-lays only when touch, the viewport, Large text or the set of shown buttons changes.
+- Keep rects: ⊕ is measured even while hidden (out of the Nexus), so the arc never jumps when you dock; the bank panel
+  is kept too. ✦'s count rides as a corner badge (the 44 px button is glyph-only).
+- Measured: farthest slot 251 / 244 / 237 / 195 px (390 × 844 / 375 × 667 / 320 × 568 / 844 × 390), 292 for ❖ at
+  568 × 320, 215 on a 768 × 1024 tablet: the Design 167 figures exactly.
+- Slots also keep their 44 px boxes ≥ 6 px apart (B-111: a 54 px chord on the diagonal let two boxes overlap at
+  640 × 360 and 844 × 390); the arc is walked in 0.5° steps. Farthest is unchanged but 320 × 568 (236).
+- The portrait phone toast moves above the core (`bottom: 50% + 44px`): below it is the arc now. The S-17 checks
+  that pinned ◎ ⟂ in the top-right row / column now pin ♪ ≡ there and ◎ ⟂ on the arc (`touch.cjs`).
+- Rejected: laying out only the buttons shown in the Nexus (⊕'s place would move them on every dock), a second
+  label element for the mode name (the existing `mode-name` floats above ⟂ on touch).

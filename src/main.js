@@ -25,6 +25,7 @@ import { registerOffline } from './pwa.js';
 import { setupKeys } from './keysui.js';
 import { Quality, GRAPHICS } from './quality.js';
 import { MapView } from './mapview.js';
+import { layoutArc, ARC_ORDER } from './thumbarc.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -48,7 +49,7 @@ let panelOpen = false;
 let saveTimer = 0;
 let toastTimer = 0, bitToasted = false, moteToasted = false, tracerToasted = false; // S-53c / S-54: the bite and snatch toasts show once per session
 let selectedMode = 'drift';
-let lastHud = ''; // updateHud's change key (S-39: cleared when a key is rebound)
+let lastHud = '', lastArc = ''; // lastArc: S-75 thumb-arc layout key. updateHud's change key (S-39: cleared when a key is rebound)
 
 const quality = new Quality(); // S-41 (D-109): Settings → Graphics; Auto steps the renderer's level from frame time
 quality.skip1 = (window.devicePixelRatio || 1) <= 1; // audit 79: L1 is L0 on such a screen
@@ -167,6 +168,14 @@ function hint() {
   return '';
 }
 
+// S-75: re-lay the touch thumb arc only when what it depends on changes (touch, shown buttons, viewport, text size).
+function placeArc() {
+  const k = [input.usingTouch, innerWidth, innerHeight, settings.largeText, ...ARC_ORDER.map(id => $(id).classList.contains('hidden'))].join('|');
+  if (k !== lastArc) { lastArc = k; layoutArc(document, input.usingTouch); }
+}
+addEventListener('resize', () => { if (lastArc) placeArc(); });
+let nameTimer = 0; // S-75: on touch the beam mode's name shows 1 s above ⟂ on a switch
+function flashModeName() { const b = $('mode-btn'); b.classList.add('named'); clearTimeout(nameTimer); nameTimer = setTimeout(() => b.classList.remove('named'), 1000); }
 function updateHud() {
   const g = game;
   const cap = g.stat('cargo'), total = g.cargoTotal();
@@ -214,6 +223,7 @@ function updateHud() {
     const lbl = lift ? `Pick up this ${PLACE_NAME[lift]}` : off ? `${pn}: ${placeToast('sink', 'kiln')}` : `Place a ${pn}`;
     $('beacon-btn').title = `${lbl} (${keys.K('place')})`; $('beacon-btn').setAttribute('aria-label', lbl);
     document.body.classList.toggle('touch', input.usingTouch); // hides keyboard badges (S-2)
+    placeArc();
     const h = hint();
     $('hint').textContent = h;
     $('hint').classList.toggle('hidden', !h || panelOpen || endingOpen); // never under the open Matrix (B-008)
@@ -230,7 +240,7 @@ function updateHud() {
     if (ev === 'spire-relit') { toast(`Spire relit (${g.spireLitCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-20, D-069
     if (ev === 'wake-start') toast(`Spire waking — hold ${SPIRE_WAKE_S} s`, 3200, NOW); // S-23; audit 59: at once, one line on phones
     if (ev === 'wake-failed') { toast('Wake failed — step out and back in', 3800, KEEP); persist(); }
-    if (ev === 'beam-mode') toast(BEAM_MODES[g.beamMode].name, 1200, NOW);
+    if (ev === 'beam-mode') { toast(BEAM_MODES[g.beamMode].name, 1200, NOW); flashModeName(); }
     if (ev === 'echo-order') { toast(`Echo: ${orderLabel(g)}`, 1400, NOW); persist(); } // S-43
     if (ev === 'beacon') { toast(placeToast(g.placeKind, g.placeResult), 1400, NOW); if (g.placeResult === 'placed' || g.placeResult === 'picked') persist(); } // S-16, S-22, S-34
     if (ev === 'weather-start') toast(g.weather.kind === 'storm' ? `Static storm — more Glitches for ${weatherLeft(g) || WEATHER_S} s` : `Aurora — ore in your light yields +${AURORA_BONUS}`, 3200, KEEP); // S-33
@@ -447,6 +457,7 @@ function applySettings() {
   if (settings.reducedMotion || !settings.shake) { if (game) game.shake = 0; }
   document.body.classList.toggle('reduce-motion', settings.reducedMotion);
   document.documentElement.classList.toggle('text-large', settings.largeText); // S-40: --ts 1.2 in style.css
+  if (lastArc) placeArc(); // S-75: Large text moves ⊕
   quality.setMode(settings.graphics); renderer.setQuality(quality.level); // S-41
   $('set-graphics').textContent = { auto: 'Auto', high: 'High', low: 'Low' }[settings.graphics];
   $('mute-btn').textContent = settings.muted ? '♪̸' : '♪';

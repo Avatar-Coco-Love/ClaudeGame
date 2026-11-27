@@ -215,7 +215,7 @@ kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid cu
    (320×568) and the minimap + ✦ by the landscape row (568×320). Portrait: just below the core (it sits ≤ 32 px from the
    centre, camera look-ahead). Landscape: under the bank panel (Surge height + 3 Anomaly chips, audit 74: +110), left of the core.
    tests/touch.cjs checks the overlap. */
-@media (orientation: portrait) and (max-width: 700px) { #toast { top: calc(50% + 40px); } }
+@media (orientation: portrait) and (max-width: 700px) { #toast { top: auto; bottom: calc(50% + 44px); } } /* S-75 (D-209): above the core; below it is the thumb arc now */
 @media (max-height: 480px) and (pointer: coarse) {
   #toast { top: calc(max(12px, env(safe-area-inset-top)) + 110px); left: max(16px, env(safe-area-inset-left)); max-width: calc(50% - 64px);
     transform: translate(0, -10px); text-align: left; padding-left: 10px; }
@@ -275,3 +275,13 @@ body.ending-seq #hud { opacity: 0; pointer-events: none; transition: opacity .4s
   #settings header { margin-bottom: 4px; }
   #settings .set-row { min-height: 50px; }
 }
+/* S-75 (D-207): touch only, the action buttons sit on the thumb arc round the bottom-right corner (src/thumbarc.js sets
+   left / top), glyph-only 44 × 44. ⟂ shows its mode name above it for 1 s on a switch; ✦ carries its count as a badge. */
+body.touch #mode-btn, body.touch #scan-btn, body.touch #beacon-btn, body.touch #echo-btn, body.touch #call-btn {
+  position: fixed; right: auto; bottom: auto; width: 44px; min-width: 44px; height: 44px; padding: 0; margin: 0; order: 0; }
+body.touch .pair { display: contents; }
+body.touch #mode-btn .mode-name { display: block; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); margin: 0;
+  padding: 2px 8px; border-radius: 8px; background: var(--panel); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
+body.touch #mode-btn.named .mode-name { opacity: 1; }
+body.touch #beacon-count { position: absolute; top: -7px; right: -7px; margin: 0; min-width: 18px; padding: 0 4px; border-radius: 9px;
+  font-size: 11px; line-height: 18px; background: rgba(20, 44, 56, .95); border: 1px solid #bff8ff; }
