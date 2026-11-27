@@ -89,6 +89,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await require('./rift.cjs').nodeChecks(check).catch(e => check('S-57a rift checks ran', false, e.message));
   await require('./lens.cjs').nodeChecks(check).catch(e => check('S-63 Lens checks ran', false, e.message));
+  await require('./thumbarc.cjs').nodeChecks(check).catch(e => check('S-75 thumb arc checks ran', false, e.message));
   await require('./nexusview.cjs').nodeChecks(check).catch(e => check('S-65 Nexus rings checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
   await require('./anomalyfound.cjs').nodeChecks(check).catch(e => check('S-37 anomaly-found checks ran', false, e.message));
@@ -376,6 +377,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('arc', () => require('./arc.cjs').browserChecks(browser, url, check, errors, process.env.ARC_SHOT).catch(e => check('S-55 arc browser checks ran', false, e.message)));
     await T('audit29', () => audit29.browserChecks(browser, url, check, errors));
     await T('touch', () => touch.browserChecks(browser, url, check, errors));
+    await T('thumbarc', () => require('./thumbarc.cjs').browserChecks(browser, url, check, errors, process.env.ARC_SHOT).catch(e => check('S-75 thumb arc browser checks ran', false, e.message)));
     await T('audit34', () => audit34.browserChecks(browser, url, check, errors));
     await T('drawcost', () => drawcost.browserChecks(browser, url, check, errors));
     await T('audit39', () => audit39.browserChecks(browser, url, check, errors));

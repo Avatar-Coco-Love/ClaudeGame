@@ -39,3 +39,16 @@ Part 22 holds sessions 159–164. Newest at the bottom; read the tail only.
 - S-66 used format 25, which S-70 took: now 26 in S-66a; toast + ending row → S-66b.
 - Q-042 → yes (hunters cost ≥ 10 % in both modes): S-77a/b in `07-…-22`. Q-041 → no. Theft toast overpromises
   since D-206 ("beam it to get it back"): fixed in S-77a.
+
+## Session 168 — Build: S-75 thumb arc (v1.12.109, D-209)
+- `thumbarc.js` `arcSlots` + `layoutArc`; touch CSS puts ⟂ ◎ ✦ ◇ ❖ fixed on the arc, glyph-only, ✦ count as a badge,
+  the mode name floats 1 s above ⟂ on a switch. Desktop untouched (checked: no inline placement, top-right column).
+- Measured keep rects in the browser at six viewports (in `thumbarc.cjs`); node and browser checks pass all rules;
+  farthest slots match Design 167 (251 / 244 / 237 / 195, 292). Screenshots 390 × 844 and 844 × 390 viewed: the arc
+  hugs the corner, ⊕ and the hint clear.
+- **B-111** (fixed): first full smoke 701/710: `touch.cjs` B-034 found ◇ × ❖ (640 × 360) and ◇ × ✦ (844 × 390)
+  overlapping: a 54 px chord at ~45° leaves |dx|, |dy| < 44. Slots now keep boxes ≥ 6 px apart; the new 640 × 360
+  viewport and box-gap rule in `thumbarc.cjs` fail on the old step. The portrait toast hit the arc (320 × 568,
+  375 × 667): moved above the core. Two S-17 position checks superseded (D-209). S-38 / S-29 FAILs were a race (VERSION
+  bumped mid-run).
+- Observed: in portrait the top-right now holds only the minimap and ♪ ≡; the top quarter is free for the toast.

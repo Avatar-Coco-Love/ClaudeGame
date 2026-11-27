@@ -1,4 +1,4 @@
-// S-17 touch pass checks (Pixel 7 emulation): landscape title, ◎/⟂ row out of the aim thumb, 44 px targets, hint wrap at 320 px,
+// S-17 touch pass checks (Pixel 7 emulation; S-75 moved ◎ ⟂ to the thumb arc): landscape title, ♪ ≡ row out of the aim thumb, 44 px targets, hint wrap at 320 px,
 // the ⟂ label, the second-finger stick handoff, and (audit 39) sheet tap targets at three phone sizes. smoke.cjs calls browserChecks.
 const { newWorld } = require('./pinworld.cjs');
 const { devices } = require('playwright');
@@ -44,10 +44,10 @@ async function browserChecks(browser, url, check, errors, shots) {
     if (shots) await pg.screenshot({ path: `${shots}/hud-844x390.png` });
     const r = {};
     for (const s of ['#scan-btn', '#mode-btn', '#mute-btn', '#menu-btn', '#minimap', '.top-left']) r[s] = await rect(pg, s);
-    const btns = ['#scan-btn', '#mode-btn', '#mute-btn', '#menu-btn'];
+    const btns = ['#mute-btn', '#menu-btn']; // S-75 (D-207, D-209): ◎ ⟂ left this row for the thumb arc (tests/thumbarc.cjs)
     const row = btns.every((s, i) => r[s].b <= 90 && r[s].r <= r['#minimap'].l && (i === 0 || r[btns[i - 1]].r <= r[s].l) && r[s].l >= r['.top-left'].r);
-    const big = btns.every(s => r[s].w >= 44 && r[s].h >= 44), gap = r['#menu-btn'].l - r['#mute-btn'].r;
-    check('landscape phone: ◎ ⟂ ♪ ≡ row left of the minimap, bottoms ≤ 90 px, ≥ 44 px, ♪/≡ gap ≥ 8 (S-17)', row && big && gap >= 8,
+    const big = ['#scan-btn', '#mode-btn', ...btns].every(s => r[s].w >= 44 && r[s].h >= 44), gap = r['#menu-btn'].l - r['#mute-btn'].r;
+    check('landscape phone: ♪ ≡ row left of the minimap, bottoms ≤ 90 px; ◎ ⟂ ♪ ≡ ≥ 44 px, ♪/≡ gap ≥ 8 (S-17, S-75)', row && big && gap >= 8,
       JSON.stringify({ ...Object.fromEntries(btns.map(s => [s, r[s]])), mini: r['#minimap'].l, panel: r['.top-left'].r, gap }));
     // ⟂ names the mode and follows a tap; the Matrix close and mode toggles are 44 px tall on a coarse pointer.
     const before = await pg.textContent('#mode-name');
@@ -130,8 +130,9 @@ async function browserChecks(browser, url, check, errors, shots) {
     for (const s of ['#minimap', '#scan-btn', '#mode-btn', '#mute-btn', '#menu-btn']) col[s] = await rect(pg, s);
     const mb = await rect(pg, '#matrix-btn'), hb = await rect(pg, '#hint');
     check('320 px: a 2-line hint never sits under Core Matrix (S-17)', mb.b <= hb.t, JSON.stringify({ matrixBottom: mb.b, hintTop: hb.t }));
-    check('portrait keeps the column: ◎ and ⟂ under ♪ ≡, all ≥ 44 px (S-17)', col['#scan-btn'].t >= col['#mute-btn'].b && col['#mode-btn'].t >= col['#scan-btn'].b
-      && ['#scan-btn', '#mode-btn', '#mute-btn', '#menu-btn'].every(s => col[s].h >= 44 && col[s].w >= 44 && col[s].r <= 320), JSON.stringify(col));
+    // S-75 (D-207, D-209): ◎ ⟂ left the column for the thumb arc, below the middle of the screen (tests/thumbarc.cjs)
+    check('portrait: ♪ ≡ under the minimap, ◎ ⟂ on the arc in the lower half, all ≥ 44 px (S-17, S-75)', col['#mute-btn'].t >= col['#minimap'].b
+      && col['#scan-btn'].t >= 284 && col['#mode-btn'].t >= 284 && ['#scan-btn', '#mode-btn', '#mute-btn', '#menu-btn'].every(s => col[s].h >= 44 && col[s].w >= 44 && col[s].r <= 320), JSON.stringify(col));
     await ctx.close();
   }
 

@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.109 — 2026-11-27
+- Phones and tablets: the action buttons (beam mode, Scanner, place, Echo order, rift call) now sit in an arc right
+  under your aiming thumb in the bottom-right corner, instead of at the top of the screen. They never cover the Core
+  Matrix button, the hint or the map. A beam-mode switch shows the mode's name above its button for a second.
+  Desktop is unchanged.
+
 ## v1.12.108 — 2026-11-27
 - Planning update, no change in the game. The next touch layout (action buttons in an arc under your right thumb)
   was measured on five phone sizes and corrected so no button lands on the Core Matrix button or the hint. Next up
