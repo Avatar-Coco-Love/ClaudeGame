@@ -3,12 +3,13 @@
 // ring's ore, once with hunters (Tracers + Pincer pairs) and once without (`hunt.off`). The ring's own creature, weather,
 // Anomalies and lairs are off, so the gap is the hunters'. Haul = ◆-equivalent banked + carried (biomefoe's WEIGHT).
 // Time cost = haul without / with − 1: how much longer the same haul takes with hunters (Drift: theft; Surge: damage +
-// recovery). Gate 1: Drift cost / Surge cost in 0.8–1.25 per ring, pooled over GATE_SEEDS seeds (D-158's two-faces rule).
+// recovery). Gate 1: Drift cost / Surge cost in 0.8–1.25 over GATE_SEEDS seeds (D-158's two-faces rule; pooled, D-202).
 // Gate 2 (reach): at each Tracer spawn a ghost Glitch is flown from the same spot at the frozen core (D-017's beeline and
 // give-up, the tier's Glitch speed); Tracers make first contact on ≥ 80 % of spawns, the ghost on < 30 %.
 // S-74b (D-201): natural Glitches off in all runs (--glitches=on restores them); one Auto Echo row per ring and mode (--no-echo).
+// S-74b2 (D-202): Surge hauls pay hull debt (below); gate 1 is pooled over the rings run, with a per-ring floor.
 // Usage: node tools/huntrun.mjs [--rings=deep,shoal,kiln] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--build=mid|max|start] [--glitches=on] [--no-echo] [--v]
-import { runBot } from './surgebot.mjs';
+import { runBot, RETREAT } from './surgebot.mjs';
 import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, GLITCH_R, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, TRACER_SPEED } from '../src/config.js';
 import { tryPlace } from '../src/craft.js';
 import { moveBody } from '../src/body.js';
@@ -87,35 +88,61 @@ function run(seed, mode, ringKey, hunters, echo = false) {
 
 const sum = (rows, f) => rows.reduce((x, y) => x + f(y), 0);
 const ends = rows => { const o = {}; for (const r of rows) for (const k in r.ends) o[k] = (o[k] || 0) + r.ends[k]; return Object.keys(o).sort().map(k => `${k} ${o[k]}`).join(' / '); };
-let costPass = true; const tot = { tracers: 0, met: 0, ghost: 0, blind: 0, blindMet: 0 };
+const pct = c => `${(100 * c).toFixed(1)} %`;
+const tot = { tracers: 0, met: 0, ghost: 0, blind: 0, blindMet: 0 }, cost = {}, pool = {};
+// S-74b2 (D-202) hull debt: a Surge run that ends below full hull has not paid its retreat yet. It owes the hull deficit
+// / (1 − RETREAT) heal trips, each priced at the ring's mean trip (s, over its Surge runs with and without hunters; a ring
+// with no trip takes the mean over all rings run), and its haul is scaled by run time / (run time + owed).
+const debt = (rows, trip) => { for (const r of rows) { r.owed = (1 - Math.min(1, r.hull)) / (1 - RETREAT) * trip; r.haul = r.raw * minutes * 60 / (minutes * 60 + r.owed); } };
+const runs = {};
+for (const ringKey of rings) for (const mode of modes) {
+  const on = [], off = [];
+  for (let k = 1; k <= seeds; k++) { on.push(run(k * 7919, mode, ringKey, true)); off.push(run(k * 7919, mode, ringKey, false)); }
+  for (const r of [...on, ...off]) r.raw = r.haul;
+  runs[`${ringKey} ${mode}`] = { on, off };
+}
+const surge = rings.flatMap(k => runs[`${k} surge`] ? [...runs[`${k} surge`].on, ...runs[`${k} surge`].off] : []);
+const tripAll = sum(surge, r => r.healS) / Math.max(1, sum(surge, r => r.trips));
 for (const ringKey of rings) {
-  const cost = {};
+  cost[ringKey] = {};
   for (const mode of modes) {
-    const on = [], off = [];
-    for (let k = 1; k <= seeds; k++) {
-      const a = run(k * 7919, mode, ringKey, true), b = run(k * 7919, mode, ringKey, false);
-      if (V) console.log(JSON.stringify({ seed: k * 7919, ring: ringKey, mode, on: { haul: a.haul, deaths: a.deaths, hunt: a.hunt }, off: { haul: b.haul, deaths: b.deaths } }));
-      on.push(a); off.push(b);
+    const { on, off } = runs[`${ringKey} ${mode}`];
+    let note = '';
+    if (mode === 'surge') {
+      const both = [...on, ...off], n = sum(both, r => r.trips), trip = n ? sum(both, r => r.healS) / n : tripAll;
+      debt(both, trip);
+      note = `, hull debt: end hull with ${(sum(on, r => r.hull) / seeds).toFixed(2)} / without ${(sum(off, r => r.hull) / seeds).toFixed(2)}, trip ${trip.toFixed(0)} s (${n ? `${n} trips` : 'all rings'}), ` +
+        `owed with ${(sum(on, r => r.owed) / seeds).toFixed(0)} s / without ${(sum(off, r => r.owed) / seeds).toFixed(0)} s, cost before debt ${pct(sum(off, r => r.raw) / Math.max(1e-9, sum(on, r => r.raw)) - 1)}`;
     }
-    cost[mode] = sum(off, r => r.haul) / Math.max(1e-9, sum(on, r => r.haul)) - 1;
+    for (const [i, a] of on.entries()) if (V) console.log(JSON.stringify({ seed: (i + 1) * 7919, ring: ringKey, mode, on: { haul: a.haul, hull: a.hull, trips: a.trips, deaths: a.deaths, hunt: a.hunt }, off: { haul: off[i].haul, hull: off[i].hull, deaths: off[i].deaths } }));
+    cost[ringKey][mode] = sum(off, r => r.haul) / Math.max(1e-9, sum(on, r => r.haul)) - 1;
+    pool[mode] = pool[mode] || { on: 0, off: 0 }; pool[mode].on += sum(on, r => r.haul); pool[mode].off += sum(off, r => r.haul);
     for (const k in tot) tot[k] += sum(on, r => r[k]);
-    console.log(`${ringKey} ${mode}: time cost ${(100 * cost[mode]).toFixed(1)} % (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
+    console.log(`${ringKey} ${mode}: time cost ${pct(cost[ringKey][mode])} (◆-eq/min with ${(sum(on, r => r.haul) / seeds / minutes).toFixed(1)}, without ${(sum(off, r => r.haul) / seeds / minutes).toFixed(1)}), ` +
       `hunters ${sum(on, r => r.hunt.spawned)} (pairs ${sum(on, r => r.hunt.pairs)}), reached ${sum(on, r => r.hunt.reached)}, gave up ${sum(on, r => r.hunt.gaveUp)}, kills ${sum(on, r => r.hunt.kills)}, taken ${sum(on, r => r.hunt.taken)}, ` +
-      `Tracers met ${sum(on, r => r.met)}/${sum(on, r => r.tracers)} (ghost Glitch ${sum(on, r => r.ghost)}), ends ${ends(on)}, deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}`);
-    if (ECHO) { // S-74b: the same seeds with hunters on and an Auto Echo along (reported, not gated)
+      `Tracers met ${sum(on, r => r.met)}/${sum(on, r => r.tracers)} (ghost Glitch ${sum(on, r => r.ghost)}), ends ${ends(on)}, deaths with ${sum(on, r => r.deaths)} / without ${sum(off, r => r.deaths)}, stuck ${sum(on, r => r.stuck) + sum(off, r => r.stuck)}${note}`);
+    if (ECHO) { // S-74b: the same seeds with hunters on and an Auto Echo along (reported, not gated; no hull debt)
       const ec = []; for (let k = 1; k <= seeds; k++) ec.push(run(k * 7919, mode, ringKey, true, true));
-      console.log(`${ringKey} ${mode} + Auto Echo: time cost ${(100 * (sum(off, r => r.haul) / Math.max(1e-9, sum(ec, r => r.haul)) - 1)).toFixed(1)} %, ` +
+      console.log(`${ringKey} ${mode} + Auto Echo: time cost ${pct(sum(off, r => r.raw) / Math.max(1e-9, sum(ec, r => r.haul)) - 1)}, ` +
         `Defend share ${(100 * sum(ec, r => r.defend) / Math.max(1, sum(ec, r => r.ticks))).toFixed(1)} % (report)`);
     }
   }
-  if (cost.drift !== undefined && cost.surge !== undefined) {
-    // A cost ≤ 0 (hunters pay more in loot than they take) has no ratio: the face does nothing, so it fails.
-    const q = cost.surge > 0 && cost.drift > 0 ? cost.drift / cost.surge : NaN, ok = q >= 0.8 && q <= 1.25; costPass = costPass && ok;
-    console.log(`${ringKey}: Drift / Surge time cost ${Number.isNaN(q) ? 'n/a (a cost ≤ 0)' : q.toFixed(3)} (0.8–1.25) ${ok ? 'ok' : 'FAIL'}`);
-  }
+  const c = cost[ringKey];
+  if (c.drift !== undefined && c.surge !== undefined) console.log(`${ringKey}: Drift / Surge time cost ${c.surge > 0 && c.drift > 0 ? (c.drift / c.surge).toFixed(3) : 'n/a (a cost ≤ 0)'} (report; the gate is pooled, D-202)`);
+}
+// D-202: the cost gate is pooled over the rings run (sum of hauls), Drift / Surge in 0.8–1.25; floor: each face costs > 0
+// in every ring (a free face fails, D-200). A cost ≤ 0 has no ratio.
+let costPass = null;
+if (pool.drift && pool.surge) {
+  const pd = pool.drift.off / Math.max(1e-9, pool.drift.on) - 1, ps = pool.surge.off / Math.max(1e-9, pool.surge.on) - 1;
+  const q = pd > 0 && ps > 0 ? pd / ps : NaN, band = q >= 0.8 && q <= 1.25;
+  const free = rings.flatMap(k => modes.filter(m => !(cost[k][m] > 0)).map(m => `${k} ${m}`));
+  costPass = band && !free.length;
+  console.log(`pooled (${rings.join(' + ')}): Drift ${pct(pd)}, Surge ${pct(ps)}, Drift / Surge ${Number.isNaN(q) ? 'n/a (a cost ≤ 0)' : q.toFixed(3)} (0.8–1.25) ${band ? 'ok' : 'FAIL'}; ` +
+    `floor (every face > 0 in every ring) ${free.length ? `FAIL: ${free.join(', ')}` : 'ok'}`);
 }
 const pc = (a, b) => (100 * a / Math.max(1, b)).toFixed(0), blind = tot.blindMet / Math.max(1, tot.blind), rok = blind >= 0.8;
 console.log(`reach: Tracers ${pc(tot.met, tot.tracers)} % of ${tot.tracers} that met or gave up, a ghost Glitch from the same spots ${pc(tot.ghost, tot.tracers)} % (report); ` +
   `where the ghost gives up, Tracers ${pc(tot.blindMet, tot.blind)} % of ${tot.blind} (≥ 80) ${rok ? 'ok' : 'FAIL'}`);
 if (seeds < GATE_SEEDS) console.log(`gate: no verdict (${seeds} seeds < ${GATE_SEEDS}, B-092)`);
-else console.log(`gate: reach ${rok ? 'PASS' : 'FAIL'}; cost ${costPass ? 'PASS' : 'FAIL'} (S-74b tunes it, D-200)`);
+else console.log(`gate: reach ${rok ? 'PASS' : 'FAIL'}; cost ${costPass === null ? 'n/a (one mode)' : costPass ? 'PASS' : 'FAIL'}${rings.length < 3 ? ` (pooled over ${rings.join(' + ')} only)` : ''} (S-74b2 tunes it, D-202)`);

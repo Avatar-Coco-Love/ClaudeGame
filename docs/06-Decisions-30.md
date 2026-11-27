@@ -43,3 +43,15 @@ alternatives). D-200 on.
 - Rejected: per ring (no lever set fits all three: Shoal and Kiln share tier 3, the gap is heat); per-ring hunter
   numbers (three tables the player can't read); a wider band (hides a free face); longer runs only (20 min: Deep
   Surge +1.4 %, still the window, not the hunter).
+
+### D-203 — S-74b2 split; B-108 is the measure, not the game; a heal trip includes the way back (session 163, build)
+- **Split:** S-74b2a = steps 1–3 (B-108, hull debt, pooled gate + floor); S-74b2b = tune + B-109, VERSION 1.12.0.
+- **B-108 closed:** no game bug. On 32 seeds Deep Surge costs −1.1 % (8-seed sets −5.8 / −0.7 / +1.4 / +0.9 %): the
+  first 8 seeds are a low draw, and the Deep's damage never forces a retreat in 10 min (4 trips in 8 runs), so it
+  was unpaid. Hunter fights mine more cells (+3…6 %); knockback without damage still shifts the route (−4.6 %).
+- **Trip price:** a trip runs from turning home until back within 4 cells of where it turned (≤ 60 s after the heal):
+  Deep 61 s, Shoal 52, Kiln 58. Each run pays its own debt (deficit / (1 − RETREAT) × trip), with and without hunters.
+- Measured (8 seeds, no Echo): Surge Deep −1.0 / Shoal +16.1 / Kiln +54.7 %, pooled Drift +6.2 %, Surge +21.8 %
+  (ratio 0.285, FAIL); floor FAIL (Deep Surge ≤ 0). Tuning must raise the Deep's Surge cost, not only lower Kiln's.
+- Rejected: heal time only (16 s: a quarter of the trip); the paired difference only (an off run below full hull
+  would pay the on run); a 32-seed gate (4× the smoke's run time).
