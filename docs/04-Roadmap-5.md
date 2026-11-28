@@ -28,7 +28,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-76** Map legend: the big map names the kinds it drew, in their glyphs; columns beside it in landscape, wrapped under it in portrait (Build 170, v1.12.111, D-211).
 - ✅ **S-77a** Decoy craft + lure: ◈ ▲4 ◆20, lures a hunter in sight ≤ 6 cells for 4 s (Build 171, v1.12.112, D-212).
 - ✅ **S-77b** `huntrun --decoy` measure, shipped as a report: no setting in D-213's bounds passes (Build 173, v1.12.114, D-214). Q-044 count pip: cut (D-213).
-- **S-77b2** make the Decoy worth its price, then gate it (≥ 25 % saving, band 0.8–1.25; Q-045, D-214). Spec in Design 177.
+- **S-77b2** a held hunter never touches; Decoys from a Nexus level, Lure (▲ 30, refilled at every deposit); the gate turns on (Q-045, D-218; spec `07-…-22`).
 - Pincer white pip: folded into S-73b (D-197).
 - **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also
   weighed: a Nexus-mouth camper, packs that retreat when hurt (both Surge-only today).
@@ -37,6 +37,6 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
 - ✅ **S-66a** (Build 175, v1.12.116, D-216) Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 27: S-77a took 26), Nexus tab list.
 - ✅ **S-66b** (Build 176, v1.12.117, D-217) A feat done toasts once + one note (no re-toast on reload / mode switch); ending row.
-- **S-67** `tools/featrun.mjs`: tune `FEAT_CHART` / `FEAT_RIFTS`; gate Drift / Surge 0.8–1.25.
+- **S-67** `tools/featrun.mjs` tunes `FEAT_CHART`; rifts check pooled from `eventrun --call` (`FEAT_RIFTS` 5 measured 21–31 min, D-219).
 - **S-68** The Nexus lights one hexagon vertex per feat done.
 - Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.
