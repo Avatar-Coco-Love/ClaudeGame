@@ -89,6 +89,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./weather.cjs').nodeChecks(check).catch(e => check('S-33 weather checks ran', false, e.message));
   await require('./rift.cjs').nodeChecks(check).catch(e => check('S-57a rift checks ran', false, e.message));
   await require('./lens.cjs').nodeChecks(check).catch(e => check('S-63 Lens checks ran', false, e.message));
+  await require('./feats.cjs').nodeChecks(check).catch(e => check('S-66a Feats checks ran', false, e.message));
   await require('./thumbarc.cjs').nodeChecks(check).catch(e => check('S-75 thumb arc checks ran', false, e.message));
   await require('./nexusview.cjs').nodeChecks(check).catch(e => check('S-65 Nexus rings checks ran', false, e.message));
   await require('./anomaly.cjs').nodeChecks(check).catch(e => check('S-35 anomaly checks ran', false, e.message));
@@ -421,6 +422,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('pincer', () => require('./pincer.cjs').browserChecks(browser, url, check, errors, process.env.PINCER_SHOT).catch(e => check('S-73a pincer browser checks ran', false, e.message)));
     await T('rift', () => require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message)));
     await T('lens', () => require('./lens.cjs').browserChecks(browser, url, check, errors, process.env.LENS_SHOT).catch(e => check('S-63 Lens browser checks ran', false, e.message)));
+    await T('feats', () => require('./feats.cjs').browserChecks(browser, url, check, errors, process.env.FEATS_SHOT).catch(e => check('S-66a Feats browser checks ran', false, e.message)));
     await T('mapview', () => require('./mapview.cjs').browserChecks(browser, url, check, errors, process.env.MAP_SHOT).catch(e => check('D-191 map view browser checks ran', false, e.message)));
     await T('nexusview', () => require('./nexusview.cjs').browserChecks(browser, url, check, errors).catch(e => check('S-65 Nexus rings browser checks ran', false, e.message)));
     await T('lock', () => require('./lock.cjs').browserChecks(browser, url, check, errors, process.env.LOCK_SHOT).catch(e => check('S-58 lock browser checks ran', false, e.message)));

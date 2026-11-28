@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.12.115';
+export const VERSION = '1.12.116';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -323,6 +323,17 @@ export const RIFT_MAJOR = [6, 6, 6, 3, 3], RIFT_BONUS = 1; // RIFT_MAJOR[ring]: 
 // S-63 Lens (D-175): a called rift costs RIFT_CALL_COST ▲ from the bank, RIFT_CALL_CD s of play apart (unsaved), and lasts RIFT_S.
 export const RIFT_CALL_COST = 30, RIFT_CALL_CD = 150; // S-64 gate (D-178): 90 s gave Kiln call / mine 1.38
 export const RIFT_RGB = '226, 208, 255'; // violet-white: the pocket's shimmer and its minimap dot
+// S-66a (D-180, D-216): Feats, six world goals that pay nothing, fixed order (S-68 maps it onto the Nexus vertices).
+// `lairs` and `over` exist in a 256 world only (bosses / profile.overdrive decide); FEAT_CHART / FEAT_RIFTS are provisional (S-67 tunes).
+export const FEATS = [
+  { id: 'lairs', name: 'Quiet lairs', rule: 'every boss brought down' },
+  { id: 'vaults', name: 'Open vaults', rule: "every vault's cache broken" },
+  { id: 'kinds', name: 'Three lights', rule: 'an Anomaly of every kind taken' },
+  { id: 'chart', name: 'Charted', rule: 'explore this share of the world' },
+  { id: 'over', name: 'Overdriven', rule: 'one Core Matrix stat at its top level' },
+  { id: 'rifts', name: 'Rift runner', rule: 'rift pockets emptied before they close' },
+];
+export const FEAT_CHART = 0.35, FEAT_RIFTS = 5;
 // S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep; + Shoal / Kiln at 256), seed-only
 // (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre
 // distance ANOMALY_D[ring] cells, ≥ ANOMALY_GAP cells apart, clear of vault footprints and Spire footprints by ANOMALY_CLEAR

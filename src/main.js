@@ -12,6 +12,7 @@ import { sinksOn, canCraftSink, craftSink, sinkAt } from './heatsink.js';
 import { canCraftWard, craftWard, wardAt } from './ward.js';
 import { canCraftDecoy, craftDecoy, decoyAt } from './decoy.js';
 import { chartOn } from './chart.js';
+import { feats, featProgress } from './feats.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
 import { tickEnding, endingSummary, fmtTime } from './ending.js';
 import { upgradeSave } from './save.js';
@@ -367,6 +368,14 @@ function renderBank() {
   $('matrix-bank').innerHTML = `<span class="shard">${RESOURCE.shard.glyph} ${g.bank.shard}</span><span class="prism">${RESOURCE.prism.glyph} ${g.bank.prism}</span>` +
     ['lumen', 'tide', 'calx'].filter(k => seen(g, k)).map(k => `<span class="${k}">${RESOURCE[k].glyph} ${g.bank[k]}</span>`).join('');
 }
+// S-66a (D-216): text only, ✓ done else ·, all of this world's feats from the start.
+function featsBlock(g) {
+  const fs = feats(g), box = document.createElement('div'), esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  box.className = 'feats'; box.id = 'feats';
+  box.innerHTML = `<h3>Feats ${fs.filter(f => f.done).length} / ${fs.length}</h3>` + fs.map(f =>
+    `<div class="feat${f.done ? ' done' : ''}" data-feat="${f.id}"><span class="mark">${f.done ? '✓' : '·'}</span><span><b>${esc(f.name)}</b> ${featProgress(f)}<small>${esc(f.rule)}</small></span></div>`).join('');
+  return box;
+}
 function renderPanel() {
   const g = game;
   $('matrix-title').textContent = { nexus: 'Nexus', research: 'Research', craft: 'Craft' }[panelTab] || 'Core Matrix';
@@ -403,6 +412,7 @@ function renderPanel() {
         if (ok && u.id === 'lens') toast(`Lens built — ${input.usingTouch ? 'tap ❖' : 'press ' + keys.K('call')} to call a rift (${RIFT_CALL_COST} ▲)`, 3200);
         return ok; }));
     }
+    list.appendChild(featsBlock(g)); // S-66a: Feats n / N below the rows
   } else {
     for (const u of UPGRADES) {
       if (u.id === 'hull' && g.mode !== 'surge' && g.upgrades.hull === 0) continue;

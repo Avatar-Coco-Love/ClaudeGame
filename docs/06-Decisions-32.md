@@ -46,3 +46,12 @@ alternatives). D-212 on.
 - D-210…D-214 vs code: match (`DECOY_R` 6, hold 4 s, near 0.6, orbit 0.45 at 4 rad/s, `lureNo` never retaken).
 - Workflow review: too little: no list of "every placed kind" to grep when a placeable lands (rule above); too much:
   none new. Rejected: a shared `PLACED_LISTS` helper now (5 call sites with different shapes; a refactor, not a fix).
+
+### D-216 — Build 175: S-66a Feats derive from saved state; two counters, format 27
+- `feats.js` `feats(game)` derives each feat (bosses' `down`, each vault's centre cache cell no longer `T.CACHE`,
+  explored share of the cells inside `BORDER`, the highest over-level of any Matrix stat vs `over`); only `stats.kinds`
+  (Anomaly-kind bitmask, set on take) and `stats.rifts` (a close with all 9 cells empty) are new, both clamped on load.
+- `lairs` lists when the world has bosses, `over` when `profile.overdrive`: a 160 world shows 4. `FEATS`, `FEAT_CHART`
+  0.35, `FEAT_RIFTS` 5 in `config.js` (provisional, S-67 tunes). The Nexus tab ends with the text list (✓ / ·).
+- Rejected: a saved `feats` done-set (could desync from the world; S-66b's toast keeps an unsaved seen-set), counting
+  a rift by `r.mined` (a running total), an Anomaly glyph per line (D-177).

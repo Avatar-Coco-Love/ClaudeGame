@@ -58,3 +58,8 @@ Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `P
 - Motes (S-54, D-150, `mote.js`): Shoal swarm of 6, 40–60 s, ride the current; Surge 4 dmg, a touch takes 1 item, Drift carries loose ore; gate PASS.
 - Decoy (S-77a, D-208, D-212, `decoy.js`): crafted ▲4 ◆20, carry 2, 3 placed, outside the Nexus disc; a non-fleeing hunter
   that sees one ≤ 6 cells locks on, circles it; 4 s after the first arrival it is spent. Not Glitches / Echo / bosses. Saved.
+- Feats (S-66a, D-216, `feats.js`): `feats(game)` derives `FEATS` (lairs, vaults, kinds, chart, over, rifts; a 160
+  world lists 4) from saved state; `stats.kinds` (bitmask, Anomaly take) and `stats.rifts` (9 of 9 mined at close). Nexus tab.
+
+## Depth rings (moved word for word from `02`, Build 175)
+Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast, lower hum.

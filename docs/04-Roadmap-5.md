@@ -35,7 +35,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - Decoy: settled yes (D-208), S-77 above. Cut (D-196): traps / mines (a second Ward), a push beam, a shield pulse.
 
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
-- **S-66a** Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 27: S-77a took 26), Nexus tab list.
+- ✅ **S-66a** (Build 175, v1.12.116, D-216) Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 27: S-77a took 26), Nexus tab list.
 - **S-66b** A feat done toasts once (no re-toast on reload); ending row (split, D-207).
 - **S-67** `tools/featrun.mjs`: tune `FEAT_CHART` / `FEAT_RIFTS`; gate Drift / Surge 0.8–1.25.
 - **S-68** The Nexus lights one hexagon vertex per feat done.
