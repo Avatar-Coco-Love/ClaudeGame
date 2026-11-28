@@ -37,4 +37,4 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
   min 20.5 %, Spires-only max 14.4 %, median × 1.3 16.7 %. Chosen: 256 = 0.20, 160 = 0.40 (D-222).
 - Gate runs in ~1 s (A* with the reach-radius heuristic); prestarted in `gates.cjs` SMOKE. Rift runner check in
   `lens.cjs` parses the `--call` lines (no new gate time).
-- No visual change (a number in the Nexus tab list); no screenshot. Smoke: see PR.
+- No visual change (a number in the Nexus tab list); no screenshot. Smoke 754/754 (a first run failed 2 VERSION checks: bumped mid-run, the session 179 pitfall again).
