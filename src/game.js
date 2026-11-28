@@ -70,7 +70,7 @@ export class Game {
     this.upgrades = Object.fromEntries(UPGRADES.map(u => [u.id, 0]));
     this.nexusLevels = Object.fromEntries(NEXUS_UPGRADES.map(u => [u.id, 0]));
     this.cargo = emptyKinds();
-    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0, tide: 0, calx: 0 }; // lumen / tide / calx: ever picked up (the HUD shows a chip after the first)
+    this.stats = { mined: 0, glitches: 0, time: 0, upgrades: 0, lumen: 0, tide: 0, calx: 0, kinds: 0, rifts: 0 }; // lumen / tide / calx: ever picked up (the HUD shows a chip after the first)
     this.research = {};      // S-11: one-time unlocks, e.g. { scanner: true }
     this.scan = emptyScan(); // S-11: the live ping (never saved)
     this.craft = { beacon: 0, relay: 0, sink: 0, ward: 0, decoy: 0, last: 'beacon' }; // S-16, S-22: crafted, not yet placed; `last` = what B / ✦ places
@@ -507,6 +507,7 @@ export class Game {
     { const c = Math.floor(Number(this.nexusLevels.chart)); this.nexusLevels.chart = chartOn(this) && c > 0 ? Math.min(2, c) : 0; } // S-52: 0–2, 0 without a Kiln
     this.nexusLevels.lens = this.nexusLevels.lens === 1 ? 1 : 0; // S-63 (B-037)
     Object.assign(this.stats, s.stats || {});
+    for (const k of ['kinds', 'rifts']) { const v = this.stats[k]; this.stats[k] = Number.isInteger(v) && v >= 0 ? v : 0; } // S-66a feats' counters (B-037)
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
     this.records = cleanRecords(s.records); // B-057: a save is never trusted
     this.ended = s.ended === true; this.endedAt = Number.isFinite(s.endedAt) ? s.endedAt : null; // S-24 (B-037: never trust a save)

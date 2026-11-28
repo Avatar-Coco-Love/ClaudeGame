@@ -74,6 +74,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #call-btn.cooling { opacity: .35; box-shadow: none; }
 @media (pointer: coarse) { #echo-btn, #call-btn { min-width: 44px; width: 44px; padding: 0; } } /* phones: glyph-only, the chip names the order */
 #beacon-count { font-size: calc(14px * var(--ts)); font-weight: 700; margin-left: 5px; font-variant-numeric: tabular-nums; }
+.feats { padding: 10px 0 2px; border-top: 1px solid rgba(90,120,255,.15); }
+.feats h3 { margin: 0 0 6px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--dim); letter-spacing: .04em; }
+.feat { display: flex; gap: 8px; padding: 3px 0; font-size: calc(13px * var(--ts)); color: var(--dim); }
+.feat .mark { width: 1em; flex: none; text-align: center; }
+.feat b { font-weight: 600; }
+.feat small { display: block; font-size: calc(11px * var(--ts)); opacity: .8; }
+.feat.done { color: var(--ink); }
+.feat.done .mark { color: var(--gold); }
 .research-hint { padding: 12px 0 4px; border-top: 1px solid rgba(90,120,255,.15); font-size: calc(13px * var(--ts)); color: var(--gold); text-align: center; }
 .touch kbd { display: none; }
 kbd { font: calc(12px * var(--ts)) ui-monospace, monospace; border: 1px solid currentColor; border-radius: 4px; padding: 1px 5px; margin-left: 6px; opacity: .7; }

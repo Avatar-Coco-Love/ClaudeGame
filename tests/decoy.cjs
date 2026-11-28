@@ -9,7 +9,7 @@ const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
-  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
   const { canCraftDecoy, craftDecoy, makeDecoy } = await import('../src/decoy.js');
   const { tryPlace, placeRefusal } = await import('../src/craft.js');
   const { makeTracer } = await import('../src/hunter.js');
@@ -81,9 +81,11 @@ async function nodeChecks(check) {
     const h = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: upgradeSave(s) });
     check('S-77a decoy: placed Decoys and carried stock survive a save round-trip',
       h.decoys.length === 1 && h.decoys[0].i === g.decoys[0].i && h.decoys[0].hold === null && h.craft.decoy === 1, JSON.stringify({ decoys: h.decoys.map(q => q.i), stock: h.craft.decoy }));
-    const old = { ...s, v: SAVE_FORMAT - 1 }; delete old.decoys; old.craft = { beacon: 1, relay: 0, sink: 0, ward: 1, last: 'ward' };
+    // S-66a: the format before Decoys is found by the step that adds `craft.decoy`, not SAVE_FORMAT - 1 (a later format moved it)
+    const decoyStep = STEPS.findIndex(f => { try { return 'decoy' in (f({ craft: {} }).craft || {}); } catch { return false; } });
+    const old = { ...s, v: decoyStep + 1 }; delete old.decoys; old.craft = { beacon: 1, relay: 0, sink: 0, ward: 1, last: 'ward' };
     const u = upgradeSave(JSON.parse(JSON.stringify(old)));
-    check('S-77a decoy: a save one format back upgrades to SAVE_FORMAT with no Decoys crafted or placed',
+    check('S-77a decoy: a save from before Decoys upgrades to SAVE_FORMAT with no Decoys crafted or placed',
       u && u.v === SAVE_FORMAT && u.craft.decoy === 0 && Array.isArray(u.decoys) && !u.decoys.length && u.craft.ward === 1, JSON.stringify(u && { v: u.v, craft: u.craft, decoys: u.decoys }));
     const nexusCell = Math.floor(h.nexus.y / CELL) * h.world.w + Math.floor(h.nexus.x / CELL);
     const j = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: upgradeSave({ ...JSON.parse(JSON.stringify(s)), decoys: [-1, 'x', 2.5, nexusCell, 0], craft: { decoy: 99 } }) });

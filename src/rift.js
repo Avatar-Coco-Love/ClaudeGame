@@ -82,7 +82,9 @@ export function openRift(game, called = false) {
 export function closeRift(game) {
   const r = game.rift;
   if (!r.open) return;
-  for (const c of r.open.cells) if (game.world.get(c.x, c.y) !== T.EMPTY) game.world.retype(c.x, c.y, c.prev); else r.mined++; // tools: cells taken
+  let taken = 0; // S-66a: this close's cells mined (r.mined is the tools' running total)
+  for (const c of r.open.cells) if (game.world.get(c.x, c.y) !== T.EMPTY) game.world.retype(c.x, c.y, c.prev); else { r.mined++; taken++; } // tools: cells taken
+  if (taken === r.open.cells.length) game.stats.rifts = (game.stats.rifts | 0) + 1; // the Rift runner feat: the whole pocket
   r.open = null;
   game.audio.riftClose(); // S-57b
   game.notify('rift-close');

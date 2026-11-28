@@ -7,6 +7,7 @@ import { CELL, T, VAULT_HALF, ANOMALY_D, ANOMALY_GAP, ANOMALY_CLEAR, ANOMALY_TRI
   ANOMALY_KINDS, LIGHT_RADIUS } from './config.js';
 import { seededStream, vaultSites, insideBorder } from './world.js';
 import { chooseSpires, SPIRE_HALF } from './spire.js';
+import { kindBit } from './feats.js';
 
 const KIND_IDS = Object.keys(ANOMALY_KINDS); // overclock, lodestone, ballast
 
@@ -76,6 +77,7 @@ export function updateAnomalies(game, dt) {
     a.taken[i] = now + ANOMALY_RECHARGE_S;
     game.buffs.push(s.kind);
     game.lastBuff = s.kind;
+    game.stats.kinds = (game.stats.kinds | 0) | kindBit(s.kind); // S-66a: the Three lights feat
     a.taught = true; // S-37: no more hint this session
     game.audio.anomaly();
     game.burst((s.x + 0.5) * CELL, (s.y + 0.5) * CELL, 36, `rgb(${ANOMALY_KINDS[s.kind].rgb})`, 240);

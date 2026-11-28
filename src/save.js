@@ -8,7 +8,7 @@ import { vaultSites, unpackBits } from './world.js';
 import { chooseSpires } from './spire.js';
 import { WORLD_SIZE_OLD, WORLD_PROFILES, KINDS } from './config.js';
 
-export const SAVE_FORMAT = 26;
+export const SAVE_FORMAT = 27;
 
 // STEPS[i] upgrades a format (i + 1) save to format (i + 2).
 export const STEPS = [
@@ -37,6 +37,7 @@ export const STEPS = [
   s => ({ ...s, nexus: { ...s.nexus, lens: 0 } }), // 23 -> 24: S-63 Nexus Lens: not built
   s => ({ ...s, echoLevels: { focus: 0, volley: 0, tether: 0 } }), // 24 -> 25: S-70 Echo upgrades: none bought
   s => ({ ...s, craft: { ...s.craft, decoy: 0 }, decoys: [] }), // 25 -> 26: S-77a Decoys: none crafted, none placed
+  s => ({ ...s, stats: { ...s.stats, kinds: 0, rifts: 0 } }), // 26 -> 27: S-66a feats' counters: no kind taken, no pocket emptied
 ];
 
 // Vaults whose footprint touches a cell the save has explored or broken; computed once here, then stored.
