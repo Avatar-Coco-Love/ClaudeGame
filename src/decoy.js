@@ -1,12 +1,12 @@
-// S-77a (D-208, D-212) Decoy: a crafted placeable that lures hunters. Crafted at the Nexus (Craft tab, every world) into a
-// carried stock, placed with B / ✦ (craft.js `tryPlace` asks here) on open floor outside the Nexus disc. A hunter (Tracer,
+// S-77a (D-208, D-212) Decoy: a placeable that lures hunters. S-77b2 (D-218): it comes from the Nexus Lure level (no craft
+// row, no per-use price): buying Lure and the end of every deposit fill the carried stock (`refillDecoys`). Placed with B / ✦ (craft.js `tryPlace` asks here) on open floor outside the Nexus disc. A hunter (Tracer,
 // Pincer lead or flank) that is not fleeing and sees a placed Decoy within DECOY_R cells (no rock between) leaves the field
 // and steers straight at it (hunter.js asks `lureGoal` once a frame; the flank's A* waits; no second field, D-198). Within
-// DECOY_NEAR cells it circles the Decoy; DECOY_HOLD_S after the first arrival the Decoy is spent (removed, a small burst,
+// DECOY_NEAR cells it circles the Decoy (while `e.lure` is set it never touches the core, S-77b2); DECOY_HOLD_S after the first arrival the Decoy is spent (removed, a small burst,
 // none with reduced motion) and every hunter it held goes back to the field. It buys seconds, never kills (D-208).
 // A fleeing Drift thief ignores Decoys; Glitches, Spitters, the Echo and bosses never read them. Same in Drift and Surge.
 // A placed Decoy is { i, x, y, hold }: `hold` (null until a hunter arrives, then seconds held) is never saved.
-import { CELL, T, NEXUS_RADIUS, GLITCH_GIVE_UP_S, DECOY_COST, DECOY_STOCK, DECOY_MAX, DECOY_R, DECOY_HOLD_S, DECOY_NEAR,
+import { CELL, T, NEXUS_RADIUS, GLITCH_GIVE_UP_S, DECOY_STOCK, DECOY_MAX, DECOY_R, DECOY_HOLD_S, DECOY_NEAR,
   DECOY_ORBIT, DECOY_PICK_R, DECOY_RGB, PLACE_BURST } from './config.js';
 
 export const DECOY_COLOR = `rgb(${DECOY_RGB})`;
@@ -17,17 +17,10 @@ export function makeDecoy(world, i) {
   return { i, x: (x + 0.5) * CELL, y: (y + 0.5) * CELL, hold: null };
 }
 
-/** Stock + placed never passes DECOY_MAX, so nothing is spent on a Decoy with nowhere to go. */
-export function canCraftDecoy(game) {
-  const n = game.craft.decoy, b = game.bank;
-  return b.prism >= DECOY_COST.prism && b.shard >= DECOY_COST.shard && n < DECOY_STOCK && n + game.decoys.length < DECOY_MAX;
-}
-export function craftDecoy(game) {
-  if (!canCraftDecoy(game)) return false;
-  game.bank.prism -= DECOY_COST.prism; game.bank.shard -= DECOY_COST.shard;
-  game.craft.decoy++; game.craft.last = 'decoy';
-  game.audio.upgrade();
-  return true;
+/** S-77b2 (D-218): with Lure built, the stock fills to DECOY_STOCK, capped so stock + placed never passes DECOY_MAX. */
+export function refillDecoys(game) {
+  if (!game.nexusLevels.lure) return;
+  game.craft.decoy = Math.max(game.craft.decoy, Math.min(DECOY_STOCK, DECOY_MAX - game.decoys.length));
 }
 
 /** Why a Decoy can't go on cell (cx, cy) now, or null. 'blocked' (not open / taken) is decided by craft.js's shared check. */

@@ -172,9 +172,9 @@ async function nodeChecks(check) {
     const dbr = new Uint8Array(ow.broken); dbr[bi] = 1;
     d.broken = packBits(dbr); d.decoys = [bi]; d.bank.prism = 0; d.bank.shard = 0; d.bosses = 'junk';
     const dg = make('drift', 4242, upgradeSave(d));
-    const dec = { decoys: dg.decoys.length, prism: dg.bank.prism, shard: dg.bank.shard, refunds: dg.bosses.refunds };
-    check('B-113 lair refund: a Decoy placed in a lair new to its save goes back to the bank as its craft cost, like a Ward',
-      dec.decoys === 0 && dec.prism === C.DECOY_COST.prism && dec.shard === C.DECOY_COST.shard && dec.refunds === 1, JSON.stringify(dec));
+    const dec = { decoys: dg.decoys.length, stock: dg.craft.decoy, prism: dg.bank.prism, shard: dg.bank.shard, refunds: dg.bosses.refunds };
+    check('B-113 lair refund: a Decoy placed in a lair new to its save goes back into the carried stock (S-77b2: no price, so no bank refund)',
+      dec.decoys === 0 && dec.stock === Math.min(C.DECOY_STOCK, (d.craft.decoy || 0) + 1) && dec.prism === 0 && dec.shard === 0 && dec.refunds === 1, JSON.stringify(dec));
   }
   { // probe: a mid build (beam 5, range 3) walks to a standpoint 3.4 cells out from the lit plate and beams it, then the core
     const res = [];

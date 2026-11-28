@@ -1,7 +1,7 @@
 // S-65 (D-179): the Nexus grows on screen. Each Nexus Development structure built (Radiance any level, Chart any level,
-// Lens) adds one thin hexagon outside the Nexus's three rings, in its own hue. Strokes only, never shadowBlur (D-160):
+// Lens, Lure) adds one thin hexagon outside the Nexus's three rings, in its own hue. Strokes only, never shadowBlur (D-160):
 // the Nexus already pays for one blurred layer. Drawn from saved levels, so nothing new is saved.
-import { NEXUS_RING_BASE, NEXUS_RING_STEP, NEXUS_RING_ALPHA, NEXUS_RING_DIM, NEXUS_RING_RGB, RIFT_RGB } from './config.js';
+import { NEXUS_RING_BASE, NEXUS_RING_STEP, NEXUS_RING_ALPHA, NEXUS_RING_DIM, NEXUS_RING_RGB, RIFT_RGB, DECOY_RGB } from './config.js';
 import { callCooldown } from './rift.js';
 
 /** The rings to draw, innermost first: [{ id, r, rgb, a }]. A Lens on cooldown is dim, bright when it can call. */
@@ -10,6 +10,7 @@ export function nexusRings(game) {
   if (L.radiance > 0) out.push({ id: 'radiance', rgb: NEXUS_RING_RGB.radiance, a: NEXUS_RING_ALPHA });
   if (L.chart > 0) out.push({ id: 'chart', rgb: NEXUS_RING_RGB.chart, a: NEXUS_RING_ALPHA });
   if (L.lens > 0) out.push({ id: 'lens', rgb: RIFT_RGB, a: game.rift && callCooldown(game) > 0 ? NEXUS_RING_DIM : NEXUS_RING_ALPHA });
+  if (L.lure > 0) out.push({ id: 'lure', rgb: DECOY_RGB, a: NEXUS_RING_ALPHA }); // S-77b2: the Decoy's peach
   out.forEach((g, i) => { g.r = NEXUS_RING_BASE + i * NEXUS_RING_STEP; });
   return out;
 }

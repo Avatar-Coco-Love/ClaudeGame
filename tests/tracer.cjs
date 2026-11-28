@@ -175,13 +175,13 @@ async function nodeChecks(check) {
     const fl = full.split('\n').find(l => l.startsWith('pooled (deep + shoal + kiln)')) || '', fg = full.split('\n').find(l => l.startsWith('gate:')) || '';
     check('S-74b2b2 hunters: the pooled cost gate passes over Deep + Shoal + Kiln (Drift / Surge 0.8–1.25, every face > 0, Drift ≤ 18 % per ring; huntrun.mjs, 8 seeds)',
       /cost PASS/.test(fg) && / ok; floor .* ok; ceiling .* ok$/.test(fl), fl.slice(0, 220));
-    // S-77b (D-208, D-213, D-214): the Decoy measure. A report row, not a gate: no setting inside D-213's bounds passes
-    // (S-77b2 owns the fix). Checked: a + Decoys row per ring and mode, the pooled line, and the Decoy runs change no other row.
-    const dr = full.split('\n').filter(l => / \+ Decoys: time cost -?[\d.]+ % \(without Decoys -?[\d.]+ %, before their price -?[\d.]+ %\), Decoys used \d+ .* lured [\d.]+ hunter-s per Decoy/.test(l));
+    // S-77b2 (D-218): the Decoy gate (replaces S-77b's report row): a + Decoys row per ring and mode, Decoy runs change no
+    // other row, and pooled per mode saving ≥ 25 %, Drift / Surge saving 0.8–1.25, pooled cost with Decoys > 0.
+    const dr = full.split('\n').filter(l => / \+ Decoys: time cost -?[\d.]+ % \(without Decoys -?[\d.]+ %\), Decoys used \d+ .* lured [\d.]+ hunter-s per Decoy/.test(l));
     const row = (o, k) => o.split('\n').find(l => l.startsWith(k)) || '', same = ['deep drift:', 'deep surge:'].every(k => row(out, k) && row(out, k) === row(full, k));
     const dl = full.split('\n').find(l => l.startsWith('decoy (deep + shoal + kiln): saving Drift')) || '';
-    check('S-77b decoy: huntrun.mjs --decoy reports per ring and mode (cost with / without / before price, used, hunter-s lured) and the pooled saving line (report, S-77b2 fixes it)',
-      dr.length === 6 && same && / \(0\.8–1\.25\) (ok|FAIL); floor \(cost with Decoys ≥ 0 in every ring\) (ok|FAIL)/.test(dl) && /decoy (PASS|FAIL) \(report/.test(fg), `${dr.length} rows, Deep rows same as without --decoy ${same} | ${dl.slice(0, 200)}`);
+    check('S-77b2 decoy: the Decoy gate passes (huntrun.mjs --decoy, 8 seeds: saving ≥ 25 % each mode, Drift / Surge 0.8–1.25, pooled cost with Decoys > 0)',
+      dr.length === 6 && same && / each\) ok; .*\(0\.8–1\.25\) ok; floor \(pooled cost with Decoys > 0: .*\) ok/.test(dl) && /decoy PASS/.test(fg), `${dr.length} rows, Deep rows same as without --decoy ${same} | ${dl.slice(0, 220)}`);
   }
   { // the Echo in Auto turns to Defend at a Drift Tracer it can see
     const L = lab('drift'), g = L.g;

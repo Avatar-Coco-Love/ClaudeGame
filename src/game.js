@@ -27,7 +27,7 @@ import { makeBosses, stampBosses, updateBosses, healBosses } from './boss.js';
 import { tryPlace, loadBeacons, loadRelays, relayAt, PLACE_KINDS } from './craft.js';
 import { loadSinks, sinksOn } from './heatsink.js';
 import { loadWards, updateWards } from './ward.js';
-import { loadDecoys, updateDecoys } from './decoy.js';
+import { loadDecoys, updateDecoys, refillDecoys } from './decoy.js';
 import { chartOn } from './chart.js';
 import { checkFeats, featsDone, FEAT_EVENTS } from './feats.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
@@ -159,6 +159,7 @@ export class Game {
     this.audio.upgrade();
     this.burst(this.nexus.x, this.nexus.y, 70, '#ffffff', 420);
     if (this.motionOn()) this.nexusFlash = 1; // S-65: the upgrade ring plays at the Nexus, not the core
+    if (id === 'lure') refillDecoys(this); // S-77b2 (D-218): Lure fills the Decoy stock at once
     if (id !== 'radiance') return true; // S-52 Chart: no light, no sweep
     this.revealQueue.push(...this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()));
     this.nexusPulse = 1;
@@ -413,6 +414,7 @@ export class Game {
       this.cargo[kind]--; this.bank[kind]++;
       this.audio.deposit(this.depositCount++);
       this.depositKinds.add(kind);
+      refillDecoys(this); // S-77b2 (D-218, D-220): Lure refills the Decoy stock whenever an item banks (Nexus or Relay)
       this.particles.push({ type: 'streak', x: this.player.x, y: this.player.y, tx, ty, life: 0.4, max: 0.4, color: RESOURCE[kind].color, size: 3 });
       if (this.cargoTotal() === 0) { this.audio.depositDone(this.depositKinds.size); this.depositKinds.clear(); this.notify('deposited'); endBuffs(this); } // S-35: a deposit that banked ≥ 1 item ends every buff
     }
@@ -511,6 +513,7 @@ export class Game {
     for (const k of Object.keys(this.nexusLevels)) if (s.nexus && s.nexus[k] != null) this.nexusLevels[k] = s.nexus[k];
     { const c = Math.floor(Number(this.nexusLevels.chart)); this.nexusLevels.chart = chartOn(this) && c > 0 ? Math.min(2, c) : 0; } // S-52: 0–2, 0 without a Kiln
     this.nexusLevels.lens = this.nexusLevels.lens === 1 ? 1 : 0; // S-63 (B-037)
+    this.nexusLevels.lure = this.nexusLevels.lure === 1 ? 1 : 0; // S-77b2 (B-037)
     Object.assign(this.stats, s.stats || {});
     for (const k of ['kinds', 'rifts']) { const v = this.stats[k]; this.stats[k] = Number.isInteger(v) && v >= 0 ? v : 0; } // S-66a feats' counters (B-037)
     this.cycle = Number.isInteger(s.cycle) && s.cycle >= 0 ? s.cycle : 0; // S-29
