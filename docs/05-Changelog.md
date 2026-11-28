@@ -3,6 +3,12 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.119 — 2026-11-28
+- Decoys now come from a one-time Nexus build, **Lure** (▲ 30): it gives you 2 Decoys and tops them up whenever you
+  bank (at the Nexus or a Relay). The Craft tab no longer sells them. A hunter drawn to a Decoy can't touch you while
+  it circles: drop one at your feet and you keep your cargo (Drift) or your Integrity (Surge) for the hold. Saves that
+  held a Decoy get Lure built for free.
+
 ## v1.12.118 — 2026-11-28
 - Design pass, no change in play yet: the Decoy's next fix is planned. Today a hunter drawn to a Decoy at your feet
   can still rob you on the way; next it will never touch you while a Decoy holds it, and Decoys will come free at

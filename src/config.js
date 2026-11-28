@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.12.118';
+export const VERSION = '1.12.119';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -224,7 +224,12 @@ export const NEXUS_UPGRADES = [
   { id: 'lens', name: 'Lens', desc: 'Call a rift where you stand', max: 1,
     value: l => l, fmt: v => ['Not built', 'Built'][v],
     cost: () => ({ shard: 0, prism: 40 }) },
+  // S-77b2 (D-218): the only source of Decoys; with it built every deposit (Nexus or Relay) refills the stock (decoy.js).
+  { id: 'lure', name: 'Lure', desc: 'A Decoy stock, refilled at every deposit', max: 1,
+    value: l => l, fmt: v => ['Not built', 'Built'][v],
+    cost: () => ({ shard: 0, prism: LURE_COST }) },
 ];
+export const LURE_COST = 30; // ▲, once (D-218)
 export const CHART_RECHECK_S = 0.5; // s of game time between re-checks of unexplored flowing chunks in the minimap window
 
 // Research (S-11, D-030, D-034): one-time unlocks paid only in Lumen. The Scanner ping shows CRYSTAL/PRISM/LUMEN cells within
@@ -399,10 +404,11 @@ export const HEATSINK_RGB = '200, 160, 255';
 // WARD_DMG hp (a Spitter bolt in one): Glitches / Spitters (Surge), Burrowers / motes (both). Same in Drift and Surge; no light.
 export const WARD_COST = { prism: 8, shard: 30 }, WARD_STOCK = 2, WARD_MAX = 4, WARD_GAP = 6, WARD_R = 4, WARD_S = 0.8, WARD_DMG = 1.2, WARD_PICK_R = 1.5, WARD_SHOT_S = 0.14;
 export const WARD_RGB = '190, 255, 120'; // lime: the Ward's ring, ticks, shot and map mark
-// S-77a (D-208, D-212) Decoy (decoy.js): crafted for DECOY_COST, DECOY_STOCK carried, DECOY_MAX placed, on open floor outside the
-// Nexus disc. A hunter not fleeing within DECOY_R cells of one with a clear line steers to it; within DECOY_NEAR cells it
-// circles it (DECOY_ORBIT cells out) and after DECOY_HOLD_S the Decoy is spent. Provisional: S-77b tunes them. Peach.
-export const DECOY_COST = { prism: 4, shard: 20 }, DECOY_STOCK = 2, DECOY_MAX = 3, DECOY_R = 6, DECOY_HOLD_S = 4, DECOY_NEAR = 0.6, DECOY_ORBIT = 0.45, DECOY_PICK_R = 1.5;
+// S-77a (D-208, D-212) Decoy (decoy.js): DECOY_STOCK carried, DECOY_MAX placed, on open floor outside the Nexus disc; S-77b2
+// (D-218): no craft price, the Nexus Lure level refills the stock at every deposit. A hunter not fleeing within DECOY_R cells
+// of one with a clear line steers to it; within DECOY_NEAR cells it circles it (DECOY_ORBIT cells out), never touching the
+// core while lured, and after DECOY_HOLD_S the Decoy is spent. Peach.
+export const DECOY_STOCK = 2, DECOY_MAX = 3, DECOY_R = 6, DECOY_HOLD_S = 4, DECOY_NEAR = 0.6, DECOY_ORBIT = 0.45, DECOY_PICK_R = 1.5;
 export const DECOY_RGB = '255, 198, 170'; // peach: the Decoy's body, pulse, flash and map mark (colours.cjs: ≥ 25 ΔE from Ward / Tracer / Pincer)
 // S-48b Kiln flare vents (D-129, vent.js): seed-only sites on Kiln cells, one per VENT_PER_CELLS Kiln cells, ≥ VENT_GAP apart.
 // Each cycles VENT_PERIOD_S from a seeded phase: a VENT_TELL_S tell, then a VENT_FLARE_S flare of VENT_R cells that shoves the

@@ -149,7 +149,7 @@ export function updateHunters(game, dt) {
     e.vx += (tx * sp - e.vx) * k; e.vy += (ty * sp - e.vy) * k;
     moveBody(game.world, e, e.vx * dt, e.vy * dt, true);
     e.spin = Math.atan2(e.vy, e.vx);
-    if (e.flee <= 0 && d < e.r + p.r && e.hitCd <= 0) {
+    if (e.flee <= 0 && !e.lure && d < e.r + p.r && e.hitCd <= 0) { // S-77b2 (D-218): a lured hunter never touches
       touch(game, e, dx / d, dy / d);
       if (!list.length) return; // B-107: a Surge death in touch() cleared the list (as B-007's Glitch guard)
     }

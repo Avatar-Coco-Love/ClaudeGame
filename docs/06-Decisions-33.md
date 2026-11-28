@@ -25,3 +25,12 @@ alternatives). D-218 on.
   21–31 min (≥ 15, keep). Drift / Surge pooled 0.86 (Deep alone 0.71), so S-67's rifts check is pooled (D-202's way).
 - The chart route runs in one mode with `god`: explored share does not depend on the mode.
 - Rejected: a per-ring rifts ratio (Deep 0.71: its Drift bot calls 2.1 times a run, Surge 2.8), a second rifts bot.
+
+### D-220 — Build 178: Lure refills the Decoy stock whenever an item banks, not only when cargo empties
+- S-77b2 said "the end of every deposit". Built that way, the gate failed: saving Drift 29.7 % / Surge 46.2 %, ratio
+  0.643 (8 seeds): a core mining on its Relay pad seldom empties its cargo, so few refills (48–70 Decoys vs 59–97).
+  D-218's measure refilled on any banked item; built that way the gate passes with D-218's own numbers (62.5 / 57.4 %,
+  ratio 1.089, pooled cost with Decoys Drift 4.6 % / Surge 5.2 %). Player text: "refilled at every deposit" still holds.
+- A lair refund (B-113) returns a placed Decoy to the stock (capped), not ▲ / ◆: a Decoy has no price now.
+- Rejected: end-of-deposit refill (fails the band), a refill timer (a second clock), refunding the old craft price
+  (free resources from a free item).

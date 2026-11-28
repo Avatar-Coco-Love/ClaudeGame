@@ -53,13 +53,13 @@ async function browserChecks(browser, url, check, errors, shot) {
     P.stroke = function (...a) { if (this === ctx) { strokes++; if (this.shadowBlur > 0) blurred++; } return st.apply(this, a); };
     const run = () => { strokes = 0; blurred = 0; R.drawNexus(ctx, ...view); return { strokes, blurred }; };
     const none = run();
-    g.nexusLevels.radiance = 1; g.nexusLevels.chart = 1; g.nexusLevels.lens = 1;
+    g.nexusLevels.radiance = 1; g.nexusLevels.chart = 1; g.nexusLevels.lens = 1; g.nexusLevels.lure = 1;
     const all = run();
     P.stroke = st;
     return { none, all };
   });
-  check('S-65 Nexus rings: the draw adds 3 hexagon strokes for 3 structures, none blurred',
-    r.all.strokes - r.none.strokes === 3 && r.all.blurred === r.none.blurred, JSON.stringify(r));
+  check('S-65 Nexus rings: the draw adds 4 hexagon strokes for 4 structures (S-77b2: Lure), none blurred',
+    r.all.strokes - r.none.strokes === 4 && r.all.blurred === r.none.blurred, JSON.stringify(r));
   if (shot) {
     await pg.evaluate(() => { const { game: g } = window.__lumen; g.player.x = g.nexus.x + 120; g.player.y = g.nexus.y + 60; });
     await pg.waitForTimeout(400); await pg.screenshot({ path: shot });

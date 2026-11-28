@@ -56,7 +56,7 @@ Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `P
   The Echo reads the same `coreField` (S-73b, D-198: one build, its path cap 24 kept). `08-…-2`.
 - Burrower (S-53a/b/c, D-145…148, `burrower.js`): Kiln creature, every 20–30 s, hunts the core; Surge lunge 22 / Drift bites 4 cargo; unsaved. Gate `biomefoe.mjs` PASS (`GATE_SEEDS` 8, D-155).
 - Motes (S-54, D-150, `mote.js`): Shoal swarm of 6, 40–60 s, ride the current; Surge 4 dmg, a touch takes 1 item, Drift carries loose ore; gate PASS.
-- Decoy (S-77a, D-208, D-212, `decoy.js`): crafted ▲4 ◆20, carry 2, 3 placed, outside the Nexus disc; a non-fleeing hunter
+- Decoy (S-77a, D-208, D-212, `decoy.js`): from Nexus Lure ▲30, refilled as items bank (S-77b2), carry 2, 3 placed, outside the Nexus disc; a non-fleeing hunter
   that sees one ≤ 6 cells locks on, circles it; 4 s after the first arrival it is spent. Not Glitches / Echo / bosses. Saved.
 - Feats (S-66a, D-216, `feats.js`): `feats(game)` derives `FEATS` (lairs, vaults, kinds, chart, over, rifts; a 160
   world lists 4) from saved state; `stats.kinds` (bitmask, Anomaly take) and `stats.rifts` (9 of 9 mined at close). Nexus tab.

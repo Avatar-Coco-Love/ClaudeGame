@@ -1,5 +1,5 @@
 // Boot, title screen, HUD, Core Matrix panel, save/load, main loop.
-import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, WARD_COST, WARD_STOCK, WARD_MAX, DECOY_COST, DECOY_STOCK, DECOY_MAX, DECOY_R, DECOY_HOLD_S, WARD_R, SPIRE_WAKE_S, RIFT_CALL_COST, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
+import { UPGRADES, NEXUS_UPGRADES, RESEARCH, RESEARCH_HINT, upgradeCost, matrixCost, KINDS, MODES, BEAM_MODES, RESOURCE, VERSION, BEACON_COST, BEACON_STOCK, BEACON_MAX, BEACON_LIGHT, RELAY_COST, RELAY_STOCK, RELAY_MAX, HEATSINK_COST, HEATSINK_STOCK, HEATSINK_MAX, WARD_COST, WARD_STOCK, WARD_MAX, DECOY_STOCK, DECOY_MAX, DECOY_R, WARD_R, SPIRE_WAKE_S, RIFT_CALL_COST, AURORA_BONUS, WEATHER_S, ANOMALY_KINDS } from './config.js';
 import { weatherLeft } from './weather.js';
 import { callBlock, callCooldown } from './rift.js';
 import { orderLabel } from './echo.js';
@@ -10,7 +10,7 @@ import { unlockedModes } from './beam.js';
 import { canCraft, craftBeacon, canCraftRelay, craftRelay, placeKind, placeRefusal, relayAt, PLACE_GLYPH } from './craft.js';
 import { sinksOn, canCraftSink, craftSink, sinkAt } from './heatsink.js';
 import { canCraftWard, craftWard, wardAt } from './ward.js';
-import { canCraftDecoy, craftDecoy, decoyAt } from './decoy.js';
+import { decoyAt } from './decoy.js';
 import { chartOn } from './chart.js';
 import { feats, featProgress } from './feats.js';
 import { spiresSeen, spiresLit, primedHere, spireHere } from './spire.js';
@@ -392,7 +392,6 @@ function renderPanel() {
     list.appendChild(craftRow('relay', 'Banks your cargo where it stands, like the Nexus ring. No healing.', RELAY_STOCK, RELAY_COST, canCraftRelay, craftRelay));
     if (sinksOn(g)) list.appendChild(craftRow('sink', 'Kiln floor only: within 5 cells your beam heats 60 % slower.', HEATSINK_STOCK, HEATSINK_COST, canCraftSink, craftSink)); // S-51
     list.appendChild(craftRow('ward', `Guards: bolts the nearest creature within ${WARD_R} cells it can see.`, WARD_STOCK, WARD_COST, canCraftWard, craftWard)); // S-56
-    list.appendChild(craftRow('decoy', `Lures: a hunter that sees it within ${DECOY_R} cells circles it ${DECOY_HOLD_S} s, then it is spent.`, DECOY_STOCK, DECOY_COST, canCraftDecoy, craftDecoy)); // S-77a
   } else if (panelTab === 'research') {
     for (const r of RESEARCH) {
       list.appendChild(researchRow(r));
@@ -411,6 +410,7 @@ function renderPanel() {
       list.appendChild(upgradeRow(u, lvl, lvl < u.max ? u.cost(lvl) : null, g.canAffordNexus(u.id), () => {
         const ok = g.buyNexus(u.id); // S-63: the Lens says how to call
         if (ok && u.id === 'lens') toast(`Lens built — ${input.usingTouch ? 'tap ❖' : 'press ' + keys.K('call')} to call a rift (${RIFT_CALL_COST} ▲)`, 3200);
+        if (ok && u.id === 'lure') toast(`Lure built — ${DECOY_STOCK} Decoys after every deposit; ${input.usingTouch ? `tap ${PLACE_GLYPH.decoy}` : 'press ' + keys.K('place')} to drop one: a hunter within ${DECOY_R} cells circles it`, 3600); // S-77b2
         return ok; }));
     }
     list.appendChild(featsBlock(g)); // S-66a: Feats n / N below the rows

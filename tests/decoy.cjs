@@ -1,20 +1,21 @@
-// S-77a Decoy checks (D-208, D-212; decoy.js). smoke.cjs calls nodeChecks + browserChecks. Node: crafting costs exactly
-// ▲4 ◆20, stock 2, stock + placed ≤ 3; placement open floor outside the Nexus disc; pick-up; in a stub room a Tracer 5 cells
+// S-77a Decoy checks (D-208, D-212; decoy.js). smoke.cjs calls nodeChecks + browserChecks. Node: S-77b2 (D-218) the Lure
+// Nexus level fills the stock (2, stock + placed ≤ 3), a deposit refills it, no Lure no stock; a lured hunter takes /
+// deals nothing; the 27 -> 28 save step; placement open floor outside the Nexus disc; pick-up; in a stub room a Tracer 5 cells
 // from a Decoy with a clear line turns to it (and not through rock), circles it 4 s, then the Decoy is gone and it walks
 // the field again; a Pincer flank lures the same; a fleeing thief ignores one; Drift = Surge (same path and hold); a Glitch
-// ignores it; save round-trip, the previous format loads none, junk loads none. Browser: place with B, a Tracer circling
-// it; screenshot. Usage: node tests/decoy.cjs [--browser]   (DECOY_SHOT=path.png)
+// ignores it; save round-trip, the previous format loads none, junk loads none. Browser: no Craft row, a Nexus Lure row
+// (360 × 640, screenshot DECOY_LURE_SHOT); place with B, a Tracer circling it; screenshot. Usage: node tests/decoy.cjs [--browser]   (DECOY_SHOT=path.png)
 const { newWorld } = require('./pinworld.cjs');
 const quiet = new Proxy({}, { get: () => () => {} });
 
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
   const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
-  const { canCraftDecoy, craftDecoy, makeDecoy } = await import('../src/decoy.js');
+  const { makeDecoy } = await import('../src/decoy.js');
   const { tryPlace, placeRefusal } = await import('../src/craft.js');
   const { makeTracer } = await import('../src/hunter.js');
   const { makeGlitch } = await import('../src/glitch.js');
-  const { CELL, T, DECOY_HOLD_S } = await import('../src/config.js');
+  const { CELL, T, DECOY_HOLD_S, LURE_COST } = await import('../src/config.js');
   const still = { move: { x: 0, y: 0 }, fire: false, aim: null };
   const give = g => Object.assign(g.bank, { prism: 100, shard: 500 });
   /** A 20 × 12 open room 30 cells east of the Nexus, dense rock round it; the core pinned at its west end (2, 6). */
@@ -55,13 +56,22 @@ async function nodeChecks(check) {
     return { log, e, g, L, dc };
   };
 
-  { // craft + place + pick up
+  { // S-77b2: Lure + place + pick up
     const L = room('drift'), g = L.g;
-    const no = canCraftDecoy(g); give(g);
-    const b0 = { ...g.bank }; craftDecoy(g); craftDecoy(g);
-    const third = canCraftDecoy(g), paid = { prism: b0.prism - g.bank.prism, shard: b0.shard - g.bank.shard };
-    check('S-77a decoy: crafting costs exactly ▲4 ◆20 each, stock caps at 2, nothing with an empty bank',
-      !no && g.craft.decoy === 2 && !third && paid.prism === 8 && paid.shard === 40, JSON.stringify({ paid, stock: g.craft.decoy }));
+    const no = g.canAffordNexus('lure'), none = g.craft.decoy; give(g);
+    const b0 = { ...g.bank }, ok = g.buyNexus('lure'), again = g.canAffordNexus('lure');
+    check(`S-77b2 decoy: Lure costs ▲${LURE_COST} once and fills the stock to 2; no Lure, no stock`,
+      !no && none === 0 && ok && !again && g.nexusLevels.lure === 1 && g.craft.decoy === 2 && b0.prism - g.bank.prism === LURE_COST && b0.shard === g.bank.shard,
+      JSON.stringify({ no, none, ok, again, stock: g.craft.decoy, paid: b0.prism - g.bank.prism }));
+    { // a deposit refills, capped by placed; no Lure: a deposit gives none
+      const d = room('drift').g, dep = (x, n) => { x.player.x = x.nexus.x; x.player.y = x.nexus.y; x.cargo.shard = n; for (let k = 0; k < 120; k++) x.update(1 / 60, still); };
+      d.nexusLevels.lure = 1; d.craft.decoy = 0; d.decoys.push({ i: 1, x: 0, y: 0, hold: null }, { i: 2, x: 0, y: 0, hold: null }); dep(d, 3);
+      const capped = d.craft.decoy; d.decoys.length = 0; d.craft.decoy = 0; dep(d, 3);
+      const full = d.craft.decoy;
+      const n = room('drift').g; dep(n, 3);
+      check('S-77b2 decoy: a deposit refills the stock to 2, capped so stock + placed ≤ 3; without Lure a deposit gives none',
+        capped === 1 && full === 2 && n.craft.decoy === 0 && n.bank.shard >= 3, JSON.stringify({ capped, full, noLure: n.craft.decoy, banked: n.bank.shard }));
+    }
     g.craft.last = 'decoy';
     const at = (x, y) => Object.assign(g.player, { x: (x + 0.5) * CELL, y: (y + 0.5) * CELL });
     at(L.ox - 1, L.oy + 4); const rock = placeRefusal(g, 'decoy');
@@ -70,8 +80,6 @@ async function nodeChecks(check) {
     at(L.ox + 8, L.oy + 4); const second = tryPlace(g);
     check('S-77a decoy: placement is open floor outside the Nexus disc; two Decoys may sit 2 cells apart (no gap rule)',
       rock === 'blocked' && nexus === 'nexus' && placed && second && g.decoys.length === 2 && g.craft.decoy === 0 && g.placeResult === 'placed', JSON.stringify({ rock, nexus, placed, second }));
-    const m = room('drift').g; give(m); m.decoys.push({ i: 1, x: 0, y: 0 }, { i: 2, x: 0, y: 0 }); craftDecoy(m);
-    check('S-77a decoy: stock + placed never passes 3', m.craft.decoy === 1 && !canCraftDecoy(m), JSON.stringify({ stock: m.craft.decoy }));
     at(L.ox + 6, L.oy + 4);
     const up = tryPlace(g);
     check('S-77a decoy: B / ✦ on a Decoy picks it up into stock (full refund)', up && g.craft.decoy === 1 && g.decoys.length === 1 && g.placeResult === 'picked', JSON.stringify({ stock: g.craft.decoy, res: g.placeResult }));
@@ -85,8 +93,16 @@ async function nodeChecks(check) {
     const decoyStep = STEPS.findIndex(f => { try { return 'decoy' in (f({ craft: {} }).craft || {}); } catch { return false; } });
     const old = { ...s, v: decoyStep + 1 }; delete old.decoys; old.craft = { beacon: 1, relay: 0, sink: 0, ward: 1, last: 'ward' };
     const u = upgradeSave(JSON.parse(JSON.stringify(old)));
-    check('S-77a decoy: a save from before Decoys upgrades to SAVE_FORMAT with no Decoys crafted or placed',
-      u && u.v === SAVE_FORMAT && u.craft.decoy === 0 && Array.isArray(u.decoys) && !u.decoys.length && u.craft.ward === 1, JSON.stringify(u && { v: u.v, craft: u.craft, decoys: u.decoys }));
+    check('S-77a decoy: a save from before Decoys upgrades to SAVE_FORMAT with no Decoys crafted or placed (and no Lure)',
+      u && u.v === SAVE_FORMAT && u.craft.decoy === 0 && Array.isArray(u.decoys) && !u.decoys.length && u.craft.ward === 1 && u.nexus.lure === 0, JSON.stringify(u && { v: u.v, craft: u.craft, decoys: u.decoys, nexus: u.nexus }));
+    // S-77b2: the step that adds `nexus.lure` builds it for a save that holds a Decoy (stock or placed), else not
+    const lureStep = STEPS.findIndex(f => { try { return 'lure' in (f({ nexus: {}, craft: {} }).nexus || {}); } catch { return false; } });
+    const pre = (craft, decoys) => { const o = { ...JSON.parse(JSON.stringify(s)), v: lureStep + 1, craft: { ...s.craft, decoy: craft }, decoys }; delete o.nexus.lure; return upgradeSave(o); };
+    const a = pre(2, []), b = pre(0, [g.decoys[0].i]), c = pre(0, []);
+    const ag = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: a });
+    check('S-77b2 decoy: a save before Lure with stock 2 loads Lure 1 + stock 2; one placed loads Lure 1; none loads Lure 0',
+      lureStep >= 0 && a.nexus.lure === 1 && ag.nexusLevels.lure === 1 && ag.craft.decoy === 2 && b.nexus.lure === 1 && c.nexus.lure === 0,
+      JSON.stringify({ lureStep, a: a.nexus.lure, stock: ag.craft.decoy, b: b.nexus.lure, c: c.nexus.lure }));
     const nexusCell = Math.floor(h.nexus.y / CELL) * h.world.w + Math.floor(h.nexus.x / CELL);
     const j = new Game({ seed: 4242, mode: 'drift', audio: quiet, save: upgradeSave({ ...JSON.parse(JSON.stringify(s)), decoys: [-1, 'x', 2.5, nexusCell, 0], craft: { decoy: 99 } }) });
     check('S-77a decoy: junk Decoys / stock in a save load as none / clamped (B-037)', j.decoys.length === 0 && j.craft.decoy === 2, JSON.stringify({ decoys: j.decoys.length, stock: j.craft.decoy }));
@@ -109,6 +125,27 @@ async function nodeChecks(check) {
     const P = lure('surge', { kind: 'flank' });
     check('S-77a decoy: a Pincer flank lures the same (its A* waits)', P.log.lured && P.log.arrive !== null && P.log.gone !== null, JSON.stringify(P.log));
   }
+  { // S-77b2 (D-218): a Tracer circling a Decoy on the core's cell takes nothing (Drift) / deals nothing (Surge), then touches
+    const held = mode => {
+      const L = room(mode), g = L.g; g.god = false; g.player.invuln = 0;
+      Object.assign(g.cargo, { shard: 40 }); const hull = g.player.integrity;
+      const dc = makeDecoy(g.world, cell(L, 2, 6)); g.decoys.push(dc);
+      const e = makeTracer(g, L.ox + 5, L.oy + 6); g.hunters.push(e);
+      let during = null, arrive = null;
+      for (let t = 0; t < DECOY_HOLD_S + 3; t += 1 / 60) {
+        const was = { shard: g.cargo.shard, hull: g.player.integrity, taken: g.hunt.taken || 0 }; // the frame the Decoy is spent frees it
+        frame(L);
+        if (arrive === null && dc.hold !== null) arrive = t;
+        if (during === null && !g.decoys.includes(dc)) during = was;
+      }
+      return { arrive, during, hull, after: { shard: g.cargo.shard, hull: g.player.integrity, met: e.met || !g.hunters.includes(e) || e.flee > 0 } };
+    };
+    const D = held('drift'), S = held('surge');
+    check('S-77b2 decoy: a Tracer circling a Decoy on the core\'s cell takes nothing in Drift for the hold, then touches as before',
+      D.arrive !== null && D.during && D.during.shard === 40 && D.after.shard < 40, JSON.stringify(D));
+    check('S-77b2 decoy: the same in Surge: no damage for the hold, then it hits',
+      S.arrive !== null && S.during && S.during.hull === S.hull && S.after.hull < S.hull, JSON.stringify(S));
+  }
   { // a Glitch is not lured
     const L = room('surge'), g = L.g, dc = makeDecoy(g.world, cell(L, 14, 1)); g.decoys.push(dc);
     const gl = makeGlitch((L.ox + 14.5) * CELL, (L.oy + 3.5) * CELL, 1, 0); g.enemies.push(gl);
@@ -124,21 +161,29 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.evaluate(() => { try { localStorage.removeItem('lumencore.save.v1'); } catch {} });
   await pg.reload(); await pg.waitForTimeout(200);
   await newWorld(pg); await pg.waitForTimeout(300);
-  await pg.evaluate(() => { const g = window.__lumen.game; Object.assign(g.bank, { prism: 20, shard: 100 }); g.player.x = g.nexus.x; g.player.y = g.nexus.y; });
+  await pg.evaluate(() => { const g = window.__lumen.game; Object.assign(g.bank, { prism: 40, shard: 100 }); g.player.x = g.nexus.x; g.player.y = g.nexus.y; });
   await pg.waitForTimeout(100);
   const row = await pg.evaluate(() => {
     document.getElementById('matrix-btn').click();
     document.querySelector('#matrix .tabs button[data-tab="craft"]').click();
-    const r = document.querySelector('#upgrade-list [data-id="decoy"]');
-    if (!r) return null;
-    const btn = r.querySelector('.buy'), txt = btn.textContent.replace(/\s+/g, ' ').trim();
-    btn.click();
+    const craftRow = !!document.querySelector('#upgrade-list [data-id="decoy"]');
+    document.querySelector('#matrix .tabs button[data-tab="nexus"]').click();
+    const r = document.querySelector('#upgrade-list [data-id="lure"]');
+    return { craftRow, lure: r ? r.textContent.replace(/\s+/g, ' ').trim() : null };
+  });
+  check('S-77b2 decoy: the Craft tab has no Decoy row; the Nexus tab has a Lure row priced ▲30',
+    !!row && !row.craftRow && !!row.lure && /30/.test(row.lure), JSON.stringify(row));
+  if (process.env.DECOY_LURE_SHOT) { // 360 × 640: the Nexus tab with the Lure row
+    await pg.setViewportSize({ width: 360, height: 640 }); await pg.waitForTimeout(300);
+    await pg.screenshot({ path: process.env.DECOY_LURE_SHOT }); await pg.setViewportSize({ width: 1000, height: 700 });
+  }
+  const bought = await pg.evaluate(() => {
+    document.querySelector('#upgrade-list [data-id="lure"] .buy').click();
     const g = window.__lumen.game;
     document.getElementById('matrix-close').click();
-    return { txt, stock: g.craft.decoy, bank: { prism: g.bank.prism, shard: g.bank.shard } };
+    return { lure: g.nexusLevels.lure, stock: g.craft.decoy, prism: g.bank.prism };
   });
-  check('S-77a decoy: the Craft tab shows a Decoy row priced ▲4 ◆20; buying it puts one in stock',
-    !!row && /▲4/.test(row.txt) && /◆20/.test(row.txt) && row.stock === 1 && row.bank.prism === 16 && row.bank.shard === 80, JSON.stringify(row));
+  check('S-77b2 decoy: buying Lure in the Nexus tab builds it and fills the stock to 2', bought.lure === 1 && bought.stock === 2 && bought.prism === 10, JSON.stringify(bought));
   await pg.evaluate(() => {
     const L = window.__lumen, g = L.game, w = g.world;
     L.dev.teleport(40, 0.6);
@@ -161,7 +206,7 @@ async function browserChecks(browser, url, check, errors, shot) {
   const held = await pg.evaluate(() => { const g = window.__lumen.game, s = g.decoys[0]; return { hold: s ? s.hold : null, lured: g.hunters.some(e => e.lure === s) }; });
   if (shot) await pg.screenshot({ path: shot });
   check('S-77a decoy: B places a Decoy (button shows ◈); a Tracer in sight circles it in the live game',
-    glyph === '◈' && r.decoys === 1 && r.stock === 0 && held.hold > 1 && held.lured, JSON.stringify({ glyph, r, held }));
+    glyph === '◈' && r.decoys === 1 && r.stock === 1 && held.hold > 1 && held.lured, JSON.stringify({ glyph, r, held }));
   await pg.close();
 }
 
