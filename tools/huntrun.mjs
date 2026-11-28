@@ -89,7 +89,7 @@ function run(seed, mode, ringKey, hunters, echo = false, decoy = false) {
     if (g.echo) { ticks++; if (echoDoing(g, g.echo) === 'defend') defend++; }
     for (const e of g.hunters) if (!seen.has(e)) { // a new hunter: fly its ghost Glitch now
       seen.add(e); const p = g.player;
-      spawns.push({ e, ghost: e.hunter === 'tracer' ? ghostReaches(g.world, e.x, e.y, e.speed / TRACER_SPEED, { x: p.x, y: p.y, r: p.r }) : null });
+      spawns.push({ e, ghost: e.hunter === 'tracer' || e.hunter === 'feint' ? ghostReaches(g.world, e.x, e.y, e.speed / TRACER_SPEED, { x: p.x, y: p.y, r: p.r }) : null });
     }
     for (const s of spawns) if (!s.end) { // how each one ended before contact: beamed down, gave up (stall), off the field
       const e = s.e;

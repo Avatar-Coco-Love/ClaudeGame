@@ -7,7 +7,7 @@ It sidesteps a beam pointed at it, so aim, tunnels and beam modes start to matte
 Drift and Surge get the same Feint, with each mode's touch (D-002, D-201).
 One slice per PR (D-063), each usable end to end (D-139). M19 → v1.14 on the last slice.
 
-## S-78a — The Feint: spawn, read, sidestep (both modes)
+## S-78a — The Feint: spawn, read, sidestep (both modes) — built (Build 183, D-226)
 - **Where:** from the Deep out (ring ≥ 2), the second of `TRACER_CAP_DEEP`'s two slots is a Feint, not a Tracer (D-225):
   the same count of hunters, a harder one. Spawn, field walk, give-up, Nexus repel, touch (Surge `TRACER_DMG` + capped
   tier step, Drift `TRACER_TAKE` worth + flee), Decoy lure and death are the Tracer's (`hunter.js` runs it as

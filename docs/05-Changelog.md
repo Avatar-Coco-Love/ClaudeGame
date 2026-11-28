@@ -3,6 +3,11 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.13.124 — 2026-11-28
+- **The Feint** arrives: from the Deep out, the second hunter on your trail can be a violet diamond that reads your beam.
+  Point the beam at it and a white chevron flashes on one side, then it darts that way. In a 1-wide tunnel it has nowhere
+  to go: pin it there. Same Feint in Drift and Surge.
+
 ## v1.13.123 — 2026-11-28
 - No change in play yet: the next enemy is chosen. **The Feint** will read your beam and sidestep it, in both modes;
   pin it in a tunnel, sweep it with Wide or Arc, or let your Echo or a Decoy deal with it. Planned for v1.14.

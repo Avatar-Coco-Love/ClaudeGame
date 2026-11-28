@@ -52,3 +52,11 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
 - Picked "reads your beam" (D-224): S-78a…d in `07-Build-Specs-23.md`; it takes the Deep's second slot (D-225). Q-047.
 - `05` neared 8 KB: v1.11.99…v1.11.106 archived word for word (`archive/changelog-v1.11.99-v1.11.106.md`). New `06` part 34.
 
+## Session 183 — Build: S-78a the Feint (v1.13.124, D-226)
+- `feint.js` (read, tell, dash, draw); `hunter.js` calls it once while it walks the field. From the Deep out the 2nd slot
+  is a Feint while a Tracer lives (`slotKind`). New stream `rng.feint` (side, only when both are open).
+- Ice cyan failed `colours.cjs` (feint / Pincer ΔE 17, deuteranopia): the new check bit. Violet `150, 0, 255` clears ≥ 36.
+- Steering the dash in (`TRACER_STEER`) reached full speed only after the dash: the velocity is set at once (D-226).
+- `feint.cjs` (7 node + 1 browser): tell 0.167 s then |vy| 250 (speed 114), 1-wide tunnel 0 dashes and killed,
+  cooldown re-read at 1.62 s, sides vary over 10 seeds, Drift = Surge path. `huntrun` counts a Feint as a Tracer for reach.
+- Screenshot (`FEINT_SHOT`, the Deep): violet diamond, white chevron above it; readable, a little dim. Smoke 768/768.

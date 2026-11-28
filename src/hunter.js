@@ -11,10 +11,11 @@ import {
   CELL, GLITCH_R, GLITCH_TIER, GLITCH_GIVE_UP_S, GLITCH_FADE_S, GLITCH_HIT_CD_S, GLITCH_KNOCKBACK,
   GLITCH_NEXUS_MARGIN, GLITCH_NEXUS_REPEL, GLITCH_NEXUS_BURN, NEXUS_RADIUS, RESOURCE,
   TRACER_S, TRACER_RETRY_S, TRACER_SPAWN, TRACER_CAP, TRACER_CAP_DEEP, TRACER_SPEED, TRACER_STEER, TRACER_LINE, TRACER_DMG,
-  TRACER_TAKE, TRACER_RETURN, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB,
+  TRACER_TAKE, TRACER_RETURN, TRACER_FLEE_MUL, HUNTER_TIER_MAX, HUNTER_LOOT_SHARDS, HUNTER_PRISM_CHANCE, ORE_WORTH, TRACER_FLEE_S, TRACER_FLEE_NODES, TRACER_TRAIL, TRACER_RGB, PINCER_S, PINCER_AVOID_R, PINCER_AVOID_COST, PINCER_SPLIT, PINCER_DMG, PINCER_PART_S, PINCER_RGB, FEINT_DASH, FEINT_RGB,
 } from './config.js';
 import { flankStep, drawPincers } from './pincer.js';
 import { lureGoal } from './decoy.js';
+import { feintStep, feintCalm, drawFeints } from './feint.js';
 import { coreField, fieldAt, downhill, uphill, ringCells, aStar } from './flow.js';
 import { glitchTier } from './glitch.js';
 import { BITE_ORDER } from './burrower.js';
@@ -25,6 +26,7 @@ export function makeHunt(game) {
   return {
     timer: gap(game), pincer: pgap(game), off: false, spawned: 0, reached: 0, gaveUp: 0, kills: 0, taken: 0, runs: 0,
     pairs: 0, frame: 0, searchFrame: -1, searches: 0, capped: 0, nodesMax: 0, // S-73a: pincer pairs and flank searches
+    feints: 0, reads: 0, dashes: 0, pinned: 0, // S-78a: Feints spawned, beam reads, dashes, reads with no open side
   };
 }
 const gap = game => TRACER_S[0] + game.rng.tracer() * TRACER_S[1];
@@ -62,16 +64,16 @@ export function makeTracer(game, cx, cy, kind = 'tracer') {
   const x = (cx + 0.5) * CELL, y = (cy + 0.5) * CELL, hp = T.hp[0] + tier * T.hp[1];
   return {
     hunter: kind, x, y, r: GLITCH_R, vx: 0, vy: 0, tier, hp, maxHp: hp, speed: TRACER_SPEED * (T.speed[0] + tier * T.speed[1]),
-    dmg: (kind === 'tracer' ? TRACER_DMG : PINCER_DMG) + Math.min(tier, HUNTER_TIER_MAX) * T.dmg[1], flash: 0, hitCd: 0.5, spin: 0, best: Infinity, stall: 0, flee: 0, carry: [], trail: [cx, cy], met: false,
+    dmg: (kind === 'tracer' || kind === 'feint' ? TRACER_DMG : PINCER_DMG) + Math.min(tier, HUNTER_TIER_MAX) * T.dmg[1], flash: 0, hitCd: 0.5, spin: 0, best: Infinity, stall: 0, flee: 0, carry: [], trail: [cx, cy], met: false,
   };
 }
 
 /** Put a Tracer out now (dev.tracer, tests); returns it or null. Ignores the ring, cap and timer. */
-export function spawnTracer(game) {
+export function spawnTracer(game, kind = 'tracer') {
   const f = coreField(game), c = spawnCell(game, f);
   if (!c) return null;
-  const t = makeTracer(game, c[0], c[1]);
-  game.hunters.push(t); game.hunt.spawned++;
+  const t = makeTracer(game, c[0], c[1], kind);
+  game.hunters.push(t); game.hunt.spawned++; if (kind === 'feint') game.hunt.feints++;
   return t;
 }
 
@@ -90,6 +92,9 @@ export function spawnPincer(game) {
   return [lead, flank];
 }
 const isPincer = e => e.hunter === 'lead' || e.hunter === 'flank';
+const isSlot = e => e.hunter === 'tracer' || e.hunter === 'feint'; // S-78a (D-225): the Tracer slots
+/** S-78a (D-225): from the Deep out the second slot is a Feint: one while a Tracer lives and no Feint does. */
+const slotKind = (game, ring) => ring >= 2 && game.hunters.some(e => e.hunter === 'tracer') && !game.hunters.some(e => e.hunter === 'feint') ? 'feint' : 'tracer';
 
 /** Every hunter gone, lootless (core death, the ending). What a Drift Tracer took is lost with it. */
 export function clearHunters(game) { game.hunters.length = 0; }
@@ -100,8 +105,8 @@ export function updateHunters(game, dt) {
   if (!h || h.off) return;
   if (game.endSeq) { clearHunters(game); return; }
   const ring = game.ringNow, cap = ring >= 2 ? TRACER_CAP_DEEP : TRACER_CAP;
-  const live = game.hunters.filter(e => e.hunter === 'tracer').length;
-  if (ring >= 1 && !game.wake && live < cap && (h.timer -= dt) <= 0) h.timer = spawnTracer(game) ? gap(game) : TRACER_RETRY_S;
+  const live = game.hunters.filter(isSlot).length;
+  if (ring >= 1 && !game.wake && live < cap && (h.timer -= dt) <= 0) h.timer = spawnTracer(game, slotKind(game, ring)) ? gap(game) : TRACER_RETRY_S;
   if (ring >= 2 && !game.wake && !game.hunters.some(isPincer) && (h.pincer -= dt) <= 0) h.pincer = spawnPincer(game) ? pgap(game) : TRACER_RETRY_S;
   h.frame++;
   if (!game.hunters.length) return;
@@ -119,7 +124,7 @@ export function updateHunters(game, dt) {
     const tc = e.trail.length;
     if (e.hunter === 'tracer' && (e.trail[tc - 2] !== cx || e.trail[tc - 1] !== cy)) { e.trail.push(cx, cy); if (e.trail.length > TRACER_TRAIL * 2) e.trail.splice(0, 2); }
     const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy) || 1;
-    let gx, gy;
+    let gx, gy, dash = null;
     if (e.flee > 0) { // Drift, after a touch: up the field, away from the core
       e.flee -= dt;
       if (fd < 0 || e.flee <= 0) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; }
@@ -128,7 +133,7 @@ export function updateHunters(game, dt) {
     } else {
       if (fd < 0) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; } // off the field: gives up (D-017's fade)
       const lure = lureGoal(game, e, dt); // S-77a: a Decoy in sight pulls it off the field (decoy.js); the flank's A* waits
-      if (lure) [gx, gy] = lure;
+      if (lure) { [gx, gy] = lure; feintCalm(e); }
       else {
         const seen = d <= TRACER_LINE * CELL && !game.world.raycast(e.x, e.y, dx / d, dy / d, d);
         const way = e.hunter === 'flank' ? flankStep(game, e, f, cx, cy, dt) : null; // S-73a: the flank's A* way, else the field
@@ -136,17 +141,20 @@ export function updateHunters(game, dt) {
         if (togo < e.best) { e.best = togo; e.stall = 0; } else if ((e.stall += dt) >= GLITCH_GIVE_UP_S) { e.fade = GLITCH_FADE_S; h.gaveUp++; continue; }
         const down = seen ? null : way || downhill(f, cx, cy);
         [gx, gy] = down ? [(down[0] + 0.5) * CELL, (down[1] + 0.5) * CELL] : [p.x, p.y];
+        if (e.hunter === 'feint') dash = feintStep(game, e, dt); // S-78a: it read the beam: sideways, not down the field
       }
     }
     let tx = gx - e.x, ty = gy - e.y; const td = Math.hypot(tx, ty) || 1; tx /= td; ty /= td;
+    if (dash) [tx, ty] = dash;
     const nd = Math.hypot(e.x - game.nexus.x, e.y - game.nexus.y);
     if (nd < NEXUS_RADIUS + GLITCH_NEXUS_MARGIN) { // the Nexus repels it like a Glitch
       tx = (e.x - game.nexus.x) / nd * GLITCH_NEXUS_REPEL; ty = (e.y - game.nexus.y) / nd * GLITCH_NEXUS_REPEL;
-      e.hp -= dt * GLITCH_NEXUS_BURN;
+      e.hp -= dt * GLITCH_NEXUS_BURN; dash = null;
     }
     const k = Math.min(1, dt * TRACER_STEER);
     const sp = e.speed * (e.flee > 0 ? TRACER_FLEE_MUL : 1); // S-74b (D-201): it runs faster than it hunts
-    e.vx += (tx * sp - e.vx) * k; e.vy += (ty * sp - e.vy) * k;
+    if (dash) { e.vx = tx * sp * FEINT_DASH; e.vy = ty * sp * FEINT_DASH; } // S-78a: the dash is at once, not steered into
+    else { e.vx += (tx * sp - e.vx) * k; e.vy += (ty * sp - e.vy) * k; }
     moveBody(game.world, e, e.vx * dt, e.vy * dt, true);
     e.spin = Math.atan2(e.vy, e.vx);
     if (e.flee <= 0 && !e.lure && d < e.r + p.r && e.hitCd <= 0) { // S-77b2 (D-218): a lured hunter never touches
@@ -196,7 +204,7 @@ function touch(game, e, ux, uy) {
   const took = biteWorth(game, TRACER_TAKE); // Drift: no damage; it snatches and runs (S-74b: by worth, D-201)
   e.carry.push(...took); h.taken += took.length;
   if (took.length) game.notify('tracer-take');
-  e.flee = TRACER_FLEE_S; e.vx = -ux * e.speed; e.vy = -uy * e.speed;
+  e.flee = TRACER_FLEE_S; feintCalm(e); e.vx = -ux * e.speed; e.vy = -uy * e.speed;
 }
 
 function die(game, e) {
@@ -204,7 +212,7 @@ function die(game, e) {
   h.kills++;
   const m = e.mate; // S-73a: one of a pair down: the other flees, then fades
   if (m && m.fade === undefined && m.hp > 0 && game.hunters.includes(m)) { m.flee = PINCER_PART_S; m.part = true; }
-  game.burst(e.x, e.y, 22, `rgb(${isPincer(e) ? PINCER_RGB : TRACER_RGB})`, 220); game.audio.enemyDie(); game.addShake(4);
+  game.burst(e.x, e.y, 22, `rgb(${isPincer(e) ? PINCER_RGB : e.hunter === 'feint' ? FEINT_RGB : TRACER_RGB})`, 220); game.audio.enemyDie(); game.addShake(4);
   const kept = Math.floor(e.carry.length * (1 - TRACER_RETURN)); // D-206: it keeps its most valuable part (carry is best first)
   for (const k of e.carry.slice(kept)) game.spawnPickup(e.x, e.y, k); // the rest, back (a Ward's kill too: D-154, D-206)
   if (game.mode !== 'surge') return; // Drift: only what it took (D-152)
@@ -233,6 +241,7 @@ export function drawHunters(R, ctx) {
   const list = R.game.hunters;
   if (!list || !list.length) return;
   if (list.some(isPincer)) drawPincers(R, ctx, list);
+  if (list.some(e => e.hunter === 'feint')) drawFeints(R, ctx, list);
   for (const e of list) {
     if (e.hunter !== 'tracer') continue;
     const fade = e.fade !== undefined ? Math.max(0, e.fade / GLITCH_FADE_S) : 1, tr = e.trail, n = tr.length / 2;

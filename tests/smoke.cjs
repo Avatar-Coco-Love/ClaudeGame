@@ -117,6 +117,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
   await require('./tracer.cjs').nodeChecks(check).catch(e => check('S-72 tracer checks ran', false, e.message));
   await require('./decoy.cjs').nodeChecks(check).catch(e => check('S-77a decoy checks ran', false, e.message));
   await require('./pincer.cjs').nodeChecks(check).catch(e => check('S-73a pincer checks ran', false, e.message));
+  await require('./feint.cjs').nodeChecks(check).catch(e => check('S-78a feint checks ran', false, e.message));
   times.push(['(node phase)', Date.now() - t0]);
   const tb = Date.now();
   await new Promise(r => server.listen(0, r));
@@ -420,6 +421,7 @@ const check = (name, ok, detail = '') => { results.push({ name, ok }); console.l
     await T('tracer', () => require('./tracer.cjs').browserChecks(browser, url, check, errors, process.env.TRACER_SHOT).catch(e => check('S-72 tracer browser checks ran', false, e.message)));
     await T('decoy', () => require('./decoy.cjs').browserChecks(browser, url, check, errors, process.env.DECOY_SHOT).catch(e => check('S-77a decoy browser checks ran', false, e.message)));
     await T('pincer', () => require('./pincer.cjs').browserChecks(browser, url, check, errors, process.env.PINCER_SHOT).catch(e => check('S-73a pincer browser checks ran', false, e.message)));
+    await T('feint', () => require('./feint.cjs').browserChecks(browser, url, check, errors, process.env.FEINT_SHOT).catch(e => check('S-78a feint browser checks ran', false, e.message)));
     await T('rift', () => require('./rift.cjs').browserChecks(browser, url, check, errors, process.env.RIFT_SHOT).catch(e => check('S-57a rift browser checks ran', false, e.message)));
     await T('lens', () => require('./lens.cjs').browserChecks(browser, url, check, errors, process.env.LENS_SHOT).catch(e => check('S-63 Lens browser checks ran', false, e.message)));
     await T('feats', () => require('./feats.cjs').browserChecks(browser, url, check, errors, process.env.FEATS_SHOT).catch(e => check('S-66a Feats browser checks ran', false, e.message)));

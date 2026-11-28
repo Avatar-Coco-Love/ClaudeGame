@@ -42,7 +42,7 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13, M19 → 1.14. Debt lives in `
 - Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.
 
 ## M19 — The Feint: a hunter that reads your beam (D-224, D-225, `07-Build-Specs-23.md`) → v1.14
-- **S-78a** the Feint: the Deep's second hunter slot; reads a beam on it, tells, dashes sideways (never in a 1-wide tunnel).
+- ✅ **S-78a** (Build 183, v1.13.124, D-226) the Feint: the Deep's second hunter slot; reads a beam on it, tells, dashes sideways (never in a 1-wide tunnel).
 - **S-78b** `huntrun --feint` measure as a report: kill rate below the Tracer's and > 0; D-206's gate still passes.
 - **S-78c** first-sight toast (saved flag), map legend + minimap dot, the Echo's Defend targets it.
 - **S-78d** the measure's bounds join smoke. **M19 done.**

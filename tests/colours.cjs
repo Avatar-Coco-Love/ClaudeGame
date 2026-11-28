@@ -77,7 +77,11 @@ function groups() {
   const rgbOf = k => (src.match(new RegExp(`${k}_RGB = '([^']+)'`)) || [])[1], decoy = rgbOf('DECOY') && { id: 'decoy', c: rgbOf('DECOY'), shape: 'cell' };
   const lure = ['WARD', 'TRACER', 'PINCER'].filter(rgbOf).map(k => ({ id: k.toLowerCase(), c: rgbOf(k), shape: 'cell' }));
   if (decoy) for (const o of lure) pairs.push([decoy, o]);
-  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length, ring: ring.length, pip: pip ? under.length + 1 : 0, decoy: decoy ? lure.length : 0 } };
+  // S-78a: the Feint's electric violet vs the Tracer, Pincer, Decoy and Ward it hunts beside (colour alone; its diamond aside).
+  const feint = rgbOf('FEINT') && { id: 'feint', c: rgbOf('FEINT'), shape: 'cell' };
+  const kin = ['TRACER', 'PINCER', 'DECOY', 'WARD'].filter(rgbOf).map(k => ({ id: k.toLowerCase(), c: rgbOf(k), shape: 'cell' }));
+  if (feint) for (const o of kin) pairs.push([feint, o]);
+  return { pairs, shapes, counts: { anomaly: anomaly.length, res: res.length, glitch: glitch.length, ring: ring.length, pip: pip ? under.length + 1 : 0, decoy: decoy ? lure.length : 0, feint: feint ? kin.length : 0 } };
 }
 
 function run() {
@@ -85,6 +89,7 @@ function run() {
   out.push({ name: 'colours: read 3 Anomaly kinds, 5 pickups, 4 Glitch tiers + Spitter, Shoal + Kiln edges, the Pincer pip vs 6 edges + Prism from config.js',
     ok: counts.anomaly === 3 && counts.res === 5 && counts.glitch === 4 && counts.ring === 4 && counts.pip === 7, detail: JSON.stringify(counts) });
   out.push({ name: 'colours: read the Decoy (S-77a) and the Ward, Tracer and Pincer it must read apart from', ok: counts.decoy === 3, detail: JSON.stringify(counts) });
+  out.push({ name: 'colours: read the Feint (S-78a) and the Tracer, Pincer, Decoy and Ward it must read apart from', ok: counts.feint === 4, detail: JSON.stringify(counts) });
   const missing = Object.keys(shapes).filter(k => !shapes[k]);
   out.push({ name: 'colours: each claimed shape is still in the draw code (hexagram, ◆ ▲ ● ≈ ⬟ pickups, Glitch star, Spitter rhombus)',
     ok: !missing.length, detail: missing.join(', ') });
