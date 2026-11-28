@@ -19,3 +19,14 @@ alternatives). D-224 on.
   the dodge, and both world sizes (160 has no Shoal) meet it. S-78b measures it against D-206's gate.
 - Rejected: Shoal / Kiln only (a 160 world never meets it), a third slot (more pressure, not a smarter foe; it would
   move D-206's band before the dodge does).
+
+### D-226 — S-78a as built: violet diamond, one Feint at a time, the dash set at once (Build 183)
+- Colour: electric violet `150, 0, 255`. Ice cyan (the first pick) failed `colours.cjs` against the Pincer under
+  deuteranopia (ΔE 17); a grid search over bright hues: violet clears Tracer / Pincer / Decoy / Ward by ≥ 36 in all four
+  visions, and the diamond outline (not the Tracer's arrow) carries it beside the Tracer's violet.
+- Slot: from the Deep out the next spawn is a Feint while a Tracer lives and no Feint does, else a Tracer: at most one
+  of each, still `TRACER_CAP_DEEP` 2. The dash sets the velocity at once (`FEINT_DASH` × speed): steered in at
+  `TRACER_STEER` it would reach full speed only after the 0.35 s dash. Body collision as ever; the Nexus repel wins.
+- A lured or fleeing Feint drops its tell / dash; the cooldown runs only while it walks the field. No trail (the Tracer's).
+- Rejected: a cyan / mint hue (fails beside Ward lime or the Pincer for colour-blind players), steering the dash (no
+  visible sidestep), a Feint able to fill both Deep slots (two readers: more than D-225's "a harder one").

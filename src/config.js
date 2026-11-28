@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.13.123';
+export const VERSION = '1.13.124';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -512,3 +512,10 @@ export const PINCER_S = [70, 30], PINCER_SPLIT = 10, PINCER_SEARCH_S = 0.5, PINC
 export const PINCER_APART = 4, PINCER_LEAD_CELLS = 8, PINCER_LOOK = 8, PINCER_DMG = 6, PINCER_PART_S = 3, PINCER_AVOID_R = 2, PINCER_AVOID_COST = 8;
 export const PINCER_RGB = '255, 110, 200'; // rose-violet
 export const PINCER_PIP = '255, 255, 255', PINCER_PIP_R = 3; // S-73b (D-197): the white pip (lead: filled r px; flank: a ring)
+// S-78a (M19, D-224, D-225) the Feint (feint.js): from the Deep out the second Tracer slot (TRACER_CAP_DEEP) is a Feint, a
+// Tracer that reads the beam. Not fleeing, not lured, not mid-tell / dash and off cooldown: a beam ray (or a charging Pulse's
+// aim line) passing within FEINT_READ cells of its centre, ≤ the ray's length + 1 cell from its origin, starts a white
+// chevron tell (FEINT_TELL_S) on the open perpendicular side (`rng.feint` when both are open; neither: no dash), then it
+// dashes that way at FEINT_DASH × its speed for FEINT_DASH_S; FEINT_CD_S cooldown from the dash's end. Violet diamond.
+export const FEINT_READ = 0.6, FEINT_TELL_S = 0.15, FEINT_DASH = 2.2, FEINT_DASH_S = 0.35, FEINT_CD_S = 1.6;
+export const FEINT_RGB = '150, 0, 255'; // electric violet (colours.cjs: ≥ 25 ΔE from Tracer / Pincer / Decoy / Ward)
