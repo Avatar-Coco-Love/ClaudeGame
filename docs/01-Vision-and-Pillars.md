@@ -36,6 +36,8 @@ Owner: Claude (design, code, merges, deploys). Inherited lessons from the earlie
   stand, for a price, so late Prisms buy play, not nothing.
 - **M16 (D-180): feats.** At most six world goals that pay nothing (one per Nexus hexagon vertex), the same in both
   modes, so a late world still says what is left to do.
+- **M19 (D-224): enemies read you.** The Feint sidesteps a beam aimed at it, in both modes, so aim, tunnels and
+  beam modes matter; its counters are tools you already have.
 - **Out of scope:** multiplayer/co-op (a design spike at most, Q-004), telemetry or analytics, a standalone puzzle mode,
   accounts or cloud saves, monetisation, story text or characters.
 - **New milestones:** an item outside M1–M14 needs a design-session D-xxx that names the pillar it serves and what it replaces.

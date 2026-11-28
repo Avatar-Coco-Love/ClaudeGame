@@ -1,7 +1,7 @@
-# 04 — Roadmap, part 5: M16–M18 (owner's Echo / hunter ask first, D-181)
+# 04 — Roadmap, part 5: M16–M19 (owner's Echo / hunter ask first, D-181)
 
 Continues `04-Roadmap-3.md` (M10–M15). Order fixed by D-181: one milestone closes its loop before the next starts.
-VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.md`.
+VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13, M19 → 1.14. Debt lives in `04-Roadmap-4.md`.
 
 ## M16 — Echo minds (D-181, `07-Build-Specs-19.md`) → v1.11
 - ✅ **S-69** (session 145, v1.10.86, D-184) Echo orders Mine / Defend / Auto (Auto: threat → Defend, 2 s hold → Mine); worth-first ore, soonest-threat first.
@@ -30,8 +30,8 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-77b** `huntrun --decoy` measure, shipped as a report: no setting in D-213's bounds passes (Build 173, v1.12.114, D-214). Q-044 count pip: cut (D-213).
 - ✅ **S-77b2** a held hunter never touches; Decoys from the Nexus Lure level (▲ 30, refilled as items bank, D-220); gate PASS: saving Drift 62.5 % / Surge 57.4 %, ratio 1.089 (Build 178, v1.12.119, D-218).
 - Pincer white pip: folded into S-73b (D-197).
-- **After M18, pick one next enemy tier** by play-test (D-196); leaning "reads your beam" (dodges the line). Also
-  weighed: a Nexus-mouth camper, packs that retreat when hurt (both Surge-only today).
+- ✅ Next enemy tier picked by play-test (Design 182, D-224): the Feint, M19 below. Parked: a Nexus-mouth camper, packs
+  that retreat when hurt (Surge-only in effect while Drift hunters steal).
 - Decoy: settled yes (D-208), S-77 above. Cut (D-196): traps / mines (a second Ward), a push beam, a shield pulse.
 
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
@@ -40,3 +40,10 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 - ✅ **S-67** (Build 180, v1.12.121, D-222) `featrun.mjs` gate: Charted per size (256 = 20 %, 160 = 40 %); Rift runner check from `eventrun --call`.
 - ✅ **S-68** (Build 181, v1.13.122, D-223) The Nexus lights one outer-ring vertex per feat done; a new one flashes. **M18 done.**
 - Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.
+
+## M19 — The Feint: a hunter that reads your beam (D-224, D-225, `07-Build-Specs-23.md`) → v1.14
+- **S-78a** the Feint: the Deep's second hunter slot; reads a beam on it, tells, dashes sideways (never in a 1-wide tunnel).
+- **S-78b** `huntrun --feint` measure as a report: kill rate below the Tracer's and > 0; D-206's gate still passes.
+- **S-78c** first-sight toast (saved flag), map legend + minimap dot, the Echo's Defend targets it.
+- **S-78d** the measure's bounds join smoke. **M19 done.**
+- Cut (D-224): a movement-predicting reader, a second reader kind, a Feint that dodges the Echo or Wards (Q-047).
