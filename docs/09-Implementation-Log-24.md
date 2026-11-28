@@ -80,4 +80,4 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
 - `eventrun --call` prints pockets emptied: 1.6–2.4 per 10 min a ring; `FEAT_RIFTS` 5 ≈ 21–31 min (D-219).
 - Observed: the hunters' cost gate fails on 16 seeds (pooled Drift / Surge 0.628; 8 seeds pass) → Q-046.
 - Specs: S-77b2 (`07-…-22`), S-67 split into a rifts check + chart route, S-68 tied to `nexusRings` (`07-…-18`).
-- Smoke: see the PR.
+- Smoke 746/746.
