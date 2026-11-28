@@ -117,6 +117,20 @@ async function browserChecks(browser, url, check, errors, shots) {
   }
   check('S-75 / B-112 notched phone: the arc keeps every button ≥ 8 px inside the safe-area insets, all rules still met',
     ins.length === 0, ins.join(' | '));
+  // Audit 179 (debt from audit 169): the arc re-lays when the bank panel grows. The panel's inline size stands in for a
+  // tall one (Anomaly chips, large text); the real trigger is Surge showing the Integrity row. Old key: never re-laid.
+  await pg.setViewportSize({ width: 390, height: 844 }); await pg.waitForTimeout(250);
+  await pg.evaluate(() => { const tl = document.querySelector('.top-left'); tl.style.minHeight = '560px'; tl.style.width = '300px'; });
+  await pg.waitForTimeout(150);
+  const surge = m => pg.evaluate(m => { window.__lumen.game.setMode(m); document.getElementById('integrity-row').classList.toggle('hidden', m !== 'surge'); }, m); // as the Matrix toggle
+  await surge('surge'); await pg.waitForTimeout(300);
+  const tall = await measure(pg), tk = Object.values(tall.keep).filter(Boolean);
+  if (shots) await pg.screenshot({ path: `${shots}/arc-tall-panel.png` });
+  const tbad = judge(tall.btns.map(q => ({ x: (q.l + q.r) / 2, y: (q.t + q.b) / 2 })), 390, 844, tk, 5);
+  check('audit 179: Surge\'s Integrity row (a taller bank panel) re-lays the thumb arc clear of it',
+    tbad.length === 0 && !tall.hidden.length, tbad.join(', ') + ` bank ${JSON.stringify(tall.keep.bank)}`);
+  await pg.evaluate(() => { const tl = document.querySelector('.top-left'); tl.style.minHeight = tl.style.width = ''; });
+  await surge('drift'); await pg.waitForTimeout(200);
   // ⟂ names the new mode above itself for 1 s on a switch (touch: the button is glyph-only)
   await pg.setViewportSize({ width: 390, height: 844 }); await pg.waitForTimeout(200);
   const nm = () => pg.evaluate(() => { const n = document.getElementById('mode-name'), b = n.getBoundingClientRect(), m = document.getElementById('mode-btn').getBoundingClientRect();

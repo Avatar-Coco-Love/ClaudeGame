@@ -6,7 +6,7 @@ const idle = (place = false) => ({ move: { x: 0, y: 0 }, aim: null, fire: false,
 
 async function nodeChecks(check) {
   const { Game } = await import('../src/game.js');
-  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
   const { T, CELL, RELAY_COST, RELAY_MAX, RELAY_R, RELAY_GAP } = await import('../src/config.js');
   const { craftRelay, craftBeacon, placeRefusal, placeKind } = await import('../src/craft.js');
   const fresh = (mode = 'drift') => { const g = new Game({ seed: 77, mode, audio }); g.spawnTimer = 1e9; return g; };
@@ -83,7 +83,8 @@ async function nodeChecks(check) {
   check('Relays, carried stock and craft.last survive save + load (S-22)', h.relays.map(r => r.i).join() === g.relays.map(r => r.i).join()
     && h.craft.relay === 1 && h.craft.last === 'relay' && h.relays[0].x === g.relays[0].x, JSON.stringify({ relays: h.relays.length, craft: h.craft }));
   const old = new Game({ seed: 77, mode: 'drift', audio, size: 160 }).toSave(); // a format-17 save is 160 (S-46b2)
-  old.v = SAVE_FORMAT - 1; old.craft = { beacon: 2 }; delete old.relays;
+  // audit 179: the format before Relays is found by the step that adds `relays`, not SAVE_FORMAT - 1 (B-114)
+  old.v = STEPS.findIndex(f => { try { return 'relays' in f({ craft: {} }); } catch { return false; } }) + 1; old.craft = { beacon: 2 }; delete old.relays;
   const up = upgradeSave(old), o = new Game({ seed: 77, mode: 'drift', audio, save: up });
   check('the previous save format loads with no Relays, its beacons kept (S-22, D-005)', up.v === SAVE_FORMAT && o.relays.length === 0 && o.craft.relay === 0
     && o.craft.beacon === 2 && o.craft.last === 'beacon', JSON.stringify({ v: up.v, craft: o.craft }));

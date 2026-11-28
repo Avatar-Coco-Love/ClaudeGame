@@ -1,5 +1,5 @@
 // S-77a (D-208, D-212) Decoy: a placeable that lures hunters. S-77b2 (D-218): it comes from the Nexus Lure level (no craft
-// row, no per-use price): buying Lure and the end of every deposit fill the carried stock (`refillDecoys`). Placed with B / ✦ (craft.js `tryPlace` asks here) on open floor outside the Nexus disc. A hunter (Tracer,
+// row, no per-use price): buying Lure and every banked item (D-220, Nexus or Relay) fill the carried stock (`refillDecoys`). Placed with B / ✦ (craft.js `tryPlace` asks here) on open floor outside the Nexus disc. A hunter (Tracer,
 // Pincer lead or flank) that is not fleeing and sees a placed Decoy within DECOY_R cells (no rock between) leaves the field
 // and steers straight at it (hunter.js asks `lureGoal` once a frame; the flank's A* waits; no second field, D-198). Within
 // DECOY_NEAR cells it circles the Decoy (while `e.lure` is set it never touches the core, S-77b2); DECOY_HOLD_S after the first arrival the Decoy is spent (removed, a small burst,

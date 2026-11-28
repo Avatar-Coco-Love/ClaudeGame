@@ -15,3 +15,17 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
   is spent on the first frame (NaN clock); stubs now carry it.
 - Screenshot (360 × 640, Nexus tab): the Lure row sits under Lens, ▲30, fits; viewed.
 - Smoke 750/750.
+
+## Session 179 — Audit: B-116 arc key, `SAVE_FORMAT - n` banned, 09 archive (v1.12.120, D-221)
+- No subagent tool: sweep in-session, newest code first (`decoy.js` S-77b2, `feats.js`, `hunter.js` contact, `boss.js`
+  refund). Edge cases: a Decoy refunded or spent mid-lure releases its hunters before the contact check; death / mode
+  switch keep Decoys. No new gameplay bug. Drift: `decoy.js` header still said "end of every deposit" (D-220); fixed.
+- Debt two audits carried first (D-144). **B-116 (fixed):** the thumb arc's re-layout key ignored the bank panel, so a
+  taller panel never moved the arc. Measured 390 × 844: the top slots sit at y 539–595, x 285–382; a panel to y 572
+  and x 312 covers one. `arcKey` adds the panel's hidden-row count; the new `thumbarc.cjs` check FAILs on the old key.
+- Build 175 debt: `echoorder` / `relay` / `echolevels` built "old" saves as `SAVE_FORMAT - 1` (format 27, not the
+  10 / 15 / 24 their comments meant); now found by their step. `saveformat.cjs` bans the pattern (FAILs on the old three).
+- D-215…D-220 vs code: match (D-220 supersedes D-218's refill wording). Workflow review: D-221.
+- `09` sessions 169–173 archived word for word (`archive/2026-11-28-09-sessions-169-173.md`).
+- Pitfall: a "baseline" smoke started before editing reads the edited tree; it is no baseline. Run it after.
+- Smoke 751/751. Screenshot (390 × 844, Surge, stand-in tall panel): the arc sits clear below it; viewed.

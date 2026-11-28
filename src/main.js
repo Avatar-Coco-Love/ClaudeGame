@@ -27,7 +27,7 @@ import { registerOffline } from './pwa.js';
 import { setupKeys } from './keysui.js';
 import { Quality, GRAPHICS } from './quality.js';
 import { MapView } from './mapview.js';
-import { layoutArc, ARC_ORDER } from './thumbarc.js';
+import { layoutArc, arcKey } from './thumbarc.js';
 
 const SAVE_KEY = 'lumencore.save.v1';
 const $ = id => document.getElementById(id);
@@ -173,7 +173,7 @@ function hint() {
 
 // S-75: re-lay the touch thumb arc only when what it depends on changes (touch, shown buttons, viewport, text size).
 function placeArc() {
-  const k = [input.usingTouch, innerWidth, innerHeight, settings.largeText, ...ARC_ORDER.map(id => $(id).classList.contains('hidden'))].join('|');
+  const k = arcKey(document, input.usingTouch, innerWidth, innerHeight, settings.largeText); // audit 179: + the bank panel's rows
   if (k !== lastArc) { lastArc = k; layoutArc(document, input.usingTouch); }
 }
 addEventListener('resize', () => { if (lastArc) placeArc(); });

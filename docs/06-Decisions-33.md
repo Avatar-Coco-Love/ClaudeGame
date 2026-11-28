@@ -34,3 +34,13 @@ alternatives). D-218 on.
 - A lair refund (B-113) returns a placed Decoy to the stock (capped), not ▲ / ◆: a Decoy has no price now.
 - Rejected: end-of-deposit refill (fails the band), a refill timer (a second clock), refunding the old craft price
   (free resources from a free item).
+
+### D-221 — Audit 179: an old save is found by its step (a check); the arc keys on the bank panel's rows
+- `saveformat.cjs` now also bans an old save built as `v: SAVE_FORMAT - n` / `.v = SAVE_FORMAT - n` in tests and tools
+  (B-114 twice: `decoy.cjs`, then `echoorder` / `relay` / `echolevels`, which tested format 27 while their comments
+  said 10 / 15 / 24). They find the step that adds their field, as `lens.cjs`. The check FAILs on the old three.
+- The thumb arc's re-layout key adds the count of hidden rows / chips in the bank panel (`arcKey`, class reads, no
+  layout), so a taller panel re-lays the arc (B-116, debt carried by audits 169 + 174, D-144).
+- Workflow review: too little: a debt line that names a rule broken twice waited an audit for its check (CLAUDE.md
+  already says "a check, not words": do it in the PR that finds the second break). Too much: none new.
+- Rejected: reading the panel's height each HUD update (a forced layout a frame), closing the arc debt unmeasured.

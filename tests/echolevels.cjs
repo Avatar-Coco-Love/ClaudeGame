@@ -10,7 +10,7 @@ async function nodeChecks(check) {
   const { T, CELL, UPGRADES, ECHO_LEVELS } = await import('../src/config.js');
   const { makeGlitch } = await import('../src/glitch.js');
   const { echoStat, buyEchoLevel, ECHO_ROWS } = await import('../src/echolevels.js');
-  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
   const audio = new Proxy({}, { get: () => () => {} });
 
   // Costs: refused before the Echo; ● 20, ● 35, then a 3rd buy refused; ● 165 for all three rows.
@@ -92,7 +92,9 @@ async function nodeChecks(check) {
     const g = new Game({ seed: 4242, mode: 'surge', audio }); Object.assign(g.echoLevels, { focus: 2, volley: 1, tether: 0 });
     const s = JSON.parse(JSON.stringify(g.toSave()));
     const back = new Game({ seed: 4242, mode: 'surge', audio, save: s }).echoLevels;
-    const old = { ...s, v: SAVE_FORMAT - 1 }; delete old.echoLevels;
+    // audit 179: the format before levels is found by the step that adds `echoLevels`, not SAVE_FORMAT - 1 (B-114)
+    const levelStep = STEPS.findIndex(f => { try { return 'echoLevels' in f({}); } catch { return false; } });
+    const old = { ...s, v: levelStep + 1 }; delete old.echoLevels;
     const up = upgradeSave(JSON.parse(JSON.stringify(old)));
     const fromOld = up && new Game({ seed: 4242, mode: 'surge', audio, save: up }).echoLevels;
     const bad = new Game({ seed: 4242, mode: 'surge', audio, save: { ...s, echoLevels: { focus: 9, volley: 'x', tether: -3 } } }).echoLevels;

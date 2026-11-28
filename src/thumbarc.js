@@ -55,6 +55,14 @@ export function safeInsets(doc) {
   return { r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0 };
 }
 
+/** What the arc depends on (S-75): touch, viewport, text size, which arc buttons show, and how many of the bank panel's
+ *  rows / chips are hidden (audit 179: a Surge Integrity row or an Anomaly chip makes the panel taller, a keep rect).
+ *  Class reads only, no layout, so main.js can compare it every HUD update. */
+export function arcKey(doc, touch, w, h, large) {
+  const $ = id => doc.getElementById(id), tl = doc.querySelector('.top-left');
+  return [touch, w, h, large, ...ARC_ORDER.map(id => $(id).classList.contains('hidden')), tl ? tl.querySelectorAll('.hidden').length : 0].join('|');
+}
+
 /** Place the visible action buttons on the arc (touch), or clear the inline placement (mouse / keyboard). The arc turns
  *  round the safe corner (w − right inset, h − bottom inset), so no button sits under a notch or the home bar (B-112). */
 export function layoutArc(doc, touch, w = innerWidth, h = innerHeight) {
