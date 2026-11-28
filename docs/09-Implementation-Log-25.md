@@ -44,3 +44,11 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
 - Spec said a 160 world uses vertices "1, 2, 4, 5"; FEATS order gives 1, 2, 3, 5 (0-based). Followed the rule (D-223).
 - Screenshot (all six, 4 structures): dots sit on the outer (Lure) ring's corners, readable, not noisy. Checks in
   `nexusview.cjs` (5 new). Smoke 759/759.
+## Session 182 — Design: M19 picked, the Feint specced (v1.13.123, D-224, D-225)
+- Play-test: `huntrun --seeds=3 --minutes=5 --no-echo --v`. Deep: beam kills 21 / 33 hunters (Drift), 27 / 35 (Surge);
+  hunters come down the field into the beam. Pooled Drift 21.9 % / Surge 19.1 %, ratio 1.142; Drift ceiling FAIL in
+  Deep and Kiln at 3 seeds (no verdict, < 8 seeds; more data for Q-046). Reach: Tracers 95 %, ghost Glitch 34 %.
+- Screenshot (`TRACER_SHOT`, a Tracer in a 1-wide shaft): readable; viewed. No gameplay code.
+- Picked "reads your beam" (D-224): S-78a…d in `07-Build-Specs-23.md`; it takes the Deep's second slot (D-225). Q-047.
+- `05` neared 8 KB: v1.11.99…v1.11.106 archived word for word (`archive/changelog-v1.11.99-v1.11.106.md`). New `06` part 34.
+
