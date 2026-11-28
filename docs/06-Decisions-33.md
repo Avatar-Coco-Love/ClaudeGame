@@ -56,3 +56,11 @@ alternatives). D-218 on.
   0.8–1.25, every ring and mode ≥ 1 a run. `FEAT_RIFTS` stays 5.
 - Rejected: one share for both sizes (none separates 160 and keeps 256 reachable), dropping Radiance from the probe
   (a feat-chasing player owns it; 256 full min falls to 18.4 %), a 160 value under its Spires-only route (trivial).
+
+### D-223 — S-68: feat dots read the done set, vertex = FEATS index (M18 done → v1.13)
+- `nexusview.js featDots` places one 3 px white dot (alpha 0.9, one unblurred fill) per feat in `featsSeen` (the set
+  `checkFeats` keeps), at vertex = its `FEATS` index on the outermost ring (bare hexagon at `NEXUS_RING_BASE` when none
+  is built), turning with it. A 160 world lights 1, 2, 3, 5 (the spec's "1, 2, 4, 5" miscounted; its rule wins).
+- A new feat sets `featFlash` (unsaved; skipped with reduced motion): a ring opening off its dot over `NEXUS_FLASH_S`.
+- Rejected: calling `feats(game)` per frame (Charted scans the whole map, 65 k cells a frame); packing a 160 world's
+  4 dots onto 4 adjacent vertices (a feat's corner would differ between sizes).

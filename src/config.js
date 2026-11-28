@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.12.121';
+export const VERSION = '1.13.122';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -478,6 +478,8 @@ export const MOTE_TAKE = 1, MOTE_SCATTER = 3, MOTE_SCATTER_S = 1.2, MOTE_LOOT = 
 // Lens), from NEXUS_RING_BASE px out at NEXUS_RING_STEP (half a cell) steps, strokes only (no blur, D-160). A Lens on
 // cooldown draws at NEXUS_RING_DIM; a Nexus purchase plays the S-4 upgrade ring at the Nexus for NEXUS_FLASH_S.
 export const NEXUS_RING_BASE = 78, NEXUS_RING_STEP = 16, NEXUS_RING_ALPHA = 0.75, NEXUS_RING_DIM = 0.22, NEXUS_FLASH_S = 0.5;
+// S-68: a feat done lights its vertex of the outermost Nexus ring (nexusview.js featDots): a white dot, radius 3 px.
+export const FEAT_DOT_R = 3, FEAT_DOT_ALPHA = 0.9;
 export const NEXUS_RING_RGB = { radiance: '46, 242, 255', chart: '150, 255, 200' }; // cyan, mint; Lens uses RIFT_RGB
 
 // S-72 (M17, D-190, D-193): hunters. FLOW_FIELD cells: the core's BFS field (flow.js), rebuilt every FLOW_S or on any break.

@@ -55,6 +55,7 @@ export function checkFeats(game) {
   for (const f of fs) if (f.done && !game.featsSeen.has(f.id)) {
     game.featsSeen.add(f.id); n++;
     game.featNew = { name: f.name, done, total: fs.length };
+    if (!game.motionOn || game.motionOn()) game.featFlash = { id: f.id, k: 1 }; // S-68: its Nexus vertex flashes (nexusview.js)
   }
   if (n) { game.audio.feat?.(); game.notify('feat'); }
   return n;
