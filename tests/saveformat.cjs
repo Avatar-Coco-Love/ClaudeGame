@@ -7,19 +7,23 @@ const ROOT = path.resolve(__dirname, '..');
 
 // `SAVE_FORMAT === 10`, `10 === SAVE_FORMAT`, `up.v === 10`, `.v == 9`: a pinned current format. `{ v: 9 }` (an OLD save) is fine. (pin-ok)
 const PIN = /SAVE_FORMAT\s*[!=]==?\s*\d|\d\s*[!=]==?\s*SAVE_FORMAT|\.v\s*[!=]==?\s*\d/;
+// Audit 179 (B-114 twice: decoy.cjs at build 175, then three more found): an "old save" built as `v: SAVE_FORMAT - 1` (pin-ok)
+// stops being the format before a field once a later format lands. Find the step that adds the field instead (lens.cjs).
+// `STEPS.length === SAVE_FORMAT - 1` (counting steps) is fine: only an assignment or `v:` is banned. (pin-ok)
+const PREV = /(\.v\s*=|\bv\s*:)\s*SAVE_FORMAT\s*-\s*\d/;
 
 function pins() {
   const files = ['tests', 'tools'].flatMap(d => fs.readdirSync(path.join(ROOT, d)).filter(f => /\.(c|m)?js$/.test(f)).map(f => d + '/' + f));
   const hits = [];
   for (const f of files) fs.readFileSync(path.join(ROOT, f), 'utf8').split('\n').forEach((l, i) => {
-    if (PIN.test(l) && !l.includes('pin-ok')) hits.push(`${f}:${i + 1}`);
+    if ((PIN.test(l) || PREV.test(l)) && !l.includes('pin-ok')) hits.push(`${f}:${i + 1}`);
   });
   return { files: files.length, hits };
 }
 
 async function nodeChecks(check) {
   const p = pins();
-  check('no test or tool pins SAVE_FORMAT to a number (H5, audit 49)', p.hits.length === 0 && p.files > 10, p.hits.join(', ') || `${p.files} files`);
+  check('no test or tool pins SAVE_FORMAT to a number or builds an old save as SAVE_FORMAT - n (H5, audit 49; B-114, audit 179)', p.hits.length === 0 && p.files > 10, p.hits.join(', ') || `${p.files} files`);
 
   const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
   const { Game } = await import('../src/game.js');
@@ -42,4 +46,4 @@ async function nodeChecks(check) {
     JSON.stringify({ bare: upgradeSave(bare), noMap, noSeed, loads }));
 }
 
-module.exports = { nodeChecks, PIN };
+module.exports = { nodeChecks, PIN, PREV };

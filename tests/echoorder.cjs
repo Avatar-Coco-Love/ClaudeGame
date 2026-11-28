@@ -11,7 +11,7 @@ async function nodeChecks(check) {
   const { makeSwarm } = await import('../src/mote.js');
   const { orderLabel } = await import('../src/echo.js');
   const { buyResearch } = await import('../src/research.js');
-  const { upgradeSave, SAVE_FORMAT } = await import('../src/save.js');
+  const { upgradeSave, SAVE_FORMAT, STEPS } = await import('../src/save.js');
   const audio = new Proxy({}, { get: () => () => {} });
 
   // A 9×5 hall in solid rock, 30 cells east of the Nexus (out of its ring and its Glitch repel), Surge, the Echo owned.
@@ -147,7 +147,9 @@ async function nodeChecks(check) {
     const { g } = lab('guard');
     const s = JSON.parse(JSON.stringify(g.toSave()));
     const back = new Game({ seed: 4242, mode: 'surge', audio, save: s }).echoOrder;
-    const old = { ...JSON.parse(JSON.stringify(new Game({ seed: 4242, mode: 'surge', audio, size: 160 }).toSave())), v: SAVE_FORMAT - 1 }; // a format-17 save is 160 (S-46b2)
+    // audit 179: the format before orders is found by the step that adds `echoOrder`, not SAVE_FORMAT - 1 (B-114)
+    const orderStep = STEPS.findIndex(f => { try { return 'echoOrder' in f({}); } catch { return false; } });
+    const old = { ...JSON.parse(JSON.stringify(new Game({ seed: 4242, mode: 'surge', audio, size: 160 }).toSave())), v: orderStep + 1 }; // a format-17 save is 160 (S-46b2)
     delete old.echoOrder;
     const up = upgradeSave(JSON.parse(JSON.stringify(old)));
     const fromOld = up && new Game({ seed: 4242, mode: 'surge', audio, save: up }).echoOrder;

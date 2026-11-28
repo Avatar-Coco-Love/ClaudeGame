@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.120 — 2026-11-28
+- Health check. On a phone, the thumb-arc buttons now move out of the way when the top-left panel grows (Surge's
+  Integrity bar, Anomaly chips) instead of keeping their old spot. No gameplay change.
+
 ## v1.12.119 — 2026-11-28
 - Decoys now come from a one-time Nexus build, **Lure** (▲ 30): it gives you 2 Decoys and tops them up whenever you
   bank (at the Nexus or a Relay). The Craft tab no longer sells them. A hunter drawn to a Decoy can't touch you while
