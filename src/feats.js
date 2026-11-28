@@ -38,3 +38,24 @@ export function feats(game) {
 
 /** The progress text of one feat: "21 % / 35 %", "2 / 5". */
 export const featProgress = f => f.pct ? `${Math.floor(f.have * 100)} % / ${Math.round(f.need * 100)} %` : `${Math.min(f.have, f.need)} / ${f.need}`;
+
+// S-66b: the moment. Run after the events that can finish a feat (deposit, cache, boss down, Anomaly take, rift close,
+// upgrade): a feat newly done toasts once (main.js reads `featNew`) and plays one note. `featsSeen` is unsaved and is
+// filled when the Game is built, so a reload (or a mode switch, the same Game) never re-toasts.
+export const FEAT_EVENTS = ['deposited', 'cache', 'boss', 'anomaly', 'rift-close'];
+
+/** The ids of this world's feats already done (the Game's start-up fill of `featsSeen`). */
+export const featsDone = game => new Set(feats(game).filter(f => f.done).map(f => f.id));
+
+/** Toast + note for each feat newly done; returns how many. */
+export function checkFeats(game) {
+  if (!game.featsSeen) return 0;
+  const fs = feats(game), done = fs.filter(f => f.done).length;
+  let n = 0;
+  for (const f of fs) if (f.done && !game.featsSeen.has(f.id)) {
+    game.featsSeen.add(f.id); n++;
+    game.featNew = { name: f.name, done, total: fs.length };
+  }
+  if (n) { game.audio.feat?.(); game.notify('feat'); }
+  return n;
+}

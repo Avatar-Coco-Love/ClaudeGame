@@ -63,3 +63,8 @@ Each dot has a white pip (S-73b, D-197: lead filled r 3, flank a 1.5 px ring; `P
 
 ## Depth rings (moved word for word from `02`, Build 175)
 Depth rings (S-8, D-028): Hearth < 24 / Veil 24–48 / Deep ≥ 48 cells; rock + dense ×1 / ×1.4 / ×2 hp, own palette, toast, lower hum.
+
+## Decoy measure, Feats moment (moved from `02`, Build 176)
+S-77b (D-214): `huntrun --decoy` measure, a report: at its price it costs ~3× what it saves.
+S-66b (D-217): `checkFeats` on the feat events + `buy()` → toast "Feat: <name> (n / N)" + one note, once (unsaved
+`featsSeen` filled at load: no re-toast on reload or mode switch); ending card "Feats n / N" after Bosses.

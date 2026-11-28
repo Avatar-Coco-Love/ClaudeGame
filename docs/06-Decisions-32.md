@@ -55,3 +55,13 @@ alternatives). D-212 on.
   0.35, `FEAT_RIFTS` 5 in `config.js` (provisional, S-67 tunes). The Nexus tab ends with the text list (✓ / ·).
 - Rejected: a saved `feats` done-set (could desync from the world; S-66b's toast keeps an unsaved seen-set), counting
   a rift by `r.mined` (a running total), an Anomaly glyph per line (D-177).
+
+### D-217 — Build 176: S-66b Feats toast on events, an unsaved seen-set
+- `checkFeats(game)` (`feats.js`) runs at the end of `Game.update` once per `notify()` of `deposited`, `cache`, `boss`,
+  `anomaly` or `rift-close` (`FEAT_EVENTS`, the `featDue` flag; B-115), and in `buy()` (Overdrive). A feat newly done: `featNew`, the
+  `feat` event (main.js toast "Feat: <name> (done / N)", KEEP) and `audio.feat()` (the arpeggio's top note, 1319 Hz).
+- `featsSeen` is filled from `feats()` when the Game is built (unsaved), so a reload never re-toasts; a mode switch keeps
+  the Game, so it can't either. Charted toasts on the next deposit (no per-frame scan of 65 k cells).
+- Ending card: "Feats n / N" after Bosses (`endingSummary` `feats` / `featN`).
+- Rejected: checking every frame (exploredShare walks the whole map), a saved seen-set (D-216), one toast per feat when
+  two finish together (the last one names the count; at most 6 a world).

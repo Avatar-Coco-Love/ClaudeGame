@@ -29,6 +29,7 @@ import { loadSinks, sinksOn } from './heatsink.js';
 import { loadWards, updateWards } from './ward.js';
 import { loadDecoys, updateDecoys } from './decoy.js';
 import { chartOn } from './chart.js';
+import { checkFeats, featsDone, FEAT_EVENTS } from './feats.js';
 import { makeAnomalies, loadAnomalies, updateAnomalies, endBuffs, buffMul } from './anomaly.js';
 import { spireHere, chooseSpires, loadSpires, stampSpires, markSpiresSeen, spiresSeen, updateSpireFeed, updateFacetAim, spireLight } from './spire.js';
 
@@ -132,6 +133,7 @@ export class Game {
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
     if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
     if (this.ended && Number.isFinite(this.endedAt) && !(this.records.cycles && this.records.cycles[this.cycle])) recordCycle(this); // B-058: ended before records existed
+    this.featsSeen = featsDone(this); this.featNew = null; // S-66b: feats done before this load never toast
   }
 
   /** S-29: the Nexus's hue this cycle ('r, g, b'). */
@@ -187,6 +189,7 @@ export class Game {
     this.stats.upgrades++;
     if (id === 'hull') this.player.integrity = this.stat('hull');
     this.audio.upgrade();
+    checkFeats(this); // S-66b: an Overdrive level can finish a feat
     if (this.motionOn()) this.coreRing = 1;
     this.burst(this.nexus.x, this.nexus.y, 40, '#ffffff', 260);
     return true;
@@ -278,6 +281,7 @@ export class Game {
     const newly = this.world.reveal(p.x, p.y, CORE_REVEAL);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
     if (newly.length && markSpiresSeen(this, newly)) this.spireFound(); // S-27: first sight of a Spire (either mode)
+    if (this.featDue) { this.featDue = false; checkFeats(this); } // S-66b: once per notify (bots never clear `events`)
     return newly;
   }
 
@@ -476,6 +480,7 @@ export class Game {
 
   notify(kind) {
     if (!this.events.includes(kind)) this.events.push(kind);
+    if (FEAT_EVENTS.includes(kind)) this.featDue = true; // S-66b: checked at the end of this update
   }
 
   // ---------- persistence ----------

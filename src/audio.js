@@ -101,6 +101,8 @@ export class Audio {
     const notes = [784, 988, 1319], n = Math.min(3, Math.max(1, kinds) + 1);
     for (let i = 0; i < n; i++) this.tone(notes[i], 0.18, { type: 'triangle', vol: 0.13, delay: 0.06 + i * 0.09 });
   }
+  // S-66b: a feat done plays the arpeggio's top note once.
+  feat() { this.tone(1319, 0.18, { type: 'triangle', vol: 0.13, delay: 0.3 }); }
   // S-4: a short rising sine sweep when the beam switches on (not repeated while it stays on).
   beamStart() { this.tone(330, 0.12, { type: 'sine', vol: 0.1, slide: 330 }); }
   upgrade() {
