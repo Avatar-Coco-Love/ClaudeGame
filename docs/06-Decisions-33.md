@@ -44,3 +44,15 @@ alternatives). D-218 on.
 - Workflow review: too little: a debt line that names a rule broken twice waited an audit for its check (CLAUDE.md
   already says "a check, not words": do it in the PR that finds the second break). Too much: none new.
 - Rejected: reading the panel's height each HUD update (a forced layout a frame), closing the arc debt unmeasured.
+
+### D-222 — S-67: Charted's share is per world size (256 = 0.20, 160 = 0.40); the Rift runner check rides the Lens run
+- `tools/featrun.mjs` (8 seeds, Radiance max, surgebot's dig-cost path, every path cell revealed by CORE_REVEAL):
+  256 full route (vaults + Spires + lairs, nearest first) min 20.5 % median 22.8 %; Spires only median 13.5 % max
+  14.4 %. Rule: 13.5 × 1.3 = 17.6 → **20 %**, under the full route's lowest (24 seeds: same min). 0.35 was unreachable.
+- A 160 world can't split them: Spires-only max 38.6 % > full min 33.2 % (the Radiance disc covers much of it). It gets
+  **40 %** (above every Spires-only seed; the full route reaches it on 2 / 8): Charted there means digging past the
+  landmarks. `WORLD_PROFILES[size].chart` replaces `FEAT_CHART`; the gate (in smoke via `feats.cjs`, ~1 s) is "Spires
+  only never; 256 full route always". `lens.cjs` reads pockets emptied from `eventrun --call`: pooled Drift / Surge
+  0.8–1.25, every ring and mode ≥ 1 a run. `FEAT_RIFTS` stays 5.
+- Rejected: one share for both sizes (none separates 160 and keeps 256 reachable), dropping Radiance from the probe
+  (a feat-chasing player owns it; 256 full min falls to 18.4 %), a 160 value under its Spires-only route (trivial).

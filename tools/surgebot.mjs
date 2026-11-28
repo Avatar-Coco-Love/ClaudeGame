@@ -34,7 +34,7 @@ const audio = new Proxy({}, { get: () => () => {} });
 
 /** Binary-heap A* / Dijkstra over the grid (4-neighbour). Cost of entering a cell, in seconds: crossing time, plus the
  *  dig time (remaining hp / beam dps) for a solid cell. `goal(i)` ends the search; `h(i)` is an admissible heuristic. */
-function search(g, start, goal, h = () => 0, maxCost = Infinity) {
+export function search(g, start, goal, h = () => 0, maxCost = Infinity) {
   const w = g.world, N = w.w * w.h, dps = g.stat('beam'), cross = CELL / g.stat('thrust');
   const dist = new Float64Array(N).fill(Infinity), prev = new Int32Array(N).fill(-1), heap = [];
   const push = (f, i) => { heap.push([f, i]); let k = heap.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (heap[p][0] <= heap[k][0]) break; [heap[p], heap[k]] = [heap[k], heap[p]]; k = p; } };

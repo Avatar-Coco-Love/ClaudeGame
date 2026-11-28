@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.121 — 2026-11-28
+- The **Charted** feat now asks for 20 % of a new (large) world, down from 35 %, which was out of reach for most runs;
+  an older, smaller world asks for 40 %. Visiting only the Spires never earns it: open the vaults and find the lairs.
+
 ## v1.12.120 — 2026-11-28
 - Health check. On a phone, the thumb-arc buttons now move out of the way when the top-left panel grows (Surge's
   Integrity bar, Anomaly chips) instead of keeping their old spot. No gameplay change.

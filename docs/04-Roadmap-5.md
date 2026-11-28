@@ -37,6 +37,6 @@ VERSION: M16 → 1.11, M17 → 1.12, M18 → 1.13. Debt lives in `04-Roadmap-4.m
 ## M18 — Feats: the world remembers (D-180, `07-Build-Specs-18.md`) → v1.13
 - ✅ **S-66a** (Build 175, v1.12.116, D-216) Feats: six goals derived from the world (4 in a 160 world), `stats.kinds` / `stats.rifts` (format 27: S-77a took 26), Nexus tab list.
 - ✅ **S-66b** (Build 176, v1.12.117, D-217) A feat done toasts once + one note (no re-toast on reload / mode switch); ending row.
-- **S-67** `tools/featrun.mjs` tunes `FEAT_CHART`; rifts check pooled from `eventrun --call` (`FEAT_RIFTS` 5 measured 21–31 min, D-219).
+- ✅ **S-67** (Build 180, v1.12.121, D-222) `featrun.mjs` gate: Charted per size (256 = 20 %, 160 = 40 %); Rift runner check from `eventrun --call`.
 - **S-68** The Nexus lights one hexagon vertex per feat done.
 - Cut (D-180): per-mode feats, feats that pay, a Feats tab, lifetime feats, more than 6. Q-032 no, Q-036 leave.

@@ -117,6 +117,16 @@ async function nodeChecks(check) {
     check('S-64 Lens gate passes (call / mine value ≤ 1.25, ▲ call − mine < 0, Drift / Surge 0.8–1.25; Deep + Shoal + Kiln, 16 seeds)',
       /: PASS/.test(out.trim().split('\n').pop()), out.trim().split('\n').filter(l => /call\/mine|drift\/surge/.test(l)).map(l => l.split(' ▲ spent')[0]).join('; '));
   }
+  { // S-67 (D-219): Rift runner from the same run: pockets emptied a run, pooled over the rings, Drift / Surge 0.8–1.25,
+    // and every ring and mode empties ≥ 1 a run (FEAT_RIFTS 5 stays reachable everywhere, no mode ahead)
+    const out = await require('./gates.cjs').run('eventrun.mjs', ['--call']), sum = {}, low = [];
+    for (const m of out.matchAll(/^(\w+) (drift|surge): .*?([\d.]+) pockets emptied/gm)) {
+      sum[m[2]] = (sum[m[2]] || 0) + Number(m[3]); if (Number(m[3]) < 1) low.push(`${m[1]} ${m[2]} ${m[3]}`);
+    }
+    const q = sum.drift / sum.surge;
+    check('S-67 Rift runner: pockets emptied a run pooled Drift / Surge 0.8–1.25, every ring and mode ≥ 1 (eventrun --call, 16 seeds)',
+      q >= 0.8 && q <= 1.25 && !low.length && Object.keys(sum).length === 2, `drift ${sum.drift} / surge ${sum.surge} = ${q.toFixed(2)}; low ${low.join(', ') || '—'}`);
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
