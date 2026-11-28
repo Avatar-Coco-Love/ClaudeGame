@@ -11,7 +11,7 @@ async function nodeChecks(check) {
   const { updateAnomalies } = await import('../src/anomaly.js');
   const { updateRift, openRift, closeRift } = await import('../src/rift.js');
   const { upgradeSave, STEPS } = await import('../src/save.js');
-  const { FEATS, FEAT_CHART, FEAT_RIFTS, UPGRADES, CELL, T, BORDER } = await import('../src/config.js');
+  const { FEATS, FEAT_RIFTS, WORLD_PROFILES, UPGRADES, CELL, T, BORDER } = await import('../src/config.js');
   const make = (size, mode = 'drift', seed = 4242) => new Game({ seed, mode, audio: quiet, size });
   const ids = g => feats(g).map(f => f.id).join(' ');
   const done = g => Object.fromEntries(feats(g).map(f => [f.id, f.done]));
@@ -26,7 +26,7 @@ async function nodeChecks(check) {
     lairs: (g, all) => { const l = g.bosses.list; l.forEach((B, i) => { B.down = all || i < l.length - 1; }); },
     vaults: (g, all) => { const v = g.world.vaults; v.forEach((s, i) => { if (all || i < v.length - 1) g.world.destroy(s.x, s.y); }); },
     kinds: (g, all) => { g.stats.kinds = all ? 7 : 5; },
-    chart: (g, all) => { const w = g.world, inner = (w.w - 2 * BORDER) ** 2, n = Math.ceil(inner * FEAT_CHART) - (all ? 0 : 1);
+    chart: (g, all) => { const w = g.world, inner = (w.w - 2 * BORDER) ** 2, n = Math.ceil(inner * w.profile.chart) - (all ? 0 : 1);
       w.explored.fill(0); // the Nexus start reveal counts too: start from none
       let k = 0; for (let y = BORDER; y < w.h - BORDER && k < n; y++) for (let x = BORDER; x < w.w - BORDER && k < n; x++, k++) w.explored[y * w.w + x] = 1; },
     over: (g, all) => { const u = UPGRADES[0]; g.upgrades[u.id] = g.topLevel(u) - (all ? 0 : 1); },
@@ -45,7 +45,9 @@ async function nodeChecks(check) {
     check('S-66a Feats: each rule done on its last step, not one short, no other feat lit, Drift = Surge (both sizes)', !bad.length, bad.join('; ') || Object.keys(seen).length + ' rules');
     const g = make(160); stub.chart(g, true); stub.rifts(g, false);
     const pc = featProgress(feats(g).find(f => f.id === 'chart')), pr = featProgress(feats(g).find(f => f.id === 'rifts'));
-    check('S-66a Feats: progress reads "35 % / 35 %" and "4 / 5"', pc === `${Math.round(FEAT_CHART * 100)} % / ${Math.round(FEAT_CHART * 100)} %` && pr === `${FEAT_RIFTS - 1} / ${FEAT_RIFTS}` && exploredShare(g) >= FEAT_CHART, `${pc} | ${pr}`);
+    check('S-66a Feats: progress reads "40 % / 40 %" (a 160 world) and "4 / 5"', pc === '40 % / 40 %' && pr === `${FEAT_RIFTS - 1} / ${FEAT_RIFTS}` && exploredShare(g) >= g.world.profile.chart, `${pc} | ${pr}`);
+    const h = make(256); h.world.explored.fill(0);
+    check('S-67 Charted: the need is per size (160 = 40 %, 256 = 20 %, D-222)', WORLD_PROFILES[160].chart === 0.4 && WORLD_PROFILES[256].chart === 0.2 && featProgress(feats(h).find(f => f.id === 'chart')) === '0 % / 20 %', featProgress(feats(h).find(f => f.id === 'chart')));
   }
   { // kinds: a take sets its kind's bit, both modes alike
     const res = [];
@@ -102,6 +104,11 @@ async function nodeChecks(check) {
     // the ending card's numbers: Feats n / N
     const { endingSummary } = await import('../src/ending.js'); const e = endingSummary(g), e2 = endingSummary(make(256));
     check('S-66b Feats: the ending summary carries feats 2 / 4 (160), 0 / 6 (fresh 256)', e.feats === 2 && e.featN === 4 && e2.feats === 0 && e2.featN === 6, JSON.stringify([e.feats, e.featN, e2.feats, e2.featN]));
+  }
+  { // S-67 (D-222): the Charted gate. featrun routes the core to every landmark (full) or the Spires only (bare), 8 seeds
+    const out = await require('./gates.cjs').run('featrun.mjs');
+    check('S-67 Charted gate passes (the Spires-only route never reaches chart; a 256 full route on every seed; 8 seeds, both sizes)',
+      /: PASS/.test(out.trim().split('\n').pop()), out.trim().split('\n').filter(l => /^\d+:/.test(l)).map(l => l.split(' → ')[0]).join('; '));
   }
 }
 

@@ -2,7 +2,7 @@
 
 // Game version: <major>.<minor>.<PR count> (D-046: minor = milestones shipped; 1.0 = M5). Bump in every PR, together with a new top entry in docs/05-Changelog.md
 // (tests/docs.cjs fails if the two disagree).
-export const VERSION = '1.12.120';
+export const VERSION = '1.12.121';
 // S-3 Settings: volume 0-100 maps linearly to master gain 0..MASTER_GAIN_MAX (default 70 -> 0.35, the pre-S-3 level).
 export const DEFAULT_VOLUME = 70;
 export const MASTER_GAIN_MAX = 0.5;
@@ -24,8 +24,8 @@ export const MAP_MAX_PX = 560; // D-191: the map view's largest side (CSS px, dr
 // 160 = the pre-M10 numbers word for word (tests/worldsize.cjs pins the result). 256 (S-46a, D-122): 5 rings, 4 more vaults
 // (outerVaults, VAULT_D_OUTER) and Anomalies in Shoal / Kiln, both drawn after the old lists with their own salts.
 export const WORLD_PROFILES = {
-  160: { rings: 3, vaults: 6, outerVaults: 0, anomalies: [3, 5, 8], overdrive: false },
-  256: { rings: 5, vaults: 6, outerVaults: 4, anomalies: [3, 5, 8, 6, 6], overdrive: true }, // S-50: Overdrive needs ≈ / ⬟, 256 only
+  160: { rings: 3, vaults: 6, outerVaults: 0, anomalies: [3, 5, 8], overdrive: false, chart: 0.40 },
+  256: { rings: 5, vaults: 6, outerVaults: 4, anomalies: [3, 5, 8, 6, 6], overdrive: true, chart: 0.20 }, // S-50: Overdrive needs ≈ / ⬟, 256 only; chart: S-67 (D-222)
 };
 export const worldProfile = size => WORLD_PROFILES[size] || WORLD_PROFILES[WORLD_SIZE_OLD];
 export const CHUNK = 16; // cells per render chunk edge
@@ -329,7 +329,8 @@ export const RIFT_MAJOR = [6, 6, 6, 3, 3], RIFT_BONUS = 1; // RIFT_MAJOR[ring]: 
 export const RIFT_CALL_COST = 30, RIFT_CALL_CD = 150; // S-64 gate (D-178): 90 s gave Kiln call / mine 1.38
 export const RIFT_RGB = '226, 208, 255'; // violet-white: the pocket's shimmer and its minimap dot
 // S-66a (D-180, D-216): Feats, six world goals that pay nothing, fixed order (S-68 maps it onto the Nexus vertices).
-// `lairs` and `over` exist in a 256 world only (bosses / profile.overdrive decide); FEAT_CHART / FEAT_RIFTS are provisional (S-67 tunes).
+// `lairs` and `over` exist in a 256 world only (bosses / profile.overdrive decide). S-67 (D-222): Charted's share is per size,
+// `WORLD_PROFILES[size].chart` (featrun.mjs: 256 = 0.20, 160 = 0.40); FEAT_RIFTS 5 measured 21–31 min (D-219).
 export const FEATS = [
   { id: 'lairs', name: 'Quiet lairs', rule: 'every boss brought down' },
   { id: 'vaults', name: 'Open vaults', rule: "every vault's cache broken" },
@@ -338,7 +339,7 @@ export const FEATS = [
   { id: 'over', name: 'Overdriven', rule: 'one Core Matrix stat at its top level' },
   { id: 'rifts', name: 'Rift runner', rule: 'rift pockets emptied before they close' },
 ];
-export const FEAT_CHART = 0.35, FEAT_RIFTS = 5;
+export const FEAT_RIFTS = 5;
 // S-35 Anomalies (D-098, D-099, anomaly.js): WORLD_PROFILES[size].anomalies sites per depth ring (Hearth / Veil / Deep; + Shoal / Kiln at 256), seed-only
 // (rng['anomaly'], drawn from the generated terrain before any save is applied), each on a rock or dense cell at centre
 // distance ANOMALY_D[ring] cells, ≥ ANOMALY_GAP cells apart, clear of vault footprints and Spire footprints by ANOMALY_CLEAR

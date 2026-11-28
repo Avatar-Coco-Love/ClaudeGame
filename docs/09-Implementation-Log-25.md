@@ -29,3 +29,12 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
 - `09` sessions 169–173 archived word for word (`archive/2026-11-28-09-sessions-169-173.md`).
 - Pitfall: a "baseline" smoke started before editing reads the edited tree; it is no baseline. Run it after.
 - Smoke 751/751. Screenshot (390 × 844, Surge, stand-in tall panel): the arc sits clear below it; viewed.
+
+## Session 180 — Build: S-67 feats probe (v1.12.121, D-222)
+- `tools/featrun.mjs` (exports surgebot's `search`): tries logged. Radiance max, 8 seeds: 256 full 20.5–26.6 %,
+  Spires-only 12.3–14.4 %; 160 full 33.2–42.5 %, Spires-only 30.3–38.6 % (overlap: one seed's full route is below its
+  own Spires-only route, the order differs). Radiance 0: 256 full min 18.4 %, 160 still overlaps. 24 seeds (256): full
+  min 20.5 %, Spires-only max 14.4 %, median × 1.3 16.7 %. Chosen: 256 = 0.20, 160 = 0.40 (D-222).
+- Gate runs in ~1 s (A* with the reach-radius heuristic); prestarted in `gates.cjs` SMOKE. Rift runner check in
+  `lens.cjs` parses the `--call` lines (no new gate time).
+- No visual change (a number in the Nexus tab list); no screenshot. Smoke: see PR.

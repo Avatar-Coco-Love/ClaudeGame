@@ -21,7 +21,7 @@ bosses have their two forms, D-158). A feat never unlocks, pays or speeds anythi
 ## S-66a / S-66b — built (Build 175 / 176, D-216 / D-217)
 `feats.js` `feats(game)` + Nexus tab list (`stats.kinds` / `stats.rifts`, format 27); `checkFeats` toast + note once, ending row.
 
-## S-67 — Feats probe: each one reachable, none trivial (M18; refreshed Design 177, D-219)
+## S-67 — Feats probe: each one reachable, none trivial (M18; refreshed Design 177, D-219) — built Build 180 (D-222: `chart` per size)
 **Save:** none.
 - **Rifts, measured Design 177:** `eventrun --call` now prints "pockets emptied" (`stats.rifts`, 16 seeds × 10 min):
   Drift / Surge Deep 1.7 / 2.4, Shoal 1.7 / 1.6, Kiln 2.0 / 2.3 a run → `FEAT_RIFTS` 5 takes 21–31 min (≥ 15 ✓, keep 5).

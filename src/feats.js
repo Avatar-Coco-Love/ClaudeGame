@@ -2,7 +2,7 @@
 // (bosses' `down`, the map, `stats`, the Matrix levels), so a feat can't desync; only two counters are new:
 // `stats.kinds` (bitmask of Anomaly kinds ever taken, anomaly.js) and `stats.rifts` (pockets emptied, rift.js closeRift).
 // A 160 world lists 4: `lairs` needs bosses, `over` needs Overdrive (profile.overdrive). Same in Drift and Surge.
-import { FEATS, FEAT_CHART, FEAT_RIFTS, UPGRADES, ANOMALY_KINDS, BORDER, T } from './config.js';
+import { FEATS, FEAT_RIFTS, UPGRADES, ANOMALY_KINDS, BORDER, T } from './config.js';
 
 const KIND_IDS = Object.keys(ANOMALY_KINDS);
 /** The bit an Anomaly kind sets in `stats.kinds`. */
@@ -21,7 +21,7 @@ const RULES = {
   lairs: g => { const l = g.bosses?.list || []; return l.length ? { have: l.filter(B => B.down).length, need: l.length } : null; },
   vaults: g => { const v = g.world.vaults; return v.length ? { have: v.filter(s => g.world.get(s.x, s.y) !== T.CACHE).length, need: v.length } : null; },
   kinds: g => ({ have: bits(g.stats.kinds || 0), need: KIND_IDS.length }),
-  chart: g => ({ have: exploredShare(g), need: FEAT_CHART, pct: true }),
+  chart: g => ({ have: exploredShare(g), need: g.world.profile.chart, pct: true }),
   over: g => g.world.profile.overdrive ? { have: Math.max(0, ...UPGRADES.map(u => Math.min(g.upgrades[u.id], g.topLevel(u)) - u.max)), need: Math.max(...UPGRADES.map(u => u.over)) } : null,
   rifts: g => ({ have: g.stats.rifts || 0, need: FEAT_RIFTS }),
 };
