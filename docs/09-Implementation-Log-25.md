@@ -38,3 +38,9 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
 - Gate runs in ~1 s (A* with the reach-radius heuristic); prestarted in `gates.cjs` SMOKE. Rift runner check in
   `lens.cjs` parses the `--call` lines (no new gate time).
 - No visual change (a number in the Nexus tab list); no screenshot. Smoke 754/754 (a first run failed 2 VERSION checks: bumped mid-run, the session 179 pitfall again).
+## Session 181 — Build: S-68 the Nexus wears its feats (v1.13.122, D-223; M18 done)
+- Dots read `featsSeen`, not `feats(game)`: the Charted share scans 65 k cells, too dear per frame. Same answer, since
+  `checkFeats` runs after every feat-finishing event and fills the set at load.
+- Spec said a 160 world uses vertices "1, 2, 4, 5"; FEATS order gives 1, 2, 3, 5 (0-based). Followed the rule (D-223).
+- Screenshot (all six, 4 structures): dots sit on the outer (Lure) ring's corners, readable, not noisy. Checks in
+  `nexusview.cjs` (5 new). Smoke 759/759.

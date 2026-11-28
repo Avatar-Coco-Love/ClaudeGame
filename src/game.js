@@ -133,7 +133,7 @@ export class Game {
     this.revealQueue = this.world.reveal(this.nexus.x, this.nexus.y, this.nexusLight()); // minimap cells revealed outside update()
     if (save) checkEnding(this); // S-24: a save that lit every Spire before the ending existed gets it now
     if (this.ended && Number.isFinite(this.endedAt) && !(this.records.cycles && this.records.cycles[this.cycle])) recordCycle(this); // B-058: ended before records existed
-    this.featsSeen = featsDone(this); this.featNew = null; // S-66b: feats done before this load never toast
+    this.featsSeen = featsDone(this); this.featNew = null; this.featFlash = null; // S-66b: feats done before this load never toast
   }
 
   /** S-29: the Nexus's hue this cycle ('r, g, b'). */
@@ -279,6 +279,7 @@ export class Game {
     this.nexusPulse = Math.max(0, this.nexusPulse - dt * 1.4);
     this.coreRing = Math.max(0, this.coreRing - dt / CORE_RING_S);
     this.nexusFlash = Math.max(0, this.nexusFlash - dt / NEXUS_FLASH_S);
+    if (this.featFlash) this.featFlash.k = Math.max(0, this.featFlash.k - dt / NEXUS_FLASH_S); // S-68: a new feat's vertex
     const newly = this.world.reveal(p.x, p.y, CORE_REVEAL);
     if (this.revealQueue.length) { newly.push(...this.revealQueue); this.revealQueue = []; }
     if (newly.length && markSpiresSeen(this, newly)) this.spireFound(); // S-27: first sight of a Spire (either mode)

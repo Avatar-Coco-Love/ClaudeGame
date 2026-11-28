@@ -34,7 +34,7 @@ bosses have their two forms, D-158). A feat never unlocks, pays or speeds anythi
   full route's lowest seed. **Gate (PASS):** the full route reaches `chart` on every seed, the bare route on none.
   Gate in `gates.cjs` (D-166), its TIME line under 60 s.
 
-## S-68 — The Nexus wears its feats (M18)
+## S-68 — The Nexus wears its feats (M18) — built Build 181 (D-223: vertex = FEATS index, so 160 uses 1, 2, 3, 5)
 **Save:** none (drawn from `feats(game)`).
 - The outermost Nexus ring (`nexusview.js` `nexusRings`, the last one; with none built, a hexagon of radius
   `NEXUS_RING_BASE`, drawn only for its dots) lights one vertex per feat
