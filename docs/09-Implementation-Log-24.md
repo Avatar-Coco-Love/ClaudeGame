@@ -52,4 +52,7 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
 - `feats.js` derives six feats (four in a 160 world); `stats.kinds` / `stats.rifts` counters, format 27; Nexus tab list.
 - Observed: a fresh world already has the Nexus reveal explored, so a chart stub must clear `explored` first (test fix).
   Screenshot 360 × 640: Radiance / Chart / Lens rows unscrolled, Feats 2 / 6 below, ✓ gold; 320 × 568 Large text no overflow.
-- New `feats.cjs` (9 checks) fails on the old code (no `feats.js`). No bugs found.
+- **B-114 (fixed):** `decoy.cjs` built its old save as `SAVE_FORMAT - 1`, so format 27 made it a post-Decoy save
+  (FAIL 740/741). Now it finds the step adding `craft.decoy` (lens.cjs's way). Second time: a ban check is debt (`04-…-4`).
+- New `feats.cjs` (9 checks) fails on the old code (no `feats.js`).
+- Smoke 741/741.
