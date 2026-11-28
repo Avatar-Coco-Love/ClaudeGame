@@ -3,6 +3,10 @@
 One entry per merged PR, newest first. Version = `<major>.<minor>.<PR count>` (D-046: minor = milestones shipped; 1.0 = M5; D-105: patch = PRs since 1.0.0). `VERSION` in `src/config.js` must match the top entry
 (`tests/docs.cjs` enforces it). Write for a player: what changed on screen, not how it was coded. Detail lives in `09`.
 
+## v1.12.117 — 2026-11-28
+- New: finishing a **Feat** now says so: a toast ("Feat: Rift runner (2 / 6)") and one bright note, once per feat (a
+  reload or a mode switch never repeats it). The ending card adds a "Feats n / N" row after Bosses.
+
 ## v1.12.116 — 2026-11-28
 - New: **Feats** at the bottom of the Nexus tab: six world goals (four in a smaller world) that pay nothing, each with
   its progress, e.g. "Charted 21 % / 35 %", "Rift runner 2 / 5". Quiet lairs, Open vaults, Three lights (an Anomaly of

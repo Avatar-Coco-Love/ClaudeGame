@@ -78,6 +78,31 @@ async function nodeChecks(check) {
       step >= 0 && up.stats.kinds === 0 && up.stats.rifts === 0 && g0.stats.kinds === 0 && g0.stats.rifts === 0 && g1.stats.kinds === 5 && g1.stats.rifts === 3 &&
       g2.stats.kinds === 0 && g2.stats.rifts === 0, JSON.stringify([step, up.stats.kinds, g0.stats.rifts, g1.stats.kinds, g1.stats.rifts, g2.stats.kinds, g2.stats.rifts]));
   }
+  { // S-66b: a feat newly done toasts once (featNew + one note), not again, not after a reload, not after a mode switch
+    const { checkFeats } = await import('../src/feats.js');
+    let notes = 0; const audio = new Proxy({}, { get: (_, k) => k === 'feat' ? () => { notes++; } : () => {} });
+    const idle = { move: { x: 0, y: 0 }, aim: null, fire: false };
+    const g = new Game({ seed: 4242, mode: 'drift', audio, size: 160 });
+    const quiet0 = checkFeats(g), ev0 = g.events.includes('feat');
+    g.stats.rifts = FEAT_RIFTS; g.notify('rift-close'); g.update(1 / 60, idle); // the update path runs the check
+    const t1 = g.featNew && `Feat: ${g.featNew.name} (${g.featNew.done} / ${g.featNew.total})`, ev1 = g.events.includes('feat'), n1 = notes;
+    g.events.length = 0; g.featNew = null; const again = checkFeats(g); g.setMode('surge'); g.notify('deposited'); g.update(1 / 60, idle); const stale = g.featDue;
+    const afterSwitch = g.events.includes('feat') || !!g.featNew;
+    const h = new Game({ seed: 4242, mode: 'drift', audio, size: 160, save: JSON.parse(JSON.stringify(g.toSave())) });
+    h.notify('deposited'); h.update(1 / 60, idle); const reload = h.events.includes('feat') || checkFeats(h);
+    g.stats.kinds = 7; g.events.length = 0; g.notify('anomaly'); g.update(1 / 60, idle); const t2 = g.featNew && `${g.featNew.name} (${g.featNew.done} / ${g.featNew.total})`;
+    const name = n => FEATS.find(f => f.id === n).name;
+    check('S-66b Feats: a feat done toasts "Feat: <name> (1 / 4)" + one note once; none again, after a mode switch or a reload; one check per notify, not per frame (B-115); the next reads 2 / 4',
+      quiet0 === 0 && !ev0 && t1 === `Feat: ${name('rifts')} (1 / 4)` && ev1 && n1 === 1 && again === 0 && !afterSwitch && stale === false && !reload && t2 === `${name('kinds')} (2 / 4)` && notes === 2,
+      JSON.stringify({ quiet0, t1, ev1, n1, again, afterSwitch, stale, reload, t2, notes }));
+    // an Overdrive level bought finishes `over` (256): the buy runs the check itself
+    const b = new Game({ seed: 4242, mode: 'drift', audio, size: 256 }), u = UPGRADES[0], over = Math.max(...UPGRADES.map(x => x.over));
+    b.upgrades[u.id] = u.max + over - 1; b.featsSeen = new Set(); b.canAfford = () => true; notes = 0; b.buy(u.id);
+    check('S-66b Feats: buying the last Overdrive level toasts Overdrive at once', b.events.includes('feat') && b.featNew && b.featNew.name === name('over') && notes === 1, JSON.stringify(b.featNew));
+    // the ending card's numbers: Feats n / N
+    const { endingSummary } = await import('../src/ending.js'); const e = endingSummary(g), e2 = endingSummary(make(256));
+    check('S-66b Feats: the ending summary carries feats 2 / 4 (160), 0 / 6 (fresh 256)', e.feats === 2 && e.featN === 4 && e2.feats === 0 && e2.featN === 6, JSON.stringify([e.feats, e.featN, e2.feats, e2.featN]));
+  }
 }
 
 async function browserChecks(browser, url, check, errors, shot) {
@@ -104,6 +129,14 @@ async function browserChecks(browser, url, check, errors, shot) {
   await pg.evaluate(() => document.documentElement.style.setProperty('--ts', '1.2')); await pg.waitForTimeout(150);
   const b = await read();
   check('S-66a Feats: 320 × 568 at Large text, no sideways overflow', !!b && b.n === 6 && b.wide, JSON.stringify(b));
+  // S-66b: the toast in the page: forget Rift runner as seen, then a rift-close event (no toast of its own) finds it again
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
+  const t = await pg.evaluate(async () => { const g = window.__lumen.game, { checkFeats } = await import('/src/feats.js');
+    const quiet = checkFeats(g) === 2; g.events.length = 0; g.featsSeen = new Set(['kinds']); g.notify('rift-close'); return quiet; });
+  await pg.waitForTimeout(400);
+  const tt = await pg.evaluate(() => document.getElementById('toast').textContent);
+  check('S-66b Feats: the page toasts "Feat: Rift runner (2 / 6)"', /Feat: Rift runner \(2 \/ 6\)/.test(tt), JSON.stringify({ tt, t }));
+  if (shot) await pg.screenshot({ path: shot.replace(/\.png$/, '-toast.png') });
   await pg.close();
 }
 

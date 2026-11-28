@@ -56,3 +56,14 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
   (FAIL 740/741). Now it finds the step adding `craft.decoy` (lens.cjs's way). Second time: a ban check is debt (`04-…-4`).
 - New `feats.cjs` (9 checks) fails on the old code (no `feats.js`).
 - Smoke 741/741.
+
+## Session 176 — Build: S-66b Feats toast + ending row (v1.12.117, D-217)
+- `checkFeats` on the feat events + `buy()`; unsaved `featsSeen` filled at load; `audio.feat()`; ending "Feats n / N".
+- Observed: a `deposited` event pushed by a page test also toasts "Deposited" first, so the browser check uses
+  `rift-close` (no toast of its own). Screenshot 360 × 640: "Feat: Rift runner (2 / 6)" over the Nexus, one line.
+- New checks: `feats.cjs` +4 (toast once / reload / mode switch, Overdrive buy, summary, page toast), `ending.cjs`
+  Feats row after Bosses (fits 568 × 320, no scroll), `audio.cjs` feat note ceiling. They fail on the old code (no `checkFeats`).
+- **B-115 (fixed before merge):** the first cut checked when the frame's `events` held a feat event; bots never clear
+  `events`, so one deposit made every later frame scan 65 k cells (`echobot --orders` stalled > 18 min). Now `notify()`
+  sets `featDue` and the update runs one check per notify; `feats.cjs` asserts it.
+- Smoke 746/746.

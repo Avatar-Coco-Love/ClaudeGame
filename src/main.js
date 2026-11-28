@@ -236,6 +236,7 @@ function updateHud() {
     if (ev === 'deposited') { toast('Deposited'); persist(); if (panelOpen) renderPanel(); } // B-025: buy buttons follow the new bank
     if (ev === 'ring') toast(`Entering the ${g.ringName()}`, 2600, KEEP);
     if (ev === 'cache') toast('Vault cache opened', 2600, KEEP);
+    if (ev === 'feat' && g.featNew) toast(`Feat: ${g.featNew.name} (${g.featNew.done} / ${g.featNew.total})`, 3200, KEEP); // S-66b
     if (ev === 'boss') { toast(`The ${g.bossDown} is down`, 3200, KEEP); persist(); } // S-60a
     if (ev === 'spire') { toast(`A dormant Spire (${g.spireCount}/${g.spires.length})`, 3200, KEEP); persist(); } // S-27
     if (ev === 'spire-primed') { if (!g.wake) toast('Spire primed', 3200, KEEP); persist(); } // S-20; B-052: a Wake's own toast says it
@@ -449,7 +450,7 @@ function openEnding() {
   const e = endingSummary(game), row = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
   $('ending-stats').innerHTML = row('Time to light them all', e.time) + row('Cells mined', e.mined) +
     row('Spires relit in Drift', e.drift) + row('Spires relit in Surge', e.surge) + (e.restored ? row('Spires restored', e.restored) : '') +
-    row('Glitches cleared', e.glitches) + (e.bosses !== null ? row('Bosses', `${e.bosses} / ${e.bossN}`) : '') + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
+    row('Glitches cleared', e.glitches) + (e.bosses !== null ? row('Bosses', `${e.bosses} / ${e.bossN}`) : '') + row('Feats', `${e.feats} / ${e.featN}`) + (e.cycle >= 1 && Number.isFinite(e.best) ? row(`Best of ${e.cycle + 1} cycles`, fmtTime(e.best)) : '');
   closePanel(); endingOpen = true; $('hint').classList.add('hidden'); $('ending').classList.remove('hidden'); $('ending-continue').focus(); // B-054: no hint under the card (B-008)
 }
 function closeEnding() { endingOpen = false; $('ending').classList.add('hidden'); input.pressed.clear(); }

@@ -3,6 +3,7 @@
 // an ENDING_FADE_S fade with no lines or pull-out. Then the summary card (main.js). `game.ended` is saved, so a reload
 // skips the sequence and keeps the lifted dark; `game.endSeq` ({ t }) is not.
 import { CELL, ENDING_S, ENDING_FADE_S, ENDING_LINE_SHARE, ENDING_MARGIN_CELLS, DARK_ALPHA, SPIRE_MARK_COLOR } from './config.js';
+import { feats } from './feats.js';
 
 
 /** Called when a Spire relights: the last one ends the world (once). */
@@ -112,8 +113,9 @@ export const fmtTime = t => `${Math.floor(t / 60)}m ${String(Math.floor(t % 60))
 
 /** The summary card's numbers (all from saved state, so the card reads the same after a reload). */
 export function endingSummary(game) {
-  const by = m => game.spires.filter(s => s.lit && s.mode === m).length, t = game.endedAt ?? game.stats.time;
+  const by = m => game.spires.filter(s => s.lit && s.mode === m).length, fs = feats(game), t = game.endedAt ?? game.stats.time;
   return { time: fmtTime(t), cycle: game.cycle, best: game.records.best, mined: game.stats.mined,
     drift: by('drift'), surge: by('surge'), restored: by('broken'), glitches: game.stats.glitches, n: game.spires.length,
-    bosses: game.bosses && game.bosses.list.length ? game.bosses.list.filter(B => B.down).length : null, bossN: game.bosses ? game.bosses.list.length : 0 }; // S-62: 256 worlds only (D-158: not required)
+    bosses: game.bosses && game.bosses.list.length ? game.bosses.list.filter(B => B.down).length : null, bossN: game.bosses ? game.bosses.list.length : 0,
+    feats: fs.filter(f => f.done).length, featN: fs.length }; // S-66b: after Bosses // S-62: 256 worlds only (D-158: not required)
 }

@@ -77,9 +77,9 @@ async function browserChecks(browser, url, check, errors, shots) {
         cycle: document.getElementById('ending-cycle').disabled, time0: g.stats.time,
         hint: !document.getElementById('hint').classList.contains('hidden'), scroll: document.querySelector('#ending .sheet').scrollHeight - document.querySelector('#ending .sheet').clientHeight }; });
     if (shots) await page.screenshot({ path: `${shots}/ending-card-${vw}x${vh}.png` });
-    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches, Bosses 0 / 2), New Cycle is live, no hint under it, no scroll (S-24, S-29, B-054)`,
+    check(`${vw}×${vh}: a ${touch ? 'tap' : 'key'} skips to the card: it fits, shows the stats (5 Drift, 50 mined, 3 Glitches, Bosses 0 / 2, then Feats 0 / 6), New Cycle is live, no hint under it, no scroll (S-24, S-29, B-054)`,
       !card.seq && card.open && !card.matrix && card.l >= 0 && card.r <= vw && card.t >= 0 && card.b <= vh && !card.ov && !card.cycle && !card.hint /* B-054 */ && card.scroll <= 0
-      && /Spires relit in Drift5/.test(card.text) && /Cells mined50/.test(card.text) && /Glitches cleared3/.test(card.text) && /Bosses0 \/ 2/.test(card.text) /* S-62: a 256 world */, JSON.stringify(card));
+      && /Spires relit in Drift5/.test(card.text) && /Cells mined50/.test(card.text) && /Glitches cleared3/.test(card.text) && /Bosses0 \/ 2Feats0 \/ 6/.test(card.text) /* S-62: a 256 world; S-66b: Feats after Bosses */, JSON.stringify(card));
     if (touch) await page.tap('#ending-continue'); else await page.click('#ending-continue');
     await page.waitForTimeout(500);
     const after = await page.evaluate(t0 => { const g = window.__lumen.game; return { open: !document.getElementById('ending').classList.contains('hidden'), moved: g.stats.time > t0 }; }, card.time0);
