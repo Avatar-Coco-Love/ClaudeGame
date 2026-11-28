@@ -14,3 +14,4 @@ Continues part 24 (`09-Implementation-Log-24.md`, near the 8 KB cap). Newest at 
 - Proved the no-touch checks fail on the old touch rule (stashed the `!e.lure`). A test stub Decoy without `hold: null`
   is spent on the first frame (NaN clock); stubs now carry it.
 - Screenshot (360 × 640, Nexus tab): the Lure row sits under Lens, ▲30, fits; viewed.
+- Smoke 750/750.
