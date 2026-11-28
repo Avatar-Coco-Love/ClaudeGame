@@ -43,6 +43,20 @@ placed, stock 0; `saveformat.cjs`, never pin the number).
 - Bounds (D-213): hold ≤ 6 s, `DECOY_R` ≤ 8, cost ≥ ▲2 ◆10. If no setting inside them passes, ship the measure as a
   report row (not a gate), log the gap in `09` and split the fix into S-77b2 (no new lure rules in this PR).
 
-## S-77b2 — the Decoy's fix (split by D-214; spec in Design 177, Q-045)
-- Built 173: the measure fails inside the bounds (price ~3× the hunter cost it cuts). This slice picks one fix from
-  Q-045, measures it with `huntrun --decoy`, and turns `tracer.cjs`'s S-77b report row into the gate above.
+## S-77b2 — the Decoy's fix: it holds without touching, from a Nexus level (Q-045, D-218)
+**Save:** `nexusLevels.lure` → the next format (28 today; upgrade step: 1 if the save holds a Decoy stock or a placed
+Decoy, else 0, so no player loses one; `saveformat.cjs`, never pin the number).
+- `hunter.js`: the touch test skips a hunter with `e.lure` set (steering at or circling a Decoy), Drift and Surge.
+- `config.js` `NEXUS_UPGRADES` gains `{ id: 'lure', name: 'Lure', desc: 'A Decoy stock, refilled at every deposit',
+  max: 1, cost ▲ 30 }` (all sizes). With Lure built, the end of every deposit (`deposited`, Nexus or Relay) sets
+  `craft.decoy` to min(`DECOY_STOCK`, `DECOY_MAX` − placed). The Craft tab's Decoy row and `craftDecoy` go (one
+  layer makes it); B / ✦ placing and pick-up stay. S-65's rings: Lure adds a hexagon in `DECOY_RGB`.
+- `huntrun.mjs --decoy`: no per-use price (`spent` 0; print the one-time ▲ 30 once); drop Design 177's measure flags
+  (`--cue` / `--price` / `--spend` / `--drop` / `--fixate`: the game does `--fixate` now). Expect saving ≈ 60 % each.
+- **Gate (PASS, `tracer.cjs`, replaces the S-77b report row):** pooled per mode, saving ≥ 25 %; Drift / Surge saving in
+  0.8–1.25; floor: pooled cost with Decoys > 0 in each mode (D-218 replaces the per-ring floor). If it fails, tune
+  `DECOY_HOLD_S` (≤ 6) then `DECOY_STOCK`; log tries in `09`.
+- Smoke (`decoy.cjs`): a Tracer circling a Decoy dropped on the core's cell takes nothing (Drift) and deals nothing
+  (Surge) for the hold, then touches as before; buying Lure fills the stock; a deposit refills it, capped by placed;
+  no Lure, no stock; the Craft tab has no Decoy row; old save with stock 2 loads Lure 1 + stock 2, with none Lure 0.
+  One screenshot: Nexus tab with the Lure row (360 × 640), viewed.

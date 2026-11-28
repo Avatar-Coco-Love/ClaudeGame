@@ -53,7 +53,7 @@ function run(seed, mode, rings, on, lens = null) { // lens: null (S-57a) | 'mine
   const got = {}; for (const k in banked) got[k] = banked[k] + (game.cargo[k] || 0);
   got.prism = (got.prism || 0) + spent; // gross: what was mined, before the Lens spent any
   const val = Object.entries(got).reduce((a, [k, n]) => a + (VALUE[k] || 0) * n, 0);
-  return { ...r, got, val, spent, prismNet: got.prism - spent, calls: spent / RIFT_CALL_COST, haul: worth(banked) + worth(game.cargo), rifts: game.rift.opened, mined: game.rift.mined + (game.rift.open ? game.rift.open.cells.filter(c => game.world.get(c.x, c.y) === T.EMPTY).length : 0) };
+  return { ...r, got, val, spent, prismNet: got.prism - spent, calls: spent / RIFT_CALL_COST, emptied: game.stats.rifts || 0, haul: worth(banked) + worth(game.cargo), rifts: game.rift.opened, mined: game.rift.mined + (game.rift.open ? game.rift.open.cells.filter(c => game.world.get(c.x, c.y) === T.EMPTY).length : 0) };
 }
 
 let all = true, verdict = seeds >= GATE_SEEDS;
@@ -61,17 +61,17 @@ if (CALL) {
   for (const name of arg('ring', 'deep,shoal,kiln').split(',')) {
     const rings = RINGS[name], ratios = {}; let ok = true;
     for (const mode of modes) {
-      const sum = { mine: { val: 0, net: 0, got: {} }, call: { val: 0, net: 0, got: {}, spent: 0, calls: 0 } };
+      const sum = { mine: { val: 0, net: 0, got: {} }, call: { val: 0, net: 0, got: {}, spent: 0, calls: 0, emptied: 0 } };
       for (let k = 1; k <= seeds; k++) for (const pol of ['mine', 'call']) {
         const x = run(k * 7919, mode, rings, false, pol), s = sum[pol];
         if (V) console.log(JSON.stringify({ ring: name, seed: k * 7919, mode, pol, val: x.val, prismNet: x.prismNet, calls: x.calls }));
         s.val += x.val; s.net += x.prismNet; for (const o in x.got) s.got[o] = (s.got[o] || 0) + x.got[o];
-        if (pol === 'call') { s.spent += x.spent; s.calls += x.calls; }
+        if (pol === 'call') { s.spent += x.spent; s.calls += x.calls; s.emptied += x.emptied; }
       }
       ratios[mode] = sum.call.val / Math.max(1e-9, sum.mine.val);
       const dPrism = (sum.call.net - sum.mine.net) / seeds, per = o => Object.entries(o).map(([k, n]) => `${k} ${(n / seeds / minutes).toFixed(1)}`).join(' ');
       ok = ok && ratios[mode] <= 1.25 && dPrism < 0;
-      console.log(`${name} ${mode}: call/mine value ${ratios[mode].toFixed(3)}, ▲ call−mine ${dPrism.toFixed(1)}/run, ▲ spent ${(sum.call.spent / seeds).toFixed(0)}/run (${(sum.call.calls / seeds).toFixed(1)} calls); /min mine [${per(sum.mine.got)}] call [${per(sum.call.got)}]`);
+      console.log(`${name} ${mode}: call/mine value ${ratios[mode].toFixed(3)}, ▲ call−mine ${dPrism.toFixed(1)}/run, ▲ spent ${(sum.call.spent / seeds).toFixed(0)}/run (${(sum.call.calls / seeds).toFixed(1)} calls, ${(sum.call.emptied / seeds).toFixed(1)} pockets emptied: S-67's Rift runner); /min mine [${per(sum.mine.got)}] call [${per(sum.call.got)}]`);
     }
     if (ratios.drift !== undefined && ratios.surge !== undefined) {
       const q = ratios.drift / ratios.surge; ok = ok && q >= 0.8 && q <= 1.25; all = all && ok;

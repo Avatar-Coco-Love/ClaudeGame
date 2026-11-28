@@ -1,7 +1,7 @@
 # 03 — Open Questions
 
 Undecided only. Once a question is settled, remove it here and record the answer as a D-xxx entry in `06-Decisions.md` (cite the Q number).
-New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169, Q-032 / Q-035 / Q-036 by D-180, Q-022 by D-181, Q-039 by D-186, Q-040 by D-189, Q-043 by D-202, Q-041 / Q-042 by D-208.
+New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win state) and Q-004 (multiplayer) were settled by D-045; Q-011 by D-054, Q-012 by D-055, Q-013 by D-062, Q-014 by D-061, Q-015 by D-069, Q-016 by D-079, Q-017 by D-087, Q-018 by D-092, Q-019 by D-098, Q-021 and Q-024 by D-114, Q-027 by D-129, Q-030 by D-147, Q-026 by D-158, Q-033 by D-169, Q-032 / Q-035 / Q-036 by D-180, Q-022 by D-181, Q-039 by D-186, Q-040 by D-189, Q-043 by D-202, Q-041 / Q-042 by D-208, Q-045 by D-218.
 
 | ID | Question | Notes |
 |----|----------|-------|
@@ -16,4 +16,4 @@ New IDs continue from the highest one ever used; never reuse an ID. Q-003 (win s
 | Q-031 | Should a rift (S-57) also show on the Scanner ring or the Chart before it opens (a warning a few seconds ahead)? | Design 117. Leaning **no**: the toast + chevron at open is enough for a 45 s window; revisit if S-57a's bot rarely reaches one in time. |
 | Q-037 | Should a feat's rule show before it is near (e.g. Rift runner 0 / 5 from the start), or only once begun? | Design 142 (D-180). Leaning **show all**: a goal you can't see is not a goal; revisit if the S-66 screenshot reads as a chore list. |
 | Q-038 | Should Glitches follow the S-72 flow field too, instead of beelining and fading (D-017)? | Session 143 (D-182). Leaning **no**: the beeline is the tunnels' safety and the contrast that makes hunters read as smart. Ask in the play-test after S-74. |
-| Q-045 | S-77b2: what makes the Decoy worth its price (D-214)? A cue only when a hunter has a line to the core ≤ `DECOY_R` (fewer, better-timed drops), a Decoy that holds every hunter in sight for one price, or Decoy stock as a Nexus level (no per-use price)? | Build 173. Leaning **the cue + one price holds all**: the bot spends a Decoy per hunter, many never heading in; measure each in `huntrun --decoy` before choosing. Design 177. |
+| Q-046 | The hunters' cost gate (D-206) passes on its 8 seeds but not on 16 (Design 177: Drift / Surge pooled 0.628, Drift 9.4 % / Surge 14.9 %). Gate on more seeds, or accept 8 as the definition (B-092)? | Design 177. Leaning **keep 8** (B-092 defines verdicts there; smoke time); re-measure on 16 at the next audit and retune if the gap holds. |

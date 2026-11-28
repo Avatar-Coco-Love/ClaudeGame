@@ -1,7 +1,7 @@
 # 02 — Current Status & Next Step
 
-_Last updated: 2026-11-28_ · **Session counter: 176** · **Version: v1.12.117**
-**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189; v1.12 = M17 Hunters, `07-…-20`, D-193…D-206). Next (D-181, `04-…-5`): M18 Feats (`07-…-18`, S-66a/b built), S-77b2 Decoy fix (Q-045, D-214; spec Design 177). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
+_Last updated: 2026-11-28_ · **Session counter: 177** · **Version: v1.12.118**
+**Scope (D-119, `01`):** M1–M15 ✅ (v1.0 = M5 … v1.9 = M14 bosses, v1.10 = M15 Lens + rings, D-175…D-179; v1.11 = M16 Echo minds, D-184…D-189; v1.12 = M17 Hunters, `07-…-20`, D-193…D-206). Next (D-181, `04-…-5`): S-77b2 Decoy fix (D-218, `07-…-22`), then M18 Feats S-67 / S-68 (`07-…-18`, D-219). Patch = PRs since 1.0.0 (D-105). Audit 159: 02 capped at 7 KB (D-199); move detail to `08-…-2` before it grows.
 
 ## What's real right now
 - Static web game (vanilla JS modules, no build), deployed from `main` via GitHub Pages. Share image `og.png` (D-044).
@@ -31,9 +31,9 @@ _Last updated: 2026-11-28_ · **Session counter: 176** · **Version: v1.12.117**
 - Darkness/light, minimap (D-123; tap / N: map, D-191; legend of the kinds drawn, S-76, D-211, `maplegend.js`), Nexus pointer, toasts, audio ceilings. `08`.
 - Desktop (WASD + mouse), touch (twin sticks; a lifted stick adopts another finger). Touch: the actions sit on a thumb arc round the bottom-right corner (S-75, D-209, `thumbarc.js`), round the safe-area corner (B-112, D-210). Phones: no key badges, buttons ≥ 44 px, landscape ◎⟂♪≡ top row, glyph-only ◎ ⟂ ≤ 700 px (D-050, D-058, D-064); bank wraps 3 + 2 (D-137).
 - Autosave to localStorage (world, economy, placed things, progress; `save.js`) every 10 s, on deposit, and on page hide. Format number (now 27), old formats upgraded on load; malformed fields load empty (B-037); no seed / unreadable map = no save (B-066); tests never pin the number (`saveformat.cjs`).
-- History: `05` changelog, `06` decisions (D-xxx, part 32 from D-212; last D-217), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-24`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
+- History: `05` changelog, `06` decisions (D-xxx, part 33 from D-218; last D-219), `03` questions (Q-xxx), `08` + `08-…-2` system detail, `09` log (tail: `09-…-24`), `08` per-system detail. Bare "continue" = 3 orchestrated PRs, `10` (D-136).
 - Seeded per draw (`game.rng.*`, D-025). Dev tools (S-7) `window.__lumen.dev.*` (`?dev`); one test server `tests/serve.cjs` (D-133); M2 rules (D-022…D-024); bots in `tools/`. Detail: `08`.
-- Specs (1 PR each, D-063): S-1…S-65, S-69…S-76, S-77a/b, S-66a/b built (M17 done). Next: S-67, S-68 (M18), S-77b2 (`07-…-22`, Q-045). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
+- Specs (1 PR each, D-063): S-1…S-65, S-69…S-76, S-77a/b, S-66a/b built (M17 done). Next: S-77b2 (`07-…-22`, D-218), S-67, S-68 (M18). Code: Glitches `glitch.js`, HUD `hud.js`, grid `body.js` (D-053), light `light.js`, chunk paint `terrain.js` (pre-scaled to the screen, D-116); a blurred 'lighter' draw is clipped (`R.glowPad`, D-149); no file > 600 lines (`docs.cjs`).
 
 ## Verified / Health
 - `node tests/smoke.cjs`: all passing, ~500 s (gates beside it, TIME lines; D-166). Perf: `tools/perf.cjs` (`VP=phone`, D-160; `pack` = hunters + a Pincer pair, 1.00× of `deep`, audit 159).
@@ -41,4 +41,4 @@ _Last updated: 2026-11-28_ · **Session counter: 176** · **Version: v1.12.117**
   Swallowed test waits: `node -r ./tools/waitprobe.cjs`.
 
 ## Next step (one thing)
-Design 177: settle Q-045 (measure the Decoy options in `huntrun --decoy`) and write the S-77b2 spec; refresh S-67 / S-68 (`07-…-18`). S-66b shipped (D-217).
+Build 178: S-77b2 (`07-…-22`, D-218): a held hunter never touches; Decoys from the Lure Nexus level (format 28); the Decoy gate on in `tracer.cjs`.

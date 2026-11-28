@@ -67,3 +67,17 @@ Continues part 23 (`09-Implementation-Log-23.md`). Newest at the bottom; read th
   `events`, so one deposit made every later frame scan 65 k cells (`echobot --orders` stalled > 18 min). Now `notify()`
   sets `featDue` and the update runs one check per notify; `feats.cjs` asserts it.
 - Smoke 746/746.
+
+## Session 177 — Design: Q-045 settled, S-77b2 spec, S-67 / S-68 refreshed (v1.12.118, D-218, D-219)
+- `huntrun --decoy` gains measure flags (`--cue`, `--price`, `--spend`, `--drop`, `--fixate`; default output unchanged,
+  checked against D-214's rows). Saving Drift / Surge at 8 seeds (16), all with `--price=level` unless noted:
+  seen −421/−596 % per-use price; seen 49/18 (–); line 32/41 (22/52); one 38/34 (2/45); throw 50/26 (32/51);
+  fade 45/72 (23/61); **fixate 62/57 (59/56), ratio 1.09 (1.06)**, floor fails Deep only (−0.5 … −1.1 %);
+  fixate + stock 1 19/50 (3/54); fixate + hold 3 54/70 (50/78). Every per-use price: −377 … −684 %.
+- Play-test (Playwright, 1000 × 700, Drift, core on its own Decoy, a Tracer 4 cells off): it steered at the Decoy
+  under the core and snatched 35 ◆-eq ("A Tracer snatched…" toast) before any hold started. Screenshot viewed: the ◈ is
+  hidden under the core. So the lure aims hunters at you when you drop it at your feet: S-77b2's no-touch rule (D-218).
+- `eventrun --call` prints pockets emptied: 1.6–2.4 per 10 min a ring; `FEAT_RIFTS` 5 ≈ 21–31 min (D-219).
+- Observed: the hunters' cost gate fails on 16 seeds (pooled Drift / Surge 0.628; 8 seeds pass) → Q-046.
+- Specs: S-77b2 (`07-…-22`), S-67 split into a rifts check + chart route, S-68 tied to `nexusRings` (`07-…-18`).
+- Smoke 746/746.

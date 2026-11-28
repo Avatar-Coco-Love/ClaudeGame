@@ -1,6 +1,6 @@
-# 07 — Build Specs, part 18: M16 Feats — the world remembers (D-180)
+# 07 — Build Specs, part 18: M18 Feats — the world remembers (D-180)
 
-Plan in D-180 (Design 142). **Renumbered M18 (→ v1.13) by D-181**: the owner's Echo / hunter ask goes first. One slice per PR (D-063), each usable end to end (D-139). VERSION: M16 → 1.11.
+Plan in D-180 (Design 142). **Renumbered M18 (→ v1.13) by D-181.** One slice per PR (D-063), each usable end to end (D-139).
 **Why:** after M15 a maxed late player has calls to spend ▲ on, but nothing says what is left to *do* in this world
 (Q-032's "out of goals", Q-035). Feats are a short fixed list of world goals that pay nothing: no layer unlocks
 anything twice, no mode earns more. At most **6** (one per vertex of the Nexus hexagon, S-68); the list never grows
@@ -18,42 +18,32 @@ without a design D-xxx.
 A 160 world has 4 (`profile.overdrive` / bosses decide it). Every feat is the same in Drift and Surge (one face, D-152;
 bosses have their two forms, D-158). A feat never unlocks, pays or speeds anything (pillar 4, D-009's layers untouched).
 
-## S-66a — Feats: derive, count, list (M18; split by Design 167, D-207)
-**Save:** `stats.kinds` (0) and `stats.rifts` (0) → the next format (26 today: S-70 took 25; upgrade step both 0,
-`saveformat.cjs`, never pin the number). Everything else is derived from saved state, so a feat can't desync.
-- `src/feats.js`: `feats(game)` → `[{ id, name, rule, done, have, need }]` for this world's size (pure). Names in code
-  today: `game.bosses.list[i].down`, `game.topLevel(u)`, `game.stats` (saved whole), `rift.js` `closeRift`.
-- `anomaly.js` take sets `stats.kinds |= bit(kind)`; `closeRift` adds 1 to `stats.rifts` when every cell of *that*
-  pocket was mined (count this close's cells; the tools' `r.mined` is a running total and stays).
-- Nexus tab, below the rows: a **Feats n / N** heading and one line per feat (✓ done, else ·; no Anomaly chip glyph,
-  D-177; name, rule, progress like "Charted 21 % / 35 %", "Rift runner 2 / 5"). Text only; all six from the start
-  (Q-037's leaning). Readable at 320 × 568 Large text (the sheet scrolls; the rows above show unscrolled at 360 × 640).
-- Smoke: each rule on a stubbed game (both sizes; a 160 world lists 4); kinds / rifts counters (8 of 9 mined does
-  not count); Drift = Surge for every feat; old save loads 0 / 0. One screenshot (Nexus tab, 360 × 640, two lit).
+## S-66a / S-66b — built (Build 175 / 176, D-216 / D-217)
+`feats.js` `feats(game)` + Nexus tab list (`stats.kinds` / `stats.rifts`, format 27); `checkFeats` toast + note once, ending row.
 
-## S-66b — Feats: the moment and the ending (M18)
-**Save:** none. `checkFeats(game)` runs on deposit, cache break, boss down, Anomaly take, rift close, upgrade; a feat
-newly done toasts "Feat: Quiet lairs (2 / 4)" and plays the deposit arpeggio's top note once. `game.featsSeen`
-(unsaved) is filled on load, so a reload never re-toasts. Ending card: "Feats n / N" after "Bosses".
-- Smoke: toast once, none after a reload or a mode switch; the ending row; audio: the note under the ceiling.
-
-## S-67 — Feats probe: each one reachable, none trivial (M16)
+## S-67 — Feats probe: each one reachable, none trivial (M18; refreshed Design 177, D-219)
 **Save:** none.
-- `tools/featrun.mjs`: a bot route that visits every Spire, vault and lair once (spirefind / vaultfind sites, max build,
-  `god`), 8 seeds (`GATE_SEEDS`), both sizes, both modes; it reports the explored share at the end and on the bare
-  Spire route (Spires only), and per-ring rift empties per 10 min of call-on-cooldown (`eventrun --call`'s bot).
+- **Rifts, measured Design 177:** `eventrun --call` now prints "pockets emptied" (`stats.rifts`, 16 seeds × 10 min):
+  Drift / Surge Deep 1.7 / 2.4, Shoal 1.7 / 1.6, Kiln 2.0 / 2.3 a run → `FEAT_RIFTS` 5 takes 21–31 min (≥ 15 ✓, keep 5).
+  Pooled Drift / Surge 5.4 / 6.3 = 0.86 (in band; Deep alone 0.71, so the gate is pooled, D-202's way). S-67 turns it
+  into a check in `lens.cjs` (same run, no new gate time): pooled ratio 0.8–1.25 and every ring ≥ 1 pocket a run.
+- **Chart:** `tools/featrun.mjs`: the core flies to every vault, Spire and lair once, nearest first (`moveBody` +
+  `world.raycast`, mining what blocks it; max build, `god`), 8 seeds (`GATE_SEEDS`), both sizes, one mode (explored
+  share is mode-free: no Glitch reveals cells); it reports the explored share at the end and on the bare Spire-only route.
 - **Tune** (log each try in `09`): `FEAT_CHART` = the bare route's median share × 1.3, rounded to 5 %, and below the
-  full route's lowest seed; `FEAT_RIFTS` so the call bot needs ≥ 15 min. **Gate (PASS):** Drift / Surge time to the
-  `rifts` feat in 0.8–1.25 (D-158's band); the full route reaches `chart` on every seed. Gate in `gates.cjs` (D-166).
+  full route's lowest seed. **Gate (PASS):** the full route reaches `chart` on every seed, the bare route on none.
+  Gate in `gates.cjs` (D-166), its TIME line under 60 s.
 
-## S-68 — The Nexus wears its feats (M16)
+## S-68 — The Nexus wears its feats (M18)
 **Save:** none (drawn from `feats(game)`).
-- The outermost Nexus ring (`nexusview.js`; the deposit hexagon when no structure is built) lights one vertex per feat
+- The outermost Nexus ring (`nexusview.js` `nexusRings`, the last one; with none built, a hexagon of radius
+  `NEXUS_RING_BASE`, drawn only for its dots) lights one vertex per feat
   done: a 3 px dot, white at alpha 0.9, unblurred (D-160), vertex order = `FEATS` order (a 160 world uses 4 of 6:
   `vaults kinds chart rifts` at the vertices 1, 2, 4, 5, leaving the 256-only pair dark slots never drawn).
-- A new feat flashes its vertex (reuse `nexusFlash`'s 0.5 s, off with reduced motion).
+- A new feat (`featNew`, S-66b) flashes its vertex (reuse `nexusFlash`'s 0.5 s, off with reduced motion). The dots
+  turn with their ring (its `t * 0.06` spin), so they sit on the stroke's corners.
 - Smoke: dots = feats done (0 → 6), positions on the outer ring's vertices, no shadowBlur in the new draw, the flash
-  skipped with reduced motion. One screenshot (all six). **M16 done** after S-68 if S-67 passed.
+  skipped with reduced motion. One screenshot (all six). **M18 done** after S-68 if S-67 passed (→ v1.13).
 
 ## Cut (D-180)
 A feats screen of its own (tab), per-mode feats (pillar 2), feats that pay (Q-001: no exclusive rewards), cross-cycle

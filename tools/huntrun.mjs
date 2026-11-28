@@ -12,9 +12,15 @@
 // walking to place one) the first time each hunter is within DECOY_SEE cells, stock DECOY_STOCK refilled at each deposit,
 // each Decoy's ◆-eq cost (DECOY_COST) taken off its haul (after hull debt). Gate: pooled per mode, the hunter cost with
 // Decoys is ≥ 25 % below today's; Drift / Surge saving in 0.8–1.25 (D-158); no ring's cost with Decoys below 0.
+// Design 177 (Q-045) measure options: --cue=seen (above, default) | line (only a hunter ≤ DECOY_R cells with a clear line
+// to the core cues one) | one (no new Decoy while a placed one is ≤ DECOY_R cells of the core); --price=use (default) |
+// level (stock from a Nexus level: no per-use price, the bot's stock still refills at each deposit); --spend=back (default:
+// a spent Decoy's hunters go back to the field) | fade (they give up, D-017's fade; the tool sets it, a measure only);
+// --drop=self (default: on the core's cell) | throw (on the farthest open cell ≤ THROW cells toward the nearest cue, in
+// line of the core); --fixate: a hunter a Decoy holds never touches the core (the tool holds its hit cooldown).
 // Usage: node tools/huntrun.mjs [--rings=deep,shoal,kiln] [--seeds=8] [--minutes=10] [--mode=drift,surge] [--build=mid|max|start] [--glitches=on] [--no-echo] [--decoy] [--v]
 import { runBot, RETREAT } from './surgebot.mjs';
-import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, GLITCH_R, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, TRACER_SPEED, DECOY_COST, DECOY_STOCK, DECOY_MAX } from '../src/config.js';
+import { CELL, T, KILN_RING, UNDERTOW_RING, ORE_KIND, GLITCH_R, GLITCH_PROGRESS_PX, GLITCH_GIVE_UP_S, GLITCH_FADE_S, TRACER_SPEED, DECOY_COST, DECOY_STOCK, DECOY_MAX, DECOY_R } from '../src/config.js';
 import { tryPlace, placeRefusal, relayAt } from '../src/craft.js';
 import { sinkAt } from '../src/heatsink.js';
 import { wardAt } from '../src/ward.js';
@@ -29,6 +35,7 @@ const RINGS = { deep: { ring: 2, ore: ['shard', 'prism', 'lumen'] }, shoal: { ri
 const rings = arg('rings', 'deep,shoal,kiln').split(','), seeds = Number(arg('seeds', GATE_SEEDS)), minutes = Number(arg('minutes', 10));
 const modes = arg('mode', 'drift,surge').split(','), BUILD = arg('build', 'mid'), V = process.argv.includes('--v');
 const DECOY = process.argv.includes('--decoy'), DECOY_SEE = 12; // S-77b: the Decoy run (see above)
+const CUE = arg('cue', 'seen'), PRICE = arg('price', 'use'), SPEND = arg('spend', 'back'), DROP = arg('drop', 'self'), FIXATE = process.argv.includes('--fixate'), THROW = 4; // Design 177 (Q-045): the options measured
 const ECHO = !process.argv.includes('--no-echo'); // S-74b: the Auto Echo row (report); --no-echo skips it
 const GLITCHES = arg('glitches', 'off') === 'on'; // S-74b (D-201): Surge's Glitches off by default, so the gap is the hunters'
 const WEIGHT = { shard: 1, prism: 4, lumen: 4, tide: 12, calx: 12 };
@@ -51,7 +58,7 @@ export function ghostReaches(world, x, y, speed, core) {
 
 function run(seed, mode, ringKey, hunters, echo = false, decoy = false) {
   const R = RINGS[ringKey], ore = new Set(R.ore); let game = null;
-  const cued = new Set(); let used = 0, lured = 0, banked1 = 0;
+  const cued = new Set(), held = new Map(); let used = 0, lured = 0, banked1 = 0;
   const seen = new Set(), spawns = []; let ticks = 0, defend = 0;
   const setup = g => {
     game = g; const w = g.world;
@@ -78,11 +85,28 @@ function run(seed, mode, ringKey, hunters, echo = false, decoy = false) {
     const p = g.player, b = worth(g.bank);
     if (b > banked1) g.craft.decoy = Math.max(g.craft.decoy, Math.min(DECOY_STOCK, DECOY_MAX - g.decoys.length)); // a deposit
     banked1 = b;
-    for (const e of g.hunters) if (e.lure && g.decoys.includes(e.lure)) lured += 1 / 60;
-    const near = g.hunters.filter(e => !cued.has(e) && Math.hypot(e.x - p.x, e.y - p.y) <= DECOY_SEE * CELL);
-    if (!near.length || g.craft.decoy < 1 || relayAt(g) || sinkAt(g) || wardAt(g) || decoyAt(g) || placeRefusal(g, 'decoy')) return;
-    g.craft.last = 'decoy';
-    if (tryPlace(g)) { used++; for (const e of near) cued.add(e); }
+    for (const e of g.hunters) if (e.lure && g.decoys.includes(e.lure)) { lured += 1 / 60; held.set(e, e.lure); if (FIXATE) e.hitCd = Math.max(e.hitCd, 0.05); }
+    for (const [e, s] of held) if (!g.decoys.includes(s)) { // spent: Design 177's --spend=fade measure
+      held.delete(e);
+      if (SPEND === 'fade' && g.hunters.includes(e) && e.fade === undefined && !e.lure) { e.fade = GLITCH_FADE_S; g.hunt.gaveUp++; }
+    }
+    const sees = e => { const dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy); return d <= DECOY_R * CELL && !(d > 0.01 && g.world.raycast(e.x, e.y, dx / d, dy / d, d)); };
+    const near = g.hunters.filter(e => !cued.has(e) && (CUE === 'seen' || (!e.lure && !(e.flee > 0))) && (CUE === 'line' ? sees(e) : Math.hypot(e.x - p.x, e.y - p.y) <= DECOY_SEE * CELL));
+    if (CUE === 'one' && g.decoys.some(s => Math.hypot(s.x - p.x, s.y - p.y) <= DECOY_R * CELL)) return;
+    if (!near.length || g.craft.decoy < 1) return;
+    const x0 = p.x, y0 = p.y;
+    if (DROP === 'throw') { // as if tossed ahead: the farthest open cell toward the nearest cue the core can see
+      const e = near.reduce((a, b) => Math.hypot(a.x - x0, a.y - y0) <= Math.hypot(b.x - x0, b.y - y0) ? a : b);
+      const d = Math.hypot(e.x - x0, e.y - y0) || 1, ux = (e.x - x0) / d, uy = (e.y - y0) / d;
+      for (let k = Math.min(THROW, Math.floor(d / CELL)); k >= 1; k--) {
+        const x = x0 + ux * k * CELL, y = y0 + uy * k * CELL;
+        if (g.world.raycast(x0, y0, ux, uy, k * CELL) || g.world.get(Math.floor(x / CELL), Math.floor(y / CELL)) !== T.EMPTY) continue;
+        p.x = (Math.floor(x / CELL) + 0.5) * CELL; p.y = (Math.floor(y / CELL) + 0.5) * CELL; break;
+      }
+    }
+    const ok = !(relayAt(g) || sinkAt(g) || wardAt(g) || decoyAt(g) || placeRefusal(g, 'decoy')) && (g.craft.last = 'decoy') && tryPlace(g);
+    p.x = x0; p.y = y0;
+    if (ok) { used++; for (const e of near) cued.add(e); }
   };
   const onTick = g => {
     if (decoy) lure(g);
@@ -104,7 +128,7 @@ function run(seed, mode, ringKey, hunters, echo = false, decoy = false) {
   // Reach is judged on Tracers that met the core or gave up; one beamed down on its way says nothing about its path.
   const tr = spawns.filter(s => s.ghost !== null && (s.end === 'met' || s.end === 'stall' || s.end === 'off')), ends = {};
   for (const s of spawns) { const k = `${s.ghost === null ? 'pincer' : 'tracer'} ${s.end || 'alive'}`; ends[k] = (ends[k] || 0) + 1; }
-  return { ...r, haul: worth(banked) + worth(game.cargo), used, lured, spent: used * worth(DECOY_COST), hunt: { ...game.hunt }, ticks, defend, tracers: tr.length, met: tr.filter(s => s.end === 'met').length,
+  return { ...r, haul: worth(banked) + worth(game.cargo), used, lured, spent: PRICE === 'level' ? 0 : used * worth(DECOY_COST), hunt: { ...game.hunt }, ticks, defend, tracers: tr.length, met: tr.filter(s => s.end === 'met').length,
     ghost: tr.filter(s => s.ghost).length, blind: tr.filter(s => !s.ghost).length, blindMet: tr.filter(s => !s.ghost && s.end === 'met').length, ends };
 }
 
